@@ -1,0 +1,1548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>1.2 Energy Band Diagrams</title>
+  <meta name="description" content="Energy band diagrams from a single silicon atom to a full crystal: levels, bands, the band gap, and how electrons cross it. An interactive lesson.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1420;
+      --panel: #1a2132;
+      --panel-hover: #212a3f;
+      --border: #2a3448;
+      --text: #e6e9ef;
+      --muted: #9aa4b8;
+      --electron: #4fc3f7;
+      --hole: #ff8a65;
+      --energy: #ffd54f;
+      --success: #81c784;
+      --vb: #3949ab;
+      --cb: #00838f;
+      --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+      --max: 960px;
+      --radius: 12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: var(--font); font-size: 16px; line-height: 1.65;
+      overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column;
+    }
+    a { color: var(--electron); }
+    code, .mono { font-family: var(--mono); }
+    .wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 16px; }
+
+    /* Sticky mini-nav */
+    .toc {
+      position: sticky; top: 0; z-index: 10; background: rgba(15, 20, 32, .95);
+      border-bottom: 1px solid var(--border); backdrop-filter: blur(6px);
+    }
+    .toc ul { display: flex; gap: 4px; list-style: none; margin: 0 auto; padding: 8px 16px; max-width: var(--max); overflow-x: auto; scrollbar-width: none; }
+    .toc ul::-webkit-scrollbar { display: none; }
+    .toc a {
+      display: block; white-space: nowrap; text-decoration: none; color: var(--muted);
+      font-size: 0.85rem; font-weight: 500; padding: 6px 10px; border-radius: 999px;
+    }
+    .toc a:hover { color: var(--text); background: var(--panel); }
+    .toc a.active { color: var(--bg); background: var(--electron); }
+
+    main { flex: 1; padding: 24px 0 48px; }
+    .crumbs { font-size: 0.875rem; color: var(--muted); margin: 0 0 16px; }
+    .crumbs a { color: var(--muted); }
+    .crumbs a:hover { color: var(--electron); }
+    .eyebrow { font-family: var(--mono); font-size: 0.8rem; color: var(--electron); letter-spacing: .04em; margin: 0; }
+    h1 { font-size: clamp(1.5rem, 6vw, 2.2rem); line-height: 1.2; margin: 4px 0 6px; }
+    .subtitle { color: var(--muted); margin: 0 0 8px; }
+    section { scroll-margin-top: 64px; padding-top: 28px; }
+    h2 { font-size: clamp(1.3rem, 5vw, 1.6rem); line-height: 1.25; margin: 0 0 14px; }
+    h3 { font-size: 1.05rem; margin: 0 0 8px; }
+    .prose { max-width: 70ch; }
+    .prose p, .prose ul { margin: 0 0 14px; }
+    .prose ul { padding-left: 20px; }
+    .prose li { margin: 4px 0; }
+    .prose strong { color: #fff; }
+    .t-e { color: var(--electron); font-weight: 600; }
+    .t-h { color: var(--hole); font-weight: 600; }
+    .t-en { color: var(--energy); font-weight: 600; }
+    .t-vb { color: #8c9eff; font-weight: 600; }
+    .t-cb { color: #4dd0e1; font-weight: 600; }
+    hr.sep { border: 0; border-top: 1px solid var(--border); margin: 40px 0 0; }
+    .rm-note { font-size: 0.78rem; color: var(--muted); margin: 0 0 8px; }
+
+    /* Buttons & controls */
+    .btn {
+      font: inherit; font-size: 0.88rem; font-weight: 600; color: var(--text);
+      background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+      padding: 7px 12px; cursor: pointer; min-height: 38px;
+    }
+    .btn:hover:not(:disabled) { background: var(--panel-hover); border-color: var(--electron); }
+    .btn:focus-visible, select:focus-visible { outline: 2px solid var(--electron); outline-offset: 2px; }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
+    .btn[aria-pressed="true"] { background: rgba(255,213,79,.14); border-color: var(--energy); color: var(--energy); }
+    .btn.photon { border-color: rgba(255,213,79,.55); color: var(--energy); }
+    .seg { display: inline-flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+    .seg > span { font-size: 0.8rem; color: var(--muted); margin-right: 2px; }
+    .seg .btn { padding: 6px 10px; min-width: 40px; }
+
+    figure.anim {
+      margin: 18px 0 0; background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 12px; min-width: 0;
+    }
+    .ctrls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-bottom: 12px; }
+    .slider { flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; }
+    .slider label { display: flex; justify-content: space-between; gap: 8px; font-size: 0.8rem; color: var(--muted); }
+    .slider output { font-family: var(--mono); color: var(--energy); white-space: nowrap; }
+    input[type="range"] { width: 100%; accent-color: var(--energy); margin: 4px 0 0; }
+    .field { display: flex; flex-direction: column; font-size: 0.8rem; color: var(--muted); flex: 1 1 180px; min-width: 0; }
+    select {
+      font: inherit; font-size: 0.9rem; color: var(--text); background: #141b2b;
+      border: 1px solid var(--border); border-radius: 8px; padding: 7px 10px; margin-top: 4px; min-height: 38px; width: 100%;
+    }
+    canvas, svg.fig { display: block; width: 100%; border-radius: 8px; background: #141b2b; }
+    svg.fig text { font-family: var(--font); }
+    .narrow { max-width: 640px; margin: 0 auto; }
+    .exag { font-size: 0.75rem; color: var(--muted); margin: 10px 0 0; }
+    .exag b { color: var(--energy); font-weight: 600; }
+    .readout { font-size: 0.85rem; color: var(--muted); margin: 10px 0 0; }
+    .readout b { font-family: var(--mono); font-weight: 500; color: var(--text); }
+    .msg {
+      margin: 10px 0 0; padding: 8px 12px; border-radius: 8px; font-size: 0.88rem; min-height: 2.6em;
+      background: #141b2b; border: 1px solid var(--border);
+    }
+    .msg.ok { border-color: rgba(129,199,132,.55); }
+    .msg.ok strong { color: var(--success); }
+    .msg.no strong { color: var(--hole); }
+
+    /* Section 3 layout: diagram + info box */
+    .split { display: grid; grid-template-columns: 1fr; gap: 12px; align-items: start; }
+    @media (min-width: 720px) { .split { grid-template-columns: 2fr 1fr; } }
+    .infobox {
+      background: #141b2b; border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; min-height: 120px;
+    }
+    .infobox h4 { margin: 0 0 6px; font-size: 1rem; color: var(--energy); }
+    .infobox p { margin: 0; font-size: 0.9rem; }
+    .infobox .hint { color: var(--muted); font-size: 0.85rem; }
+    .hit { cursor: pointer; }
+    .hit:focus { outline: none; }
+    .hit:focus-visible .hl-target, .hit.sel .hl-target { stroke: var(--energy); stroke-width: 2.5; }
+    .hit.sel .ecl, .hit:focus-visible .ecl { stroke-width: 4; }
+
+    /* Section 4: three panels */
+    .bands3 { display: grid; grid-template-columns: 1fr; gap: 14px; max-width: 320px; margin: 0 auto; }
+    @media (min-width: 640px) { .bands3 { grid-template-columns: repeat(3, 1fr); max-width: none; } }
+    .bands3 figure { margin: 0; min-width: 0; }
+    .bands3 figcaption { text-align: center; font-size: 0.82rem; color: var(--muted); margin-top: 6px; }
+    .bands3 figcaption b { color: var(--text); display: block; font-size: 0.92rem; }
+    .bands3 .cnt { font-family: var(--mono); color: var(--electron); }
+
+    /* Section 5: wavelength slider with cut-off marker */
+    .wl-wrap { position: relative; padding-bottom: 20px; }
+    .cut {
+      position: absolute; bottom: 0; transform: translateX(-50%); font-size: 0.7rem; color: var(--success);
+      white-space: nowrap; pointer-events: none;
+    }
+    .cut::before { content: ""; position: absolute; left: 50%; bottom: 14px; width: 2px; height: 14px; background: var(--success); }
+    .swatch { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -1px; margin-right: 4px; border: 1px solid rgba(255,255,255,.3); }
+
+    .keypoints {
+      margin-top: 16px; padding: 14px 16px; border-radius: var(--radius);
+      background: rgba(129,199,132,.07); border: 1px solid rgba(129,199,132,.35);
+    }
+    .keypoints h3 { color: var(--success); font-size: 0.95rem; text-transform: uppercase; letter-spacing: .05em; }
+    .keypoints ul { margin: 0; padding-left: 20px; }
+    .keypoints li { margin: 4px 0; }
+
+    /* Summary */
+    .table-box { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 12px; overflow-x: auto; }
+    .vt { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    .vt th, .vt td { text-align: left; padding: 7px 6px; border-top: 1px solid var(--border); vertical-align: top; }
+    .vt thead th { color: var(--muted); font-weight: 600; border-top: 0; }
+    .vt td.n { font-family: var(--mono); white-space: nowrap; }
+    .formulas { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 16px; }
+    @media (min-width: 640px) { .formulas { grid-template-columns: 1fr 1fr; } }
+    .fcard { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; min-width: 0; }
+    .fcard .f { font-family: var(--mono); font-size: 1.02rem; color: var(--energy); overflow-wrap: anywhere; }
+    .fcard p { margin: 6px 0 0; font-size: 0.85rem; color: var(--muted); }
+    .src { font-size: 0.75rem; color: var(--muted); margin: 10px 0 0; }
+
+    .pager { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 48px; }
+    .pager a {
+      display: block; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 12px 14px; text-decoration: none; color: var(--text); min-width: 0;
+    }
+    .pager a:hover { border-color: var(--electron); }
+    .pager small { display: block; color: var(--muted); font-size: 0.75rem; }
+    .pager .next { text-align: right; }
+
+    .site-footer { border-top: 1px solid var(--border); color: var(--muted); font-size: 0.875rem; }
+    .site-footer .wrap { padding-top: 20px; padding-bottom: 20px; }
+  </style>
+</head>
+<body>
+
+  <nav class="toc" aria-label="Sections">
+    <ul>
+      <li><a href="#why">Why</a></li>
+      <li><a href="#atom">Single atom</a></li>
+      <li><a href="#bands">Levels → bands</a></li>
+      <li><a href="#reading">Reading a diagram</a></li>
+      <li><a href="#materials">Materials</a></li>
+      <li><a href="#crossing">Crossing the gap</a></li>
+      <li><a href="#summary">Summary</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <a href="../../index.html">Home</a> / <a href="../index.html">Unit 1</a> / 1.2
+      </nav>
+      <p class="eyebrow">TOPIC 1.2</p>
+      <h1>Energy Band Diagrams</h1>
+      <p class="subtitle">From one silicon atom to a full crystal, and how electrons become free</p>
+      <p class="rm-note" id="rmNote" hidden>Your device asks for reduced motion, so every animation starts paused. Press Play on any animation to run it.</p>
+
+      <!-- ================= SECTION 0 ================= -->
+      <section id="why" aria-labelledby="h0">
+        <h2 id="h0">Why we need band diagrams</h2>
+        <div class="prose">
+          <p>In topic 1.1 we saw that a material conducts only if it has electrons that are <strong>free to move</strong>. A <strong>band diagram</strong> is the tool engineers use to show this, using <strong class="t-en">energy</strong>.</p>
+          <p>The vertical axis of a band diagram is <strong>electron energy</strong>. We measure it in <strong>electron-volts (eV)</strong>. One electron-volt is the energy an electron gains when it moves through a potential difference of 1 volt: <strong>1 eV = 1.602 × 10<sup>−19</sup> J</strong>. This unit is tiny, which is exactly why it suits single electrons. <strong>Higher on the diagram means more energy.</strong></p>
+          <p>At a glance, a band diagram tells us three things: where electrons are <strong>allowed</strong> to be, where they are <strong>forbidden</strong>, and <strong>how much energy</strong> it takes to make a bound electron free.</p>
+          <p>To understand where the diagram comes from, we will start with a single atom and build up, step by step, to a full crystal.</p>
+        </div>
+
+        <figure class="anim" id="anim0">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="slider">
+              <label for="vSl"><span>Voltage between the plates</span><output id="vOut">1 V</output></label>
+              <input type="range" id="vSl" min="1" max="5" step="1" value="1">
+            </div>
+          </div>
+          <canvas id="cv0" class="narrow" style="aspect-ratio:400/236" role="img" aria-label="An electron accelerates from the 0 V plate to the positive plate. An energy bar on the right rises to V electron-volts."></canvas>
+          <p class="readout" aria-live="polite">Energy gained = q × V = <b id="evOut">1 eV = 1.602 × 10⁻¹⁹ J</b></p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: why band diagrams">
+          <h3>Key points</h3>
+          <ul>
+            <li>A band diagram shows <strong>electron energy</strong> on the vertical axis. Higher means more energy.</li>
+            <li>1 eV is the energy an electron gains moving through 1 V: <strong>1 eV = 1.602 × 10<sup>−19</sup> J</strong>.</li>
+            <li>It shows where electrons are allowed, where they are forbidden, and how much energy frees them.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <hr class="sep">
+
+      <!-- ================= SECTION 1 ================= -->
+      <section id="atom" aria-labelledby="h1s">
+        <h2 id="h1s">Energy levels in a single atom</h2>
+        <div class="prose">
+          <p>In an isolated atom an electron cannot have just any energy. It can only sit on certain <strong>fixed energy levels</strong>, the shells and subshells named 1s, 2s, 2p, 3s, 3p and so on. We say the energy is <strong>quantised</strong>. Energies between the allowed levels are simply not allowed for the electron.</p>
+          <p>Silicon has 14 electrons, arranged as <strong>1s² 2s² 2p⁶ 3s² 3p²</strong>. The 10 inner electrons (1s, 2s, 2p) sit on deep levels and are held very tightly by the nucleus. The 4 outer electrons in 3s and 3p are the <strong class="t-e">valence electrons</strong>. They are the ones that form bonds, and later the ones that can become free.</p>
+          <p>The levels are drawn as a ladder. An electron can climb to a higher, empty level only if it absorbs <strong>exactly</strong> the right amount of energy, for example from a photon whose energy matches the difference between the two levels. A photon with any other energy cannot be absorbed and passes by. When the excited electron falls back down, it releases the same energy, often as a new photon.</p>
+          <p>Try it below. Tap any electron on the atom to find it on the ladder. Then send photons of different energies at a 3p electron. Only the energies that match a step on the ladder are absorbed.</p>
+        </div>
+
+        <figure class="anim" id="anim1">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="ctrls">
+            <div class="slider">
+              <label for="aeSl"><span>Photon energy</span><output id="aeOut">4.90 eV</output></label>
+              <input type="range" id="aeSl" min="1" max="9" step="0.05" value="4.9">
+            </div>
+            <button class="btn photon" type="button" id="aFire">Send photon</button>
+          </div>
+          <svg class="fig narrow" id="svg1" viewBox="0 0 400 300" role="img" aria-labelledby="svg1t">
+            <title id="svg1t">Left: a silicon atom with nucleus +14 and shells holding 2, 8 and 4 electrons; the 4 valence electrons glow. Right: an energy ladder with levels 1s, 2s, 2p, 3s, 3p and empty levels 4s and 3d, each electron shown as a dot. Tap an electron to highlight it in both places.</title>
+          </svg>
+          <p class="msg" id="aMsg" aria-live="polite">Tap an electron, or press <strong>Send photon</strong>.</p>
+          <p class="exag"><b>Simplified:</b> one-electron picture of the outer levels. Step energies above 3p are approximate (3p→4s ≈ 4.9 eV, 3p→3d ≈ 5.6 eV, ionisation 8.15 eV). Inner levels are far deeper than drawn (the ladder is broken at ≈).</p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: single atom">
+          <h3>Key points</h3>
+          <ul>
+            <li>In an atom, electron energy is <strong>quantised</strong>: only fixed levels are allowed.</li>
+            <li>Si: <strong>1s² 2s² 2p⁶ 3s² 3p²</strong>. 10 tightly bound inner electrons, <strong>4 valence electrons</strong> (3s² 3p²).</li>
+            <li>An electron jumps up only by absorbing <strong>exactly</strong> the energy difference, and gives it back when it falls.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <hr class="sep">
+
+      <!-- ================= SECTION 2 ================= -->
+      <section id="bands" aria-labelledby="h2s">
+        <h2 id="h2s">From energy levels to energy bands</h2>
+        <div class="prose">
+          <p>A real crystal is not one atom. A single cm³ of silicon holds about <strong>5 × 10<sup>22</sup> atoms</strong>. What happens to the energy levels when so many atoms sit side by side?</p>
+          <p>The key rule is the <strong>Pauli exclusion principle</strong>: no two electrons in the same system can have exactly the same quantum state.</p>
+          <p>When atoms are far apart, each atom is its own system and keeps its own identical set of levels. When they come close, their outer electron clouds overlap and the atoms become <strong>one system</strong>. Now the identical levels are not allowed to stay identical, so each level <strong>splits</strong> into slightly different levels. Two atoms turn each level into 2. N atoms turn each level into N levels. For N ≈ 10<sup>22</sup> these levels are so close together that they form a practically continuous <strong>band</strong> of allowed energies.</p>
+          <p>Inner levels (1s, 2s, 2p) hardly split, because inner electron clouds are small and do not overlap. The outer levels (3s, 3p) split the most.</p>
+          <p>In silicon something special happens. As the atoms approach, the 3s band (2N states) and the 3p band (6N states) widen until they <strong>merge</strong> into one band of 8N states. At the actual spacing in the crystal, this band splits again into two bands of <strong>4N states each</strong>, with a range of energies between them where no state exists. Silicon has exactly 4N valence electrons, so at 0 K they fill the lower band completely and leave the upper band empty.</p>
+          <p>The lower, full band is the <strong class="t-vb">valence band</strong>. The upper, empty band is the <strong class="t-cb">conduction band</strong>. The empty range between them is the <strong class="t-en">forbidden gap</strong>, or <strong>band gap</strong>.</p>
+        </div>
+
+        <figure class="anim" id="anim2">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="seg" role="group" aria-label="Number of atoms">
+              <span>Atoms:</span>
+              <button class="btn" type="button" data-n="1" aria-pressed="false">1</button>
+              <button class="btn" type="button" data-n="2" aria-pressed="true">2</button>
+              <button class="btn" type="button" data-n="4" aria-pressed="false">4</button>
+              <button class="btn" type="button" data-n="8" aria-pressed="false">8</button>
+              <button class="btn" type="button" data-n="0" aria-pressed="false">N (crystal)</button>
+            </div>
+          </div>
+          <div class="ctrls">
+            <div class="slider">
+              <label for="aSl"><span>Spacing (closer ← → farther)</span><output id="aOut">14.00 Å</output></label>
+              <input type="range" id="aSl" min="4" max="14" step="0.01" value="14">
+            </div>
+          </div>
+          <canvas id="cv2" style="aspect-ratio:420/410" role="img" aria-label="Top: a row of silicon atoms whose electron clouds overlap as they come closer. Bottom: energy versus lattice spacing. The 3s and 3p levels split, merge into one band, then separate into a valence band and a conduction band at the silicon spacing of 5.43 angstrom."></canvas>
+          <p class="readout" id="bInfo" aria-live="polite"></p>
+          <p class="exag"><b>Not to scale:</b> energy axis is schematic (only the gap at 5.43 Å is labelled with its real value), inner levels are moved up so they fit, and the band shapes follow the textbook sketch, not a calculation.</p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: levels to bands">
+          <h3>Key points</h3>
+          <ul>
+            <li>Pauli exclusion: overlapping atoms form one system, so identical levels must <strong>split</strong>.</li>
+            <li>N atoms → each level splits into N levels; for a crystal (≈ 5 × 10<sup>22</sup> cm<sup>−3</sup>) they form a continuous <strong>band</strong>.</li>
+            <li>Inner levels barely split; outer 3s and 3p split the most.</li>
+            <li>In Si the 3s and 3p bands merge, then split into two bands of <strong>4N states</strong>. The 4N valence electrons fill the lower one at 0 K.</li>
+            <li>Lower full band = <strong class="t-vb">valence band</strong>, upper empty band = <strong class="t-cb">conduction band</strong>, between = <strong class="t-en">band gap</strong>.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <hr class="sep">
+
+      <!-- ================= SECTION 3 ================= -->
+      <section id="reading" aria-labelledby="h3s">
+        <h2 id="h3s">Reading a band diagram</h2>
+        <div class="prose">
+          <p>The full picture has many bands, but for electronics only two matter, so the simplified band diagram keeps just those two.</p>
+          <ul>
+            <li><strong class="t-vb">Valence band (VB)</strong>: the highest band that is full at 0 K. Its electrons are the ones locked in covalent bonds. Its top edge is called <strong>E<sub>v</sub></strong>.</li>
+            <li><strong class="t-cb">Conduction band (CB)</strong>: the lowest band that is empty at 0 K. An electron that reaches it is free to move through the crystal and carry current. Its bottom edge is called <strong>E<sub>c</sub></strong>.</li>
+            <li><strong class="t-en">Band gap</strong>: <strong>E<sub>g</sub> = E<sub>c</sub> − E<sub>v</sub></strong>. In a perfect crystal no electron can have an energy inside it. It is the minimum energy needed to free a bonded electron.</li>
+          </ul>
+          <p>When an electron jumps from the VB to the CB, it leaves an empty state behind in the VB. This empty state is called a <strong class="t-h">hole</strong>. A neighbouring bonded electron can move into it, so the hole moves too, and it behaves like a <strong>positive</strong> charge carrier. One jump always makes one <strong>electron–hole pair</strong>.</p>
+          <p>An electric field pushes the two carriers in opposite directions: electrons move against the field and holes move with it. Both movements give current in the <strong>same</strong> direction, the direction of the field, because the charges are opposite.</p>
+          <p>The horizontal axis of this simplified diagram is <strong>position</strong> in the crystal. Flat, straight lines mean the material is the same everywhere. Later, in PN junctions, you will see these lines bend.</p>
+        </div>
+
+        <figure class="anim" id="anim3">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <button class="btn" type="button" id="freeBtn">Free an electron</button>
+            <button class="btn" type="button" id="fieldBtn" aria-pressed="false">Electric field: OFF</button>
+          </div>
+          <div class="split">
+            <svg class="fig" id="svg3" viewBox="0 0 400 300" role="group" aria-label="Simplified band diagram. Tap a region to see its definition."></svg>
+            <div class="infobox" id="info3" aria-live="polite">
+              <h4>Tap the diagram</h4>
+              <p class="hint">Tap the conduction band, the valence band, the gap, the Ec or Ev line, or the Eg arrow to see what it means.</p>
+            </div>
+          </div>
+          <p class="exag"><b>Exaggerated on screen:</b> drift speed and hole steps are slowed down and enlarged so you can follow them.</p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: reading a band diagram">
+          <h3>Key points</h3>
+          <ul>
+            <li><strong>VB</strong>: highest band full at 0 K, top edge <strong>E<sub>v</sub></strong>. <strong>CB</strong>: lowest band empty at 0 K, bottom edge <strong>E<sub>c</sub></strong>.</li>
+            <li><strong>E<sub>g</sub> = E<sub>c</sub> − E<sub>v</sub></strong>: no states inside; minimum energy to free a bonded electron.</li>
+            <li>Each jump makes an <strong class="t-e">electron</strong> in the CB and a <strong class="t-h">hole</strong> in the VB. Both carry current.</li>
+            <li>In a field, electrons and holes move opposite ways but their currents add.</li>
+            <li>Horizontal axis = position. Flat lines = uniform material.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <hr class="sep">
+
+      <!-- ================= SECTION 4 ================= -->
+      <section id="materials" aria-labelledby="h4s">
+        <h2 id="h4s">Insulator, semiconductor and metal on a band diagram</h2>
+        <div class="prose">
+          <p>Now we can explain the three kinds of material from topic 1.1 with one picture. The only thing that changes is the <strong>band gap</strong>.</p>
+          <p><strong>Insulator.</strong> The gap is very wide, more than about 4–5 eV (SiO<sub>2</sub> ≈ 9 eV, diamond ≈ 5.5 eV). The thermal energy available at room temperature is only about kT ≈ 0.026 eV. That is hundreds of times too small, so practically no electron crosses and the CB stays empty.</p>
+          <p><strong>Semiconductor.</strong> The gap is small: Ge 0.66 eV, Si 1.12 eV and GaAs 1.42 eV (values at 300 K). Heat lifts a small number of electrons into the CB, each leaving a hole in the VB. The hotter it gets, the more electron–hole pairs there are, and the better it conducts.</p>
+          <p><strong>Metal.</strong> The bands overlap, or the highest band is only partly filled. There is <strong>no gap</strong>, so there are plenty of free electrons at any temperature, even at 0 K.</p>
+          <p>Use the slider below to heat all three together. Change the semiconductor to see how much a few tenths of an eV matter.</p>
+        </div>
+
+        <figure class="anim" id="anim4">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <label class="field" for="m4Sel"><span>Semiconductor (E<sub>g</sub> at 300 K)</span>
+              <select id="m4Sel">
+                <option value="Ge">Germanium (Ge): 0.66 eV</option>
+                <option value="Si" selected>Silicon (Si): 1.12 eV</option>
+                <option value="GaAs">Gallium arsenide (GaAs): 1.42 eV</option>
+              </select>
+            </label>
+          </div>
+          <div class="ctrls">
+            <div class="slider">
+              <label for="t4Sl"><span>Temperature (all three)</span><output id="t4Out">300 K</output></label>
+              <input type="range" id="t4Sl" min="0" max="600" step="10" value="300">
+            </div>
+          </div>
+          <div class="bands3">
+            <figure><canvas id="cv4i" style="aspect-ratio:220/330" role="img" aria-label="Insulator (diamond): large gap, conduction band stays empty."></canvas><figcaption><b>Insulator</b>diamond · free electrons: <span class="cnt" id="c4i">0</span></figcaption></figure>
+            <figure><canvas id="cv4s" style="aspect-ratio:220/330" role="img" aria-label="Semiconductor: small gap, heat creates electron-hole pairs."></canvas><figcaption><b>Semiconductor</b><span id="m4Name">Si</span> · free electrons: <span class="cnt" id="c4s">0</span></figcaption></figure>
+            <figure><canvas id="cv4m" style="aspect-ratio:220/330" role="img" aria-label="Metal: bands overlap, many free electrons at any temperature."></canvas><figcaption><b>Metal</b>copper · free electrons: <span class="cnt">always many</span></figcaption></figure>
+          </div>
+          <p class="readout" aria-live="polite">Relative jump rate ∝ e<sup>−Eg/2kT</sup>: semiconductor <b id="r4s">×1.0</b>, insulator <b id="r4i">×0</b> (vs Si at 300 K)</p>
+          <p class="exag"><b>Rate exaggerated for visibility.</b> Si at 300 K is shown as about one jump per second; the others scale by the real factor above, capped so the screen does not flood. Gaps are drawn to the same scale (24 px per eV) in all three panels; the gap shrinks slightly as temperature rises.</p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: materials">
+          <h3>Key points</h3>
+          <ul>
+            <li><strong>Insulator</strong>: E<sub>g</sub> &gt; ~4–5 eV (SiO<sub>2</sub> ≈ 9, diamond ≈ 5.5). kT ≈ 0.026 eV is far too small; CB stays empty.</li>
+            <li><strong>Semiconductor</strong>: small E<sub>g</sub> (Ge 0.66, Si 1.12, GaAs 1.42 eV at 300 K). Heat makes a few electron–hole pairs, more when hotter.</li>
+            <li><strong>Metal</strong>: bands overlap or are partly filled. No gap, many free electrons always.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <hr class="sep">
+
+      <!-- ================= SECTION 5 ================= -->
+      <section id="crossing" aria-labelledby="h5s">
+        <h2 id="h5s">How electrons cross the gap</h2>
+        <div class="prose">
+          <p>An electron needs at least E<sub>g</sub> of energy to cross from the VB to the CB. There are two main ways to get it.</p>
+          <p><strong>Thermal excitation.</strong> The atoms of a crystal are always vibrating, and these lattice vibrations pass energy to electrons. The chance that an electron gets enough energy to cross falls very steeply as the gap gets bigger, roughly like <strong>e<sup>−Eg/2kT</sup></strong>. At 300 K, 2kT ≈ 0.052 eV, so making E<sub>g</sub> bigger by just 0.1 eV divides the rate by about e<sup>2</sup> ≈ 7. That is why Ge, Si and GaAs behave so differently even though their gaps look similar.</p>
+          <p><strong>Optical excitation.</strong> A photon carries energy <strong>E = hc/λ</strong>. In handy units, <strong>λ(nm) = 1240 / E(eV)</strong>. If E ≥ E<sub>g</sub>, the photon can be absorbed and lift an electron across, making an electron–hole pair. If E &lt; E<sub>g</sub>, the photon passes straight through. Silicon (E<sub>g</sub> = 1.12 eV) absorbs light with wavelength shorter than about <strong>1107 nm</strong>, which includes all visible light. Any extra energy above E<sub>g</sub> is quickly lost as heat while the electron settles to E<sub>c</sub>.</p>
+          <p><strong>Recombination.</strong> A CB electron can fall back into a VB hole. Both carriers disappear and about E<sub>g</sub> of energy is released. In silicon and germanium this energy mainly becomes heat. In <strong>direct-gap</strong> materials like GaAs it often comes out as light, which is how LEDs work (topic 3.2).</p>
+          <p><strong>Note:</strong> E<sub>g</sub> itself shrinks slightly as temperature rises. For silicon it is about 1.17 eV at 0 K and 1.12 eV at 300 K. The animation includes this change.</p>
+        </div>
+
+        <figure class="anim" id="anim5">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <label class="field" for="m5Sel"><span>Material (E<sub>g</sub> at 300 K)</span>
+              <select id="m5Sel">
+                <option value="Ge">Germanium (Ge): 0.66 eV</option>
+                <option value="Si" selected>Silicon (Si): 1.12 eV</option>
+                <option value="GaAs">Gallium arsenide (GaAs): 1.42 eV</option>
+                <option value="C">Diamond (C): ~5.5 eV</option>
+              </select>
+            </label>
+            <button class="btn" type="button" id="recBtn" aria-pressed="true">Recombination: ON</button>
+          </div>
+          <div class="ctrls">
+            <div class="slider">
+              <label for="t5Sl"><span>Temperature</span><output id="t5Out">300 K</output></label>
+              <input type="range" id="t5Sl" min="0" max="600" step="10" value="300">
+            </div>
+          </div>
+          <div class="ctrls">
+            <div class="slider wl-wrap">
+              <label for="wlSl"><span><span class="swatch" id="wlSw"></span>Photon wavelength</span><output id="wlOut">620 nm · 2.00 eV</output></label>
+              <input type="range" id="wlSl" min="200" max="2000" step="1" value="620">
+              <span class="cut" id="cutMk">cut-off 1107 nm</span>
+            </div>
+            <button class="btn photon" type="button" id="fire5">Fire photon</button>
+          </div>
+          <canvas id="cv5" class="narrow" style="aspect-ratio:440/386" role="img" aria-label="Band diagram of the chosen material, energy axis to scale in eV. Photons arrive from the left; electrons (blue) cross to the conduction band leaving holes (orange); recombination releases heat or, in GaAs, light."></canvas>
+          <p class="readout" aria-live="polite">E<sub>g</sub>(<span id="t5b">300</span> K) = <b id="eg5">1.12 eV</b> · cut-off 1240/E<sub>g</sub> = <b id="lc5">1107 nm</b> · thermal rate <b id="r5">×1.0</b> vs Si at 300 K · free electrons <b id="n5">0</b></p>
+          <p class="msg" id="pMsg" aria-live="polite">Choose a wavelength and press <strong>Fire photon</strong>.</p>
+          <p class="exag"><b>Rate exaggerated for visibility.</b> Thermal jumps scale by the real factor e<sup>−Eg/2kT</sup> (Si at 300 K ≈ 1 per second on screen, capped at 12 per second). Carrier lifetime is shortened to a few seconds. Energy axis is to scale.</p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: crossing the gap">
+          <h3>Key points</h3>
+          <ul>
+            <li><strong>Thermal</strong>: rate ∝ e<sup>−Eg/2kT</sup>, so a slightly bigger gap means far fewer carriers.</li>
+            <li><strong>Optical</strong>: absorbed only if E = hc/λ ≥ E<sub>g</sub>. λ(nm) = 1240/E(eV). Si absorbs λ &lt; ~1107 nm.</li>
+            <li><strong>Recombination</strong> releases ≈ E<sub>g</sub>: mostly heat in Si/Ge, light in direct-gap GaAs (LEDs).</li>
+            <li>E<sub>g</sub> falls slightly with temperature: Si ≈ 1.17 eV at 0 K, 1.12 eV at 300 K.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <hr class="sep">
+
+      <!-- ================= SECTION 6 ================= -->
+      <section id="summary" aria-labelledby="h6s">
+        <h2 id="h6s">Summary</h2>
+        <div class="table-box">
+          <table class="vt">
+            <thead><tr><th scope="col">Material</th><th scope="col">E<sub>g</sub> at 300 K (eV)</th><th scope="col">Cut-off 1240/E<sub>g</sub> (nm)</th><th scope="col">Type</th></tr></thead>
+            <tbody>
+              <tr><td>Germanium (Ge)</td><td class="n">0.66</td><td class="n">1879</td><td>Semiconductor</td></tr>
+              <tr><td>Silicon (Si)</td><td class="n">1.12</td><td class="n">1107</td><td>Semiconductor</td></tr>
+              <tr><td>Gallium arsenide (GaAs)</td><td class="n">1.42</td><td class="n">873</td><td>Semiconductor</td></tr>
+              <tr><td>Diamond (C)</td><td class="n">~5.5</td><td class="n">~225</td><td>Insulator</td></tr>
+              <tr><td>Silicon dioxide (SiO<sub>2</sub>)</td><td class="n">~9</td><td class="n">~138</td><td>Insulator</td></tr>
+              <tr><td>Copper (Cu)</td><td class="n">—</td><td class="n">—</td><td>Metal (no gap)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="formulas">
+          <div class="fcard"><div class="f">E<sub>g</sub> = E<sub>c</sub> − E<sub>v</sub></div><p>Band gap = bottom of CB minus top of VB.</p></div>
+          <div class="fcard"><div class="f">E = hc / λ</div><p>Photon energy; h = 6.626 × 10<sup>−34</sup> J·s, c = 2.998 × 10<sup>8</sup> m/s.</p></div>
+          <div class="fcard"><div class="f">λ (nm) = 1240 / E (eV)</div><p>Same formula in handy units (hc = 1239.8 eV·nm). Absorption needs λ ≤ 1240/E<sub>g</sub>.</p></div>
+          <div class="fcard"><div class="f">1 eV = 1.602 × 10<sup>−19</sup> J</div><p>Energy gained by one electron moving through 1 V.</p></div>
+          <div class="fcard"><div class="f">kT = 0.0259 eV at 300 K</div><p>k = 8.617 × 10<sup>−5</sup> eV/K. Thermal rate ∝ e<sup>−Eg/2kT</sup>.</p></div>
+          <div class="fcard"><div class="f">Si: E<sub>g</sub> = 1.12 eV, a = 5.43 Å</div><p>Values at 300 K. About 5 × 10<sup>22</sup> atoms/cm³; E<sub>g</sub> ≈ 1.17 eV at 0 K.</p></div>
+        </div>
+        <p class="src">Values cross-checked with Streetman &amp; Banerjee, Neamen, Sze and Millman &amp; Halkias. Sze lists 5.47 eV for diamond and 1.424 eV for GaAs; SiO<sub>2</sub> is often quoted as 8–9 eV. Temperature dependence of E<sub>g</sub> uses the Varshni fits tabulated in Sze.</p>
+      </section>
+
+      <nav class="pager" aria-label="Topic navigation">
+        <a href="../1-1-what-is-a-semiconductor/index.html"><small>← Previous</small>1.1 What is a Semiconductor?</a>
+        <a class="next" href="../1-3-intrinsic-semiconductors/index.html"><small>Next →</small>1.3 Intrinsic Semiconductors</a>
+      </nav>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">© 2026 Naveen Bokka</div>
+  </footer>
+
+<script>
+(function () {
+  'use strict';
+
+  /* =========================================================
+     Constants (Streetman & Banerjee, Neamen, Sze)
+     ========================================================= */
+  const KB = 8.617e-5;                                   // eV/K
+  // Varshni temperature dependence Eg(T) = E0 − αT²/(T+β) (Sze, Thurmond). Diamond held constant.
+  const MAT = {
+    Ge:   { name: 'Ge',      E300: 0.66, al: 4.774e-4, be: 235, direct: false },
+    Si:   { name: 'Si',      E300: 1.12, al: 4.73e-4,  be: 636, direct: false },
+    GaAs: { name: 'GaAs',    E300: 1.42, al: 5.405e-4, be: 204, direct: true },
+    C:    { name: 'diamond', E300: 5.47, al: 0,        be: 1,   direct: false }
+  };
+  // Anchored to the textbook 300 K value; the Varshni shape gives the change with T (Si: 1.17 eV at 0 K).
+  const egT = (m, T) => { const M = MAT[m]; return M.E300 - M.al * (T * T / (T + M.be) - 90000 / (300 + M.be)); };
+  const REF = Math.exp(-egT('Si', 300) / (2 * KB * 300));        // Si at 300 K = 1 on screen
+  const relRate = (E, T) => (T <= 0 ? 0 : Math.exp(-E / (2 * KB * T)) / REF);
+
+  const C = {
+    text: '#e6e9ef', muted: '#9aa4b8', e: '#4fc3f7', h: '#ff8a65', en: '#ffd54f', ok: '#81c784',
+    vb: '#3949ab', cb: '#00838f', vbL: '#8c9eff', cbL: '#4dd0e1', line: '#33405e', ion: '#b39ddb'
+  };
+  const FONT = 'Inter, system-ui, sans-serif', MONO = '"JetBrains Mono", ui-monospace, monospace';
+  const RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const TAU = Math.PI * 2, rnd = Math.random;
+  const $ = id => document.getElementById(id);
+  const NS = 'http://www.w3.org/2000/svg';
+  if (RM) $('rmNote').hidden = false;
+
+  const SUP = { '-': '⁻', '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹' };
+  const sup = n => String(n).split('').map(ch => SUP[ch] || ch).join('');
+  function fmtX(x) {
+    if (x === 0) return '0';
+    if (x >= 0.1 && x < 1000) return x.toFixed(x < 10 ? 1 : 0);
+    let e = Math.floor(Math.log10(x)), ms = (x / Math.pow(10, e)).toFixed(1);
+    if (parseFloat(ms) >= 10) { e++; ms = '1.0'; }
+    return ms + '×10' + sup(e);
+  }
+  function wlColor(nm) {
+    if (nm < 380) return '#a77bff';       // UV: violet
+    if (nm > 750) return '#c62828';       // IR: dark red
+    let r, g, b;
+    if (nm < 440) { r = (440 - nm) / 60; g = 0; b = 1; }
+    else if (nm < 490) { r = 0; g = (nm - 440) / 50; b = 1; }
+    else if (nm < 510) { r = 0; g = 1; b = (510 - nm) / 20; }
+    else if (nm < 580) { r = (nm - 510) / 70; g = 1; b = 0; }
+    else if (nm < 645) { r = 1; g = (645 - nm) / 65; b = 0; }
+    else { r = 1; g = 0; b = 0; }
+    const m = v => Math.round(255 * (0.25 + 0.75 * v));
+    return 'rgb(' + m(r) + ',' + m(g) + ',' + m(b) + ')';
+  }
+  function wlName(nm) {
+    if (nm < 380) return 'ultraviolet';
+    if (nm > 750) return 'infrared';
+    if (nm < 450) return 'visible, violet';
+    if (nm < 495) return 'visible, blue';
+    if (nm < 570) return 'visible, green';
+    if (nm < 590) return 'visible, yellow';
+    if (nm < 620) return 'visible, orange';
+    return 'visible, red';
+  }
+
+  /* =========================================================
+     Canvas helpers
+     ========================================================= */
+  let FS = 1;
+  function Cv(id, W, H) { this.el = $(id); this.W = W; this.H = H; this.ctx = this.el.getContext('2d'); }
+  Cv.prototype.begin = function () {
+    const w = this.el.clientWidth; if (!w) return null;
+    const dpr = window.devicePixelRatio || 1;
+    const pw = Math.round(w * dpr), ph = Math.round(w * dpr * this.H / this.W);
+    if (this.el.width !== pw || this.el.height !== ph) { this.el.width = pw; this.el.height = ph; }
+    const c = this.ctx, s = pw / this.W;
+    FS = Math.min(1.65, Math.max(1, 1.15 * this.W / w));   // keep labels ≈ 11 px on small screens
+    c.setTransform(s, 0, 0, s, 0, 0); c.clearRect(0, 0, this.W, this.H);
+    c.textBaseline = 'middle'; c.textAlign = 'left';
+    return c;
+  };
+  // Watermark: drawn inside the canvas, bottom-right, ~13 px on screen at any size.
+  Cv.prototype.wm = function (c) {
+    const s = 13 * this.W / this.el.clientWidth;
+    c.save(); c.font = '500 ' + s.toFixed(1) + 'px ' + FONT; c.fillStyle = 'rgba(255,255,255,.35)';
+    c.textAlign = 'right'; c.textBaseline = 'bottom'; c.fillText('© Naveen Bokka', this.W - 6, this.H - 4); c.restore();
+  };
+  function circ(c, x, y, r, fill, stroke, lw) {
+    c.beginPath(); c.arc(x, y, r, 0, TAU);
+    if (fill) { c.fillStyle = fill; c.fill(); }
+    if (stroke) { c.strokeStyle = stroke; c.lineWidth = lw || 1.5; c.stroke(); }
+  }
+  function dot(c, x, y, r, col, a) { c.globalAlpha = a == null ? 1 : a; circ(c, x, y, r, col); c.globalAlpha = 1; }
+  function txt(c, s, x, y, col, size, weight, align, font) {
+    c.font = (weight || 500) + ' ' + ((size || 11) * FS).toFixed(1) + 'px ' + (font || FONT);
+    c.fillStyle = col || C.text; c.textAlign = align || 'left'; c.fillText(s, x, y);
+  }
+  function tag(c, s, x, y, col, align) {
+    c.font = '600 ' + (10 * FS).toFixed(1) + 'px ' + FONT;
+    const w = c.measureText(s).width + 8, hh = 8 * FS;
+    const x0 = align === 'right' ? x - w : align === 'center' ? x - w / 2 : x;
+    c.fillStyle = 'rgba(15,20,32,.85)'; c.fillRect(x0, y - hh, w, 2 * hh);
+    c.fillStyle = col || C.text; c.textAlign = 'left'; c.fillText(s, x0 + 4, y + 0.5);
+  }
+  function hline(c, x0, x1, y, col, lw, dash) {
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []);
+    c.beginPath(); c.moveTo(x0, y); c.lineTo(x1, y); c.stroke(); c.setLineDash([]);
+  }
+  function vline(c, x, y0, y1, col, lw, dash) {
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []);
+    c.beginPath(); c.moveTo(x, y0); c.lineTo(x, y1); c.stroke(); c.setLineDash([]);
+  }
+  function darrow(c, x, y0, y1, col) {
+    vline(c, x, y0 + 1, y1 - 1, col, 1.5);
+    if (y1 - y0 < 10) return;
+    c.fillStyle = col;
+    c.beginPath(); c.moveTo(x, y0); c.lineTo(x - 4, y0 + 6); c.lineTo(x + 4, y0 + 6); c.fill();
+    c.beginPath(); c.moveTo(x, y1); c.lineTo(x - 4, y1 - 6); c.lineTo(x + 4, y1 - 6); c.fill();
+  }
+  function wave(c, hx, hy, dx, dy, len, wl, amp, col) {    // photon wave packet ending at head (hx, hy)
+    c.strokeStyle = col; c.lineWidth = 2; c.beginPath();
+    for (let i = 0; i <= len; i++) {
+      const u = i / len, s = -len + i, env = Math.sin(Math.PI * u), w = amp * env * Math.sin(TAU * s / wl);
+      const x = hx + dx * s - dy * w, y = hy + dy * s + dx * w;
+      i ? c.lineTo(x, y) : c.moveTo(x, y);
+    }
+    c.stroke();
+    c.fillStyle = col; c.beginPath();
+    c.moveTo(hx + dx * 7, hy + dy * 7); c.lineTo(hx - dy * 4, hy + dx * 4); c.lineTo(hx + dy * 4, hy - dx * 4); c.fill();
+  }
+
+  /* ---------- SVG helpers ---------- */
+  function sv(tag, attrs, parent) {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  const svgWms = [];
+  function svgWatermark(svg, W, H) {
+    const t = sv('text', { x: W - 6, y: H - 5, 'text-anchor': 'end', fill: '#fff', 'fill-opacity': '.35', 'pointer-events': 'none', 'font-weight': 500 }, svg);
+    t.textContent = '© Naveen Bokka';
+    svgWms.push({ svg, t, W });
+  }
+  function sizeSvgWms() {
+    svgWms.forEach(o => {
+      const w = o.svg.clientWidth; if (!w) return;
+      o.t.setAttribute('font-size', (13 * o.W / w).toFixed(1));
+      const k = Math.min(1.3, Math.max(1, 1.1 * o.W / w));     // enlarge labels on small screens
+      o.svg.querySelectorAll('text').forEach(t => {
+        if (t === o.t) return;
+        if (!t.dataset.fs) t.dataset.fs = t.getAttribute('font-size') || 11;
+        t.setAttribute('font-size', (t.dataset.fs * k).toFixed(1));
+      });
+    });
+  }
+
+  /* =========================================================
+     Animation framework
+     ========================================================= */
+  const anims = [];
+  function Anim(rootId, o) {
+    this.root = $(rootId); this.o = o; this.playing = !RM; this.visible = true; this.dirty = true;
+    this.pb = this.root.querySelector('[data-act="play"]');
+    this.pb.addEventListener('click', () => this.setPlaying(!this.playing));
+    this.root.querySelector('[data-act="reset"]').addEventListener('click', () => { o.reset(); this.dirty = true; });
+    this.sync(); anims.push(this);
+    if ('IntersectionObserver' in window) {
+      this.visible = false;
+      new IntersectionObserver(es => es.forEach(e => { this.visible = e.isIntersecting; if (this.visible) this.dirty = true; }))
+        .observe(this.root);
+    }
+  }
+  Anim.prototype.setPlaying = function (p) { this.playing = p; this.sync(); this.dirty = true; };
+  Anim.prototype.sync = function () { this.pb.textContent = this.playing ? 'Pause' : 'Play'; };
+  Anim.prototype.kick = function () { if (!this.playing) this.setPlaying(true); };  // user-triggered motion
+
+  /* =========================================================
+     Carriers (canvas): electrons in CB, holes in VB
+     g: { x0, x1, cols, rows, rowGap, top, Ev(), Ec(), zone:[near,far], life:[min,spread],
+          vj, vrel, hop, recomb(), onRec(x,y) }
+     ========================================================= */
+  function Carriers(g) { this.g = g; this.reset(); }
+  Carriers.prototype.reset = function () {
+    this.sites = [];
+    for (let r = 0; r < this.g.rows; r++) for (let c = 0; c < this.g.cols; c++) this.sites.push({ r, c, filled: true, lock: false });
+    this.els = []; this.holes = []; this.fx = [];
+  };
+  Carriers.prototype.pos = function (s) {
+    const g = this.g;
+    return { x: g.x0 + (s.c + 0.5) * (g.x1 - g.x0) / g.cols, y: g.Ev() + g.top + s.r * g.rowGap };
+  };
+  Carriers.prototype.pick = function (nearX) {
+    const f = this.sites.filter(s => s.r === 0 && s.filled && !s.lock);
+    if (!f.length) return null;
+    if (nearX == null) return f[(rnd() * f.length) | 0];
+    let best = f[0];
+    f.forEach(s => { if (Math.abs(this.pos(s).x - nearX) < Math.abs(this.pos(best).x - nearX)) best = s; });
+    return best;
+  };
+  Carriers.prototype.generate = function (site, ty) {
+    const p = this.pos(site), g = this.g;
+    site.filled = false; site.lock = false;
+    const h = { site, x: p.x, y: p.y };
+    this.holes.push(h);
+    this.els.push({ x: p.x, y: p.y, sy: p.y, ty, st: 'jump', life: g.life[0] + rnd() * g.life[1], h, vx: (rnd() - 0.5) * 50, ph: rnd() * TAU, heat: 0 });
+  };
+  Carriers.prototype.step = function (dt) {
+    const g = this.g, Ec = g.Ec(), far = Ec - g.zone[1], near = Ec - g.zone[0];
+    const rec = g.recomb ? g.recomb() : true;
+    for (let i = this.els.length - 1; i >= 0; i--) {
+      const e = this.els[i];
+      if (e.st === 'jump') {
+        e.y -= g.vj * dt;
+        if (e.y <= e.ty) { e.y = e.ty; e.st = e.y < far - 2 ? 'hot' : 'free'; }
+      } else if (e.st === 'hot') {            // extra energy above Ec lost as heat
+        e.y += g.vrel * dt; e.heat += dt;
+        if (e.heat > 0.1) { e.heat = 0; this.fx.push({ x: e.x, y: e.y, t: 0, k: 'heat', d: rnd() < .5 ? -1 : 1 }); }
+        if (e.y >= far + 4) e.st = 'free';
+      } else if (e.st === 'free') {
+        e.x += e.vx * dt;
+        if (e.x < g.x0 + 6) { e.x = g.x0 + 6; e.vx = Math.abs(e.vx); }
+        if (e.x > g.x1 - 6) { e.x = g.x1 - 6; e.vx = -Math.abs(e.vx); }
+        if (rnd() < dt * 0.8) e.vx = (rnd() - 0.5) * 70;
+        e.ph += dt * 2.2;
+        const yt = (far + near) / 2 + Math.sin(e.ph) * (near - far) * 0.4;
+        e.y += (yt - e.y) * Math.min(1, dt * 2.5);
+        if (rec) { e.life -= dt; if (e.life <= 0) e.st = 'fall'; }
+      } else {                                // 'fall' into its own hole
+        const h = e.h, dx = h.x - e.x, dy = h.y - e.y, d = Math.hypot(dx, dy), s = g.vj * dt;
+        if (d <= s) {
+          if (g.onRec) g.onRec(h.x, h.y, this); else this.fx.push({ x: h.x, y: h.y, t: 0, k: 'rec' });
+          h.site.filled = true;
+          this.holes.splice(this.holes.indexOf(h), 1);
+          this.els.splice(i, 1);
+        } else { e.x += dx / d * s; e.y += dy / d * s; }
+      }
+    }
+    this.holes.forEach(h => {
+      if (rnd() < g.hop * dt) {
+        const nb = this.sites.filter(s => s.filled && !s.lock && Math.abs(s.r - h.site.r) + Math.abs(s.c - h.site.c) === 1);
+        if (nb.length) { const n = nb[(rnd() * nb.length) | 0]; h.site.filled = true; n.filled = false; h.site = n; }
+      }
+      const p = this.pos(h.site), k = Math.min(1, dt * 8);
+      h.x += (p.x - h.x) * k; h.y += (p.y - h.y) * k;
+    });
+    this.fx.forEach(f => { f.t += dt; });
+    this.fx = this.fx.filter(f => f.t < 0.7);
+  };
+  Carriers.prototype.draw = function (c) {
+    this.sites.forEach(s => { if (s.filled) { const p = this.pos(s); dot(c, p.x, p.y, 3.5, C.e, 0.95); } });
+    this.holes.forEach(h => circ(c, h.x, h.y, 4.3, '#141b2b', C.h, 1.8));
+    this.els.forEach(e => {
+      if (e.st === 'jump') { c.globalAlpha = .4; vline(c, e.x, e.y, e.sy, C.e, 1, [2, 3]); c.globalAlpha = 1; }
+      dot(c, e.x, e.y, 8, C.e, 0.2);
+      dot(c, e.x, e.y, 4, C.e);
+      if (e.st === 'hot') circ(c, e.x, e.y, 7, null, C.en, 1.2);
+    });
+    this.fx.forEach(f => {
+      const a = 1 - f.t / 0.7;
+      if (f.k === 'rec') circ(c, f.x, f.y, 4 + f.t * 18, null, 'rgba(255,213,79,' + a.toFixed(2) + ')', 1.6);
+      else dot(c, f.x + f.d * (8 + f.t * 30), f.y - f.t * 6, 2, C.en, a);
+    });
+  };
+
+  /* =========================================================
+     SECTION 0 — 1 eV
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv0', 400, 236), vSl = $('vSl');
+    const XL = 52, XR = 232, TT = 1.6, AX = 300, Y0 = 196, PXE = 32;
+    let V = 1, t = 0, hold = 0;
+    const frac = () => Math.min(1, Math.pow(t / TT, 2));     // uniform field: constant acceleration
+    function readout() {
+      $('vOut').textContent = V + ' V';
+      $('evOut').textContent = V + ' eV = ' + (V * 1.602).toFixed(3).replace(/0+$/, '').replace(/\.$/, '') + ' × 10⁻¹⁹ J';
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      // plates
+      c.fillStyle = '#9aa4b8'; c.fillRect(34, 40, 6, 140); c.fillRect(244, 40, 6, 140);
+      txt(c, '0 V', 37, 28, C.muted, 10, 600, 'center');
+      txt(c, '+' + V + ' V', 247, 28, C.en, 10, 600, 'center');
+      // field arrows (E points from + to −)
+      c.globalAlpha = .45;
+      [70, 110, 150].forEach(y => {
+        hline(c, 70, 214, y, C.muted, 1);
+        c.fillStyle = C.muted; c.beginPath(); c.moveTo(66, y); c.lineTo(74, y - 4); c.lineTo(74, y + 4); c.fill();
+      });
+      c.globalAlpha = 1;
+      txt(c, 'field E', 142, 188, C.muted, 9.5, 500, 'center');
+      // electron
+      const f = frac(), x = XL + (XR - XL) * f, E = V * f;
+      dot(c, x, 110, 10, C.e, 0.2); dot(c, x, 110, 6, C.e);
+      txt(c, 'electron', x, 92, C.e, 10, 600, 'center');
+      // energy axis
+      vline(c, AX, Y0, Y0 - 5 * PXE - 12, C.line, 1.2);
+      c.fillStyle = C.line; c.beginPath(); c.moveTo(AX, Y0 - 5 * PXE - 18); c.lineTo(AX - 4, Y0 - 5 * PXE - 10); c.lineTo(AX + 4, Y0 - 5 * PXE - 10); c.fill();
+      for (let k = 0; k <= 5; k++) { hline(c, AX - 4, AX, Y0 - k * PXE, C.muted, 1); txt(c, String(k), AX - 8, Y0 - k * PXE, C.muted, 9.5, 500, 'right', MONO); }
+      txt(c, 'energy (eV)', AX, 12, C.muted, 9.5, 600, 'center');
+      c.fillStyle = 'rgba(255,213,79,.75)'; c.fillRect(AX + 6, Y0 - E * PXE, 16, E * PXE);
+      hline(c, AX + 4, AX + 26, Y0 - E * PXE, C.en, 1.5);
+      txt(c, E.toFixed(2), AX + 30, Y0 - E * PXE, C.en, 10, 600, 'left', MONO);
+      cv.wm(c);
+    }
+    const A = new Anim('anim0', {
+      step(dt) {
+        if (hold > 0) { hold -= dt; if (hold <= 0) t = 0; return; }
+        t += dt; if (t >= TT) { t = TT; hold = 1; }
+      },
+      draw, reset() { t = 0; hold = 0; }
+    });
+    vSl.addEventListener('input', () => { V = +vSl.value; readout(); A.dirty = true; });
+    readout();
+  })();
+
+  /* =========================================================
+     SECTION 1 — single silicon atom (SVG)
+     ========================================================= */
+  (function () {
+    const svg = $('svg1'), W = 400, H = 300, CX = 98, CY = 150;
+    const SH = [24, 46, 70], EXC_R = 90;
+    // Ladder (schematic): y positions; 3p→4s 4.9 eV, 3p→3d 5.6 eV, ionisation 8.15 eV at 17 px/eV
+    const LX0 = 226, LX1 = 304, Y3P = 166, PEV = 18.5;
+    const LV = {
+      '1s': 270, '2s': 248, '2p': 232, '3s': 194, '3p': Y3P,
+      '4s': Y3P - 4.9 * PEV, '3d': Y3P - 5.6 * PEV, 'free': Y3P - 8.15 * PEV
+    };
+    const TARGETS = [{ lv: '4s', dE: 4.9 }, { lv: '3d', dE: 5.6 }];
+    const ION = 8.15;
+    // 14 electrons: shell index, subshell, angle offset
+    const E = [];
+    const add = (sh, sub, n, a0) => { for (let k = 0; k < n; k++) E.push({ sh, sub, a: a0 + TAU * k / n }); };
+    add(0, '1s', 2, 0); add(1, '2s', 2, 0.4); add(1, '2p', 6, 0.4 + TAU / 16);
+    add(2, '3s', 2, 0.2); add(2, '3p', 2, 0.2 + TAU / 4);
+    // ladder slot index per subshell
+    const cnt = {};
+    E.forEach((e, i) => { e.i = i; e.k = cnt[e.sub] = (cnt[e.sub] || 0) + 1; e.k--; });
+
+    // static drawing
+    const gBack = sv('g', {}, svg);
+    SH.forEach(r => sv('circle', { cx: CX, cy: CY, r, fill: 'none', stroke: '#33405e', 'stroke-width': 1.4 }, gBack));
+    const excRing = sv('circle', { cx: CX, cy: CY, r: EXC_R, fill: 'none', stroke: C.en, 'stroke-opacity': .5, 'stroke-dasharray': '4 4', 'stroke-width': 1.2, opacity: 0 }, gBack);
+    sv('circle', { cx: CX, cy: CY, r: 13, fill: 'rgba(179,157,219,.25)', stroke: C.ion, 'stroke-width': 1.5 }, gBack);
+    const nt = sv('text', { x: CX, y: CY + 4, 'font-size': 11, 'font-weight': 700, fill: C.ion, 'text-anchor': 'middle' }, gBack); nt.textContent = '+14';
+    const lab = (s, x, y, col, size, anchor, w) => { const t = sv('text', { x, y, 'font-size': size || 11, fill: col || C.muted, 'text-anchor': anchor || 'start', 'font-weight': w || 500 }, svg); t.textContent = s; return t; };
+    lab('Si atom', CX, 18, C.text, 12, 'middle', 600);
+    const ionLab = lab('Si⁺ (ionised)', CX, 290 - 14, C.en, 11, 'middle', 600); ionLab.setAttribute('opacity', 0);
+
+    // ladder
+    sv('line', { x1: 210, y1: 282, x2: 210, y2: 14, stroke: '#33405e', 'stroke-width': 1.2 }, svg);
+    sv('path', { d: 'M206 20 L210 12 L214 20 Z', fill: '#33405e' }, svg);
+    const et = lab('energy', 204, 150, C.muted, 10, 'middle'); et.setAttribute('transform', 'rotate(-90 204 150)');
+    Object.keys(LV).forEach(k => {
+      const empty = k === '4s' || k === '3d' || k === 'free';
+      sv('line', { x1: LX0, y1: LV[k], x2: LX1, y2: LV[k], stroke: k === 'free' ? C.en : empty ? C.muted : '#c5cbe0', 'stroke-width': 1.5, 'stroke-dasharray': empty ? '4 3' : 'none', 'stroke-opacity': empty ? .7 : 1 }, svg);
+    });
+    lab('1s', 310, LV['1s'] + 4); lab('2s', 310, LV['2s'] + 4); lab('2p', 310, LV['2p'] + 4);
+    lab('3s', 310, LV['3s'] + 4, C.e); lab('3p', 310, LV['3p'] + 4, C.e);
+    lab('4s +4.9 eV', 310, LV['4s'] + 7, C.muted, 10); lab('3d +5.6 eV', 310, LV['3d'] + 1, C.muted, 10);
+    lab('free 8.15 eV', 310, LV.free + 4, C.en, 10);
+    // axis break between inner and outer levels
+    sv('path', { d: 'M204 216 L216 210 M204 222 L216 216', stroke: C.muted, 'stroke-width': 1.2, fill: 'none' }, svg);
+    lab('≈', 222, 218, C.muted, 11);
+    lab("} valence", 330, (LV["3s"] + Y3P) / 2 + 5, C.e, 10);
+
+    // electrons (atom + ladder)
+    const atomG = sv('g', {}, svg), ladG = sv('g', {}, svg);
+    E.forEach(e => {
+      const val = e.sh === 2;
+      e.ga = sv('g', { class: 'hit', tabindex: 0, role: 'button', 'aria-label': e.sub + ' electron' + (val ? ' (valence)' : '') }, atomG);
+      if (val) e.glowA = sv('circle', { r: 10, fill: C.e, 'fill-opacity': .22 }, e.ga);
+      e.ca = sv('circle', { r: val ? 5.5 : 4.5, fill: val ? C.e : '#7f8cab' }, e.ga);
+      sv('circle', { r: 12, fill: 'transparent' }, e.ga);
+      e.gl = sv('g', { class: 'hit', tabindex: 0, role: 'button', 'aria-label': e.sub + ' electron on the ladder' }, ladG);
+      if (val) e.glowL = sv('circle', { r: 9, fill: C.e, 'fill-opacity': .22 }, e.gl);
+      e.cl = sv('circle', { r: val ? 5 : 4, fill: val ? C.e : '#7f8cab' }, e.gl);
+      sv('circle', { r: 9, fill: 'transparent' }, e.gl);
+      e.lx = LX0 + 10 + e.k * 13; e.ly = LV[e.sub];
+      const pick = () => select(e.i);
+      [e.ga, e.gl].forEach(g => {
+        g.addEventListener('click', pick);
+        g.addEventListener('keydown', ev => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); pick(); } });
+      });
+    });
+    const photon = sv('path', { fill: 'none', 'stroke-width': 2, opacity: 0 }, svg);
+    svgWatermark(svg, W, H);
+
+    let sel = -1, ang = [0, 0, 0], ph = null, exc = null, emit = null;
+    const msg = $('aMsg'), eSl = $('aeSl');
+    const NAMES = { '1s': 'a 1s electron (innermost, very tightly bound)', '2s': 'a 2s electron (inner, tightly bound)', '2p': 'a 2p electron (inner, tightly bound)', '3s': 'a 3s electron: one of the 4 valence electrons', '3p': 'a 3p electron: one of the 4 valence electrons' };
+    function setMsg(h, cls) { msg.innerHTML = h; msg.className = 'msg' + (cls ? ' ' + cls : ''); }
+    function select(i) {
+      sel = sel === i ? -1 : i;
+      E.forEach(e => {
+        const on = e.i === sel;
+        [e.ca, e.cl].forEach(c => { c.setAttribute('stroke', on ? C.en : 'none'); c.setAttribute('stroke-width', on ? 3 : 0); });
+      });
+      if (sel >= 0) setMsg('Selected <strong>' + NAMES[E[sel].sub] + '</strong>. It sits on the ' + E[sel].sub + ' level of the ladder.');
+      A.dirty = true;
+    }
+    function wavePath(hx, hy, dx, dy, len, wl, amp) {
+      let d = '';
+      for (let i = 0; i <= len; i += 2) {
+        const u = i / len, s = -len + i, w = amp * Math.sin(Math.PI * u) * Math.sin(TAU * s / wl);
+        d += (i ? 'L' : 'M') + (hx + dx * s - dy * w).toFixed(1) + ' ' + (hy + dy * s + dx * w).toFixed(1);
+      }
+      return d;
+    }
+    function fire() {
+      if (ph || exc || emit) return;
+      const En = +eSl.value;
+      const ion = En >= ION;
+      const tg = TARGETS.find(T => Math.abs(En - T.dE) <= 0.051);
+      const victim = E.find(e => e.sub === '3p' && (sel < 0 || e.i === sel)) || E.find(e => e.sub === '3p');
+      ph = { x: -10, E: En, hit: ion || !!tg, tg, ion, victim };
+      const nm = 1240 / En;
+      setMsg('Photon sent: E = ' + En.toFixed(2) + ' eV (λ = ' + Math.round(nm) + ' nm, ' + wlName(nm) + ').');
+      A.kick();
+    }
+    function aPos(e) {
+      let r = SH[e.sh];
+      if (exc && exc.e === e) r = SH[2] + (exc.r - SH[2]);
+      const a = e.a + ang[e.sh];
+      return { x: CX + r * Math.cos(a), y: CY + r * Math.sin(a) };
+    }
+    function step(dt) {
+      ang[0] += 0.9 * dt; ang[1] += 0.5 * dt; ang[2] += 0.3 * dt;
+      if (ph) {
+        ph.x += 230 * dt;
+        if (ph.hit) {
+          const p = aPos(ph.victim);
+          if (ph.x >= p.x - 4) {
+            exc = { e: ph.victim, t: 0, r: SH[2], ion: ph.ion, ly: Y3P, ty: ph.ion ? LV.free - 30 : LV[ph.tg.lv], E: ph.E, tg: ph.tg };
+            setMsg(ph.ion
+              ? '<strong>Absorbed</strong>: ' + ph.E.toFixed(2) + ' eV ≥ 8.15 eV, so the 3p electron leaves the atom completely (ionisation).'
+              : '<strong>Absorbed</strong>: ' + ph.E.toFixed(2) + ' eV matches the 3p → ' + ph.tg.lv + ' step, so the electron jumps up.', 'ok');
+            ph = null;
+          }
+        } else if (ph.x > 200) {
+          setMsg('<strong>Passed by</strong>: no empty level is exactly ' + ph.E.toFixed(2) + ' eV above 3p (try 4.90 or 5.60 eV, or ≥ 8.15 eV).', 'no');
+          ph = null;
+        }
+      }
+      if (exc) {
+        exc.t += dt;
+        const up = Math.min(1, exc.t / 0.4);
+        if (exc.ion) {
+          exc.r = SH[2] + up * 40 + Math.max(0, exc.t - 0.4) * 160;
+          exc.ly = Y3P + (exc.ty - Y3P) * up;
+          if (exc.t > 2.6) { exc = null; setMsg('The ion has captured a new electron (shown simply as a reset).'); }
+        } else if (exc.t < 1.6) {
+          exc.r = SH[2] + (EXC_R - SH[2]) * up;
+          exc.ly = Y3P + (exc.ty - Y3P) * up;
+        } else {
+          const dn = Math.min(1, (exc.t - 1.6) / 0.35);
+          exc.r = EXC_R - (EXC_R - SH[2]) * dn;
+          exc.ly = exc.ty + (Y3P - exc.ty) * dn;
+          if (dn >= 1) {
+            const p = aPos(exc.e);
+            emit = { x: p.x, y: p.y, s: 0, E: exc.E };
+            setMsg('The electron falls back to 3p and <strong>emits a photon</strong> of the same energy, ' + exc.E.toFixed(2) + ' eV.', 'ok');
+            exc = null;
+          }
+        }
+      }
+      if (emit) { emit.s += 230 * dt; if (emit.s > 160) emit = null; }
+    }
+    function draw() {
+      E.forEach(e => {
+        const p = aPos(e);
+        let op = 1;
+        if (exc && exc.e === e && exc.ion) op = Math.max(0, 1 - Math.max(0, exc.t - 0.6) / 1.2);
+        e.ga.setAttribute('transform', 'translate(' + p.x.toFixed(1) + ' ' + p.y.toFixed(1) + ')');
+        e.ga.setAttribute('opacity', op);
+        const ly = exc && exc.e === e ? exc.ly : e.ly;
+        e.gl.setAttribute('transform', 'translate(' + e.lx + ' ' + ly.toFixed(1) + ')');
+        e.gl.setAttribute('opacity', op);
+      });
+      excRing.setAttribute('opacity', exc && !exc.ion ? 1 : 0);
+      ionLab.setAttribute('opacity', exc && exc.ion && exc.t > 0.8 ? 1 : 0);
+      if (ph) {
+        const nm = 1240 / ph.E, wl = Math.max(7, Math.min(36, nm / 20));
+        photon.setAttribute('d', wavePath(ph.x, CY - 30, 1, 0, 60, wl, 6));
+        photon.setAttribute('stroke', wlColor(nm)); photon.setAttribute('opacity', 1);
+      } else if (emit) {
+        const nm = 1240 / emit.E, wl = Math.max(7, Math.min(36, nm / 20)), dx = -0.8, dy = -0.6;
+        photon.setAttribute('d', wavePath(emit.x + dx * emit.s, emit.y + dy * emit.s, dx, dy, 50, wl, 6));
+        photon.setAttribute('stroke', wlColor(nm)); photon.setAttribute('opacity', Math.max(0, 1 - emit.s / 160));
+      } else photon.setAttribute('opacity', 0);
+    }
+    const A = new Anim('anim1', {
+      step, draw,
+      reset() { ang = [0, 0, 0]; ph = null; exc = null; emit = null; sel = 0; select(0); setMsg('Tap an electron, or press <strong>Send photon</strong>.'); }
+    });
+    eSl.addEventListener('input', () => { $('aeOut').textContent = (+eSl.value).toFixed(2) + ' eV'; });
+    $('aFire').addEventListener('click', fire);
+  })();
+
+  /* =========================================================
+     SECTION 2 — levels to bands (canvas)
+     ========================================================= */
+  (function () {
+    const A0 = 5.43, AMIN = 4, AMAX = 14, AM = 8.5, AS = 6.6;
+    const ES = 0.34, EP = 0.58, H0 = 0.06, DEC = 1.2, INNER = 0.035;
+    const cv = new Cv('cv2', 420, 410);
+    const PX0 = 50, PX1 = 410, PY0 = 104, PY1 = 352;
+    const sl = $('aSl'), segBtns = Array.from(document.querySelectorAll('#anim2 [data-n]'));
+    let a = AMAX, N = 2, lastMsg = '';
+
+    // Band edges vs lattice spacing a (schematic, after Streetman & Banerjee Fig. 3-3)
+    function edges(x) {
+      if (x >= AM) { const hs = H0 * Math.exp(-(x - AM) / DEC); return { reg: 'far', sB: ES - hs, sT: ES + hs, pB: EP - 3 * hs, pT: EP + 3 * hs }; }
+      if (x >= AS) { const d = AM - x; return { reg: 'merged', B: 0.28 - 0.03 * d, T: 0.76 + 0.04 * d }; }
+      const d0 = AM - AS, d = AS - x, M = (0.28 - 0.03 * d0 + 0.76 + 0.04 * d0) / 2, g = 0.2 * d / (AS - A0);
+      return { reg: 'split', B: 0.28 - 0.03 * d0 - 0.05 * d, T: 0.76 + 0.04 * d0 + 0.05 * d, lt: M - g / 2, ub: M + g / 2 };
+    }
+    // energy of the state at fraction f (0..1) of all 8N states, ordered by energy
+    function epos(e, f) {
+      if (e.reg === 'far') return f < 0.25 ? e.sB + (f / 0.25) * (e.sT - e.sB) : e.pB + ((f - 0.25) / 0.75) * (e.pT - e.pB);
+      if (e.reg === 'merged') return e.B + f * (e.T - e.B);
+      return f < 0.5 ? e.B + (f / 0.5) * (e.lt - e.B) : e.ub + ((f - 0.5) / 0.5) * (e.T - e.ub);
+    }
+    const xa = v => PX0 + (v - AMIN) / (AMAX - AMIN) * (PX1 - PX0);
+    const ye = E => PY1 - E * (PY1 - PY0);
+    const EPS = 1e-6;
+
+    function band(c, f0, f1, aLo, aHi, fill) {
+      const S = 60; c.beginPath();
+      for (let i = 0; i <= S; i++) { const v = aLo + (aHi - aLo) * i / S; const y = ye(epos(edges(v), f1 - EPS)); i ? c.lineTo(xa(v), y) : c.moveTo(xa(v), y); }
+      for (let i = S; i >= 0; i--) { const v = aLo + (aHi - aLo) * i / S; c.lineTo(xa(v), ye(epos(edges(v), f0 + EPS))); }
+      c.closePath(); c.fillStyle = fill; c.fill();
+    }
+    function level(c, f, aLo, aHi, col) {
+      const S = 60; c.strokeStyle = col; c.lineWidth = 1; c.beginPath();
+      for (let i = 0; i <= S; i++) { const v = aLo + (aHi - aLo) * i / S; const y = ye(epos(edges(v), f)); i ? c.lineTo(xa(v), y) : c.moveTo(xa(v), y); }
+      c.stroke();
+    }
+    function drawAtoms(c) {
+      const nd = N || 8, s = Math.min(6, 370 / ((nd - 1) * AMAX + 4)), rc = 4.25 * s, cx = 220, cy = 50;
+      for (let i = 0; i < nd; i++) {
+        const x = cx + (i - (nd - 1) / 2) * a * s;
+        const g = c.createRadialGradient(x, cy, 0, x, cy, rc);
+        g.addColorStop(0, 'rgba(79,195,247,.42)'); g.addColorStop(1, 'rgba(79,195,247,0)');
+        c.fillStyle = g; c.beginPath(); c.arc(x, cy, rc, 0, TAU); c.fill();
+        circ(c, x, cy, 3, C.ion);
+      }
+      if (!N) {
+        const ex = ((nd - 1) / 2) * a * s + rc + 4;
+        if (cx - ex > 14) { txt(c, '···', cx - ex, cy, C.muted, 12, 700, 'right'); txt(c, '···', cx + ex, cy, C.muted, 12, 700, 'left'); }
+      }
+      txt(c, N === 1 ? '1 atom' : N ? N + ' atoms' : 'crystal: ~5×10²² atoms/cm³', 8, 12, C.muted, 10, 500);
+      txt(c, 'a = ' + a.toFixed(2) + ' Å', 412, 12, C.en, 10, 600, 'right', MONO);
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      drawAtoms(c);
+      hline(c, 0, 420, 90, C.line, 1);
+      const eq = Math.abs(a - A0) < 0.1;
+      c.save(); c.beginPath(); c.rect(PX0, PY0 - 4, PX1 - PX0, PY1 - PY0 + 4); c.clip();
+      // inner levels: nearly flat
+      hline(c, PX0, PX1, ye(INNER), '#7f8cab', 1);
+      if (N === 1) {
+        hline(c, PX0, PX1, ye(ES), '#c5cbe0', 1.6); hline(c, PX0, PX1, ye(EP), '#c5cbe0', 1.6);
+      } else {
+        const neutralFill = N ? 'rgba(154,164,184,.14)' : 'rgba(154,164,184,.45)';
+        const vbFill = N ? 'rgba(57,73,171,.30)' : 'rgba(57,73,171,.9)', cbFill = N ? 'rgba(0,131,143,.30)' : 'rgba(0,131,143,.9)';
+        band(c, 0, 0.25, AS, AMAX, neutralFill); band(c, 0.25, 1, AS, AMAX, neutralFill);
+        band(c, 0, 0.5, AMIN, AS, vbFill); band(c, 0.5, 1, AMIN, AS, cbFill);
+        if (N) {
+          const L = 4 * N;
+          for (let k = 0; k < L; k++) {
+            const f = (k + 0.5) / L;
+            level(c, f, AS, AMAX, '#b7bfd6');
+            level(c, f, AMIN, AS, f < 0.5 ? C.vbL : C.cbL);
+          }
+        }
+      }
+      c.restore();
+      // axes
+      vline(c, PX0, PY0 - 8, PY1, C.line, 1.2); hline(c, PX0, PX1, PY1, C.line, 1.2);
+      c.fillStyle = C.line; c.beginPath(); c.moveTo(PX0, PY0 - 14); c.lineTo(PX0 - 4, PY0 - 6); c.lineTo(PX0 + 4, PY0 - 6); c.fill();
+      c.strokeStyle = C.muted; c.lineWidth = 1.2; c.beginPath();
+      c.moveTo(PX0 - 5, ye(0.075) + 3); c.lineTo(PX0 + 5, ye(0.075) - 3); c.moveTo(PX0 - 5, ye(0.075) + 8); c.lineTo(PX0 + 5, ye(0.075) + 2); c.stroke();
+      [4, 6, 8, 10, 12, 14].forEach(v => { vline(c, xa(v), PY1, PY1 + 4, C.muted, 1); txt(c, String(v), xa(v), PY1 + 13, C.muted, 9.5, 500, 'center'); });
+      txt(c, '← closer   a (Å)   farther →', PX0, PY1 + 31, C.muted, 10, 500, 'left');
+      c.save(); c.translate(16, (PY0 + PY1) / 2); c.rotate(-Math.PI / 2); txt(c, 'electron energy →', 0, 0, C.muted, 10, 500, 'center'); c.restore();
+      // far-right labels
+      const sN = N === 1 ? '' : N ? ' · ' + 2 * N + ' states' : ' · 2N states';
+      const pN = N === 1 ? '' : N ? ' · ' + 6 * N + ' states' : ' · 6N states';
+      txt(c, '3p' + pN, PX1 - 4, ye(EP) - 16, C.text, 9.5, 600, 'right');
+      txt(c, '3s' + sN, PX1 - 4, ye(ES) - 12, C.text, 9.5, 600, 'right');
+      txt(c, '2p, 2s, 1s (inner, barely split)', PX1 - 4, ye(INNER) - 9, C.muted, 9, 500, 'right');
+      // Si spacing marker
+      vline(c, xa(A0), PY0, PY1, C.ok, 1.3, [4, 3]);
+      tag(c, 'Si: 5.43 Å', xa(A0) - 2, PY0 - 2, C.ok, 'center');
+      // labels at equilibrium
+      if (eq && N !== 1) {
+        const e = edges(A0), n4 = N ? 4 * N + ' states' : '4N states';
+        tag(c, 'Conduction band · ' + n4, xa(A0) + 6, ye((e.ub + e.T) / 2), C.cbL);
+        tag(c, 'Valence band · ' + n4, xa(A0) + 6, ye((e.B + e.lt) / 2), C.vbL);
+        darrow(c, xa(A0) + 16, ye(e.ub), ye(e.lt), C.en);
+        tag(c, 'Eg = 1.12 eV', xa(A0) + 24, ye((e.ub + e.lt) / 2), C.en);
+      }
+      // cursor
+      vline(c, xa(a), PY0, PY1, C.en, 1.6);
+      c.fillStyle = C.en; c.beginPath(); c.moveTo(xa(a), PY1 - 1); c.lineTo(xa(a) - 5, PY1 + 7); c.lineTo(xa(a) + 5, PY1 + 7); c.fill();
+      cv.wm(c);
+      $('aOut').textContent = a.toFixed(2) + ' Å';
+      const reg = edges(a).reg;
+      const m = N === 1 ? 'One atom on its own: its 3s and 3p levels stay sharp at every spacing, because there is no neighbour to overlap with.'
+        : eq ? 'Silicon spacing (5.43 Å): two bands of 4N states each. The lower (valence) band is full, the upper (conduction) band is empty, and Eg = 1.12 eV separates them.'
+        : reg === 'far' && a > 11 ? 'Far apart: no overlap, so every atom has the same sharp 3s and 3p levels.'
+        : reg === 'far' ? 'Clouds begin to overlap: each level splits into ' + (N ? N : 'N') + ' levels and spreads into a band.'
+        : reg === 'merged' ? 'The 3s and 3p bands have merged into one band of 8N states.'
+        : a > A0 ? 'The merged band is splitting into a lower and an upper band; a gap is opening.'
+        : 'Closer than the real spacing: the gap keeps growing. Atoms do not sit here in a real crystal.';
+      if (m !== lastMsg) { $('bInfo').textContent = m; lastMsg = m; }
+    }
+    const A = new Anim('anim2', {
+      step(dt) { if (a > A0) { a = Math.max(A0, a - 1.8 * dt); sl.value = a; } },
+      draw, reset() { a = AMAX; sl.value = a; }
+    });
+    sl.addEventListener('input', () => { a = +sl.value; if (A.playing) A.setPlaying(false); A.dirty = true; });
+    segBtns.forEach(b => b.addEventListener('click', () => {
+      N = +b.dataset.n;
+      segBtns.forEach(o => o.setAttribute('aria-pressed', String(o === b)));
+      A.dirty = true;
+    }));
+  })();
+
+  /* =========================================================
+     SECTION 3 — reading a band diagram (SVG)
+     ========================================================= */
+  (function () {
+    const svg = $('svg3'), W = 400, H = 300;
+    const X0 = 30, X1 = 326, CBT = 24, EC = 96, EV = 186, VBB = 258;
+    const COLS = 16, ROWS = 4, RG = 17;
+    const DEF = {
+      cb: ['Conduction band (CB)', 'The lowest band that is empty at 0 K. An electron that reaches it is free to move through the crystal and carry current.'],
+      vb: ['Valence band (VB)', 'The highest band that is full at 0 K. Its electrons are held in covalent bonds between atoms.'],
+      gap: ['Forbidden gap', 'A range of energies where no electron state exists in a perfect crystal. An electron can only jump across it, never stay in it.'],
+      ec: ['Ec', 'The bottom edge of the conduction band: the lowest energy a free electron can have.'],
+      ev: ['Ev', 'The top edge of the valence band: the highest energy a bonded electron can have.'],
+      eg: ['Eg = Ec − Ev', 'The band gap: the minimum energy needed to free a bonded electron. Si: 1.12 eV at 300 K.']
+    };
+    const hits = {};
+    function hitGroup(key, label) {
+      const g = sv('g', { class: 'hit', tabindex: 0, role: 'button', 'aria-label': label }, svg);
+      g.addEventListener('click', () => choose(key));
+      g.addEventListener('keydown', ev => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); choose(key); } });
+      hits[key] = g; return g;
+    }
+    // axes
+    sv('line', { x1: 14, y1: 262, x2: 14, y2: 16, stroke: '#33405e', 'stroke-width': 1.2 }, svg);
+    sv('path', { d: 'M10 22 L14 13 L18 22 Z', fill: '#33405e' }, svg);
+    const yl = sv('text', { x: 10, y: 140, 'font-size': 10, fill: C.muted, 'text-anchor': 'middle', transform: 'rotate(-90 10 140)' }, svg); yl.textContent = 'electron energy';
+    const xl = sv('text', { x: X0, y: 294, 'font-size': 10, fill: C.muted }, svg); xl.textContent = 'position x in the crystal →';
+    // regions
+    const gCB = hitGroup('cb', 'Conduction band');
+    sv('rect', { class: 'hl-target', x: X0, y: CBT, width: X1 - X0, height: EC - CBT, fill: C.cb, 'fill-opacity': .55, stroke: 'none' }, gCB);
+    const tcb = sv('text', { x: X0 + 8, y: CBT + 16, 'font-size': 12, 'font-weight': 600, fill: '#e0f7fa' }, gCB); tcb.textContent = 'conduction band (CB)';
+    const gGap = hitGroup('gap', 'Forbidden gap');
+    sv('rect', { class: 'hl-target', x: X0, y: EC + 2, width: X1 - X0, height: EV - EC - 4, fill: '#141b2b', stroke: 'none' }, gGap);
+    const tg = sv('text', { x: (X0 + X1) / 2, y: (EC + EV) / 2 - 10, 'font-size': 11, fill: C.muted, 'text-anchor': 'middle' }, gGap); tg.textContent = 'forbidden gap';
+    const gVB = hitGroup('vb', 'Valence band');
+    sv('rect', { class: 'hl-target', x: X0, y: EV, width: X1 - X0, height: VBB - EV, fill: C.vb, 'fill-opacity': .75, stroke: 'none' }, gVB);
+    const tvb = sv('text', { x: X0 + 8, y: VBB + 14, 'font-size': 11, 'font-weight': 600, fill: C.vbL }, svg); tvb.textContent = 'valence band (VB)';
+    // Ec / Ev lines with wide invisible hit strokes
+    const gEc = hitGroup('ec', 'Ec, bottom of conduction band');
+    sv('line', { x1: X0, y1: EC, x2: X1, y2: EC, stroke: 'transparent', 'stroke-width': 14 }, gEc);
+    const lEc = sv('line', { class: 'ecl', x1: X0, y1: EC, x2: X1 + 6, y2: EC, stroke: C.cbL, 'stroke-width': 2.5 }, gEc);
+    const tEc = sv('text', { x: X1 + 10, y: EC + 4, 'font-size': 13, 'font-weight': 700, fill: C.cbL, 'font-family': MONO }, gEc); tEc.textContent = 'Ec';
+    const gEv = hitGroup('ev', 'Ev, top of valence band');
+    sv('line', { x1: X0, y1: EV, x2: X1, y2: EV, stroke: 'transparent', 'stroke-width': 14 }, gEv);
+    const lEv = sv('line', { class: 'ecl', x1: X0, y1: EV, x2: X1 + 6, y2: EV, stroke: C.vbL, 'stroke-width': 2.5 }, gEv);
+    const tEv = sv('text', { x: X1 + 10, y: EV + 4, 'font-size': 13, 'font-weight': 700, fill: C.vbL, 'font-family': MONO }, gEv); tEv.textContent = 'Ev';
+    const gEg = hitGroup('eg', 'Eg, band gap');
+    sv('rect', { x: 352, y: EC, width: 40, height: EV - EC, fill: 'transparent' }, gEg);
+    sv('line', { class: 'ecl', x1: 366, y1: EC + 6, x2: 366, y2: EV - 6, stroke: C.en, 'stroke-width': 2 }, gEg);
+    sv('path', { d: `M366 ${EC} L361 ${EC + 8} L371 ${EC + 8} Z M366 ${EV} L361 ${EV - 8} L371 ${EV - 8} Z`, fill: C.en }, gEg);
+    const tEg = sv('text', { x: 374, y: (EC + EV) / 2 + 4, 'font-size': 13, 'font-weight': 700, fill: C.en, 'font-family': MONO }, gEg); tEg.textContent = 'Eg';
+    // field / current arrows (shown when field on)
+    const fieldG = sv('g', { opacity: 0, 'pointer-events': 'none' }, svg);
+    sv('path', { d: `M${X0 + 10} ${EV - 22} H${X0 + 90} M${X0 + 84} ${EV - 27} L${X0 + 92} ${EV - 22} L${X0 + 84} ${EV - 17}`, stroke: C.muted, 'stroke-width': 1.6, fill: 'none' }, fieldG);
+    const fl = sv('text', { x: X0 + 10, y: EV - 30, 'font-size': 11, fill: C.muted }, fieldG); fl.textContent = 'field E';
+    sv('path', { d: `M${X1 - 90} ${EV - 22} H${X1 - 10} M${X1 - 16} ${EV - 27} L${X1 - 8} ${EV - 22} L${X1 - 16} ${EV - 17}`, stroke: C.ok, 'stroke-width': 2, fill: 'none' }, fieldG);
+    const il = sv('text', { x: X1 - 90, y: EV - 30, 'font-size': 11, fill: C.ok }, fieldG); il.textContent = 'current I';
+    // carriers layer
+    const carG = sv('g', { 'pointer-events': 'none' }, svg);
+    const sites = [];
+    for (let r = 0; r < ROWS; r++) for (let k = 0; k < COLS; k++) {
+      const s = { r, k, x: X0 + (k + 0.5) * (X1 - X0) / COLS, y: EV + 10 + r * RG, filled: true };
+      s.el = sv('circle', { cx: s.x, cy: s.y, r: 4, fill: C.e }, carG);
+      sites.push(s);
+    }
+    const labE = sv('text', { 'font-size': 11, 'font-weight': 600, fill: C.e, opacity: 0, 'text-anchor': 'middle' }, carG); labE.textContent = 'electron';
+    const labH = sv('text', { 'font-size': 11, 'font-weight': 600, fill: C.h, opacity: 0, 'text-anchor': 'middle' }, carG); labH.textContent = 'hole';
+    svgWatermark(svg, W, H);
+
+    let els = [], holes = [], field = false, chosen = null, hopT = 0;
+    const info = $('info3'), fieldBtn = $('fieldBtn'), freeBtn = $('freeBtn');
+    function choose(key) {
+      chosen = chosen === key ? null : key;
+      Object.keys(hits).forEach(k => hits[k].classList.toggle('sel', k === chosen));
+      [lEc, lEv].forEach(l => l.setAttribute('stroke-width', 2.5));
+      if (chosen === 'ec') lEc.setAttribute('stroke-width', 4);
+      if (chosen === 'ev') lEv.setAttribute('stroke-width', 4);
+      if (chosen) info.innerHTML = '<h4>' + DEF[chosen][0] + '</h4><p>' + DEF[chosen][1] + '</p>';
+      else info.innerHTML = '<h4>Tap the diagram</h4><p class="hint">Tap the conduction band, the valence band, the gap, the Ec or Ev line, or the Eg arrow to see what it means.</p>';
+    }
+    function freeOne() {
+      const top = sites.filter(s => s.r === 0 && s.filled);
+      if (!top.length || els.length >= 6) return;
+      const s = top[(rnd() * top.length) | 0];
+      s.filled = false;
+      const h = { s, x: s.x, y: s.y, el: sv('circle', { r: 4.6, fill: '#141b2b', stroke: C.h, 'stroke-width': 2 }, carG) };
+      holes.push(h);
+      const e = { x: s.x, y: s.y, ty: EC - 16 - rnd() * 40, st: 'jump', vx: (rnd() - 0.5) * 60, ph: rnd() * TAU,
+        el: sv('circle', { r: 5, fill: C.e }, carG), glow: sv('circle', { r: 10, fill: C.e, 'fill-opacity': .22 }, carG) };
+      els.push(e);
+      A.kick();
+      if (els.length >= 6) freeBtn.disabled = true;
+    }
+    function wrapX(x) { const w = X1 - X0 - 12; while (x < X0 + 6) x += w; while (x > X1 - 6) x -= w; return x; }
+    function step(dt) {
+      els.forEach(e => {
+        if (e.st === 'jump') { e.y -= 260 * dt; if (e.y <= e.ty) { e.y = e.ty; e.st = 'free'; } return; }
+        if (field) e.vx += (-45 - e.vx) * Math.min(1, dt * 3);              // drift against the field
+        else if (rnd() < dt * 0.8) e.vx = (rnd() - 0.5) * 80;
+        e.x = wrapX(e.x + e.vx * dt);
+        e.ph += dt * 2; e.y = Math.max(CBT + 26, Math.min(EC - 8, e.y + Math.sin(e.ph) * 10 * dt));
+      });
+      if (field) {        // the bound electron to the right of a hole steps left into it → hole moves right
+        hopT -= dt;
+        if (hopT <= 0) {
+          hopT = 0.55;
+          holes.forEach(h => {
+            const nk = (h.s.k + 1) % COLS, n = sites.find(s => s.r === h.s.r && s.k === nk);
+            if (n && n.filled) { h.s.filled = true; n.filled = false; h.s = n; if (nk === 0) h.x = n.x; }
+          });
+        }
+      }
+      holes.forEach(h => { h.x += (h.s.x - h.x) * Math.min(1, dt * 10); h.y += (h.s.y - h.y) * Math.min(1, dt * 10); });
+    }
+    function draw() {
+      sites.forEach(s => s.el.setAttribute('opacity', s.filled ? 1 : 0));
+      els.forEach(e => {
+        e.el.setAttribute('cx', e.x.toFixed(1)); e.el.setAttribute('cy', e.y.toFixed(1));
+        e.glow.setAttribute('cx', e.x.toFixed(1)); e.glow.setAttribute('cy', e.y.toFixed(1));
+      });
+      holes.forEach(h => { h.el.setAttribute('cx', h.x.toFixed(1)); h.el.setAttribute('cy', h.y.toFixed(1)); });
+      if (els.length) {
+        const e = els[0], h = holes[0];
+        labE.setAttribute('x', e.x.toFixed(1)); labE.setAttribute('y', (e.y - 12).toFixed(1)); labE.setAttribute('opacity', 1);
+        labH.setAttribute('x', h.x.toFixed(1)); labH.setAttribute('y', (EV - 6).toFixed(1)); labH.setAttribute('opacity', 1);
+      } else { labE.setAttribute('opacity', 0); labH.setAttribute('opacity', 0); }
+      fieldG.setAttribute('opacity', field ? 1 : 0);
+    }
+    function reset() {
+      els.forEach(e => { e.el.remove(); e.glow.remove(); }); holes.forEach(h => h.el.remove());
+      els = []; holes = []; sites.forEach(s => { s.filled = true; });
+      field = false; fieldBtn.setAttribute('aria-pressed', 'false'); fieldBtn.textContent = 'Electric field: OFF';
+      freeBtn.disabled = false; choose(null);
+    }
+    const A = new Anim('anim3', { step, draw, reset });
+    freeBtn.addEventListener('click', freeOne);
+    fieldBtn.addEventListener('click', () => {
+      field = !field;
+      fieldBtn.setAttribute('aria-pressed', String(field));
+      fieldBtn.textContent = 'Electric field: ' + (field ? 'ON' : 'OFF');
+      A.dirty = true; if (field) A.kick();
+    });
+  })();
+
+  /* =========================================================
+     SECTION 4 — insulator / semiconductor / metal
+     ========================================================= */
+  (function () {
+    const W = 220, H = 330, BX0 = 16, BX1 = 160, EVY = 248, SC = 24;    // 24 px per eV in all panels
+    const cvI = new Cv('cv4i', W, H), cvS = new Cv('cv4s', W, H), cvM = new Cv('cv4m', W, H);
+    const sel = $('m4Sel'), tSl = $('t4Sl');
+    let mat = 'Si', T = 300;
+    const egS = () => egT(mat, T), egI = () => egT('C', T);
+    const mk = egf => new Carriers({ x0: BX0, x1: BX1, cols: 9, rows: 3, rowGap: 14, top: 9, Ev: () => EVY, Ec: () => EVY - egf() * SC,
+      zone: [6, 34], life: [3, 3], vj: 300, vrel: 60, hop: 0.6 });
+    const simS = mk(egS), simI = mk(egI);
+    // metal: VB 170..296, CB 92..196 (overlap 170..196), electrons filled up to y=180
+    let metal = [];
+    function resetMetal() {
+      metal = [];
+      for (let y = 288; y >= 178; y -= 11) for (let i = 0; i < 9; i++)
+        metal.push({ x: BX0 + 8 + i * 16 + (y % 2) * 4, y, vx: y < 205 ? (rnd() - 0.5) * 60 : 0 });
+    }
+    resetMetal();
+
+    function bands(c, Ec, Ev, egVal) {
+      c.fillStyle = 'rgba(0,131,143,.55)'; c.fillRect(BX0, Ec - 50, BX1 - BX0, 50);
+      hline(c, BX0, BX1, Ec, C.cbL, 1.8);
+      c.fillStyle = 'rgba(57,73,171,.7)'; c.fillRect(BX0, Ev, BX1 - BX0, 48);
+      hline(c, BX0, BX1, Ev, C.vbL, 1.8);
+      txt(c, 'Ec', BX1 + 5, Ec, C.cbL, 10.5, 700, 'left', MONO);
+      txt(c, 'Ev', BX1 + 5, Ev, C.vbL, 10.5, 700, 'left', MONO);
+      darrow(c, 202, Ec, Ev, C.en);
+      txt(c, 'CB', BX0 + 5, Ec - 40, '#e0f7fa', 10, 700);
+      txt(c, 'VB', BX0 + 5, Ev + 60, C.vbL, 10, 700);
+      const s = 'Eg = ' + egVal.toFixed(2) + ' eV';
+      if (Ev - Ec >= 24) tag(c, s, (BX0 + BX1) / 2, (Ec + Ev) / 2, C.en, 'center');
+      else tag(c, s, (BX0 + BX1) / 2, Ec - 62, C.en, 'center');
+    }
+    function axis(c) {
+      vline(c, 7, 300, 20, C.line, 1);
+      c.fillStyle = C.line; c.beginPath(); c.moveTo(7, 13); c.lineTo(3, 21); c.lineTo(11, 21); c.fill();
+    }
+    function drawI() {
+      const c = cvI.begin(); if (!c) return;
+      axis(c); const e = egI(); bands(c, EVY - e * SC, EVY, e); simI.draw(c); cvI.wm(c);
+    }
+    function drawS() {
+      const c = cvS.begin(); if (!c) return;
+      axis(c); const e = egS(); bands(c, EVY - e * SC, EVY, e); simS.draw(c); cvS.wm(c);
+    }
+    function drawM() {
+      const c = cvM.begin(); if (!c) return;
+      axis(c);
+      c.fillStyle = 'rgba(57,73,171,.7)'; c.fillRect(BX0, 170, BX1 - BX0, 126);
+      c.fillStyle = 'rgba(0,131,143,.55)'; c.fillRect(BX0, 92, BX1 - BX0, 104);
+      hline(c, BX0, BX1, 196, C.cbL, 1.8); hline(c, BX0, BX1, 170, C.vbL, 1.8);
+      metal.forEach(e => dot(c, e.x, e.y, 3.4, C.e, e.vx ? 1 : 0.85));
+      txt(c, 'Ev', BX1 + 5, 168, C.vbL, 10.5, 700, 'left', MONO);
+      txt(c, 'Ec', BX1 + 5, 198, C.cbL, 10.5, 700, 'left', MONO);
+      txt(c, 'CB', BX0 + 5, 104, '#e0f7fa', 10, 700);
+      tag(c, 'bands overlap', (BX0 + BX1) / 2, 140, C.en, 'center');
+      cvM.wm(c);
+    }
+    function counts() {
+      $('c4s').textContent = simS.els.length; $('c4i').textContent = simI.els.length;
+      $('r4s').textContent = '×' + fmtX(relRate(egS(), T)); $('r4i').textContent = '×' + fmtX(relRate(egI(), T));
+    }
+    function gen(sim, eg, dt) {
+      const rate = Math.min(10, relRate(eg, T));
+      if (sim.holes.length < 12 && rnd() < rate * dt) { const s = sim.pick(); if (s) sim.generate(s, EVY - eg * SC - 8 - rnd() * 24); }
+    }
+    const A = new Anim('anim4', {
+      step(dt) {
+        gen(simS, egS(), dt); gen(simI, egI(), dt);
+        simS.step(dt); simI.step(dt);
+        metal.forEach(e => { if (e.vx) { e.x += e.vx * dt; if (e.x > BX1 - 4) e.x = BX0 + 4; if (e.x < BX0 + 4) e.x = BX1 - 4; } });
+        counts();
+      },
+      draw() { drawI(); drawS(); drawM(); },
+      reset() { sel.value = 'Si'; mat = 'Si'; $('m4Name').textContent = 'Si'; T = 300; tSl.value = 300; $('t4Out').textContent = '300 K'; simS.reset(); simI.reset(); resetMetal(); counts(); }
+    });
+    sel.addEventListener('change', () => { mat = sel.value; $('m4Name').textContent = MAT[mat].name; simS.reset(); counts(); A.dirty = true; });
+    tSl.addEventListener('input', () => { T = +tSl.value; $('t4Out').textContent = T + ' K'; counts(); A.dirty = true; });
+    counts();
+  })();
+
+  /* =========================================================
+     SECTION 5 — crossing the gap
+     ========================================================= */
+  (function () {
+    const W = 440, H = 386, EVY = 300, SC = 40, BX0 = 56, BX1 = 366;
+    const RATE_CAP = 12, MAX_TH = 20, PH_SPEED = 260;
+    const cv = new Cv('cv5', W, H);
+    const sel = $('m5Sel'), tSl = $('t5Sl'), wlSl = $('wlSl'), recBtn = $('recBtn'), msg = $('pMsg');
+    let mat = 'Si', T = 300, wl = 620, rec = true;
+    let photons = [], arrows = [], emits = [];
+    const Eg = () => egT(mat, T), Ecy = () => EVY - Eg() * SC;
+    const sim = new Carriers({ x0: BX0, x1: BX1, cols: 18, rows: 3, rowGap: 15, top: 9, Ev: () => EVY, Ec: Ecy,
+      zone: [5, 32], life: [3, 4], vj: 420, vrel: 75, hop: 0.6, recomb: () => rec,
+      onRec(x, y, s) {
+        if (MAT[mat].direct) emits.push({ x, y: (y + Ecy()) / 2, s: 0, E: Eg() });   // light (GaAs)
+        else { s.fx.push({ x, y, t: 0, k: 'rec' }); for (let k = 0; k < 4; k++) s.fx.push({ x, y, t: 0, k: 'heat', d: k % 2 ? 1 : -1 }); }
+      } });
+    function setMsg(h, cls) { msg.innerHTML = h; msg.className = 'msg' + (cls ? ' ' + cls : ''); }
+    function readouts() {
+      const e = Eg(), lc = 1240 / e, E = 1240 / wl;
+      $('t5Out').textContent = T + ' K'; $('t5b').textContent = T;
+      $('eg5').textContent = e.toFixed(2) + ' eV';
+      $('lc5').textContent = Math.round(lc) + ' nm';
+      $('r5').textContent = '×' + fmtX(relRate(e, T));
+      $('wlOut').textContent = wl + ' nm · ' + E.toFixed(2) + ' eV';
+      $('wlSw').style.background = wlColor(wl);
+      const p = Math.max(0, Math.min(1, (lc - 200) / 1800)), mk = $('cutMk');
+      mk.style.left = 'calc(' + (p * 100).toFixed(2) + '% + ' + (8 - p * 16).toFixed(1) + 'px)';
+      mk.textContent = 'cut-off ' + Math.round(lc) + ' nm';
+      mk.style.transform = p < 0.12 ? 'translateX(-8px)' : p > 0.88 ? 'translateX(calc(-100% + 8px))' : 'translateX(-50%)';
+    }
+    function counts() { const n = String(sim.els.length); if ($('n5').textContent !== n) $('n5').textContent = n; }
+
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const Ec = Ecy(), e = Eg();
+      const g = c.createLinearGradient(0, 6, 0, Ec);
+      g.addColorStop(0, 'rgba(0,131,143,.08)'); g.addColorStop(1, 'rgba(0,131,143,.6)');
+      c.fillStyle = g; c.fillRect(BX0, 6, BX1 - BX0, Ec - 6);
+      hline(c, BX0, BX1, Ec, C.cbL, 1.8);
+      c.fillStyle = 'rgba(57,73,171,.7)'; c.fillRect(BX0, EVY, BX1 - BX0, 52);
+      hline(c, BX0, BX1, EVY, C.vbL, 1.8);
+      // energy axis (to scale)
+      vline(c, 44, EVY + 52, 8, C.line, 1);
+      for (let k = 0; k * SC <= EVY - 12; k++) { const y = EVY - k * SC; hline(c, 40, 44, y, C.muted, 1); txt(c, String(k), 36, y, C.muted, 9.5, 500, 'right', MONO); }
+      c.save(); c.translate(13, (EVY + 20) / 2); c.rotate(-Math.PI / 2); txt(c, 'E − Ev (eV)', 0, 0, C.muted, 10, 500, 'center'); c.restore();
+      txt(c, 'Ec', BX1 + 6, Ec, C.cbL, 11, 700, 'left', MONO);
+      txt(c, 'Ev', BX1 + 6, EVY, C.vbL, 11, 700, 'left', MONO);
+      darrow(c, BX1 + 44, Ec, EVY, C.en);
+      txt(c, 'Eg', BX1 + 50, (Ec + EVY) / 2, C.en, 11, 700, 'left', MONO);
+      if (Ec - 52 > 12) tag(c, 'conduction band', BX0 + 4, Ec - 48, C.cbL);
+      txt(c, 'valence band', BX0 + 4, EVY + 66, C.vbL, 10, 600, 'left');
+      tag(c, 'Eg = ' + e.toFixed(2) + ' eV', (BX0 + BX1) / 2, (Ec + EVY) / 2, C.en, 'center');
+      txt(c, MAT[mat].name + ' · ' + T + ' K', BX1 - 4, 16, C.muted, 10, 600, 'right');
+      sim.draw(c);
+      arrows.forEach(a => {
+        c.globalAlpha = Math.max(0, 1 - a.t / 1.8);
+        vline(c, a.x + 10, a.y1, EVY, C.en, 1.4, [4, 3]);
+        txt(c, a.E.toFixed(2) + ' eV', a.x + 16, Math.max(a.y1, 18) + 12, C.en, 10, 600, 'left', MONO);
+        if (a.y1 < Ec - 34) txt(c, 'extra → heat', a.x + 16, Math.max(a.y1, 18) + 26, C.en, 9.5, 500);
+        c.globalAlpha = 1;
+      });
+      photons.forEach(p => {
+        const nm = 1240 / p.E, col = wlColor(nm);
+        wave(c, p.x, p.y, 1, 0, 70, Math.max(7, Math.min(40, nm / 25)), 7, col);
+      });
+      emits.forEach(p => {
+        const nm = 1240 / p.E, col = wlColor(nm);
+        c.globalAlpha = Math.max(0, 1 - p.s / 240);
+        wave(c, p.x + 0.7 * p.s, p.y - 0.7 * p.s, 0.7, -0.7, 50, Math.max(7, Math.min(40, nm / 25)), 6, col);
+        if (p.s < 90) txt(c, 'light', p.x + 0.7 * p.s + 10, p.y - 0.7 * p.s, col, 9.5, 600);
+        c.globalAlpha = 1;
+      });
+      cv.wm(c);
+    }
+    function fire() {
+      const E = 1240 / wl;
+      const target = E >= Eg() ? sim.pick(BX0 + (BX1 - BX0) * 0.45) : null;
+      if (target) target.lock = true;
+      photons.push({ x: -8, y: EVY + 9, E, target });
+      setMsg('Photon fired: λ = ' + wl + ' nm (' + wlName(wl) + '), E = 1240 / ' + wl + ' = ' + E.toFixed(2) + ' eV.');
+      A.kick();
+    }
+    function step(dt) {
+      const e = Eg(), rate = Math.min(RATE_CAP, relRate(e, T));
+      if (sim.holes.length < MAX_TH && rnd() < rate * dt) { const s = sim.pick(); if (s) sim.generate(s, Ecy() - 6 - rnd() * 25); }
+      for (let i = photons.length - 1; i >= 0; i--) {
+        const p = photons[i];
+        p.x += PH_SPEED * dt;
+        const nm = Math.round(1240 / p.E);
+        if (p.target && p.x >= sim.pos(p.target).x) {
+          const tx = sim.pos(p.target).x, y1 = Math.max(14, EVY - p.E * SC);
+          sim.generate(p.target, y1);
+          arrows.push({ x: tx, y1, E: p.E, t: 0 });
+          photons.splice(i, 1);
+          const ex = p.E - e;
+          setMsg('<strong>Absorbed</strong>: E = ' + p.E.toFixed(2) + ' eV ≥ Eg = ' + e.toFixed(2) + ' eV (λ = ' + nm + ' nm), so one electron–hole pair is created.' +
+            (ex > 0.05 ? ' The extra ' + ex.toFixed(2) + ' eV is lost as heat as the electron settles to Ec.' : ''), 'ok');
+        } else if (p.x > W + 80) {
+          photons.splice(i, 1);
+          if (p.E >= e) setMsg('Passed: no free valence electron was in the way. Try again.', 'no');
+          else setMsg('<strong>Passed straight through</strong>: E = ' + p.E.toFixed(2) + ' eV &lt; Eg = ' + e.toFixed(2) + ' eV (λ = ' + nm + ' nm is longer than the cut-off). ' + MAT[mat].name + ' is transparent to this light.', 'no');
+        }
+      }
+      arrows.forEach(a => { a.t += dt; }); arrows = arrows.filter(a => a.t < 1.8);
+      emits.forEach(p => { p.s += 200 * dt; }); emits = emits.filter(p => p.s < 240);
+      sim.step(dt);
+      counts();
+    }
+    function resetSim() { sim.reset(); photons = []; arrows = []; emits = []; counts(); setMsg('Choose a wavelength and press <strong>Fire photon</strong>.'); }
+    const A = new Anim('anim5', {
+      step, draw,
+      reset() {
+        sel.value = 'Si'; mat = 'Si'; T = 300; tSl.value = 300; wl = 620; wlSl.value = 620;
+        rec = true; recBtn.setAttribute('aria-pressed', 'true'); recBtn.textContent = 'Recombination: ON';
+        resetSim(); readouts();
+      }
+    });
+    sel.addEventListener('change', () => { mat = sel.value; resetSim(); readouts(); A.dirty = true; });
+    tSl.addEventListener('input', () => { T = +tSl.value; readouts(); A.dirty = true; });
+    wlSl.addEventListener('input', () => { wl = +wlSl.value; readouts(); });
+    recBtn.addEventListener('click', () => {
+      rec = !rec; recBtn.setAttribute('aria-pressed', String(rec)); recBtn.textContent = 'Recombination: ' + (rec ? 'ON' : 'OFF');
+    });
+    $('fire5').addEventListener('click', fire);
+    readouts();
+  })();
+
+  /* =========================================================
+     Mini-nav highlight + main loop
+     ========================================================= */
+  (function () {
+    const links = Array.from(document.querySelectorAll('.toc a'));
+    const secs = links.map(l => document.querySelector(l.getAttribute('href')));
+    function upd() {
+      let cur = 0;
+      secs.forEach((s, i) => { if (s.getBoundingClientRect().top < 120) cur = i; });
+      links.forEach((l, i) => l.classList.toggle('active', i === cur));
+    }
+    window.addEventListener('scroll', upd, { passive: true }); upd();
+  })();
+
+  let last = performance.now();
+  function frame(ts) {
+    const dt = Math.min(0.05, Math.max(0, (ts - last) / 1000)); last = ts;
+    anims.forEach(a => {
+      if (!a.visible) return;
+      if (a.playing) { a.o.step(dt); a.o.draw(); }
+      else if (a.dirty) a.o.draw();
+      a.dirty = false;
+    });
+    requestAnimationFrame(frame);
+  }
+  function onResize() { sizeSvgWms(); anims.forEach(a => { a.dirty = true; }); }
+  window.addEventListener('resize', onResize);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(onResize);
+  onResize();
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
