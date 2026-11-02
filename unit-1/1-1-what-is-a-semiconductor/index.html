@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>1.1 What is a Semiconductor?</title>
+  <meta name="description" content="Insulators vs metals vs semiconductors: an interactive lesson for first-year engineering students.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1420;
+      --panel: #1a2132;
+      --panel-hover: #212a3f;
+      --border: #2a3448;
+      --text: #e6e9ef;
+      --muted: #9aa4b8;
+      --electron: #4fc3f7;
+      --hole: #ff8a65;
+      --energy: #ffd54f;
+      --success: #81c784;
+      --ion: #b39ddb;
+      --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+      --max: 960px;
+      --radius: 12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: var(--font); font-size: 16px; line-height: 1.65;
+      overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column;
+    }
+    a { color: var(--electron); }
+    code, .mono { font-family: var(--mono); }
+    .wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 16px; }
+
+    .site-footer { border-top: 1px solid var(--border); color: var(--muted); font-size: 0.875rem; }
+    .site-footer .wrap { padding-top: 20px; padding-bottom: 20px; }
+
+    /* Sticky mini-nav */
+    .toc {
+      position: sticky; top: 0; z-index: 10; background: rgba(15, 20, 32, .95);
+      border-bottom: 1px solid var(--border); backdrop-filter: blur(6px);
+    }
+    .toc ul { display: flex; gap: 4px; list-style: none; margin: 0 auto; padding: 8px 16px; max-width: var(--max); overflow-x: auto; scrollbar-width: none; }
+    .toc ul::-webkit-scrollbar { display: none; }
+    .toc a {
+      display: block; white-space: nowrap; text-decoration: none; color: var(--muted);
+      font-size: 0.85rem; font-weight: 500; padding: 6px 10px; border-radius: 999px;
+    }
+    .toc a:hover { color: var(--text); background: var(--panel); }
+    .toc a.active { color: var(--bg); background: var(--electron); }
+
+    main { flex: 1; padding: 24px 0 48px; }
+    .crumbs { font-size: 0.875rem; color: var(--muted); margin: 0 0 16px; }
+    .crumbs a { color: var(--muted); }
+    .eyebrow { font-family: var(--mono); font-size: 0.8rem; color: var(--electron); letter-spacing: .04em; margin: 0; }
+    h1 { font-size: clamp(1.5rem, 6vw, 2.2rem); line-height: 1.2; margin: 4px 0 6px; }
+    .subtitle { color: var(--muted); margin: 0 0 8px; }
+    section { scroll-margin-top: 64px; padding-top: 28px; }
+    h2 { font-size: clamp(1.3rem, 5vw, 1.6rem); line-height: 1.25; margin: 0 0 14px; }
+    h3 { font-size: 1.05rem; margin: 0 0 8px; }
+    .prose { max-width: 70ch; }
+    .prose p { margin: 0 0 14px; }
+    .prose strong { color: #fff; }
+    .t-e { color: var(--electron); font-weight: 600; }
+    .t-h { color: var(--hole); font-weight: 600; }
+    .t-en { color: var(--energy); font-weight: 600; }
+    .t-ion { color: var(--ion); font-weight: 600; }
+    hr.sep { border: 0; border-top: 1px solid var(--border); margin: 40px 0 0; }
+
+    /* Buttons & controls */
+    .btn {
+      font: inherit; font-size: 0.88rem; font-weight: 600; color: var(--text);
+      background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+      padding: 7px 12px; cursor: pointer; min-height: 38px;
+    }
+    .btn:hover:not(:disabled) { background: var(--panel-hover); border-color: var(--electron); }
+    .btn:focus-visible { outline: 2px solid var(--electron); outline-offset: 2px; }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
+    .btn[aria-pressed="true"] { background: rgba(255,213,79,.14); border-color: var(--energy); color: var(--energy); }
+    .btn.danger { border-color: rgba(255,138,101,.5); color: var(--hole); }
+    .btn.danger:hover:not(:disabled) { background: rgba(255,138,101,.12); border-color: var(--hole); }
+
+    figure.anim {
+      margin: 18px 0 0; background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 12px; min-width: 0;
+    }
+    .ctrls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-bottom: 12px; }
+    .slider { flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; }
+    .slider label { display: flex; justify-content: space-between; gap: 8px; font-size: 0.8rem; color: var(--muted); }
+    .slider output { font-family: var(--mono); color: var(--energy); white-space: nowrap; }
+    input[type="range"] { width: 100%; accent-color: var(--energy); margin: 4px 0 0; }
+    input[type="range"]:disabled { opacity: .4; }
+    .viz { display: grid; grid-template-columns: 1fr; gap: 12px; align-items: start; }
+    @media (min-width: 720px) { .viz { grid-template-columns: 2fr 1fr; } }
+    canvas { display: block; width: 100%; border-radius: 8px; background: #141b2b; }
+    .band-cv { max-width: 260px; margin: 0 auto; }
+    @media (min-width: 720px) { .band-cv { max-width: none; } }
+    .exag { font-size: 0.75rem; color: var(--muted); margin: 8px 0 0; }
+    .exag b { color: var(--energy); font-weight: 600; }
+    .rm-note { font-size: 0.78rem; color: var(--muted); margin: 0 0 8px; }
+
+    .keypoints {
+      margin-top: 16px; padding: 14px 16px; border-radius: var(--radius);
+      background: rgba(129,199,132,.07); border: 1px solid rgba(129,199,132,.35);
+    }
+    .keypoints h3 { color: var(--success); font-size: 0.95rem; text-transform: uppercase; letter-spacing: .05em; }
+    .keypoints ul { margin: 0; padding-left: 20px; }
+    .keypoints li { margin: 4px 0; }
+
+    /* Atom (section 0) */
+    .atom-svg { display: block; width: 100%; max-width: 520px; margin: 0 auto; height: auto; }
+    .atom-svg text { font-family: var(--font); }
+    .vshell { cursor: pointer; outline: none; }
+    .vshell-ring { transition: stroke .2s, stroke-width .2s; }
+    .atom-svg.hl .vshell-ring { stroke: var(--energy); stroke-width: 3; }
+    .atom-svg .v-e { transition: filter .2s; }
+    .atom-svg.hl .v-e { filter: drop-shadow(0 0 5px #ffd54f); }
+    .atom-svg .hl-text { opacity: 0; transition: opacity .2s; }
+    .atom-svg.hl .hl-text { opacity: 1; }
+    .vshell:focus-visible .vshell-hit { stroke: rgba(79,195,247,.25); }
+
+    /* Comparison */
+    .cmp-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin-top: 8px; }
+    .cmp-table th, .cmp-table td { text-align: left; vertical-align: top; padding: 8px; border-top: 1px solid var(--border); }
+    .cmp-table thead th { color: var(--muted); font-weight: 600; border-top: 0; }
+    .cmp-table tbody th { color: var(--muted); font-weight: 500; width: 22%; }
+    .cmp-table .c-ins { color: var(--text); }
+    .table-box { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 12px; }
+    @media (max-width: 640px) {
+      .cmp-table thead { display: none; }
+      .cmp-table tr { display: block; padding: 8px 0; border-top: 1px solid var(--border); }
+      .cmp-table tbody tr:first-child { border-top: 0; }
+      .cmp-table th, .cmp-table td { display: block; border: 0; padding: 2px 0; width: auto; }
+      .cmp-table tbody th { color: var(--electron); font-weight: 600; padding-bottom: 4px; width: auto; }
+      .cmp-table td::before { content: attr(data-label) ": "; color: var(--muted); font-weight: 600; }
+    }
+    .minis { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    @media (min-width: 720px) { .minis { grid-template-columns: repeat(3, 1fr); } }
+    .mini h3 { font-size: 0.95rem; margin: 0 0 6px; display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+    .mini h3 span { font-size: 0.75rem; color: var(--muted); font-weight: 500; }
+    .bands3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .bands3 figure { margin: 0; min-width: 0; }
+    .bands3 figcaption { text-align: center; font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
+
+    .scale-svg { display: block; width: 100%; max-width: 760px; height: auto; margin: 0 auto; }
+    .scale-svg text { font-family: var(--font); }
+    .mk { cursor: pointer; outline: none; }
+    .mk:focus-visible circle, .mk:focus-visible rect { stroke: #fff; stroke-width: 2; }
+    .mk.sel circle, .mk.sel rect { stroke: #fff; stroke-width: 2; }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .chip {
+      font: inherit; font-size: 0.8rem; color: var(--text); background: #141b2b;
+      border: 1px solid var(--border); border-radius: 999px; padding: 4px 10px; cursor: pointer;
+    }
+    .chip:hover, .chip[aria-pressed="true"] { border-color: var(--energy); color: var(--energy); }
+    .chip:focus-visible { outline: 2px solid var(--electron); outline-offset: 2px; }
+    .mk-info { margin: 10px 0 0; font-size: 0.9rem; min-height: 1.6em; }
+    .mk-info b { font-family: var(--mono); color: var(--energy); font-weight: 500; }
+
+    .pager { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 48px; }
+    .pager a, .pager .disabled {
+      display: block; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 12px 14px; text-decoration: none; color: var(--text); min-width: 0;
+    }
+    .pager a:hover { border-color: var(--electron); }
+    .pager small { display: block; color: var(--muted); font-size: 0.75rem; }
+    .pager .next { text-align: right; }
+    .pager .disabled { opacity: .55; }
+  </style>
+</head>
+<body>
+
+  <nav class="toc" aria-label="Sections">
+    <ul>
+      <li><a href="#intro">Intro</a></li>
+      <li><a href="#insulators">Insulators</a></li>
+      <li><a href="#metals">Metals</a></li>
+      <li><a href="#semiconductors">Semiconductors</a></li>
+      <li><a href="#compare">Compare</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <a href="../../index.html">Home</a> / <a href="../index.html">Unit 1</a> / 1.1
+      </nav>
+      <p class="eyebrow">TOPIC 1.1</p>
+      <h1>What is a Semiconductor?</h1>
+      <p class="subtitle">Insulators vs metals vs semiconductors</p>
+      <p class="rm-note" id="rmNote" hidden>Your device asks for reduced motion, so every animation starts paused. Press Play on any animation to run it.</p>
+
+      <!-- ================= SECTION 0 ================= -->
+      <section id="intro" aria-labelledby="h-intro">
+        <h2 id="h-intro">What decides if a material conducts?</h2>
+        <div class="prose">
+          <p>Every atom has three parts that matter here: a positive <strong>nucleus</strong>, <strong>inner electrons</strong> held tightly close to it, and outer <strong class="t-e">valence electrons</strong>. The inner electrons are locked in place and never take part in conduction.</p>
+          <p>An electric current is simply moving charge. So a material can conduct only if it has <strong>charge carriers that are free to move</strong> when a voltage is applied.</p>
+          <p>That makes the whole story one question: <strong>how tightly does the material hold on to its valence electrons?</strong> There are three answers. <strong>Insulators</strong> hold them very tightly, so nothing flows. <strong>Metals</strong> let them go completely, so current flows easily. <strong>Semiconductors</strong> are in between, and, most importantly, we can control them.</p>
+        </div>
+
+        <figure class="anim" id="anim-atom">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <button class="btn" type="button" id="atomHl" aria-pressed="false">Highlight valence electrons</button>
+          </div>
+          <svg class="atom-svg" id="atomSvg" viewBox="0 0 360 250" role="img" aria-labelledby="atomTitle">
+            <title id="atomTitle">Silicon atom: nucleus, two inner shells with 10 locked electrons, and an outer valence shell with 4 electrons. Tap the outer shell to highlight it.</title>
+            <circle cx="120" cy="120" r="34" fill="none" stroke="#33405e" stroke-width="1.5"/>
+            <circle cx="120" cy="120" r="58" fill="none" stroke="#33405e" stroke-width="1.5"/>
+            <g class="vshell" id="vshell" tabindex="0" role="button" aria-pressed="false" aria-label="Valence shell: tap to highlight">
+              <circle class="vshell-ring" cx="120" cy="120" r="90" fill="none" stroke="#4fc3f7" stroke-opacity=".6" stroke-width="1.5" stroke-dasharray="5 4"/>
+              <circle class="vshell-hit" cx="120" cy="120" r="90" fill="none" stroke="transparent" stroke-width="24" pointer-events="stroke"/>
+            </g>
+            <g id="shell1"></g><g id="shell2"></g><g id="shell3" pointer-events="none"></g>
+            <circle cx="120" cy="120" r="17" fill="rgba(179,157,219,.25)" stroke="#b39ddb" stroke-width="1.5"/>
+            <text x="120" y="124" font-size="11" font-weight="700" fill="#b39ddb" text-anchor="middle">+14</text>
+            <g stroke="#9aa4b8" stroke-opacity=".6" stroke-width="1">
+              <line x1="134" y1="110" x2="226" y2="44"/>
+              <line x1="175" y1="100" x2="226" y2="96"/>
+              <line x1="198" y1="160" x2="226" y2="168"/>
+            </g>
+            <g font-size="12">
+              <text x="230" y="48" fill="#e6e9ef">nucleus</text>
+              <text x="230" y="94" fill="#e6e9ef">inner electrons</text>
+              <text x="230" y="109" fill="#9aa4b8" font-size="11">locked in place</text>
+              <text x="230" y="166" fill="#4fc3f7">valence electrons</text>
+              <text x="230" y="181" fill="#9aa4b8" font-size="11">outer shell (Si: 4)</text>
+            </g>
+            <text class="hl-text" x="180" y="236" font-size="13" font-weight="600" fill="#ffd54f" text-anchor="middle">these electrons decide conduction</text>
+            <text x="4" y="246" font-size="9" fill="#9aa4b8">simplified shell picture, not to scale</text>
+          </svg>
+        </figure>
+      </section>
+
+      <hr class="sep">
+
+      <!-- ================= SECTION 1 ================= -->
+      <section id="insulators" aria-labelledby="h-ins">
+        <h2 id="h-ins">Insulators</h2>
+        <div class="prose">
+          <p>An <strong>insulator</strong> is a material that does not allow electric current to flow under normal conditions. Common examples are glass (mostly SiO<sub>2</sub>), rubber, plastic, mica, porcelain, dry wood and diamond.</p>
+          <p><strong>Why?</strong> In an insulator every valence electron is locked in a strong chemical bond, either <em>covalent</em> (shared between two atoms) or <em>ionic</em> (handed from one atom to another). There are practically no free electrons, so there is nothing to carry a current.</p>
+          <p><strong>The energy view.</strong> Freeing an electron from its bond costs a minimum energy called the <strong class="t-en">band gap</strong>, E<sub>g</sub>. In an insulator this gap is large, more than about 4–5 eV: SiO<sub>2</sub> ≈ 9 eV and diamond ≈ 5.5 eV (300 K). The typical thermal energy at room temperature is only kT ≈ 0.026 eV, hundreds of times too small, so heat cannot free the electrons. The resistivity is enormous: about 10<sup>10</sup> to 10<sup>16</sup> Ω·m.</p>
+          <p><strong>Under a voltage</strong> the bound electrons are pulled slightly towards the positive side, so each atom becomes a little stretched. This is called <strong>polarisation</strong>. The charges shift a tiny distance but they do not flow. If the voltage is made extremely high, the electric field can rip electrons out of their bonds all at once. The insulator then fails suddenly, which is called <strong>dielectric breakdown</strong>, and it is usually permanently damaged.</p>
+          <p><strong>Uses:</strong> insulators are as important as conductors. They cover wires, form printed circuit boards, and a very thin gate oxide (traditionally SiO<sub>2</sub>) sits inside every MOSFET in a chip.</p>
+        </div>
+
+        <figure class="anim" id="anim-ins">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <button class="btn danger" type="button" id="insBreak">Extreme voltage</button>
+          </div>
+          <div class="ctrls">
+            <div class="slider">
+              <label for="insV"><span>Voltage (0 → normal max)</span><output id="insVOut">0%</output></label>
+              <input type="range" id="insV" min="0" max="100" step="1" value="0">
+            </div>
+            <div class="slider">
+              <label for="insT"><span>Temperature</span><output id="insTOut">300 K</output></label>
+              <input type="range" id="insT" min="0" max="600" step="10" value="300">
+            </div>
+          </div>
+          <div class="viz">
+            <canvas id="cv-ins" style="aspect-ratio:400/284" role="img" aria-label="Insulator lattice with electron pairs locked in bonds. Ammeter reads zero."></canvas>
+            <canvas id="cv-ins-band" class="band-cv" style="aspect-ratio:200/284" role="img" aria-label="Insulator band diagram: full valence band, empty conduction band, 9 eV gap."></canvas>
+          </div>
+          <p class="exag"><b>Exaggerated on screen:</b> atom vibration and the polarisation shift (really a tiny fraction of an atom's size). The band gap is not drawn to scale.</p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: insulators">
+          <h3>Key points</h3>
+          <ul>
+            <li>All valence electrons are locked in strong bonds, so there are practically <strong>no free carriers</strong>.</li>
+            <li>Large band gap (&gt; ~4–5 eV). SiO<sub>2</sub> ≈ 9 eV is far beyond kT ≈ 0.026 eV at 300 K.</li>
+            <li>Resistivity ≈ 10<sup>10</sup>–10<sup>16</sup> Ω·m.</li>
+            <li>A voltage only <strong>polarises</strong> the atoms. Too high a voltage causes <strong>dielectric breakdown</strong>, which is destructive.</li>
+            <li>Used for wire insulation, PCBs and MOSFET gate oxides.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <hr class="sep">
+
+      <!-- ================= SECTION 2 ================= -->
+      <section id="metals" aria-labelledby="h-met">
+        <h2 id="h-met">Metals (conductors)</h2>
+        <div class="prose">
+          <p>A <strong>metal</strong> (conductor) is a material that allows current to flow very easily. Silver, copper, gold and aluminium are the best-known examples.</p>
+          <p><strong>Why?</strong> Each metal atom gives up its valence electrons (copper gives one) into a shared <strong class="t-e">“sea” of free electrons</strong> that belongs to the whole crystal, not to any single atom. What remains are <strong class="t-ion">positive ion cores</strong> fixed in a regular lattice. The number of free electrons is huge: about 8.5 × 10<sup>28</sup> per m<sup>3</sup> in copper, roughly one per atom.</p>
+          <p><strong>The energy view.</strong> In a metal the energy bands overlap or are only partly filled, so there is <strong>no gap</strong>. An electron can move into a slightly higher empty state with almost no extra energy.</p>
+          <p><strong>Random motion vs drift.</strong> Even without a voltage the free electrons move very fast (about 10<sup>6</sup> m/s in copper), but in random directions. Just as many cross any plane one way as the other, so there is no net current. A voltage adds a slow <strong>drift</strong> towards the positive terminal on top of this random motion, typically only a fraction of a millimetre per second. This tiny drift, shared by an enormous number of electrons, is the current.</p>
+          <p><strong>Resistivity</strong> is very low: about 10<sup>−8</sup> Ω·m (copper ≈ 1.7 × 10<sup>−8</sup> Ω·m at 300 K). <strong>When heated</strong>, the ion cores vibrate more, electrons collide with them more often, and the resistance <strong>increases</strong>. This is a positive temperature coefficient.</p>
+          <p><strong>Uses:</strong> wires, cables, and the copper interconnects that wire up the transistors inside a chip.</p>
+        </div>
+
+        <figure class="anim" id="anim-met">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <button class="btn" type="button" id="metBatt" aria-pressed="false">Battery: OFF</button>
+            <div class="slider">
+              <label for="metT"><span>Temperature</span><output id="metTOut">300 K</output></label>
+              <input type="range" id="metT" min="100" max="600" step="10" value="300">
+            </div>
+          </div>
+          <div class="viz">
+            <canvas id="cv-met" style="aspect-ratio:400/284" role="img" aria-label="Metal lattice of positive ion cores with a sea of free electrons. Counters show electrons crossing a line each way."></canvas>
+            <canvas id="cv-met-band" class="band-cv" style="aspect-ratio:200/284" role="img" aria-label="Metal band diagram: overlapping bands filled up to the Fermi level, no gap."></canvas>
+          </div>
+          <p class="exag"><b>Simplified on screen:</b> with the battery ON, the animation hides the random thermal motion and shows only the drift, so you can see the electrons move in straight lines toward +. Each yellow flash is a collision with an ion core: the electron stops, then the field speeds it up again. Heating makes collisions more frequent. In a real metal the random motion (~10<sup>6</sup> m/s) continues and the drift is about 10<sup>10</sup> times slower. The ammeter values are real for a 1 m, 1 mm² copper wire with 0.1 V across it.</p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: metals">
+          <h3>Key points</h3>
+          <ul>
+            <li>Valence electrons form a shared <strong>electron sea</strong> (≈ 8.5 × 10<sup>28</sup> m<sup>−3</sup> in Cu). <strong class="t-ion">Ion cores</strong> stay fixed.</li>
+            <li>Bands overlap: <strong>no band gap</strong>.</li>
+            <li>Random motion gives no net current. A voltage adds a slow <strong>drift</strong>, and that is the current.</li>
+            <li>Resistivity ≈ 10<sup>−8</sup> Ω·m (Cu 1.7 × 10<sup>−8</sup> Ω·m, 300 K).</li>
+            <li>Hotter means more collisions and <strong>more resistance</strong> (positive temperature coefficient).</li>
+          </ul>
+        </aside>
+      </section>
+
+      <hr class="sep">
+
+      <!-- ================= SECTION 3 ================= -->
+      <section id="semiconductors" aria-labelledby="h-sem">
+        <h2 id="h-sem">Semiconductors</h2>
+        <div class="prose">
+          <p>A <strong>semiconductor</strong> is a material whose conductivity lies between that of metals and insulators and, more importantly, <strong>can be controlled</strong> by temperature, by light and by adding tiny amounts of impurities (doping).</p>
+          <p><strong>Examples:</strong> silicon (Si) and germanium (Ge) are in group IV of the periodic table, so each atom has <strong>4 valence electrons</strong>. Compound semiconductors such as gallium arsenide (GaAs) are also widely used.</p>
+          <p><strong>Structure.</strong> In a silicon crystal each atom shares its 4 valence electrons with 4 neighbours, forming 4 covalent bonds. At 0 K every bond is complete, no electron is free, and pure silicon behaves like an insulator.</p>
+          <p><strong>The energy view.</strong> The band gap is small: 1.12 eV for Si and 0.66 eV for Ge (300 K). At room temperature, heat breaks a few bonds. Each broken bond releases a free <strong class="t-e">electron</strong> and leaves behind an empty place in the bond called a <strong class="t-h">hole</strong>. A neighbouring bound electron can jump into the hole, so the hole moves, and it behaves like a positive charge carrier. <strong>Both electrons and holes carry current.</strong> Pure (intrinsic) silicon has a resistivity of about 2.3 × 10<sup>3</sup> Ω·m and germanium about 0.46 Ω·m: between metals and insulators.</p>
+          <p><strong>Temperature and light.</strong> Heating breaks more bonds, so the number of carriers rises sharply and the resistance <strong>decreases</strong>. This is a negative temperature coefficient, the opposite of a metal. Light whose photon energy is larger than the band gap also breaks bonds, which is how solar cells and photodiodes work.</p>
+          <p><strong>Why it matters.</strong> Because conduction can be controlled, semiconductors are used to make diodes, transistors and every integrated circuit. Doping, the most powerful way to control them, is covered in topic 1.4.</p>
+        </div>
+
+        <figure class="anim" id="anim-sem">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <button class="btn" type="button" id="semBatt" aria-pressed="false">Battery: OFF</button>
+            <button class="btn" type="button" id="semLight" aria-pressed="false">Shine light: OFF</button>
+            <div class="slider">
+              <label for="semT"><span>Temperature</span><output id="semTOut">300 K</output></label>
+              <input type="range" id="semT" min="0" max="500" step="10" value="300">
+            </div>
+          </div>
+          <div class="viz">
+            <canvas id="cv-sem" style="aspect-ratio:400/284" role="img" aria-label="Silicon lattice. Heat breaks bonds into free electrons and holes; a battery makes electrons drift to plus and holes to minus."></canvas>
+            <canvas id="cv-sem-band" class="band-cv" style="aspect-ratio:200/284" role="img" aria-label="Silicon band diagram: 1.12 eV gap with electrons jumping from valence band to conduction band, leaving holes."></canvas>
+          </div>
+          <p class="exag"><b>Exaggerated on screen:</b> the number of electron–hole pairs is on a log scale (the real count rises about 10<sup>4</sup>× from 300 K to 500 K), and the jump rate in the band diagram is sped up. With the battery ON, the random thermal motion is hidden: free electrons drift in straight lines toward +, and holes step straight toward − as the neighbouring bound electron jumps in. The drift speed is exaggerated. The ammeter values are real for a pure Si bar 1 cm long, 1 mm², with 10 V. The light intensity is illustrative.</p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: semiconductors">
+          <h3>Key points</h3>
+          <ul>
+            <li>Si and Ge have <strong>4 valence electrons</strong> in 4 covalent bonds. At 0 K they behave as insulators.</li>
+            <li>Small band gap: Si 1.12 eV, Ge 0.66 eV (300 K).</li>
+            <li>Each broken bond makes one <strong class="t-e">free electron</strong> and one <strong class="t-h">hole</strong>. Both carry current, and in pure material n = p.</li>
+            <li>Intrinsic resistivity: Si ≈ 2.3 × 10<sup>3</sup> Ω·m, Ge ≈ 0.46 Ω·m (300 K).</li>
+            <li>Hotter means more carriers and <strong>less resistance</strong> (negative temperature coefficient). Light can also create carriers.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <hr class="sep">
+
+      <!-- ================= SECTION 4 ================= -->
+      <section id="compare" aria-labelledby="h-cmp">
+        <h2 id="h-cmp">Side-by-side comparison</h2>
+        <div class="table-box">
+          <table class="cmp-table">
+            <thead>
+              <tr><th scope="col"></th><th scope="col">Insulator</th><th scope="col">Metal</th><th scope="col">Semiconductor</th></tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">Examples</th>
+                <td data-label="Insulator">Glass, rubber, mica, porcelain, diamond</td>
+                <td data-label="Metal">Silver, copper, gold, aluminium</td>
+                <td data-label="Semiconductor">Si, Ge, GaAs</td></tr>
+              <tr><th scope="row">Valence electrons / bonding</th>
+                <td data-label="Insulator">All locked in strong covalent or ionic bonds</td>
+                <td data-label="Metal">Released into a shared electron sea (Cu: 1 per atom)</td>
+                <td data-label="Semiconductor">4 (Si, Ge), shared in covalent bonds</td></tr>
+              <tr><th scope="row">Free carriers at 300 K</th>
+                <td data-label="Insulator">Practically none</td>
+                <td data-label="Metal">~10<sup>28</sup>–10<sup>29</sup> m<sup>−3</sup> (Cu 8.5 × 10<sup>28</sup>)</td>
+                <td data-label="Semiconductor">Few: Si n<sub>i</sub> ≈ 1.5 × 10<sup>16</sup> m<sup>−3</sup> electrons, same number of holes</td></tr>
+              <tr><th scope="row">Band gap (300 K)</th>
+                <td data-label="Insulator">Large, &gt; ~4–5 eV (SiO<sub>2</sub> ≈ 9, diamond ≈ 5.5)</td>
+                <td data-label="Metal">None (bands overlap or are partly filled)</td>
+                <td data-label="Semiconductor">Small: Si 1.12, Ge 0.66, GaAs 1.42 eV</td></tr>
+              <tr><th scope="row">Resistivity, Ω·m (300 K)</th>
+                <td data-label="Insulator">10<sup>10</sup> – 10<sup>16</sup></td>
+                <td data-label="Metal">~10<sup>−8</sup> (Cu 1.7 × 10<sup>−8</sup>)</td>
+                <td data-label="Semiconductor">Intrinsic Si 2.3 × 10<sup>3</sup>, Ge 0.46. Doping lowers it greatly</td></tr>
+              <tr><th scope="row">Heating changes resistance</th>
+                <td data-label="Insulator">Stays extremely high (falls slowly, but current stays negligible)</td>
+                <td data-label="Metal">Increases (positive temperature coefficient)</td>
+                <td data-label="Semiconductor">Decreases sharply (negative temperature coefficient)</td></tr>
+              <tr><th scope="row">Typical uses</th>
+                <td data-label="Insulator">Wire insulation, PCBs, MOSFET gate oxide</td>
+                <td data-label="Metal">Wires, cables, chip interconnects</td>
+                <td data-label="Semiconductor">Diodes, transistors, ICs, solar cells, sensors</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <figure class="anim" id="anim-cmp">
+          <h3>One temperature, three materials</h3>
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="slider">
+              <label for="cmpT"><span>Temperature (all three)</span><output id="cmpTOut">300 K</output></label>
+              <input type="range" id="cmpT" min="0" max="600" step="10" value="300">
+            </div>
+          </div>
+          <div class="minis">
+            <div class="mini"><h3>Insulator <span>glass</span></h3><canvas id="cv-c-ins" style="aspect-ratio:300/234" role="img" aria-label="Insulator mini panel; current stays essentially zero."></canvas></div>
+            <div class="mini"><h3>Metal <span>copper</span></h3><canvas id="cv-c-met" style="aspect-ratio:300/234" role="img" aria-label="Metal mini panel; current falls slightly as temperature rises."></canvas></div>
+            <div class="mini"><h3>Semiconductor <span>pure Si</span></h3><canvas id="cv-c-sem" style="aspect-ratio:300/234" role="img" aria-label="Semiconductor mini panel; current rises sharply as temperature rises."></canvas></div>
+          </div>
+          <p class="exag"><b>Same sample for all three:</b> a bar 1 cm long, 1 mm², with 1 mV across it, so the ammeter readings are real. The ammeter dials are on a log scale (10<sup>−20</sup> to 10<sup>2</sup> A). The silicon pair count and the drift are exaggerated, as above.</p>
+        </figure>
+
+        <figure class="anim" id="scaleFig">
+          <h3>Resistivity scale (300 K, log scale)</h3>
+          <svg class="scale-svg" id="scaleSvg" viewBox="0 0 440 175" role="group" aria-label="Logarithmic resistivity scale from 1e-9 to 1e17 ohm-metres with material markers"></svg>
+          <div class="chips" id="chips" role="group" aria-label="Select a material"></div>
+          <p class="mk-info" id="mkInfo" aria-live="polite">Tap a marker or a name to see its value.</p>
+          <p class="exag">Region boundaries are approximate; textbooks draw them slightly differently.</p>
+        </figure>
+
+        <figure class="anim">
+          <h3>Band diagrams compared</h3>
+          <div class="bands3">
+            <figure><canvas id="cv-b-met" style="aspect-ratio:200/284" role="img" aria-label="Metal: overlapping bands, no gap"></canvas><figcaption>Metal: bands overlap</figcaption></figure>
+            <figure><canvas id="cv-b-sem" style="aspect-ratio:200/284" role="img" aria-label="Semiconductor: small 1.12 eV gap"></canvas><figcaption>Semiconductor: small gap</figcaption></figure>
+            <figure><canvas id="cv-b-ins" style="aspect-ratio:200/284" role="img" aria-label="Insulator: large 9 eV gap"></canvas><figcaption>Insulator: large gap</figcaption></figure>
+          </div>
+          <p class="exag">Gap heights are drawn to show order, not to scale.</p>
+        </figure>
+      </section>
+
+      <nav class="pager" aria-label="Topic navigation">
+        <a href="../index.html"><small>← Back to</small>Unit 1 topics</a>
+        <span class="disabled next" aria-disabled="true"><small>Next · coming soon</small>1.2 Energy Band Diagrams →</span>
+      </nav>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">© 2026 Naveen Bokka · Built with open-source tools</div>
+  </footer>
+
+<script>
+(function () {
+  'use strict';
+
+  /* =========================================================
+     Constants (300 K; Streetman & Banerjee, Neamen, Sze)
+     ========================================================= */
+  const KB = 8.617e-5, Q = 1.602e-19;
+  const SI = { Eg: 1.12, ni: 1.5e10, mun: 1350, mup: 480 };       // eV, cm^-3, cm^2/V.s
+  const RHO_CU20 = 1.7e-8, ALPHA_CU = 0.0039, RHO_GLASS = 1e12;  // ohm.m, 1/K, ohm.m
+  const C = {
+    bg: '#0f1420', cv: '#141b2b', band: '#111725', text: '#e6e9ef', muted: '#9aa4b8',
+    e: '#4fc3f7', h: '#ff8a65', en: '#ffd54f', ok: '#81c784', ion: '#b39ddb',
+    line: '#33405e', atom: '#26304a', atomS: '#3d4a68'
+  };
+  const FONT = 'Inter, system-ui, sans-serif', MONO = '"JetBrains Mono", ui-monospace, monospace';
+  const RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const TAU = Math.PI * 2;
+  const rnd = Math.random;
+
+  function niSi(T) {
+    if (T <= 0) return 0;
+    return SI.ni * Math.pow(T / 300, 1.5) * Math.exp(-(SI.Eg / (2 * KB)) * (1 / T - 1 / 300));
+  }
+  function muF(T) { return Math.pow(Math.max(T, 50) / 300, -1.5); }
+  function rhoSi(T, dn) {
+    const n = niSi(T) + (dn || 0);
+    if (n <= 0) return Infinity;
+    return 1 / (Q * n * (SI.mun + SI.mup) * muF(T)) / 100; // ohm.m
+  }
+  function rhoCu(T) { return Math.max(RHO_CU20 * (1 + ALPHA_CU * (T - 293)), 1e-10); }
+  const RHO_CU300 = rhoCu(300);
+  function pairsFor(T, Tmax, maxP) {
+    const n = niSi(T);
+    if (n <= 1) return 0;
+    const v = (Math.log10(n) - 6) / (Math.log10(niSi(Tmax)) - 6);
+    return v <= 0 ? 0 : Math.round(maxP * Math.pow(Math.min(v, 1), 1.6));
+  }
+
+  /* ---------- formatting ---------- */
+  const SUP = { '-': '⁻', '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '.': '·' };
+  const sup = n => String(n).split('').map(c => SUP[c] || c).join('');
+  function sci(x) {
+    if (!isFinite(x)) return '∞';
+    if (x === 0) return '0';
+    let e = Math.floor(Math.log10(x)), m = x / Math.pow(10, e), ms = m.toFixed(1);
+    if (parseFloat(ms) >= 10) { e++; ms = (m / 10).toFixed(1); }
+    return (ms === '1.0' ? '' : ms + '×') + '10' + sup(e);
+  }
+  function siu(x, u) {
+    if (!isFinite(x)) return '∞ ' + u;
+    if (x === 0) return '0 ' + u;
+    const P = [[1e3, 'k'], [1, ''], [1e-3, 'm'], [1e-6, 'µ'], [1e-9, 'n'], [1e-12, 'p'], [1e-15, 'f']];
+    for (const [m, p] of P) if (x >= m * 0.9995) {
+      const v = x / m;
+      return (v >= 100 ? v.toFixed(0) : v >= 10 ? v.toFixed(1) : v.toFixed(2)) + ' ' + p + u;
+    }
+    return sci(x) + ' ' + u;
+  }
+
+  /* =========================================================
+     Canvas + drawing helpers
+     ========================================================= */
+  let FS = 1; // on-canvas font scale, set per canvas in Cv.begin
+  function Cv(id, W, H) { this.el = document.getElementById(id); this.W = W; this.H = H; this.ctx = this.el.getContext('2d'); }
+  Cv.prototype.begin = function () {
+    const w = this.el.clientWidth; if (!w) return null;
+    const dpr = window.devicePixelRatio || 1;
+    const pw = Math.round(w * dpr), ph = Math.round(w * dpr * this.H / this.W);
+    if (this.el.width !== pw || this.el.height !== ph) { this.el.width = pw; this.el.height = ph; }
+    const c = this.ctx, s = pw / this.W;
+    FS = Math.min(1.3, Math.max(1, 0.95 * this.W / w)); // enlarge on-canvas text when drawn small (phones)
+    c.setTransform(s, 0, 0, s, 0, 0); c.clearRect(0, 0, this.W, this.H);
+    c.textBaseline = 'middle'; c.textAlign = 'left';
+    return c;
+  };
+  function circ(c, x, y, r, fill, stroke, lw) {
+    c.beginPath(); c.arc(x, y, r, 0, TAU);
+    if (fill) { c.fillStyle = fill; c.fill(); }
+    if (stroke) { c.strokeStyle = stroke; c.lineWidth = lw || 1.5; c.stroke(); }
+  }
+  function dot(c, x, y, r, col, a) { c.globalAlpha = a == null ? 1 : a; circ(c, x, y, r, col); c.globalAlpha = 1; }
+  function txt(c, s, x, y, col, size, weight, align, font) {
+    c.font = (weight || 500) + ' ' + ((size || 11) * FS).toFixed(1) + 'px ' + (font || FONT);
+    c.fillStyle = col || C.text; c.textAlign = align || 'left'; c.fillText(s, x, y);
+  }
+  function tag(c, s, x, y, col, align) { // short on-diagram label with dark backing
+    c.font = '600 ' + (10 * FS).toFixed(1) + 'px ' + FONT;
+    const w = c.measureText(s).width + 8, hh = 8 * FS;
+    const x0 = align === 'right' ? x - w : align === 'center' ? x - w / 2 : x;
+    c.fillStyle = 'rgba(15,20,32,.85)'; c.fillRect(x0, y - hh, w, 2 * hh);
+    c.fillStyle = col || C.text; c.textAlign = 'left'; c.fillText(s, x0 + 4, y + 0.5);
+  }
+  function lead(c, x1, y1, x2, y2, col) {
+    c.globalAlpha = .7; c.strokeStyle = col || C.muted; c.lineWidth = 1;
+    c.beginPath(); c.moveTo(x1, y1); c.lineTo(x2, y2); c.stroke(); c.globalAlpha = 1;
+  }
+  function meter(c, W, y0, h, frac, m, on) {
+    c.fillStyle = C.band; c.fillRect(0, y0, W, h);
+    const r = Math.min(36, h - 16), cx = 14 + r, cy = y0 + h - 8;
+    c.lineWidth = 6; c.strokeStyle = '#2a3448';
+    c.beginPath(); c.arc(cx, cy, r, Math.PI, TAU); c.stroke();
+    for (let k = 0; k <= 4; k++) {
+      const a = Math.PI + Math.PI * k / 4;
+      c.strokeStyle = '#5b6680'; c.lineWidth = 1;
+      c.beginPath(); c.moveTo(cx + Math.cos(a) * (r - 7), cy + Math.sin(a) * (r - 7));
+      c.lineTo(cx + Math.cos(a) * (r + 3), cy + Math.sin(a) * (r + 3)); c.stroke();
+    }
+    const na = Math.PI + Math.PI * Math.max(0, Math.min(1, frac));
+    c.strokeStyle = on ? C.en : '#5b6680'; c.lineWidth = 2;
+    c.beginPath(); c.moveTo(cx, cy); c.lineTo(cx + Math.cos(na) * (r - 4), cy + Math.sin(na) * (r - 4)); c.stroke();
+    circ(c, cx, cy, 3.5, C.text);
+    txt(c, 'A', cx, cy - 15, C.muted, 10, 700, 'center');
+    const tx = cx + r + 14;
+    txt(c, m.title || 'Ammeter', tx, y0 + 12, C.muted, 10, 500);
+    txt(c, m.value, tx, y0 + 28, on ? C.text : C.muted, 13, 600, 'left', MONO);
+    if (m.sub) txt(c, m.sub, tx, y0 + 44, C.muted, 10, 500);
+    if (m.sub2) txt(c, m.sub2, tx, y0 + 57, C.muted, 9.5, 500);
+  }
+  function plates(c, W, LH) {
+    c.fillStyle = '#9aa4b8'; c.fillRect(0, 0, 4, LH); c.fillRect(W - 4, 0, 4, LH);
+    [['−', 13], ['+', W - 13]].forEach(([s, x]) => {
+      circ(c, x, LH / 2, 9, C.bg, '#9aa4b8', 1);
+      txt(c, s, x, LH / 2 + 1, C.text, 13, 700, 'center');
+    });
+  }
+
+  /* ---------- lattice ---------- */
+  function lattice(W, LH, cols, rows) {
+    const dx = W / cols, dy = LH / rows, atoms = [], bonds = [], stubs = [];
+    for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++)
+      atoms.push({ i, j, x0: dx * (i + .5), y0: dy * (j + .5), x: 0, y: 0, ph: rnd() * TAU, ph2: rnd() * TAU, w: 5 + rnd() * 3 });
+    const at = (i, j) => atoms[j * cols + i];
+    for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
+      const a = at(i, j);
+      if (i < cols - 1) bonds.push({ a, b: at(i + 1, j), broken: -1, busy: false });
+      if (j < rows - 1) bonds.push({ a, b: at(i, j + 1), broken: -1, busy: false });
+      if (i === 0) stubs.push({ a, dx: -dx / 2, dy: 0 });
+      if (i === cols - 1) stubs.push({ a, dx: dx / 2, dy: 0 });
+      if (j === 0) stubs.push({ a, dx: 0, dy: -dy / 2 });
+      if (j === rows - 1) stubs.push({ a, dx: 0, dy: dy / 2 });
+    }
+    bonds.forEach(b => {
+      b.mx = (b.a.x0 + b.b.x0) / 2; b.my = (b.a.y0 + b.b.y0) / 2;
+      b.nb = bonds.filter(o => o !== b && (o.a === b.a || o.a === b.b || o.b === b.a || o.b === b.b));
+    });
+    return { atoms, bonds, stubs, dx, dy, r: Math.min(dx, dy) * 0.2 };
+  }
+  function vibrate(atoms, T, t, k) {
+    const amp = k * Math.sqrt(Math.max(T, 0) / 300);
+    atoms.forEach(a => { a.x = a.x0 + amp * Math.sin(t * a.w + a.ph); a.y = a.y0 + amp * Math.cos(t * a.w * 1.13 + a.ph2); });
+  }
+  function slot(b, s) {
+    const f = s ? 0.62 : 0.38;
+    return { x: b.a.x + (b.b.x - b.a.x) * f, y: b.a.y + (b.b.y - b.a.y) * f };
+  }
+  // Horizontal lanes between atom rows, used for straight-line drift.
+  function laneYs(L, LH) {
+    const ys = [];
+    for (let j = 1; j < Math.round(LH / L.dy); j++) ys.push(L.dy * j);
+    return ys.length ? ys : [LH / 2];
+  }
+  // Battery ON: move in a straight line toward + (right). After each collision the
+  // electron stops and the field accelerates it again (time constant tau).
+  function driftStraight(e, dt, lanes, vmax, rate, tau, onHit) {
+    if (!e.str) {
+      e.str = true; e.v = Math.max(0, e.vx || 0);
+      e.lane = lanes.reduce((a, y) => (Math.abs(y - e.y) < Math.abs(a - e.y) ? y : a), lanes[0]);
+    }
+    e.vy = (e.lane - e.y) * 6;                 // settle onto its lane, then stay on it
+    if (rnd() < rate * dt) { e.v = 0; if (onHit) onHit(); }
+    e.v += (vmax - e.v) * (1 - Math.exp(-dt / tau));
+    e.vx = e.v;
+  }
+  function randVel(sp) { const a = rnd() * TAU; return { vx: Math.cos(a) * sp, vy: Math.sin(a) * sp }; }
+  function drawBondsAtoms(c, L, label) {
+    c.strokeStyle = C.line; c.lineWidth = 2;
+    L.stubs.forEach(s => { c.beginPath(); c.moveTo(s.a.x, s.a.y); c.lineTo(s.a.x + s.dx, s.a.y + s.dy); c.stroke(); });
+    L.bonds.forEach(b => { c.beginPath(); c.moveTo(b.a.x, b.a.y); c.lineTo(b.b.x, b.b.y); c.stroke(); });
+    L.atoms.forEach(a => {
+      circ(c, a.x, a.y, L.r, C.atom, C.atomS, 1.5);
+      if (label) txt(c, label, a.x, a.y + .5, C.muted, 9, 600, 'center');
+    });
+  }
+
+  /* =========================================================
+     Animation framework (play/pause/reset, visibility)
+     ========================================================= */
+  const anims = [];
+  function Anim(rootId, o) {
+    this.root = document.getElementById(rootId); this.o = o;
+    this.playing = !RM; this.visible = false;
+    this.pb = this.root.querySelector('[data-act="play"]');
+    const rb = this.root.querySelector('[data-act="reset"]');
+    this.pb.addEventListener('click', () => { this.playing = !this.playing; this.sync(); if (!this.playing && o.onPause) o.onPause(); this.render(); });
+    rb.addEventListener('click', () => { o.reset(); this.render(); });
+    this.sync(); anims.push(this);
+  }
+  Anim.prototype.sync = function () { this.pb.textContent = this.playing ? 'Pause' : 'Play'; };
+  Anim.prototype.render = function () { this.o.draw(0); };
+  Anim.prototype.changed = function () { if (!this.playing) { if (this.o.onPause) this.o.onPause(); this.render(); } };
+
+  /* =========================================================
+     SECTION 0 — atom
+     ========================================================= */
+  (function () {
+    const svg = document.getElementById('atomSvg'), NS = 'http://www.w3.org/2000/svg';
+    const shells = [['shell1', 34, 2, 50], ['shell2', 58, 8, 28], ['shell3', 90, 4, 16]];
+    const groups = shells.map(([id, r, n, sp]) => {
+      const g = document.getElementById(id);
+      for (let k = 0; k < n; k++) {
+        const a = TAU * k / n, e = document.createElementNS(NS, 'circle');
+        e.setAttribute('cx', 120 + r * Math.cos(a)); e.setAttribute('cy', 120 + r * Math.sin(a));
+        e.setAttribute('r', id === 'shell3' ? 6 : 4.5);
+        e.setAttribute('fill', id === 'shell3' ? C.e : '#6b7a99');
+        if (id === 'shell3') e.setAttribute('class', 'v-e');
+        g.appendChild(e);
+      }
+      return { g, sp, ang: 0 };
+    });
+    const vs = document.getElementById('vshell'), btn = document.getElementById('atomHl');
+    let pinned = false, hover = false;
+    function upd() {
+      const on = pinned || hover;
+      svg.classList.toggle('hl', on);
+      vs.setAttribute('aria-pressed', String(pinned)); btn.setAttribute('aria-pressed', String(pinned));
+    }
+    vs.addEventListener('mouseenter', () => { hover = true; upd(); });
+    vs.addEventListener('mouseleave', () => { hover = false; upd(); });
+    vs.addEventListener('click', () => { pinned = !pinned; upd(); });
+    vs.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pinned = !pinned; upd(); } });
+    btn.addEventListener('click', () => { pinned = !pinned; upd(); });
+    const A = new Anim('anim-atom', {
+      step(dt) { groups.forEach(g => { g.ang = (g.ang + g.sp * dt) % 360; }); },
+      draw() { groups.forEach(g => g.g.setAttribute('transform', 'rotate(' + g.ang.toFixed(2) + ' 120 120)')); },
+      reset() { groups.forEach(g => { g.ang = 0; }); pinned = false; hover = false; upd(); }
+    });
+    A.o.anim = A;
+  })();
+
+  /* =========================================================
+     INSULATOR simulation
+     ========================================================= */
+  function InsSim(o) {
+    Object.assign(this, { W: 400, LH: 220, MH: 64, cols: 6, rows: 4, labels: true }, o);
+    this.reset();
+  }
+  InsSim.prototype.reset = function () {
+    this.L = lattice(this.W, this.LH, this.cols, this.rows);
+    this.T = 300; this.V = this.V0 || 0; this.time = 0; this.brk = null;
+    vibrate(this.L.atoms, this.T, 0, 1.6);
+  };
+  InsSim.prototype.breakdown = function (instant) {
+    const W = this.W, LH = this.LH, pts = [];
+    let y = LH * (0.35 + rnd() * 0.3);
+    for (let x = 0; x <= W; x += W / 12) { pts.push({ x, y }); y = Math.max(LH * .15, Math.min(LH * .85, y + (rnd() - .5) * LH * .3)); }
+    const near = b => {
+      for (let k = 0; k < pts.length - 1; k++) {
+        const p = pts[k], q = pts[k + 1];
+        if (b.mx >= p.x - 4 && b.mx <= q.x + 4) {
+          const yy = p.y + (q.y - p.y) * ((b.mx - p.x) / (q.x - p.x || 1));
+          if (Math.abs(b.my - yy) < this.L.dy * 0.6) return true;
+        }
+      }
+      return false;
+    };
+    this.L.bonds.forEach(b => { b.burnt = near(b); });
+    this.brk = { pts, t: instant ? 2 : 0 };
+  };
+  InsSim.prototype.step = function (dt) {
+    this.time += dt;
+    vibrate(this.L.atoms, this.T, this.time, 1.6);
+    if (this.brk) this.brk.t += dt;
+  };
+  InsSim.prototype.draw = function (c) {
+    const W = this.W, LH = this.LH, L = this.L, sh = this.V * 5, t = this.time;
+    c.fillStyle = C.cv; c.fillRect(0, 0, W, LH);
+    if (this.V > 0 || this.brk) plates(c, W, LH);
+    drawBondsAtoms(c, L, '');
+    const jig = 0.7 * Math.sqrt(this.T / 300);
+    L.bonds.forEach((b, i) => {
+      if (b.burnt && this.brk) return;
+      for (let k = 0; k < 2; k++) {
+        const p = slot(b, k), ph = t * 9 + i * 1.7 + k;
+        dot(c, p.x + sh + jig * Math.sin(ph), p.y + jig * Math.cos(ph * 1.2), 2.8, C.e, 0.85);
+      }
+    });
+    if (this.brk) {
+      const bt = this.brk.t, P = this.brk.pts;
+      const path = () => { c.beginPath(); P.forEach((p, k) => k ? c.lineTo(p.x, p.y) : c.moveTo(p.x, p.y)); };
+      if (bt < 0.9) {
+        c.globalAlpha = 0.5 + 0.5 * rnd();
+        c.strokeStyle = C.en; c.lineWidth = 7; path(); c.stroke();
+        c.strokeStyle = '#ffffff'; c.lineWidth = 2.5; path(); c.stroke();
+        c.globalAlpha = 1;
+      } else {
+        c.strokeStyle = '#05070c'; c.lineWidth = 5; path(); c.stroke();
+        c.globalAlpha = .55; c.strokeStyle = C.h; c.lineWidth = 1.2; path(); c.stroke(); c.globalAlpha = 1;
+      }
+      if (this.labels) tag(c, 'Dielectric breakdown — destructive', W / 2, 14, C.h, 'center');
+      else tag(c, 'breakdown', W / 2, 12, C.h, 'center');
+    }
+    if (this.labels) {
+      const a = L.atoms[this.cols + 1];
+      lead(c, a.x + L.r * .7, a.y + L.r * .7, a.x + 22, a.y + 24); tag(c, 'atom', a.x + 20, a.y + 28, C.text);
+      const b = L.bonds.find(bb => bb.a === L.atoms[2 * this.cols + 3] && bb.b === L.atoms[2 * this.cols + 4]);
+      if (b && !(this.brk && b.burnt)) { const p = slot(b, 1); lead(c, p.x, p.y + 3, p.x + 6, p.y + 22); tag(c, 'bonded pair (2 e⁻)', p.x - 10, p.y + 28, C.e); }
+      if (this.V > 0 && !this.brk) tag(c, 'pulled toward +', W - 22, LH - 12, C.muted, 'right');
+    }
+    const m = this.meterFn ? this.meterFn(this) : (this.brk
+      ? { value: this.brk.t < 1.2 ? 'I: huge (arc)' : 'I = 0', sub: this.brk.t < 1.2 ? 'current punches through' : 'insulator damaged', sub2: 'press Reset' }
+      : { value: 'I = 0', sub: this.V > 0 ? 'charges shift, none flow' : 'no voltage applied', sub2: 'V = ' + Math.round(this.V * 100) + '% of rating' });
+    const frac = this.meterFn ? m.frac : (this.brk && this.brk.t < 1.2 ? 1 : 0);
+    meter(c, W, LH, this.MH, frac, m, this.V > 0 || !!this.brk);
+  };
+
+  function drawBandIns(c, W, H, t, T, still) {
+    const cbT = 22, cbB = 66, vbT = H - 78, vbB = H - 30;
+    c.fillStyle = C.cv; c.fillRect(0, 0, W, H);
+    c.fillStyle = 'rgba(79,195,247,.06)'; c.strokeStyle = '#3d4a68'; c.lineWidth = 1;
+    c.fillRect(24, cbT, W - 48, cbB - cbT); c.strokeRect(24, cbT, W - 48, cbB - cbT);
+    txt(c, 'conduction band', W / 2, cbT + 13, C.muted, 10, 600, 'center');
+    txt(c, '(empty)', W / 2, cbT + 28, C.muted, 10, 500, 'center');
+    c.fillStyle = 'rgba(79,195,247,.16)'; c.fillRect(24, vbT, W - 48, vbB - vbT); c.strokeRect(24, vbT, W - 48, vbB - vbT);
+    for (let r = 0; r < 3; r++) for (let k = 0; k < 9; k++) dot(c, 34 + k * ((W - 68) / 8), vbT + 10 + r * 14, 2.6, C.e, 0.9);
+    txt(c, 'valence band (full)', W / 2, vbB + 13, C.muted, 10, 600, 'center');
+    // gap arrow
+    const ax = W - 36;
+    c.strokeStyle = C.en; c.lineWidth = 1.2; c.beginPath(); c.moveTo(ax, cbB + 3); c.lineTo(ax, vbT - 3); c.stroke();
+    [[cbB + 3, 1], [vbT - 3, -1]].forEach(([y, d]) => { c.beginPath(); c.moveTo(ax - 4, y + 6 * d); c.lineTo(ax, y); c.lineTo(ax + 4, y + 6 * d); c.stroke(); });
+    const my = (cbB + vbT) / 2;
+    txt(c, 'E', ax - 26, my - 9, C.en, 13, 700, 'right');
+    txt(c, 'g', ax - 26, my - 4, C.en, 9, 700, 'left');
+    txt(c, '≈ 9 eV', ax - 8, my + 8, C.en, 12, 700, 'right');
+    txt(c, '(SiO₂, 300 K)', ax - 8, my + 23, C.muted, 9.5, 500, 'right');
+    if (!still) {
+      const p = (t % 2.4) / 2.4, h = Math.sin(Math.PI * p) * (14 + 16 * Math.min(T, 600) / 600);
+      const x = 46, y = vbT + 10 - h;
+      dot(c, x, y, 7, C.e, 0.2); dot(c, x, y, 3.4, C.e, 1);
+      if (p > 0.25 && p < 0.75) tag(c, 'falls back', x + 8, y - 12, C.muted);
+      tag(c, 'kT ≈ 0.026 eV', 62, vbT - 12, C.en);
+    }
+  }
+
+  /* =========================================================
+     METAL simulation
+     ========================================================= */
+  function MetSim(o) {
+    Object.assign(this, { W: 400, LH: 220, MH: 64, cols: 7, rows: 4, labels: true, counter: true, trail: true }, o);
+    this.reset();
+  }
+  MetSim.prototype.reset = function () {
+    this.L = lattice(this.W, this.LH, this.cols, this.rows);
+    this.T = 300; this.batt = !!this.batt0; this.time = 0;
+    this.es = []; this.flashes = []; this.events = []; this.path = [];
+    const n = this.cols * this.rows; // Cu: one free electron per atom
+    for (let k = 0; k < n; k++) { const v = randVel(70); this.es.push({ x: rnd() * this.W, y: 8 + rnd() * (this.LH - 16), vx: v.vx, vy: v.vy, hi: k === 0 }); }
+    vibrate(this.L.atoms, this.T, 0, 2.4);
+  };
+  MetSim.prototype.step = function (dt) {
+    this.time += dt;
+    const T = this.T, W = this.W, LH = this.LH, mid = W / 2, ratio = rhoCu(T) / RHO_CU300;
+    vibrate(this.L.atoms, T, this.time, 2.4);
+    const scatter = Math.max(0.25, 1.4 * ratio);
+    const lanes = laneYs(this.L, LH);
+    this.es.forEach(e => {
+      if (this.batt) {
+        // battery ON: straight-line drift toward +, stopped briefly by collisions with ion cores
+        driftStraight(e, dt, lanes, 80, Math.max(0.15, 0.6 * ratio), 0.35,
+          () => this.flashes.push({ x: e.x, y: e.y, age: 0, big: e.hi }));
+      } else {
+        if (e.str) { e.str = false; const v = randVel(70); e.vx = v.vx; e.vy = v.vy; }
+        if (rnd() < scatter * dt) {
+          const v = randVel(70); e.vx = v.vx; e.vy = v.vy;
+          this.flashes.push({ x: e.x, y: e.y, age: 0, big: e.hi });
+        }
+      }
+      const px = e.x; let wrapped = false;
+      e.x += e.vx * dt; e.y += e.vy * dt;
+      if (e.y < 6) { e.y = 6; e.vy = Math.abs(e.vy); }
+      if (e.y > LH - 6) { e.y = LH - 6; e.vy = -Math.abs(e.vy); }
+      if (e.x > W) { e.x -= W; wrapped = true; }
+      if (e.x < 0) { e.x += W; wrapped = true; }
+      if (!wrapped) {
+        if (px < mid && e.x >= mid) this.events.push({ t: this.time, d: 1 });
+        else if (px >= mid && e.x < mid) this.events.push({ t: this.time, d: -1 });
+      }
+      if (e.hi && this.trail) { if (wrapped) this.path.push(null); this.path.push({ x: e.x, y: e.y }); if (this.path.length > 220) this.path.shift(); }
+    });
+    this.events = this.events.filter(ev => this.time - ev.t < 4);
+    this.flashes.forEach(f => { f.age += dt; });
+    this.flashes = this.flashes.filter(f => f.age < 0.45);
+  };
+  MetSim.prototype.draw = function (c) {
+    const W = this.W, LH = this.LH, L = this.L, mid = W / 2;
+    c.fillStyle = C.cv; c.fillRect(0, 0, W, LH);
+    if (this.batt) plates(c, W, LH);
+    if (this.counter) {
+      c.setLineDash([5, 5]); c.strokeStyle = 'rgba(230,233,239,.35)'; c.lineWidth = 1.2;
+      c.beginPath(); c.moveTo(mid, 0); c.lineTo(mid, LH); c.stroke(); c.setLineDash([]);
+    }
+    L.atoms.forEach(a => {
+      circ(c, a.x, a.y, L.r * 0.95, 'rgba(179,157,219,.16)', C.ion, 1.5);
+      txt(c, '+', a.x, a.y + .5, C.ion, 13, 700, 'center');
+    });
+    if (this.trail && this.path.length > 1) {
+      c.strokeStyle = 'rgba(230,233,239,.55)'; c.lineWidth = 1.3; c.beginPath();
+      let pen = false;
+      this.path.forEach(p => { if (!p) { pen = false; return; } if (pen) c.lineTo(p.x, p.y); else { c.moveTo(p.x, p.y); pen = true; } });
+      c.stroke();
+    }
+    this.flashes.forEach(f => {
+      c.globalAlpha = (1 - f.age / 0.45) * (f.big ? 1 : 0.6); c.strokeStyle = C.en; c.lineWidth = f.big ? 2 : 1.2;
+      c.beginPath(); c.arc(f.x, f.y, (f.big ? 5 : 3) + 10 * f.age, 0, TAU); c.stroke(); c.globalAlpha = 1;
+    });
+    this.es.forEach(e => {
+      dot(c, e.x, e.y, 6, C.e, 0.22); dot(c, e.x, e.y, 3.2, C.e, 1);
+      if (e.hi && this.trail) circ(c, e.x, e.y, 6.5, null, '#ffffff', 1.5);
+    });
+    if (this.labels) {
+      const a = L.atoms[1];
+      lead(c, a.x + L.r * .8, a.y + L.r * .5, a.x + 24, a.y + 22); tag(c, 'ion core', a.x + 20, a.y + 28, C.ion);
+      const h = this.es[0]; tag(c, 'tracked electron', Math.min(W - 6, Math.max(6, h.x + 10)), Math.max(10, h.y - 14), C.text, h.x > W - 100 ? 'right' : 'left');
+      if (this.batt) tag(c, 'drift only (simplified)', 10, LH - 12, C.muted);
+    }
+    if (this.counter) {
+      const r = this.events.filter(e => e.d > 0).length, l = this.events.filter(e => e.d < 0).length;
+      tag(c, '→ ' + r, mid + 4, 12, C.e); tag(c, l + ' ←', mid - 4, 12, C.e, 'right');
+      tag(c, 'crossings (last 4 s)', mid, LH - 12, C.muted, 'center');
+    }
+    let m, frac;
+    if (this.meterFn) { m = this.meterFn(this); frac = m.frac; }
+    else {
+      const R = rhoCu(this.T) * 1 / 1e-6, I = this.batt ? 0.1 / R : 0;
+      frac = I / 30;
+      m = { value: 'I = ' + siu(I, 'A'), sub: 'R = ' + siu(R, 'Ω') + (this.batt ? '' : ' · battery off'), sub2: '1 m × 1 mm² Cu wire, 0.1 V' };
+    }
+    meter(c, W, LH, this.MH, frac, m, this.batt);
+  };
+
+  function drawBandMet(c, W, H, t, T, batt) {
+    c.fillStyle = C.cv; c.fillRect(0, 0, W, H);
+    const x0 = 22, x1 = W - 22, cbT = 34, cbB = 150, vbT = 116, vbB = 244, EF = 88;
+    // filled states: everything below the Fermi level
+    c.fillStyle = 'rgba(79,195,247,.18)'; c.fillRect(x0, EF, x1 - x0, vbB - EF);
+    // overlap region (top of valence band reaches into the conduction band)
+    c.fillStyle = 'rgba(129,199,132,.16)'; c.fillRect(x0, vbT, x1 - x0, cbB - vbT);
+    c.lineWidth = 1.2;
+    c.strokeStyle = '#6b7a99'; c.strokeRect(x0, cbT, x1 - x0, cbB - cbT);     // conduction band
+    c.setLineDash([5, 3]); c.strokeStyle = '#9aa4b8'; c.strokeRect(x0 + 3, vbT, x1 - x0 - 6, vbB - vbT); c.setLineDash([]); // valence band
+    txt(c, 'conduction band', W / 2, cbT - 12, C.muted, 10, 600, 'center');
+    txt(c, 'valence band', W / 2, vbB + 13, C.muted, 10, 600, 'center');
+    // electrons in filled states
+    const cols = 7, gx = (x1 - x0 - 24) / (cols - 1), amp = 1 + 5 * Math.min(T, 600) / 600;
+    for (let y = EF + 12, r = 0; y < vbB - 6; y += 18, r++) {
+      for (let k = 0; k < cols; k++) {
+        const x = x0 + 12 + k * gx;
+        const jig = r === 0 ? Math.sin(t * (3 + k * .6) + k * 2.1) * amp : 0; // thermal smearing near E_F
+        dot(c, x, y + jig, 2.6, C.e, r === 0 ? 1 : .75);
+      }
+    }
+    tag(c, 'overlap: no gap', W / 2, (vbT + cbB) / 2 + 1, C.ok, 'center');
+    // Fermi level
+    c.setLineDash([4, 3]); c.strokeStyle = C.en; c.lineWidth = 1.4;
+    c.beginPath(); c.moveTo(x0 - 8, EF); c.lineTo(x1 + 8, EF); c.stroke(); c.setLineDash([]);
+    txt(c, 'E', x0 + 2, EF - 9, C.en, 12, 700); txt(c, 'F', x0 + 10, EF - 5, C.en, 8, 700);
+    if (batt) {
+      // a tiny energy from the field lifts electrons just above E_F into empty states, where they move
+      for (let k = 0; k < 4; k++) {
+        const span = x1 - x0 - 30, x = x0 + 15 + ((t * 28 + k * span / 4) % span), y = EF - 9;
+        dot(c, x, y, 6, C.e, .2); dot(c, x, y, 3, C.e, 1);
+        c.strokeStyle = C.e; c.lineWidth = 1.2; c.beginPath(); c.moveTo(x + 6, y); c.lineTo(x + 12, y); c.lineTo(x + 9, y - 3); c.moveTo(x + 12, y); c.lineTo(x + 9, y + 3); c.stroke();
+      }
+      txt(c, 'electrons near the Fermi', W / 2, EF - 44, C.e, 9.5, 600, 'center');
+      txt(c, 'level move into empty states', W / 2, EF - 32, C.e, 9.5, 600, 'center');
+    } else tag(c, 'empty states', W / 2, (cbT + EF) / 2 - 6, C.muted, 'center');
+  }
+
+  /* =========================================================
+     SEMICONDUCTOR simulation
+     ========================================================= */
+  function SemSim(o) {
+    Object.assign(this, { W: 400, LH: 220, MH: 64, cols: 6, rows: 4, labels: true, Tmax: 500, maxP: 9, lightP: 5 }, o);
+    this.reset();
+  }
+  SemSim.prototype.reset = function () {
+    this.L = lattice(this.W, this.LH, this.cols, this.rows);
+    this.T = 300; this.batt = !!this.batt0; this.light = false; this.time = 0;
+    this.es = []; this.holes = []; this.flashes = []; this.photons = []; this.genT = 0; this.photT = 0; this.tracked = null;
+    vibrate(this.L.atoms, this.T, 0, 1.6);
+    this.syncInstant();
+  };
+  SemSim.prototype.target = function () { return pairsFor(this.T, this.Tmax, this.maxP) + (this.light ? this.lightP : 0); };
+  SemSim.prototype.active = function () { return this.holes.filter(h => !h.locked).length; };
+  SemSim.prototype.generate = function (b, flash) {
+    if (!b) {
+      const ok = this.L.bonds.filter(x => x.broken < 0 && !x.busy);
+      if (!ok.length) return; b = ok[Math.floor(rnd() * ok.length)];
+    }
+    const s = rnd() < .5 ? 0 : 1; b.broken = s;
+    const p = slot(b, s), v = randVel(30);
+    this.holes.push({ b, locked: false, hopT: .6 + rnd() * 2, jump: null });
+    this.es.push({ x: p.x, y: p.y, vx: v.vx, vy: v.vy, target: null });
+    if (flash) this.flashes.push({ x: p.x, y: p.y, age: 0 });
+  };
+  SemSim.prototype.startRecomb = function () {
+    const es = this.es.filter(e => !e.target), hs = this.holes.filter(h => !h.locked && !h.jump && h !== this.tracked);
+    const pool = hs.length ? hs : this.holes.filter(h => !h.locked && !h.jump);
+    if (!es.length || !pool.length) return;
+    const e = es[Math.floor(rnd() * es.length)];
+    let best = null, bd = 1e9;
+    pool.forEach(h => { const p = slot(h.b, h.b.broken), d = Math.hypot(p.x - e.x, p.y - e.y); if (d < bd) { bd = d; best = h; } });
+    e.target = best; best.locked = true;
+  };
+  SemSim.prototype.removePair = function (e, flash) {
+    const h = e.target, p = slot(h.b, h.b.broken);
+    h.b.broken = -1;
+    this.holes.splice(this.holes.indexOf(h), 1); this.es.splice(this.es.indexOf(e), 1);
+    if (this.tracked === h) this.tracked = null;
+    if (flash) this.flashes.push({ x: p.x, y: p.y, age: 0, rec: true });
+  };
+  SemSim.prototype.syncInstant = function () {
+    this.es.filter(e => e.target).forEach(e => this.removePair(e, false));
+    this.holes.forEach(h => { if (h.jump) { h.jump.fb.busy = false; h.jump = null; } });
+    this.photons = [];
+    const target = this.target();
+    while (this.holes.length < target) this.generate(null, false);
+    while (this.holes.length > target) { const e = this.es[this.es.length - 1]; e.target = this.holes[this.holes.length - 1]; this.removePair(e, false); }
+  };
+  SemSim.prototype.hop = function (h) {
+    const b = h.b, cands = b.nb.filter(n => n.broken < 0 && !n.busy);
+    if (!cands.length) return;
+    let next = null, wrap = false;
+    const horiz = n => n.a.j === n.b.j;
+    if (this.batt) {
+      // battery ON: the hole steps straight toward − along its row of horizontal bonds
+      const left = cands.filter(n => horiz(n) && n.mx < b.mx - 1);
+      if (left.length) next = left[Math.floor(rnd() * left.length)];
+      else {
+        // reached the − side: the circuit refills it and a new hole starts at the + end of the same row
+        const right = this.L.bonds.filter(n => horiz(n) && n.a.j === b.a.j && n.broken < 0 && !n.busy && n.mx > this.W - this.L.dx * 1.2);
+        if (right.length) { next = right[0]; wrap = true; }
+      }
+      if (!next) return; // blocked this time; try again on the next hop
+    } else next = cands[Math.floor(rnd() * cands.length)];
+    const os = b.broken, ns = rnd() < .5 ? 0 : 1;
+    b.broken = -1; next.broken = ns; h.b = next;
+    if (!wrap) { b.busy = true; h.jump = { fb: b, fs: os, t: 0 }; } // a bound electron from `next` moves into the old hole
+  };
+  SemSim.prototype.step = function (dt) {
+    this.time += dt;
+    const T = this.T;
+    vibrate(this.L.atoms, T, this.time, 1.6);
+    const thermal = pairsFor(T, this.Tmax, this.maxP), target = this.target(), active = this.active();
+    this.genT -= dt;
+    if (this.genT <= 0) {
+      if (active < thermal) { this.generate(null, true); this.genT = .15; }
+      else if (active > target) { this.startRecomb(); this.genT = .15; }
+      else if (target > 0 && rnd() < dt * (this.batt ? 0.08 : 0.25) * target) { this.startRecomb(); if (!this.light || active < thermal + 1) this.generate(null, true); }
+    }
+    if (this.light) {
+      this.photT -= dt;
+      if (this.photT <= 0) {
+        this.photT = .3;
+        const ok = this.L.bonds.filter(x => x.broken < 0 && !x.busy);
+        if (ok.length) { const b = ok[Math.floor(rnd() * ok.length)], s = rnd() < .5 ? 0 : 1, p = slot(b, s); this.photons.push({ x: p.x - 60 + rnd() * 40, y: -6, b, tx: p.x, ty: p.y }); }
+      }
+    }
+    this.photons = this.photons.filter(ph => {
+      const dx = ph.tx - ph.x, dy = ph.ty - ph.y, d = Math.hypot(dx, dy);
+      if (d < 4) {
+        if (this.active() < this.target() && ph.b.broken < 0 && !ph.b.busy) this.generate(ph.b, true);
+        return false;
+      }
+      const s = Math.min(d, 170 * dt); ph.x += dx / d * s; ph.y += dy / d * s; return true;
+    });
+    const speed = 20 + 30 * Math.sqrt(T / 300), W = this.W, LH = this.LH, lanes = laneYs(this.L, LH);
+    this.es.slice().forEach(e => {
+      if (e.target) {
+        const p = slot(e.target.b, e.target.b.broken), dx = p.x - e.x, dy = p.y - e.y, d = Math.hypot(dx, dy);
+        if (d < 3) { this.removePair(e, true); return; }
+        const s = Math.min(d, 130 * dt); e.x += dx / d * s; e.y += dy / d * s; e.str = false; return;
+      }
+      if (this.batt) {
+        // battery ON: straight-line drift toward +; lattice collisions get more frequent when hot
+        driftStraight(e, dt, lanes, 75, Math.min(3, 0.8 / muF(T)), 0.3);
+      } else {
+        if (e.str) { e.str = false; const v = randVel(speed); e.vx = v.vx; e.vy = v.vy; }
+        if (rnd() < 2.5 * dt) { const v = randVel(speed); e.vx = v.vx; e.vy = v.vy; }
+      }
+      e.x += e.vx * dt; e.y += e.vy * dt;
+      if (e.y < 6) { e.y = 6; e.vy = Math.abs(e.vy); }
+      if (e.y > LH - 6) { e.y = LH - 6; e.vy = -Math.abs(e.vy); }
+      if (e.x > W) e.x -= W; if (e.x < 0) e.x += W;
+    });
+    if (!this.tracked || this.holes.indexOf(this.tracked) < 0 || this.tracked.locked) this.tracked = this.holes.find(h => !h.locked) || null;
+    const rate = this.batt ? Math.min(1.2, 0.45 * muF(T)) : 0.35;
+    this.holes.forEach(h => {
+      if (h.jump) { h.jump.t += dt / 0.45; if (h.jump.t >= 1) { h.jump.fb.busy = false; h.jump = null; } return; }
+      if (h.locked) return;
+      h.hopT -= dt;
+      if (h.hopT <= 0) { this.hop(h); h.hopT = (0.7 + rnd() * 0.8) / rate; }
+    });
+    this.flashes.forEach(f => { f.age += dt; });
+    this.flashes = this.flashes.filter(f => f.age < 0.6);
+  };
+  SemSim.prototype.current = function (V, L, A) { // amps for a bar of length L, area A (m)
+    if (!this.batt) return 0;
+    const dn = this.light ? 30 * SI.ni : 0, r = rhoSi(this.T, dn);
+    return isFinite(r) ? V / (r * L / A) : 0;
+  };
+  SemSim.prototype.draw = function (c) {
+    const W = this.W, LH = this.LH, L = this.L;
+    c.fillStyle = C.cv; c.fillRect(0, 0, W, LH);
+    if (this.batt) plates(c, W, LH);
+    drawBondsAtoms(c, L, 'Si');
+    L.bonds.forEach(b => {
+      for (let k = 0; k < 2; k++) {
+        if (b.broken === k) continue;
+        if (b.busy) { const h = this.holes.find(x => x.jump && x.jump.fb === b); if (h && h.jump.fs === k) continue; }
+        const p = slot(b, k); dot(c, p.x, p.y, 2.7, C.e, 0.55);
+      }
+    });
+    this.holes.forEach(h => {
+      const p = slot(h.b, h.b.broken);
+      circ(c, p.x, p.y, 4.4, 'rgba(255,138,101,.2)', C.h, 2);
+      if (h.jump) { // bound electron moving from the hole's new position into its old one
+        const q = slot(h.jump.fb, h.jump.fs), k = h.jump.t, x = p.x + (q.x - p.x) * k, y = p.y + (q.y - p.y) * k;
+        dot(c, x, y, 3, C.e, 1);
+        if (this.labels && h === this.tracked) tag(c, 'bound e⁻ jumps in', Math.min(W - 8, x + 8), y + 16, C.e, x > W - 120 ? 'right' : 'left');
+      }
+    });
+    this.flashes.forEach(f => {
+      const k = f.age / 0.6;
+      c.globalAlpha = 1 - k; c.strokeStyle = C.en; c.lineWidth = f.rec ? 1.4 : 2;
+      c.beginPath(); c.arc(f.x, f.y, (f.rec ? 3 : 4) + (f.rec ? 8 : 14) * k, 0, TAU); c.stroke(); c.globalAlpha = 1;
+    });
+    this.photons.forEach(ph => {
+      c.strokeStyle = C.en; c.lineWidth = 1.5; c.beginPath();
+      for (let k = 0; k <= 12; k++) { const yy = ph.y - k * 2.2, xx = ph.x - k * 0.8 + Math.sin(k * 1.4 + this.time * 20) * 2.4; k ? c.lineTo(xx, yy) : c.moveTo(xx, yy); }
+      c.stroke(); dot(c, ph.x, ph.y, 2.6, C.en, 1);
+    });
+    this.es.forEach(e => { dot(c, e.x, e.y, 6, C.e, 0.22); dot(c, e.x, e.y, 3.2, C.e, 1); });
+    if (this.labels) {
+      if (this.tracked) { const p = slot(this.tracked.b, this.tracked.b.broken); tag(c, 'hole', p.x + 7, p.y - 11, C.h); }
+      const tp = this.tracked ? slot(this.tracked.b, this.tracked.b.broken) : { x: -999, y: -999 };
+      const fe = this.es.find(e => !e.target && Math.hypot(e.x - tp.x, e.y - tp.y) > 50);
+      if (fe) tag(c, 'electron', Math.min(W - 8, fe.x + 8), Math.max(10, fe.y - 12), C.e, fe.x > W - 70 ? 'right' : 'left');
+      if (this.photons.length) { const ph = this.photons[0]; tag(c, 'photon', ph.x + 8, Math.max(10, ph.y - 4), C.en); }
+      const n = this.active();
+      tag(c, 'free e⁻ = ' + n + '   holes = ' + n, 8, LH - 12, C.text);
+      if (this.T === 0 && !this.light) tag(c, '0 K: every bond complete', W / 2, 12, C.muted, 'center');
+    }
+    let m, frac;
+    if (this.meterFn) { m = this.meterFn(this); frac = m.frac; }
+    else {
+      const I = this.current(10, 0.01, 1e-6);
+      frac = I > 0 ? (Math.log10(I) + 10) / 8 : 0;
+      const pn = Math.round(100 * SI.mun / (SI.mun + SI.mup));
+      m = { value: 'I = ' + siu(I, 'A'), sub: this.batt ? (I > 0 ? 'electrons ' + pn + '% · holes ' + (100 - pn) + '%' : 'no free carriers') : 'battery off', sub2: '1 cm × 1 mm² Si bar, 10 V · log dial' };
+    }
+    meter(c, W, LH, this.MH, frac, m, this.batt);
+  };
+
+  /* ---------- semiconductor band diagram ---------- */
+  function SemBand(W, H) {
+    this.W = W; this.H = H; this.cbT = 34; this.cbB = 92; this.vbT = 176; this.vbB = 234;
+    this.slots = [];
+    for (let r = 0; r < 3; r++) for (let k = 0; k < 7; k++) this.slots.push({ x: 36 + k * ((W - 72) / 6), y: this.vbT + 12 + r * 16, used: false });
+    this.reset();
+  }
+  SemBand.prototype.reset = function () { this.jumps = []; this.acc = 0; this.flashes = []; this.slots.forEach(s => { s.used = false; }); this.t = 0; };
+  SemBand.prototype.spawn = function (photon) {
+    const free = this.slots.filter(s => !s.used && s.y < this.vbT + 20); // top row first
+    const pool = free.length ? free : this.slots.filter(s => !s.used);
+    if (!pool.length || this.jumps.length >= 8) return;
+    const s = pool[Math.floor(rnd() * pool.length)]; s.used = true;
+    this.jumps.push({ s, ph: 'up', t: 0, cx: 30 + rnd() * (this.W - 60), cy: this.cbT + 14 + rnd() * (this.cbB - this.cbT - 28), stay: 1.8 + rnd() * 2, photon, vx: (rnd() - .5) * 16 });
+  };
+  SemBand.prototype.step = function (dt, frac, light) {
+    this.t += dt;
+    const rate = (frac > 0 ? 0.35 + 2.2 * frac : 0);
+    this.acc += rate * dt;
+    while (this.acc >= 1) { this.acc -= 1; this.spawn(false); }
+    if (light && rnd() < 1.3 * dt) this.spawn(true);
+    this.jumps = this.jumps.filter(j => {
+      j.t += dt;
+      if (j.ph === 'up' && j.t >= 0.5) { j.ph = 'cb'; j.t = 0; }
+      else if (j.ph === 'cb') { j.cx = Math.max(26, Math.min(this.W - 26, j.cx + j.vx * dt)); if (j.t >= j.stay) { j.ph = 'down'; j.t = 0; } }
+      else if (j.ph === 'down' && j.t >= 0.5) { j.s.used = false; this.flashes.push({ x: j.s.x, y: j.s.y, age: 0 }); return false; }
+      return true;
+    });
+    this.flashes.forEach(f => { f.age += dt; }); this.flashes = this.flashes.filter(f => f.age < .5);
+  };
+  SemBand.prototype.draw = function (c, opts) {
+    const W = this.W, H = this.H;
+    c.fillStyle = C.cv; c.fillRect(0, 0, W, H);
+    c.strokeStyle = '#3d4a68'; c.lineWidth = 1;
+    c.fillStyle = 'rgba(79,195,247,.06)'; c.fillRect(20, this.cbT, W - 40, this.cbB - this.cbT); c.strokeRect(20, this.cbT, W - 40, this.cbB - this.cbT);
+    c.fillStyle = 'rgba(79,195,247,.16)'; c.fillRect(20, this.vbT, W - 40, this.vbB - this.vbT); c.strokeRect(20, this.vbT, W - 40, this.vbB - this.vbT);
+    txt(c, 'conduction band', W / 2, this.cbT - 11, C.muted, 10, 600, 'center');
+    txt(c, 'valence band', W / 2, this.vbB + 12, C.muted, 10, 600, 'center');
+    const ax = W - 32, my = (this.cbB + this.vbT) / 2;
+    c.strokeStyle = C.en; c.lineWidth = 1.2; c.beginPath(); c.moveTo(ax, this.cbB + 3); c.lineTo(ax, this.vbT - 3); c.stroke();
+    [[this.cbB + 3, 1], [this.vbT - 3, -1]].forEach(([y, d]) => { c.beginPath(); c.moveTo(ax - 4, y + 6 * d); c.lineTo(ax, y); c.lineTo(ax + 4, y + 6 * d); c.stroke(); });
+    txt(c, 'E', ax - 22, my - 22, C.en, 13, 700, 'right'); txt(c, 'g', ax - 21, my - 17, C.en, 9, 700);
+    txt(c, '= 1.12 eV', ax - 8, my - 2, C.en, 11, 700, 'right');
+    txt(c, '(Si, 300 K)', ax - 8, my + 14, C.muted, 9.5, 500, 'right');
+    this.slots.forEach(s => {
+      if (s.used) circ(c, s.x, s.y, 4, 'rgba(255,138,101,.2)', C.h, 1.8);
+      else dot(c, s.x, s.y, 2.6, C.e, .9);
+    });
+    this.jumps.forEach(j => {
+      let x, y;
+      if (j.ph === 'up') { const k = j.t / .5; x = j.s.x + (j.cx - j.s.x) * k; y = j.s.y + (j.cy - j.s.y) * k; if (j.photon && k < .6) { c.strokeStyle = C.en; c.lineWidth = 1.4; c.beginPath(); for (let q = 0; q <= 10; q++) { const xx = j.s.x - 30 + q * 3, yy = j.s.y - 4 + Math.sin(q * 1.6) * 3; q ? c.lineTo(xx, yy) : c.moveTo(xx, yy); } c.stroke(); } }
+      else if (j.ph === 'cb') { x = j.cx; y = j.cy; }
+      else { const k = j.t / .5; x = j.cx + (j.s.x - j.cx) * k; y = j.cy + (j.s.y - j.cy) * k; }
+      dot(c, x, y, 6, C.e, .2); dot(c, x, y, 3.2, C.e, 1);
+    });
+    this.flashes.forEach(f => { c.globalAlpha = 1 - f.age / .5; c.strokeStyle = C.en; c.lineWidth = 1.4; c.beginPath(); c.arc(f.x, f.y, 3 + 10 * f.age, 0, TAU); c.stroke(); c.globalAlpha = 1; });
+    if (opts && opts.labels) {
+      const j = this.jumps.find(q => q.ph === 'cb');
+      if (j) { tag(c, 'electron', Math.min(W - 10, j.cx + 8), j.cy - 12, C.e, j.cx > W - 70 ? 'right' : 'left'); tag(c, 'hole', j.s.x + 7, j.s.y - 12, C.h); }
+      txt(c, 'rate exaggerated for visibility', W / 2, H - 12, C.muted, 9, 500, 'center');
+    }
+  };
+
+  /* =========================================================
+     Wire up section animations
+     ========================================================= */
+  function bindSlider(id, outId, fmt, fn) {
+    const s = document.getElementById(id), o = document.getElementById(outId);
+    const f = () => { o.textContent = fmt(+s.value); fn(+s.value); };
+    s.addEventListener('input', f);
+    return { el: s, set(v) { s.value = v; o.textContent = fmt(v); } };
+  }
+  const fmtK = v => v + ' K';
+  function setPressed(btn, on, base) { btn.setAttribute('aria-pressed', String(on)); btn.textContent = base + (on ? 'ON' : 'OFF'); }
+
+  /* ---- Section 1: insulator ---- */
+  (function () {
+    const sim = new InsSim({}), cv = new Cv('cv-ins', 400, 284), bcv = new Cv('cv-ins-band', 200, 284);
+    const brkBtn = document.getElementById('insBreak');
+    let A;
+    const sV = bindSlider('insV', 'insVOut', v => v + '%', v => { sim.V = v / 100; A.changed(); });
+    const sT = bindSlider('insT', 'insTOut', fmtK, v => { sim.T = v; A.changed(); });
+    function lock(on) { sV.el.disabled = on; sT.el.disabled = on; brkBtn.disabled = on; }
+    A = new Anim('anim-ins', {
+      step(dt) { sim.step(dt); },
+      draw() { const c = cv.begin(); if (c) sim.draw(c); const b = bcv.begin(); if (b) drawBandIns(b, 200, 284, sim.time, sim.T); },
+      reset() { sim.reset(); sV.set(0); sT.set(300); lock(false); }
+    });
+    brkBtn.addEventListener('click', () => { if (sim.V === 0) { sim.V = 1; sV.set(100); } sim.breakdown(!A.playing); lock(true); A.render(); });
+  })();
+
+  /* ---- Section 2: metal ---- */
+  (function () {
+    const sim = new MetSim({}), cv = new Cv('cv-met', 400, 284), bcv = new Cv('cv-met-band', 200, 284);
+    const bb = document.getElementById('metBatt');
+    let A;
+    const sT = bindSlider('metT', 'metTOut', fmtK, v => { sim.T = v; A.changed(); });
+    A = new Anim('anim-met', {
+      step(dt) { sim.step(dt); },
+      draw() { const c = cv.begin(); if (c) sim.draw(c); const b = bcv.begin(); if (b) drawBandMet(b, 200, 284, sim.time, sim.T, sim.batt); },
+      reset() { sim.reset(); sT.set(300); setPressed(bb, false, 'Battery: '); }
+    });
+    bb.addEventListener('click', () => { sim.batt = !sim.batt; setPressed(bb, sim.batt, 'Battery: '); A.changed(); });
+  })();
+
+  /* ---- Section 3: semiconductor ---- */
+  (function () {
+    const sim = new SemSim({}), band = new SemBand(200, 284);
+    const cv = new Cv('cv-sem', 400, 284), bcv = new Cv('cv-sem-band', 200, 284);
+    const bb = document.getElementById('semBatt'), lb = document.getElementById('semLight');
+    let A;
+    const sT = bindSlider('semT', 'semTOut', fmtK, v => { sim.T = v; A.changed(); });
+    A = new Anim('anim-sem', {
+      step(dt) { sim.step(dt); band.step(dt, pairsFor(sim.T, sim.Tmax, sim.maxP) / sim.maxP, sim.light); },
+      draw() { const c = cv.begin(); if (c) sim.draw(c); const b = bcv.begin(); if (b) band.draw(b, { labels: true }); },
+      reset() { sim.reset(); band.reset(); sT.set(300); setPressed(bb, false, 'Battery: '); setPressed(lb, false, 'Shine light: '); },
+      onPause() { sim.syncInstant(); }
+    });
+    bb.addEventListener('click', () => { sim.batt = !sim.batt; setPressed(bb, sim.batt, 'Battery: '); A.changed(); });
+    lb.addEventListener('click', () => { sim.light = !sim.light; setPressed(lb, sim.light, 'Shine light: '); A.changed(); });
+  })();
+
+  /* ---- Section 4: combined comparison ---- */
+  (function () {
+    const LEN = 0.01, AREA = 1e-6, VOLT = 1e-3; // same bar for all three
+    const amps = rho => (isFinite(rho) ? VOLT / (rho * LEN / AREA) : 0);
+    const dial = I => (I > 0 ? (Math.log10(I) + 20) / 22 : 0);
+    const fmtI = I => (I <= 0 ? 'I = 0' : I < 1e-15 ? 'I ≈ ' + sci(I) + ' A' : 'I ≈ ' + siu(I, 'A'));
+    const ratio = (r300, r) => (isFinite(r) ? '×' + (r300 / r < 100 && r300 / r > 0.01 ? (r300 / r).toFixed(2) : sci(r300 / r)) + ' vs 300 K' : 'no carriers');
+    const mini = { W: 300, LH: 170, MH: 64, labels: false };
+    const ins = new InsSim(Object.assign({}, mini, { cols: 5, rows: 3, V0: 0.6, meterFn: () => { const I = amps(RHO_GLASS); return { frac: dial(I), value: fmtI(I), sub: 'essentially zero', sub2: 'ρ ≈ 10¹² Ω·m (glass)' }; } }));
+    const met = new MetSim(Object.assign({}, mini, { cols: 5, rows: 3, counter: false, trail: false, batt0: true, meterFn: s => { const r = rhoCu(s.T), I = amps(r); return { frac: dial(I), value: fmtI(I), sub: ratio(RHO_CU300, r), sub2: 'ρ ≈ ' + sci(r) + ' Ω·m' }; } }));
+    const sem = new SemSim(Object.assign({}, mini, { cols: 5, rows: 3, Tmax: 600, maxP: 8, batt0: true, meterFn: s => { const r = rhoSi(s.T), I = amps(r); return { frac: dial(I), value: fmtI(I), sub: ratio(rhoSi(300), r), sub2: 'ρ ≈ ' + sci(r) + ' Ω·m' }; } }));
+    const sims = [ins, met, sem];
+    const cvs = [new Cv('cv-c-ins', 300, 234), new Cv('cv-c-met', 300, 234), new Cv('cv-c-sem', 300, 234)];
+    let A;
+    const sT = bindSlider('cmpT', 'cmpTOut', fmtK, v => { sims.forEach(s => { s.T = v; }); A.changed(); });
+    A = new Anim('anim-cmp', {
+      step(dt) { sims.forEach(s => s.step(dt)); },
+      draw() { sims.forEach((s, k) => { const c = cvs[k].begin(); if (c) s.draw(c); }); },
+      reset() { sims.forEach(s => s.reset()); sT.set(300); },
+      onPause() { sem.syncInstant(); }
+    });
+  })();
+
+  /* ---- static band diagrams (comparison) ---- */
+  const staticBands = (function () {
+    const bm = new Cv('cv-b-met', 200, 284), bs = new Cv('cv-b-sem', 200, 284), bi = new Cv('cv-b-ins', 200, 284);
+    const sb = new SemBand(200, 284);
+    [3, 10].forEach(k => { const s = sb.slots[k]; s.used = true; sb.jumps.push({ s, ph: 'cb', t: 0, cx: s.x + 8, cy: sb.cbT + 22 + k, stay: 1e9, vx: 0 }); });
+    return function () {
+      let c = bm.begin(); if (c) drawBandMet(c, 200, 284, 0.6, 300);
+      c = bs.begin(); if (c) sb.draw(c, { labels: false });
+      c = bi.begin(); if (c) drawBandIns(c, 200, 284, 0, 300, true);
+    };
+  })();
+
+  /* =========================================================
+     Resistivity scale
+     ========================================================= */
+  (function () {
+    const svg = document.getElementById('scaleSvg'), NS = 'http://www.w3.org/2000/svg';
+    const LO = -9, HI = 17, X0 = 18, X1 = 422, AY = 112;
+    const sx = lg => X0 + (lg - LO) * (X1 - X0) / (HI - LO);
+    function el(tag, a, parent, text) {
+      const e = document.createElementNS(NS, tag);
+      for (const k in a) e.setAttribute(k, a[k]);
+      if (text != null) e.textContent = text;
+      (parent || svg).appendChild(e); return e;
+    }
+    [[LO, -5, 'rgba(79,195,247,.35)', 'Conductors'], [-5, 8, 'rgba(255,213,79,.25)', 'Semiconductors'], [8, HI, 'rgba(154,164,184,.25)', 'Insulators']].forEach(r => {
+      el('rect', { x: sx(r[0]), y: AY, width: sx(r[1]) - sx(r[0]), height: 14, fill: r[2] });
+      el('text', { x: (sx(r[0]) + sx(r[1])) / 2, y: AY + 10.5, 'font-size': 10, fill: C.text, 'text-anchor': 'middle' }, null, r[3]);
+    });
+    for (let d = LO; d <= HI; d++) {
+      el('line', { x1: sx(d), x2: sx(d), y1: AY + 14, y2: AY + (d % 4 === 0 ? 20 : 17), stroke: C.muted, 'stroke-width': 1 });
+      if (d % 4 === 0) el('text', { x: sx(d), y: AY + 32, 'font-size': 11, fill: C.muted, 'text-anchor': 'middle' }, null, '10' + sup(d));
+    }
+    el('text', { x: 220, y: AY + 52, 'font-size': 10, fill: C.muted, 'text-anchor': 'middle' }, null, 'Resistivity ρ (Ω·m) at 300 K, log scale');
+
+    const M = [
+      { id: 'ag', n: 'Silver', s: 'Ag', v: 1.6e-8, col: C.e, row: 0, kind: 'metal' },
+      { id: 'cu', n: 'Copper', s: 'Cu', v: 1.7e-8, col: C.e, row: 1, kind: 'metal' },
+      { id: 'al', n: 'Aluminium', s: 'Al', v: 2.7e-8, col: C.e, row: 2, kind: 'metal' },
+      { id: 'ge', n: 'Germanium (intrinsic)', s: 'Ge', v: 0.46, col: C.en, row: 2, kind: 'semiconductor' },
+      { id: 'si', n: 'Silicon (intrinsic)', s: 'Si', v: 2.3e3, col: C.en, row: 1, kind: 'semiconductor' },
+      { id: 'gl', n: 'Glass', s: 'Glass', lo: 1e10, hi: 1e14, col: C.text, row: 2, kind: 'insulator' },
+      { id: 'rb', n: 'Rubber', s: 'Rubber', v: 1e13, col: C.text, row: 0, kind: 'insulator', approx: true },
+      { id: 'ox', n: 'SiO₂ (thermal oxide / quartz)', s: 'SiO₂', lo: 1e14, hi: 1e16, col: C.text, row: 1, kind: 'insulator' }
+    ];
+    const rowY = [34, 58, 82];
+    const info = document.getElementById('mkInfo'), chips = document.getElementById('chips');
+    function valText(m) { return m.lo ? sci(m.lo) + ' – ' + sci(m.hi) : (m.approx ? '~' : '≈ ') + sci(m.v); }
+    function select(id) {
+      M.forEach(m => { m.g.classList.toggle('sel', m.id === id); m.chip.setAttribute('aria-pressed', String(m.id === id)); });
+      const m = M.find(x => x.id === id);
+      info.innerHTML = '';
+      info.append(m.n + ': ρ ');
+      const b = document.createElement('b'); b.textContent = valText(m) + ' Ω·m'; info.append(b);
+      info.append(' (300 K) · ' + m.kind);
+    }
+    M.forEach(m => {
+      const g = el('g', { class: 'mk', tabindex: 0, role: 'button', 'aria-label': m.n + ' ' + valText(m) + ' ohm metres' });
+      const y = rowY[m.row];
+      if (m.lo) {
+        const x1 = sx(Math.log10(m.lo)), x2 = sx(Math.log10(m.hi));
+        el('line', { x1: (x1 + x2) / 2, x2: (x1 + x2) / 2, y1: y + 5, y2: AY, stroke: m.col, 'stroke-opacity': .35, 'stroke-width': 1 }, g);
+        el('rect', { x: x1, y: y - 5, width: x2 - x1, height: 10, rx: 5, fill: 'rgba(230,233,239,.25)', stroke: m.col, 'stroke-width': 1 }, g);
+        el('text', { x: x1 - 4, y: y + 4, 'font-size': 11, fill: m.col, 'text-anchor': 'end' }, g, m.s);
+      } else {
+        const x = sx(Math.log10(m.v));
+        el('line', { x1: x, x2: x, y1: y + 5, y2: AY, stroke: m.col, 'stroke-opacity': .35, 'stroke-width': 1 }, g);
+        el('circle', { cx: x, cy: y, r: 5.5, fill: m.col }, g);
+        el('text', { x: x + 9, y: y + 4, 'font-size': 11, fill: m.col }, g, m.s);
+      }
+      g.addEventListener('click', () => select(m.id));
+      g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(m.id); } });
+      m.g = g;
+      const ch = document.createElement('button'); ch.type = 'button'; ch.className = 'chip'; ch.textContent = m.n.replace(/ \(.*\)/, '');
+      ch.setAttribute('aria-pressed', 'false'); ch.addEventListener('click', () => select(m.id));
+      chips.appendChild(ch); m.chip = ch;
+    });
+  })();
+
+  /* =========================================================
+     Mini-nav highlight, visibility, main loop
+     ========================================================= */
+  if (RM) document.getElementById('rmNote').hidden = false;
+  const tocLinks = Array.from(document.querySelectorAll('.toc a'));
+  if ('IntersectionObserver' in window) {
+    const secIO = new IntersectionObserver(ents => {
+      ents.forEach(en => {
+        if (en.isIntersecting) tocLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + en.target.id));
+      });
+    }, { rootMargin: '-45% 0px -50% 0px' });
+    document.querySelectorAll('main section').forEach(s => secIO.observe(s));
+
+    const animIO = new IntersectionObserver(ents => {
+      ents.forEach(en => { const a = anims.find(x => x.root === en.target); if (a) { a.visible = en.isIntersecting; if (a.visible) a.render(); } });
+    }, { rootMargin: '50px' });
+    anims.forEach(a => animIO.observe(a.root));
+  } else anims.forEach(a => { a.visible = true; });
+
+  function renderAll() { anims.forEach(a => a.render()); staticBands(); }
+  if ('ResizeObserver' in window) {
+    let pending = false;
+    new ResizeObserver(() => { if (!pending) { pending = true; requestAnimationFrame(() => { pending = false; renderAll(); }); } }).observe(document.querySelector('main'));
+  } else window.addEventListener('resize', renderAll);
+
+  let last = performance.now();
+  function frame(now) {
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    anims.forEach(a => { if (a.visible && a.playing) { a.o.step(dt); a.o.draw(dt); } });
+    requestAnimationFrame(frame);
+  }
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(renderAll);
+  renderAll();
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Electronic Devices &amp; Circuits</title>
+  <meta name="description" content="Animated lessons on Electronic Devices and Circuits by Naveen Bokka.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1420;
+      --panel: #1a2132;
+      --panel-hover: #212a3f;
+      --border: #2a3448;
+      --text: #e6e9ef;
+      --muted: #9aa4b8;
+      --electron: #4fc3f7;
+      --hole: #ff8a65;
+      --energy: #ffd54f;
+      --success: #81c784;
+      --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+      --max: 960px;
+      --radius: 12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    a { color: var(--electron); }
+    code, .mono { font-family: var(--mono); }
+    .wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 16px; }
+
+
+    main { flex: 1; padding: 32px 0 48px; }
+    h1 { font-size: clamp(1.6rem, 6vw, 2.4rem); line-height: 1.2; margin: 0 0 8px; }
+    .byline { color: var(--muted); margin: 0 0 20px; }
+    .intro { max-width: 65ch; margin: 0 0 32px; }
+    .legend { display: flex; flex-wrap: wrap; gap: 8px 16px; color: var(--muted); font-size: 0.875rem; margin: 0 0 32px; padding: 0; list-style: none; }
+    .legend li { display: flex; align-items: center; gap: 6px; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+    h2 { font-size: 1.25rem; margin: 0 0 16px; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+      gap: 16px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .card {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      color: var(--text);
+      text-decoration: none;
+      transition: background .15s, border-color .15s, transform .15s;
+    }
+    a.card:hover, a.card:focus-visible { background: var(--panel-hover); border-color: var(--electron); transform: translateY(-2px); }
+    a.card:focus-visible { outline: 2px solid var(--electron); outline-offset: 2px; }
+    .card .num { font-family: var(--mono); font-size: 0.8rem; color: var(--electron); letter-spacing: .04em; }
+    .card h3 { margin: 4px 0 12px; font-size: 1.05rem; line-height: 1.35; }
+    .badge { margin-top: auto; align-self: flex-start; font-size: 0.75rem; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+    .badge.ready { color: var(--bg); background: var(--success); }
+    .badge.soon { color: var(--muted); border: 1px solid var(--border); }
+    .card.disabled { opacity: .6; }
+    .card.disabled .num { color: var(--muted); }
+
+    .site-footer { border-top: 1px solid var(--border); color: var(--muted); font-size: 0.875rem; }
+    .site-footer .wrap { padding-top: 20px; padding-bottom: 20px; }
+  </style>
+</head>
+<body>
+
+  <main>
+    <div class="wrap">
+      <h1>Electronic Devices &amp; Circuits</h1>
+      <p class="byline">by Naveen Bokka</p>
+      <p class="intro">
+        A free, animated walkthrough of Electronic Devices and Circuits — from how electrons
+        and holes move inside a crystal to how transistors amplify and oscillate. Each topic
+        pairs a short animation with concise notes and the key formulas, so you can see the
+        physics before you memorise the equations.
+      </p>
+      <ul class="legend" aria-label="Colour key used in animations">
+        <li><span class="dot" style="background:var(--electron)"></span>Electrons</li>
+        <li><span class="dot" style="background:var(--hole)"></span>Holes</li>
+        <li><span class="dot" style="background:var(--energy)"></span>Energy</li>
+      </ul>
+
+      <h2>Units</h2>
+      <ul class="grid" id="unit-grid"></ul>
+      <noscript><p class="byline">Enable JavaScript to see the unit list, or open <a href="unit-1/index.html">Unit 1</a> directly.</p></noscript>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">© 2026 Naveen Bokka · Built with open-source tools</div>
+  </footer>
+
+  <script>
+    // Unit numbers that have a published index page (unit-N/index.html).
+    const builtUnits = [1];
+
+    const units = [
+      "Semiconductor Fundamentals",
+      "PN Junction Diode",
+      "Special Purpose Diodes",
+      "Rectifiers and Filters",
+      "BJT",
+      "Transistor Biasing and Stabilization",
+      "Small Signal BJT Analysis",
+      "Field Effect Transistors",
+      "Special Devices",
+      "Feedback Amplifiers and Oscillators"
+    ];
+
+    const grid = document.getElementById("unit-grid");
+    units.forEach(function (title, i) {
+      const n = i + 1;
+      const built = builtUnits.indexOf(n) !== -1;
+      const li = document.createElement("li");
+      const card = document.createElement(built ? "a" : "div");
+      card.className = "card" + (built ? "" : " disabled");
+      if (built) card.href = "unit-" + n + "/index.html";
+      else card.setAttribute("aria-disabled", "true");
+      card.innerHTML =
+        '<span class="num">UNIT ' + String(n).padStart(2, "0") + '</span>' +
+        '<h3></h3>' +
+        '<span class="badge ' + (built ? 'ready">Start learning' : 'soon">Coming soon') + '</span>';
+      card.querySelector("h3").textContent = title;
+      li.appendChild(card);
+      grid.appendChild(li);
+    });
+  </script>
+</body>
+</html>
