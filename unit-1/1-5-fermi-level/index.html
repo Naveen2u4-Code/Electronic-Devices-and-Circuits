@@ -65,7 +65,8 @@
     section { scroll-margin-top: 64px; padding-top: 28px; }
     h2 { font-size: clamp(1.3rem, 5vw, 1.6rem); line-height: 1.25; margin: 0 0 14px; }
     h3 { font-size: 1.05rem; margin: 0 0 8px; }
-    .prose { max-width: 36em; font-size: 17px; line-height: 1.7; }
+    .prose { font-size: 17px; line-height: 1.7; }
+    .prose > :not(.eq) { max-width: 36em; }   /* text column; equations span the full width */
     .prose p, .prose ul { margin: 0 0 14px; }
     .prose ul { padding-left: 20px; }
     .prose li { margin: 4px 0; }
@@ -160,11 +161,14 @@
 
     /* Maths (KaTeX). The plain-text version inside each element stays as a fallback. */
     .eq[data-tex], .f[data-tex] { font-family: var(--font); }
-    .eq .katex-display, .f .katex-display { margin: 0; text-align: left; overflow-x: auto; overflow-y: hidden; padding: 4px 0; }
-    .eq .katex-display > .katex, .f .katex-display > .katex { text-align: left; }
-    .eq .katex, .f .katex { font-size: 1.15em; }
-    td.f .katex { font-size: 1.05em; }
-    .m .katex { font-size: 1.06em; }
+    .eq[data-tex], .f[data-tex] { text-align: center; }
+    .eq .katex-display, .f .katex-display { margin: 0; text-align: center; overflow-x: auto; overflow-y: hidden; padding: 6px 0; }
+    .eq .katex-display > .katex, .f .katex-display > .katex { text-align: center; }
+    .eq .katex, .f .katex { font-size: 1.3em; }
+    td.f .katex { font-size: 1.15em; }
+    .m .katex { font-size: 1.12em; }
+    td.f .katex { white-space: nowrap; }
+    @media (max-width: 480px) { td.f .katex { font-size: 1em; } }
   </style>
 </head>
 <body>
