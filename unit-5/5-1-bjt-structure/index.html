@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>5.1 BJT Structure: NPN vs PNP</title>
+  <meta name="description" content="BJT structure explained step by step: emitter, base and collector, the two PN junctions, NPN and PNP types and their symbols,. An interactive lesson.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1420;
+      --panel: #1a2132;
+      --panel-hover: #212a3f;
+      --border: #2a3448;
+      --text: #e6e9ef;
+      --muted: #9aa4b8;
+      --electron: #4fc3f7;
+      --hole: #ff8a65;
+      --energy: #ffd54f;
+      --success: #81c784;
+      --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+      --max: 960px;
+      --radius: 12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: var(--font); font-size: 16px; line-height: 1.65;
+      overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column;
+    }
+    a { color: var(--electron); }
+    .wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 16px; }
+
+    /* Sticky mini-nav */
+    .toc {
+      position: sticky; top: 0; z-index: 10; background: rgba(15, 20, 32, .95);
+      border-bottom: 1px solid var(--border); backdrop-filter: blur(6px);
+    }
+    .toc ul { display: flex; gap: 4px; list-style: none; margin: 0 auto; padding: 8px 16px; max-width: var(--max); overflow-x: auto; scrollbar-width: none; }
+    .toc ul::-webkit-scrollbar { display: none; }
+    .toc a {
+      display: block; white-space: nowrap; text-decoration: none; color: var(--muted);
+      font-size: 0.85rem; font-weight: 500; padding: 6px 10px; border-radius: 999px;
+    }
+    .toc a:hover { color: var(--text); background: var(--panel); }
+    .toc a.active { color: var(--bg); background: var(--electron); }
+
+    main { flex: 1; padding: 24px 0 48px; }
+    .crumbs { font-size: 0.875rem; color: var(--muted); margin: 0 0 16px; }
+    .crumbs a { color: var(--muted); }
+    .crumbs a:hover { color: var(--electron); }
+    .eyebrow { font-family: var(--mono); font-size: 0.8rem; color: var(--electron); letter-spacing: .04em; margin: 0; }
+    h1 { font-size: clamp(1.5rem, 6vw, 2.2rem); line-height: 1.2; margin: 4px 0 6px; }
+    .subtitle { color: var(--muted); margin: 0 0 8px; }
+    section { scroll-margin-top: 64px; padding-top: 28px; }
+    h2 { font-size: clamp(1.3rem, 5vw, 1.6rem); line-height: 1.25; margin: 0 0 14px; }
+    h3 { font-size: 1.05rem; margin: 0 0 8px; }
+    /* Explanation text: 17px / 1.7, at most ~70 characters per line */
+    .prose { font-size: 17px; line-height: 1.7; max-width: 34em; }
+    .prose p, .prose ul, .prose ol { margin: 0 0 14px; }
+    .prose ul, .prose ol { padding-left: 22px; }
+    .prose li { margin: 4px 0; }
+    .prose strong { color: #fff; }
+    .prose .note { border-left: 3px solid var(--energy); padding-left: 12px; }
+    .t-e { color: var(--electron); font-weight: 600; }
+    .t-h { color: var(--hole); font-weight: 600; }
+    hr.sep { border: 0; border-top: 1px solid var(--border); margin: 40px 0 0; }
+    .rm-note { font-size: 0.78rem; color: var(--muted); margin: 0 0 8px; }
+
+    /* Buttons & controls */
+    .btn {
+      font: inherit; font-size: 0.88rem; font-weight: 600; color: var(--text);
+      background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+      padding: 7px 12px; cursor: pointer; min-height: 38px;
+    }
+    .btn:hover:not(:disabled) { background: var(--panel-hover); border-color: var(--electron); }
+    .btn:focus-visible, input:focus-visible, canvas:focus-visible { outline: 2px solid var(--electron); outline-offset: 2px; }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
+    .btn[aria-pressed="true"] { background: rgba(255,213,79,.14); border-color: var(--energy); color: var(--energy); }
+    .seg { display: inline-flex; gap: 0; }
+    .seg .btn { border-radius: 0; }
+    .seg .btn:first-child { border-radius: 8px 0 0 8px; }
+    .seg .btn:last-child { border-radius: 0 8px 8px 0; }
+    .seg .btn + .btn { margin-left: -1px; }
+
+    figure.anim {
+      margin: 18px 0 0; background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 12px; min-width: 0;
+    }
+    .ctrls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-bottom: 12px; }
+    .slider { flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; }
+    .slider label { display: flex; justify-content: space-between; gap: 8px; font-size: 0.8rem; color: var(--muted); }
+    .slider output { font-family: var(--mono); color: var(--energy); white-space: nowrap; }
+    input[type="range"] { width: 100%; accent-color: var(--energy); margin: 4px 0 0; }
+    canvas { display: block; width: 100%; border-radius: 8px; background: #141b2b; }
+    .narrow { max-width: 480px; margin: 0 auto; }
+    .exag { font-size: 0.75rem; color: var(--muted); margin: 10px 0 0; }
+    .exag b { color: var(--energy); font-weight: 600; }
+
+    .counters { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px auto 0; }
+    .ctr {
+      flex: 1 1 90px; background: #141b2b; border: 1px solid var(--border); border-radius: 8px;
+      padding: 6px 10px; font-size: 0.78rem; color: var(--muted); min-width: 0;
+    }
+    .ctr b { display: block; font-family: var(--mono); font-size: 1.02rem; font-weight: 500; white-space: nowrap; color: var(--success); overflow: hidden; text-overflow: ellipsis; }
+
+    .legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 0.8rem; color: var(--muted); margin: 8px 0 0; padding: 0; list-style: none; }
+    .legend li { display: inline-flex; align-items: center; gap: 6px; }
+    .sw { display: inline-block; width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
+    .sw.e { background: var(--electron); }
+    .sw.h { border: 2px solid var(--hole); background: rgba(255,138,101,.2); }
+    .sq { display: inline-block; width: 14px; height: 11px; border-radius: 2px; flex-shrink: 0; }
+    .sq.n { background: #2e4a7d; } .sq.p { background: #7d3a3a; }
+    .sq.d { background: repeating-linear-gradient(135deg, #3a3f4f 0 3px, #6a7080 3px 4px); }
+    .ln { display: inline-block; width: 18px; height: 0; border-top: 3px solid var(--success); flex-shrink: 0; }
+
+    /* Section 1: diagram with info strip beside it (below it on phones) */
+    .withinfo { display: grid; grid-template-columns: 1fr; gap: 12px; align-items: start; }
+    @media (min-width: 720px) { .withinfo { grid-template-columns: 3fr 2fr; } }
+    .info { background: #141b2b; border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; min-width: 0; }
+    .info .info-h { margin: 0 0 8px; font-weight: 700; color: var(--energy); }
+    .info dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; font-size: 0.9rem; }
+    .info dt { color: var(--muted); }
+    .info dd { margin: 0; min-width: 0; }
+
+    /* Section 2 layout */
+    .duo { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    @media (min-width: 640px) { .duo { grid-template-columns: 1fr 1fr; } }
+
+    .keypoints {
+      margin-top: 16px; padding: 14px 16px; border-radius: var(--radius);
+      background: rgba(129,199,132,.07); border: 1px solid rgba(129,199,132,.35);
+    }
+    .keypoints h3 { color: var(--success); font-size: 0.95rem; text-transform: uppercase; letter-spacing: .05em; }
+    .keypoints ul { margin: 0; padding-left: 20px; }
+    .keypoints li { margin: 4px 0; }
+
+    .table-box { background: #141b2b; border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; margin-bottom: 12px; }
+    .vt { width: 100%; border-collapse: collapse; font-size: 0.9rem; table-layout: fixed; }
+    .vt th, .vt td { text-align: left; padding: 8px 6px; border-top: 1px solid var(--border); vertical-align: top; overflow-wrap: anywhere; }
+    .vt thead th, .vt thead td { border-top: 0; font-size: 1rem; }
+    .vt thead th.n { color: var(--electron); } .vt thead th.p { color: var(--hole); }
+    .vt tbody th { font-weight: 600; color: var(--muted); width: 32%; }
+    @media (max-width: 480px) { .vt { font-size: .8rem; } .vt th, .vt td { padding: 6px 4px; } }
+
+    .pager { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 48px; }
+    .pager a {
+      display: block; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 12px 14px; text-decoration: none; color: var(--text); min-width: 0;
+    }
+    .pager a:hover { border-color: var(--electron); }
+    .pager small { display: block; color: var(--muted); font-size: 0.75rem; }
+    .pager .next { text-align: right; }
+    .site-foot { border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; text-align: center; padding: 18px 16px; }
+
+    /* Justified paragraphs on desktop; phones stay left-aligned to avoid wide word gaps. */
+    @media (min-width: 768px) {
+      .prose p, .prose li, .keypoints li, .exag { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="toc" aria-label="Sections">
+    <ul>
+      <li><a href="#s0">What is a BJT?</a></li>
+      <li><a href="#s1">Regions &amp; junctions</a></li>
+      <li><a href="#s2">NPN vs PNP</a></li>
+      <li><a href="#s3">Summary</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="wrap">
+      <header>
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="../../index.html">Home</a> / <a href="../index.html">Unit 5</a> / 5.1
+        </nav>
+        <p class="eyebrow">TOPIC 5.1</p>
+        <h1>BJT Structure: NPN vs PNP</h1>
+        <p class="subtitle">Three doped regions, two junctions, and the two ways to stack them</p>
+        <p class="rm-note" id="rmNote" hidden>Your device asks for reduced motion, so every animation starts paused. Press Play on any animation to run it. Sliders and buttons still update the picture.</p>
+      </header>
+
+      <!-- ================= SECTION 0 ================= -->
+      <section id="s0" aria-labelledby="h0">
+        <h2 id="h0">What is a bipolar junction transistor?</h2>
+        <div class="prose">
+          <p>A <strong>transistor</strong> is a three-terminal semiconductor device that can <strong>amplify</strong> a signal or act as an electronic <strong>switch</strong>. The <strong>bipolar junction transistor (BJT)</strong> was the first practical transistor, developed at Bell Labs in the late 1940s, and it made modern electronics possible.</p>
+          <p>A BJT is made of three doped semiconductor regions placed one after another, forming two PN junctions. The three regions are called the <strong>emitter (E)</strong>, the <strong>base (B)</strong> and the <strong>collector (C)</strong>, and each has its own terminal.</p>
+          <p>It is called <strong>bipolar</strong> because current inside it is carried by both kinds of carriers: <span class="t-e">electrons</span> and <span class="t-h">holes</span>. It is called a <strong>junction</strong> transistor because its action depends on its two PN junctions.</p>
+          <p>The key idea of a BJT is <strong>control</strong>: a small current into the base controls a much larger current flowing between the collector and the emitter.</p>
+          <p class="note"><strong>Note:</strong> two separate diodes connected back to back do <strong>not</strong> make a transistor. Transistor action needs both junctions to share one extremely thin base region inside a single crystal. Topic 5.2 explains why.</p>
+        </div>
+
+        <figure class="anim" id="anim0a">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <canvas id="cv0a" class="narrow" style="aspect-ratio:600/280;max-width:640px" role="img" aria-label="A single crystal bar divided into three regions: N emitter, thin P base and N collector, with leads: E out of the left end, B out of the bottom of the base, C out of the right end. The two junctions are marked EBJ and CBJ."></canvas>
+          <ul class="legend">
+            <li><span class="sq n"></span><span>N-type</span></li>
+            <li><span class="sq p"></span><span>P-type</span></li>
+            <li><span class="sq d"></span><span>junction (depletion region)</span></li>
+          </ul>
+          <p class="exag"><b>Not to scale.</b></p>
+        </figure>
+
+        <figure class="anim" id="anim0b">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="seg" role="group" aria-label="Structure">
+              <button class="btn" type="button" data-mode="0" aria-pressed="true">Two diodes</button>
+              <button class="btn" type="button" data-mode="1" aria-pressed="false">One transistor</button>
+            </div>
+          </div>
+          <canvas id="cv0b" class="narrow" style="aspect-ratio:600/270;max-width:640px" role="img" aria-label="Two separate diode blocks joined by a wire, giving a thick middle with no transistor action, morph into one crystal with a very thin shared base."></canvas>
+          <p class="exag"><b>Not to scale:</b> in a real BJT the base is far thinner than shown.</p>
+        </figure>
+
+        <figure class="anim" id="anim0c">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="slider">
+              <label for="ib0"><span>Base current I<sub>B</sub></span><output id="ib0o" for="ib0">20 µA</output></label>
+              <input type="range" id="ib0" min="0" max="50" step="1" value="20">
+            </div>
+          </div>
+          <canvas id="cv0c" class="narrow" style="aspect-ratio:420/320" role="img" aria-label="NPN transistor symbol. A thin green arrow flows into the base. A much thicker green arrow flows into the collector and out of the emitter. Its thickness follows the base current slider."></canvas>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr">I<sub>B</sub><b id="c0b">20 µA</b></div>
+            <div class="ctr">I<sub>C</sub><b id="c0c">2.00 mA</b></div>
+            <div class="ctr">I<sub>E</sub><b id="c0e">2.02 mA</b></div>
+          </div>
+          <p class="exag"><b>Symbolic demo:</b> here I<sub>C</sub> is set to 100 × I<sub>B</sub>. Arrow widths are not to scale.</p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: what is a BJT">
+          <h3>Key points</h3>
+          <ul>
+            <li>A BJT has three doped regions, emitter, base and collector, forming two PN junctions.</li>
+            <li>Bipolar: both electrons and holes carry the current.</li>
+            <li>A small base current controls a much larger collector–emitter current.</li>
+            <li>Two back-to-back diodes are not a transistor: the base must be one extremely thin, shared region.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 1 ================= -->
+      <section id="s1" aria-labelledby="h1s">
+        <h2 id="h1s">The three regions and two junctions</h2>
+        <div class="prose">
+          <p>The three regions are <strong>not</strong> alike. Each is built for a different job:</p>
+          <ul>
+            <li><strong>Emitter:</strong> heavily doped. Its job is to emit (inject) a large number of charge carriers into the base.</li>
+            <li><strong>Base:</strong> very thin and lightly doped. Its job is to let almost all injected carriers pass straight through to the collector, while giving a small control current.</li>
+            <li><strong>Collector:</strong> moderately doped and physically the largest region. Its job is to collect the carriers coming from the base. Because most of the power is dissipated here, it is made large so it can get rid of heat.</li>
+          </ul>
+          <p>The two PN junctions are:</p>
+          <ul>
+            <li>the <strong>emitter-base junction</strong> (EBJ, also written J<sub>E</sub>), between emitter and base;</li>
+            <li>the <strong>collector-base junction</strong> (CBJ, also written J<sub>C</sub>), between collector and base.</li>
+          </ul>
+          <p>Because the emitter and collector differ in doping and size, a BJT is <strong>not symmetrical</strong>. If you swap the emitter and collector connections, the device still works a little, but its current gain becomes very small. The base width is very small compared with the emitter and collector, and this <strong>thinness</strong> is essential for transistor action.</p>
+        </div>
+
+        <figure class="anim" id="anim1">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="seg" role="group" aria-label="Select region">
+              <button class="btn" type="button" data-reg="0" aria-pressed="false">Emitter</button>
+              <button class="btn" type="button" data-reg="1" aria-pressed="false">Base</button>
+              <button class="btn" type="button" data-reg="2" aria-pressed="false">Collector</button>
+            </div>
+            <button class="btn" type="button" id="swap1" aria-pressed="false">Swap E and C</button>
+          </div>
+          <div class="withinfo">
+            <canvas id="cv1" style="aspect-ratio:560/330;cursor:pointer" role="img" aria-label="Cross-section of an NPN transistor. The emitter is the darkest region with dense dopant dots, the thin base is the lightest, and the large collector is medium. Below is a gain meter. Tap a region to see its details."></canvas>
+            <div class="info" aria-live="polite">
+              <p class="info-h" id="i1n">Tap a region</p>
+              <dl>
+                <dt>Doping</dt><dd id="i1d">–</dd>
+                <dt>Size</dt><dd id="i1s">–</dd>
+                <dt>Job</dt><dd id="i1j">Tap the emitter, base or collector in the diagram, or use the buttons above.</dd>
+                <dt>Wired as</dt><dd id="i1w">–</dd>
+              </dl>
+            </div>
+          </div>
+          <p class="exag"><b>Not to scale:</b> base width exaggerated. Darker colour and denser dots mean heavier doping.</p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: regions and junctions">
+          <h3>Key points</h3>
+          <ul>
+            <li>Emitter: heavily doped, injects carriers into the base.</li>
+            <li>Base: very thin and lightly doped, passes almost all carriers on to the collector.</li>
+            <li>Collector: moderately doped and largest, collects carriers and gets rid of the heat.</li>
+            <li>Two junctions, EBJ (J<sub>E</sub>) and CBJ (J<sub>C</sub>); the BJT is not symmetrical, so swapping E and C makes the gain very small.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 2 ================= -->
+      <section id="s2" aria-labelledby="h2s">
+        <h2 id="h2s">NPN and PNP transistors</h2>
+        <div class="prose">
+          <p>There are two types of BJT, depending on the order of the doped regions:</p>
+          <ul>
+            <li><strong>NPN:</strong> an N-type emitter, a P-type base and an N-type collector. The main current carriers through the base are <span class="t-e">electrons</span>.</li>
+            <li><strong>PNP:</strong> a P-type emitter, an N-type base and a P-type collector. The main current carriers through the base are <span class="t-h">holes</span>.</li>
+          </ul>
+          <p>Both work on the same principle. In a PNP transistor every voltage polarity and every current direction is simply the <strong>reverse</strong> of an NPN.</p>
+          <p><strong>Circuit symbols:</strong> both have a base line in the middle with the emitter and collector drawn as slanted lines. The emitter carries an <strong>arrow</strong> that shows the direction of conventional current through the emitter. In an NPN, the arrow points <strong>out</strong> of the transistor (memory aid: “<strong>N</strong>ot <strong>P</strong>ointing i<strong>N</strong>”). In a PNP, the arrow points <strong>in</strong>.</p>
+          <p>NPN transistors are used more often, because electrons move more easily than holes (higher <strong>mobility</strong>). This makes NPN transistors faster and gives them better performance for the same size.</p>
+        </div>
+
+        <figure class="anim" id="anim2">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="seg" role="group" aria-label="Transistor type">
+              <button class="btn" type="button" data-type="0" aria-pressed="true">NPN</button>
+              <button class="btn" type="button" data-type="1" aria-pressed="false">PNP</button>
+            </div>
+            <button class="btn" type="button" id="car2" aria-pressed="false">Show carriers</button>
+          </div>
+          <div class="duo">
+            <canvas id="cv2a" style="aspect-ratio:400/300" role="img" aria-label="Three-region block. NPN: N emitter, P base, N collector. PNP: P emitter, N base, P collector. With carriers shown, electrons (NPN) or holes (PNP) stream from emitter through base to collector, with a green conventional current arrow."></canvas>
+            <canvas id="cv2b" style="aspect-ratio:400/300" role="img" aria-label="Matching circuit symbol. The emitter arrow points out for NPN and in for PNP. Green arrows show the terminal currents IB, IC and IE, which reverse for PNP."></canvas>
+          </div>
+          <ul class="legend">
+            <li><span class="sw e"></span><span>electron</span></li>
+            <li><span class="sw h"></span><span>hole</span></li>
+            <li><span class="ln"></span><span>conventional current</span></li>
+          </ul>
+          <p class="exag"><b>Not to scale.</b></p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: NPN and PNP">
+          <h3>Key points</h3>
+          <ul>
+            <li>NPN: N–P–N, electrons carry the current through the base.</li>
+            <li>PNP: P–N–P, holes carry it; every polarity and current direction is reversed.</li>
+            <li>The emitter arrow shows conventional current: out for NPN (“Not Pointing iN”), in for PNP.</li>
+            <li>NPN is more common: electrons have higher mobility, so NPN is faster.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 3 ================= -->
+      <section id="s3" aria-labelledby="h3s">
+        <h2 id="h3s">Summary</h2>
+        <div class="prose">
+          <p>The BJT is a <strong>three-region, two-junction</strong> device. The heavily doped emitter injects carriers, the thin lightly doped base controls them, and the large moderately doped collector collects them. NPN and PNP transistors work the same way with opposite polarities. The arrow in the symbol marks the emitter and shows the direction of conventional current.</p>
+        </div>
+
+        <figure class="anim" id="anim4">
+          <div class="table-box">
+            <table class="vt">
+              <thead><tr><td></td><th scope="col" class="n">NPN</th><th scope="col" class="p">PNP</th></tr></thead>
+              <tbody>
+                <tr><th scope="row">Region order (E–B–C)</th><td>N – P – N</td><td>P – N – P</td></tr>
+                <tr><th scope="row">Main carriers through the base</th><td><span class="t-e">Electrons</span></td><td><span class="t-h">Holes</span></td></tr>
+                <tr><th scope="row">Emitter arrow</th><td>Points out</td><td>Points in</td></tr>
+                <tr><th scope="row">V<sub>BE</sub> in normal use</th><td>Base positive w.r.t. emitter</td><td>Base negative w.r.t. emitter</td></tr>
+                <tr><th scope="row">Typical use</th><td>The most common type; amplifiers and switches, faster for the same size</td><td>Used where the opposite polarity is needed, often paired with an NPN</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <canvas id="cv4" class="narrow" style="aspect-ratio:600/280;max-width:640px" role="img" aria-label="NPN and PNP circuit symbols side by side. The NPN emitter arrow pulses outward, the PNP emitter arrow pulses inward."></canvas>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: summary">
+          <h3>Key points</h3>
+          <ul>
+            <li>Three regions, two junctions: the emitter injects, the base controls, the collector collects.</li>
+            <li>NPN and PNP work the same way with opposite polarities and current directions.</li>
+            <li>The symbol’s arrow marks the emitter and shows conventional current: out for NPN, in for PNP.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <nav class="pager" aria-label="Topic navigation">
+        <a href="../index.html"><small>← Previous</small>Unit 5: Bipolar Junction Transistor</a>
+        <a class="next" href="../5-2-transistor-action/index.html"><small>Next →</small>5.2 How a transistor works</a>
+      </nav>
+    </div>
+  </main>
+
+  <footer class="site-foot">© 2026 Naveen Bokka</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  const C = {
+    text: '#e6e9ef', muted: '#9aa4b8', e: '#4fc3f7', h: '#ff8a65', v: '#ffd54f', cur: '#81c784', wire: '#cfd8dc',
+    N: '#2e4a7d', P: '#7d3a3a', dep: '#3a3f4f', Nh: '#1b3260', Pl: '#a35a5a', line: '#33405e'
+  };
+  const FONT = 'Inter, system-ui, sans-serif';
+  const RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const TAU = Math.PI * 2;
+  const $ = id => document.getElementById(id);
+  if (RM) $('rmNote').hidden = false;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const ease = x => x * x * (3 - 2 * x);
+  const approach = (v, t, r) => v < t ? Math.min(t, v + r) : Math.max(t, v - r);
+  function hex(h) { return [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)); }
+  function mix(a, b, t) { const A = hex(a), B = hex(b); return 'rgb(' + A.map((v, i) => Math.round(v + (B[i] - v) * t)).join(',') + ')'; }
+  let seed = 7;
+  const srnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+
+  /* ---------- Canvas helpers ---------- */
+  let FS = 1;
+  function Cv(id, W, H) { this.el = $(id); this.W = W; this.H = H; this.ctx = this.el.getContext('2d'); }
+  Cv.prototype.begin = function () {
+    const w = this.el.clientWidth; if (!w) return null;
+    const dpr = window.devicePixelRatio || 1;
+    const pw = Math.round(w * dpr), ph = Math.round(w * dpr * this.H / this.W);
+    if (this.el.width !== pw || this.el.height !== ph) { this.el.width = pw; this.el.height = ph; }
+    const c = this.ctx, s = pw / this.W;
+    FS = Math.min(1.6, Math.max(1, 1.15 * this.W / w));
+    c.setTransform(s, 0, 0, s, 0, 0); c.clearRect(0, 0, this.W, this.H);
+    c.textBaseline = 'middle'; c.textAlign = 'left'; c.globalAlpha = 1; c.setLineDash([]);
+    return c;
+  };
+  // Watermark: drawn inside the canvas, bottom-right, 13 px on screen at any size.
+  Cv.prototype.wm = function (c) {
+    const k = this.W / this.el.clientWidth, s = 13 * k;
+    c.save(); c.globalAlpha = 1; c.font = '500 ' + s.toFixed(1) + 'px ' + FONT; c.fillStyle = 'rgba(255,255,255,.35)';
+    c.textAlign = 'right'; c.textBaseline = 'bottom'; c.fillText('© Naveen Bokka', this.W - 6 * k, this.H - 5 * k); c.restore();
+  };
+  Cv.prototype.pt = function (e) {
+    const r = this.el.getBoundingClientRect();
+    return { x: (e.clientX - r.left) * this.W / r.width, y: (e.clientY - r.top) * this.H / r.height };
+  };
+  function circ(c, x, y, r, fill, stroke, lw) {
+    c.beginPath(); c.arc(x, y, Math.max(0, r), 0, TAU);
+    if (fill) { c.fillStyle = fill; c.fill(); }
+    if (stroke) { c.strokeStyle = stroke; c.lineWidth = lw || 1.5; c.stroke(); }
+  }
+  function txt(c, s, x, y, col, size, weight, align) {
+    c.font = (weight || 600) + ' ' + ((size || 12) * FS).toFixed(1) + 'px ' + FONT;
+    c.fillStyle = col || C.text; c.textAlign = align || 'left'; c.fillText(s, x, y);
+  }
+  // Label with subscript, e.g. sub(c, 'I', 'B', …)
+  function sub(c, a, b, x, y, col, size, align) {
+    const z = (size || 13) * FS;
+    c.font = '700 ' + z.toFixed(1) + 'px ' + FONT; const wa = c.measureText(a).width;
+    c.font = '700 ' + (z * 0.72).toFixed(1) + 'px ' + FONT; const wb = c.measureText(b).width;
+    const w = wa + wb, x0 = align === 'right' ? x - w : align === 'center' ? x - w / 2 : x;
+    c.fillStyle = col; c.textAlign = 'left';
+    c.font = '700 ' + z.toFixed(1) + 'px ' + FONT; c.fillText(a, x0, y);
+    c.font = '700 ' + (z * 0.72).toFixed(1) + 'px ' + FONT; c.fillText(b, x0 + wa, y + z * 0.3);
+  }
+  function line(c, x0, y0, x1, y1, col, lw, dash) {
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []);
+    c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke(); c.setLineDash([]);
+  }
+  function arrow(c, x0, y0, x1, y1, col, lw, head) {
+    const dx = x1 - x0, dy = y1 - y0, L = Math.hypot(dx, dy); if (L < 2) return;
+    const ux = dx / L, uy = dy / L, hs = Math.min(head || 10, L * 0.8);
+    line(c, x0, y0, x1 - ux * hs * 0.7, y1 - uy * hs * 0.7, col, lw || 3);
+    c.fillStyle = col; c.beginPath(); c.moveTo(x1, y1);
+    c.lineTo(x1 - ux * hs - uy * hs * 0.55, y1 - uy * hs + ux * hs * 0.55);
+    c.lineTo(x1 - ux * hs + uy * hs * 0.55, y1 - uy * hs - ux * hs * 0.55); c.closePath(); c.fill();
+  }
+  function poly(c, pts, fill, stroke, lw) {
+    c.beginPath(); c.moveTo(pts[0][0], pts[0][1]); for (let k = 1; k < pts.length; k++) c.lineTo(pts[k][0], pts[k][1]); c.closePath();
+    if (fill) { c.fillStyle = fill; c.fill(); }
+    if (stroke) { c.strokeStyle = stroke; c.lineWidth = lw || 1.2; c.stroke(); }
+  }
+  // Thick "block" arrow whose shaft width is w, with moving stripes (phase ph) to show flow
+  function blockArrow(c, x0, y0, x1, y1, w, col, ph) {
+    const dx = x1 - x0, dy = y1 - y0, L = Math.hypot(dx, dy); if (L < 4 || w <= 0) return;
+    const ux = dx / L, uy = dy / L, nx = -uy, ny = ux;
+    const hw = Math.max(w * 0.95 + 5, w / 2 + 6), hl = Math.min(L * 0.5, w * 0.9 + 10);
+    const bx = x1 - ux * hl, by = y1 - uy * hl, s = w / 2;
+    const pts = [[x0 + nx * s, y0 + ny * s], [bx + nx * s, by + ny * s], [bx + nx * hw, by + ny * hw], [x1, y1],
+      [bx - nx * hw, by - ny * hw], [bx - nx * s, by - ny * s], [x0 - nx * s, y0 - ny * s]];
+    poly(c, pts, col);
+    if (ph == null) return;
+    c.save(); poly(c, pts); c.clip();
+    c.strokeStyle = 'rgba(255,255,255,.35)'; c.lineWidth = 3;
+    const gap = 16, off = (ph % 1) * gap;
+    for (let d = -gap + off; d < L; d += gap) {
+      const px = x0 + ux * d, py = y0 + uy * d;
+      c.beginPath(); c.moveTo(px + nx * hw, py + ny * hw); c.lineTo(px - nx * hw, py - ny * hw); c.stroke();
+    }
+    c.restore();
+  }
+  // Depletion region: grey with light hatching
+  function hatch(c, x, y, w, h) {
+    c.save(); c.fillStyle = C.dep; c.fillRect(x, y, w, h);
+    c.beginPath(); c.rect(x, y, w, h); c.clip();
+    c.strokeStyle = 'rgba(255,255,255,.28)'; c.lineWidth = 1;
+    for (let k = -h; k < w + h; k += 5) { c.beginPath(); c.moveTo(x + k, y + h); c.lineTo(x + k + h, y); c.stroke(); }
+    c.restore();
+  }
+  // Terminal leads on a block: E out of the left end, C out of the right end, B down from the base
+  function leadL(c, x, ym, lab, al) {
+    c.fillStyle = C.wire; c.fillRect(x - 6, ym - 12, 6, 24); line(c, x - 6, ym, x - 34, ym, C.wire, 3);
+    c.globalAlpha = al == null ? 1 : al; txt(c, lab, x - 46, ym, C.text, 17, 700, 'center'); c.globalAlpha = 1;
+  }
+  function leadR(c, x, ym, lab, al) {
+    c.fillStyle = C.wire; c.fillRect(x, ym - 12, 6, 24); line(c, x + 6, ym, x + 34, ym, C.wire, 3);
+    c.globalAlpha = al == null ? 1 : al; txt(c, lab, x + 46, ym, C.text, 17, 700, 'center'); c.globalAlpha = 1;
+  }
+  function leadB(c, x, y, yEnd, lab, pad) {
+    if (pad !== false) { c.fillStyle = C.wire; c.fillRect(x - 11, y, 22, 6); }
+    line(c, x, y + (pad !== false ? 6 : 0), x, yEnd, C.wire, 3);
+    txt(c, lab, x, yEnd + 16, C.text, 17, 700, 'center');
+  }
+  function elec(c, x, y, r) { circ(c, x, y, (r || 4) * 1.9, 'rgba(79,195,247,.15)'); circ(c, x, y, r || 4, C.e); }
+  function holeRing(c, x, y, r) { circ(c, x, y, r || 4.5, 'rgba(255,138,101,.22)', C.h, 2); }
+  function segSel(root, attr, val) {
+    root.querySelectorAll('[data-' + attr + ']').forEach(b => b.setAttribute('aria-pressed', String(b.dataset[attr] === String(val))));
+  }
+
+  /* BJT circuit symbol. (bx, by) = middle of the base bar, s = scale.
+     o.alpha: arrow opacity, o.ghost: 0..1 phase of a moving arrow, o.glow: 0..1 */
+  function bjtSym(c, bx, by, s, pnp, o) {
+    o = o || {};
+    const P = (x, y) => [bx + x * s, by + y * s];
+    const L = (a, b, w) => { const A = P(a[0], a[1]), B = P(b[0], b[1]); line(c, A[0], A[1], B[0], B[1], C.wire, (w || 3) * s); };
+    const cc = P(35, 0); circ(c, cc[0], cc[1], 72 * s, null, 'rgba(207,216,220,.3)', 1.5);
+    L([-100, 0], [0, 0]); L([0, -50], [0, 50], 6); L([0, -28], [70, -70]); L([70, -70], [70, -125]);
+    L([0, 28], [70, 70]); L([70, 70], [70, 125]);
+    const A = [0, 28], B = [70, 70], ll = Math.hypot(70, 42);
+    let ux = 70 / ll, uy = 42 / ll; if (pnp) { ux = -ux; uy = -uy; }
+    const head = (f, col, al) => {
+      const T = P(A[0] + (B[0] - A[0]) * f, A[1] + (B[1] - A[1]) * f), hs = 17 * s;
+      c.globalAlpha = al;
+      poly(c, [[T[0], T[1]], [T[0] - ux * hs - uy * hs * 0.6, T[1] - uy * hs + ux * hs * 0.6], [T[0] - ux * hs + uy * hs * 0.6, T[1] - uy * hs - ux * hs * 0.6]], col);
+      c.globalAlpha = 1;
+      return T;
+    };
+    const al = o.alpha == null ? 1 : o.alpha;
+    const f0 = pnp ? 0.3 : 0.82;
+    if (o.glow) { const T = P(A[0] + (B[0] - A[0]) * (f0 + (pnp ? 0.12 : -0.12)), A[1] + (B[1] - A[1]) * (f0 + (pnp ? 0.12 : -0.12))); c.globalAlpha = al * o.glow; circ(c, T[0], T[1], 20 * s, 'rgba(129,199,132,.45)'); c.globalAlpha = 1; }
+    head(f0, C.wire, al);
+    if (o.ghost != null) {
+      const g = o.ghost, f = pnp ? 0.95 - 0.8 * g : 0.15 + 0.8 * g;
+      head(f, C.cur, al * 0.75 * Math.sin(Math.PI * g));
+    }
+  }
+
+  /* ---------- Animation framework: own Play/Pause/Reset, runs only while visible ---------- */
+  const anims = [];
+  function Anim(rootId, o) {
+    this.root = $(rootId); this.o = o; this.playing = !RM; this.visible = true; this.dirty = true;
+    this.pb = this.root.querySelector('[data-act="play"]');
+    this.pb.addEventListener('click', () => this.setPlaying(!this.playing));
+    this.root.querySelector('[data-act="reset"]').addEventListener('click', () => { o.reset(); this.setPlaying(!RM); });
+    o.reset(); this.sync(); anims.push(this);
+    if ('IntersectionObserver' in window) {
+      this.visible = false;
+      new IntersectionObserver(es => es.forEach(e => { this.visible = e.isIntersecting; if (this.visible) this.dirty = true; }))
+        .observe(this.root);
+    }
+  }
+  Anim.prototype.setPlaying = function (p) { this.playing = p; this.sync(); this.dirty = true; };
+  Anim.prototype.sync = function () { this.pb.textContent = this.playing ? 'Pause' : 'Play'; };
+  // After a button press: run the transition, or snap to it under reduced motion
+  Anim.prototype.kick = function (snap) { if (RM) { snap(); this.dirty = true; } else this.setPlaying(true); };
+
+  /* =========================================================
+     0a. One crystal, three regions, two junctions
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv0a', 600, 280);
+    const y0 = 80, y1 = 170, ym = (y0 + y1) / 2;
+    const R = [{ x0: 90, x1: 265, lab: 'N', col: C.N }, { x0: 265, x1: 315, lab: 'P', col: C.P }, { x0: 315, x1: 510, lab: 'N', col: C.N }];
+    let t = 0;
+    new Anim('anim0a', {
+      reset() { t = 0; },
+      step(dt) { t += dt; },
+      draw() {
+        const c = cv.begin(); if (!c) return;
+        R.forEach(r => { c.fillStyle = r.col; c.fillRect(r.x0, y0, r.x1 - r.x0, y1 - y0); });
+        hatch(c, 259, y0, 12, y1 - y0); hatch(c, 309, y0, 12, y1 - y0);
+        if (t > 0) {   // a highlight walks E → B → C
+          const i = Math.floor(t / 1.4) % 3, r = R[i], a = 0.5 + 0.5 * Math.sin((t % 1.4) / 1.4 * Math.PI);
+          c.globalAlpha = a; c.strokeStyle = C.v; c.lineWidth = 3; c.strokeRect(r.x0 + 1.5, y0 + 1.5, r.x1 - r.x0 - 3, y1 - y0 - 3); c.globalAlpha = 1;
+        }
+        c.strokeStyle = 'rgba(207,216,220,.5)'; c.lineWidth = 1.2; c.strokeRect(90, y0, 420, y1 - y0);
+        R.forEach(r => txt(c, r.lab, (r.x0 + r.x1) / 2, ym, '#fff', 20, 700, 'center'));
+        leadL(c, 90, ym, 'E'); leadR(c, 510, ym, 'C'); leadB(c, 290, y1, 222, 'B');
+        const pa = t > 0 ? 0.65 + 0.35 * Math.sin(t * 3) : 1;
+        c.globalAlpha = pa;
+        line(c, 265, y0 - 2, 253, 52, C.v, 1.5); line(c, 315, y0 - 2, 327, 52, C.v, 1.5);
+        txt(c, 'EBJ', 251, 42, C.v, 14, 700, 'right'); txt(c, 'CBJ', 329, 42, C.v, 14, 700, 'left');
+        c.globalAlpha = 1;
+        cv.wm(c);
+      }
+    });
+  })();
+
+  /* =========================================================
+     0b. Two diodes vs one transistor
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv0b', 600, 270), root = $('anim0b');
+    const y0 = 90, y1 = 160, ym = (y0 + y1) / 2;
+    let u = 0, tgt = 0, auto = true, hold = 0;
+    const A = new Anim('anim0b', {
+      reset() { u = 0; tgt = 0; auto = true; hold = 0; segSel(root, 'mode', 0); },
+      step(dt) {
+        if (u !== tgt) u = approach(u, tgt, 0.6 * dt);
+        else if (auto) { hold += dt; if (hold > 2.5) { hold = 0; tgt = 1 - tgt; segSel(root, 'mode', tgt); } }
+      },
+      draw() {
+        const c = cv.begin(); if (!c) return;
+        const k = ease(u), L = (a, b) => lerp(a, b, k);
+        const n1 = [L(75, 90), L(195, 280)], p1 = [L(195, 280), L(245, 300)], p2 = [L(355, 300), L(405, 320)], n2 = [L(405, 320), L(525, 510)];
+        if (p2[0] - p1[1] > 0.5) line(c, p1[1], ym, p2[0], ym, C.wire, 4);
+        [[n1, C.N], [p1, C.P], [p2, C.P], [n2, C.N]].forEach(q => { c.fillStyle = q[1]; c.fillRect(q[0][0], y0, q[0][1] - q[0][0], y1 - y0); });
+        hatch(c, n1[1] - 5, y0, 10, y1 - y0); hatch(c, p2[1] - 5, y0, 10, y1 - y0);
+        c.lineWidth = 1.5;
+        c.globalAlpha = 1 - k; c.strokeStyle = C.wire;
+        c.strokeRect(n1[0], y0, p1[1] - n1[0], y1 - y0); c.strokeRect(p2[0], y0, n2[1] - p2[0], y1 - y0);
+        c.globalAlpha = k; c.strokeRect(n1[0], y0, n2[1] - n1[0], y1 - y0); c.globalAlpha = 1;
+        // leads
+        const xe = (n1[0] + n1[1]) / 2, xc = (n2[0] + n2[1]) / 2, yb = lerp(ym, y1, k);
+        leadL(c, n1[0], ym, 'E'); leadR(c, n2[1], ym, 'C'); leadB(c, 300, yb, 212, 'B', false);
+        circ(c, 300, yb, 4, C.wire);
+        txt(c, 'N', xe, ym, '#fff', 18, 700, 'center'); txt(c, 'N', xc, ym, '#fff', 18, 700, 'center');
+        c.globalAlpha = 1 - k; txt(c, 'P', (p1[0] + p1[1]) / 2, ym, '#fff', 18, 700, 'center'); txt(c, 'P', (p2[0] + p2[1]) / 2, ym, '#fff', 18, 700, 'center');
+        c.globalAlpha = k; txt(c, 'P', 300, ym, '#fff', 16, 700, 'center');
+        c.globalAlpha = clamp(1 - 2 * k, 0, 1); txt(c, 'no transistor action', 300, 50, C.h, 14, 600, 'center');
+        c.globalAlpha = clamp(2 * k - 1, 0, 1); line(c, 300, 63, 300, y0 - 3, C.v, 1.5); txt(c, 'thin shared base', 300, 50, C.v, 14, 600, 'center');
+        c.globalAlpha = 1;
+        cv.wm(c);
+      }
+    });
+    root.querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => {
+      auto = false; tgt = +b.dataset.mode; segSel(root, 'mode', tgt);
+      A.kick(() => { u = tgt; });
+    }));
+  })();
+
+  /* =========================================================
+     0c. Small base current controls a large collector current
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv0c', 420, 320), sl = $('ib0');
+    let ib = 20, ph = 0;
+    function upd() {
+      const ic = ib * 100 / 1000;   // mA
+      $('ib0o').textContent = ib + ' µA'; $('c0b').textContent = ib + ' µA';
+      $('c0c').textContent = ic.toFixed(2) + ' mA'; $('c0e').textContent = (ic + ib / 1000).toFixed(2) + ' mA';
+    }
+    const A = new Anim('anim0c', {
+      reset() { ib = 20; sl.value = 20; ph = 0; upd(); },
+      step(dt) { ph += dt * 1.5; },
+      draw() {
+        const c = cv.begin(); if (!c) return;
+        const f = ib / 50, bx = 150, by = 160;
+        bjtSym(c, bx, by, 1, false);
+        txt(c, 'B', 42, by, C.text, 16, 700, 'right');
+        txt(c, 'C', 206, 40, C.text, 16, 700, 'right');
+        txt(c, 'E', 206, 280, C.text, 16, 700, 'right');
+        if (ib > 0) {
+          const wb = 1.5 + 2.5 * f, wc = 3 + 25 * f;
+          blockArrow(c, 58, 140, 128, 140, wb, C.cur, ph);
+          sub(c, 'I', 'B', 92, 118, C.cur, 14, 'center');
+          blockArrow(c, 262, 28, 262, 98, wc, C.cur, ph);
+          sub(c, 'I', 'C', 300, 62, C.cur, 14, 'left');
+          blockArrow(c, 262, 220, 262, 276, wc + 0.3, C.cur, ph);
+          sub(c, 'I', 'E', 300, 252, C.cur, 14, 'left');
+        }
+        cv.wm(c);
+      }
+    });
+    sl.addEventListener('input', () => { ib = +sl.value; upd(); A.dirty = true; });
+  })();
+
+  /* =========================================================
+     1. The three regions: doping, size, job; swap E and C
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv1', 560, 330), root = $('anim1'), swapB = $('swap1');
+    const y0 = 70, y1 = 180;
+    const REG = [
+      { name: 'Emitter', dop: 'Heavy (N+)', size: 'Medium', job: 'Emits (injects) a large number of charge carriers into the base.', x0: 70, x1: 205, fill: C.Nh, lab: 'N+', n: 72, xl: 137 },
+      { name: 'Base', dop: 'Light (P)', size: 'Very thin', job: 'Lets almost all injected carriers pass straight through to the collector, while giving a small control current.', x0: 205, x1: 245, fill: C.Pl, lab: 'P', n: 3, xl: 225 },
+      { name: 'Collector', dop: 'Moderate (N)', size: 'Largest', job: 'Collects the carriers coming from the base. Most of the power is dissipated here, so it is made large to get rid of heat.', x0: 245, x1: 490, fill: C.N, lab: 'N', n: 34, xl: 367 }
+    ];
+    seed = 11;
+    REG.forEach(r => { r.dots = []; for (let k = 0; k < r.n; k++) r.dots.push([lerp(r.x0 + 5, r.x1 - 5, srnd()), lerp(y0 + 6, y1 - 6, srnd()), srnd() * TAU]); });
+    let t = 0, sel = -1, swapped = false, s = 0, g = 0.9;
+    function info() {
+      segSel(root, 'reg', sel);
+      if (sel < 0) {
+        $('i1n').textContent = 'Tap a region'; $('i1d').textContent = '–'; $('i1s').textContent = '–';
+        $('i1j').textContent = 'Tap the emitter, base or collector in the diagram, or use the buttons above.'; $('i1w').textContent = '–';
+        return;
+      }
+      const r = REG[sel];
+      $('i1n').textContent = r.name; $('i1d').textContent = r.dop; $('i1s').textContent = r.size; $('i1j').textContent = r.job;
+      $('i1w').textContent = sel === 1 ? 'B' : sel === 0 ? (swapped ? 'C (swapped)' : 'E (normal)') : (swapped ? 'E (swapped)' : 'C (normal)');
+    }
+    const A = new Anim('anim1', {
+      reset() { t = 0; sel = -1; swapped = false; s = 0; g = 0.9; swapB.setAttribute('aria-pressed', 'false'); info(); },
+      step(dt) { t += dt; s = approach(s, swapped ? 1 : 0, 1.1 * dt); g = approach(g, swapped ? 0.12 : 0.9, 0.7 * dt); },
+      draw() {
+        const c = cv.begin(); if (!c) return;
+        REG.forEach((r, i) => {
+          c.fillStyle = r.fill; c.fillRect(r.x0, y0, r.x1 - r.x0, y1 - y0);
+          r.dots.forEach(d => { c.globalAlpha = 0.3 + 0.2 * Math.sin(t * 2 + d[2]); circ(c, d[0], d[1], 1.8, '#fff'); });
+          c.globalAlpha = 1;
+        });
+        hatch(c, 201, y0, 8, y1 - y0); hatch(c, 241, y0, 8, y1 - y0);
+        c.strokeStyle = 'rgba(207,216,220,.5)'; c.lineWidth = 1.2; c.strokeRect(70, y0, 420, y1 - y0);
+        REG.forEach(r => txt(c, r.lab, r.xl, 125, '#fff', 17, 700, 'center'));
+        if (sel >= 0) {
+          const r = REG[sel];
+          c.globalAlpha = 0.75 + 0.25 * Math.sin(t * 4); c.strokeStyle = C.v; c.lineWidth = 3;
+          c.strokeRect(r.x0 + 1.5, y0 + 1.5, r.x1 - r.x0 - 3, y1 - y0 - 3); c.globalAlpha = 1;
+        }
+        // leads: E left, C right, B below (E and C labels trade places when swapped)
+        const ym = (y0 + y1) / 2, sw = s > 0.5, la = Math.abs(1 - 2 * s);
+        leadL(c, 70, ym, sw ? 'C' : 'E', la); leadR(c, 490, ym, sw ? 'E' : 'C', la); leadB(c, 225, y1, 222, 'B');
+        line(c, 205, y0 - 2, 195, 50, C.v, 1.5); line(c, 245, y0 - 2, 255, 50, C.v, 1.5);
+        txt(c, 'EBJ', 193, 42, C.v, 13, 700, 'right'); txt(c, 'CBJ', 257, 42, C.v, 13, 700, 'left');
+        txt(c, 'base width exaggerated', 225, 14, C.muted, 10.5, 500, 'center');
+        // gain meter
+        txt(c, 'gain', 40, 274, C.muted, 12, 600, 'left');
+        c.fillStyle = '#0f1420'; c.fillRect(95, 264, 240, 20); c.strokeStyle = C.line; c.lineWidth = 1; c.strokeRect(95, 264, 240, 20);
+        c.fillStyle = mix(C.h, C.cur, clamp((g - 0.12) / 0.78, 0, 1)); c.fillRect(96, 265, 238 * g, 18);
+        txt(c, g > 0.5 ? 'high' : 'very low', 345, 274, g > 0.5 ? C.cur : C.h, 13, 700, 'left');
+        cv.wm(c);
+      }
+    });
+    function select(i) { sel = i; info(); A.dirty = true; }
+    root.querySelectorAll('[data-reg]').forEach(b => b.addEventListener('click', () => select(+b.dataset.reg)));
+    cv.el.addEventListener('pointerdown', e => {
+      const p = cv.pt(e); if (p.y < y0 - 10 || p.y > y1 + 10) return;
+      const i = REG.findIndex(r => p.x >= r.x0 && p.x < r.x1); if (i >= 0) select(i);
+    });
+    swapB.addEventListener('click', () => {
+      swapped = !swapped; swapB.setAttribute('aria-pressed', String(swapped)); info();
+      A.kick(() => { s = swapped ? 1 : 0; g = swapped ? 0.12 : 0.9; });
+    });
+  })();
+
+  /* =========================================================
+     2. NPN vs PNP: block, carriers, symbol, terminal currents
+     ========================================================= */
+  (function () {
+    const cva = new Cv('cv2a', 400, 300), cvb = new Cv('cv2b', 400, 300), root = $('anim2'), carB = $('car2');
+    const y0 = 100, y1 = 180;
+    let t = 0, k = 0, tgt = 0, show = false, sa = 0, parts = [], spawn = 0;
+    function newPart(x) { return { x: x, y: lerp(y0 + 12, y1 - 12, Math.random()), v: 55 + 20 * Math.random() }; }
+    const A = new Anim('anim2', {
+      reset() {
+        t = 0; k = 0; tgt = 0; show = false; sa = 0; segSel(root, 'type', 0); carB.setAttribute('aria-pressed', 'false');
+        parts = []; for (let i = 0; i < 12; i++) parts.push(newPart(lerp(64, 336, Math.random())));
+      },
+      step(dt) {
+        t += dt; k = approach(k, tgt, 1.2 * dt); sa = approach(sa, show ? 1 : 0, 2 * dt);
+        parts.forEach(p => { p.x += p.v * dt; });
+        parts = parts.filter(p => p.x < 336);
+        spawn += dt; while (spawn > 0.25) { spawn -= 0.25; parts.push(newPart(64)); }
+      },
+      draw() {
+        const pnp = k > 0.5, al = Math.abs(2 * k - 1);
+        // ---- block ----
+        let c = cva.begin();
+        if (c) {
+          const R = [[60, 170, 'E'], [170, 210, 'B'], [210, 340, 'C']];
+          R.forEach((r, i) => {
+            c.fillStyle = i === 1 ? mix(C.P, C.N, k) : mix(C.N, C.P, k); c.fillRect(r[0], y0, r[1] - r[0], y1 - y0);
+          });
+          hatch(c, 166, y0, 8, y1 - y0); hatch(c, 206, y0, 8, y1 - y0);
+          c.strokeStyle = 'rgba(207,216,220,.5)'; c.lineWidth = 1.2; c.strokeRect(60, y0, 280, y1 - y0);
+          leadL(c, 60, (y0 + y1) / 2, 'E'); leadR(c, 340, (y0 + y1) / 2, 'C'); leadB(c, 190, y1, 222, 'B');
+          R.forEach((r, i) => {
+            const xm = (r[0] + r[1]) / 2;
+            c.globalAlpha = al; txt(c, (i === 1) !== pnp ? 'P' : 'N', xm, (y0 + y1) / 2, '#fff', 17, 700, 'center'); c.globalAlpha = 1;
+          });
+          if (sa > 0) {
+            c.globalAlpha = sa * al;
+            parts.forEach(p => pnp ? holeRing(c, p.x, p.y) : elec(c, p.x, p.y));
+            if (pnp) arrow(c, 70, 72, 330, 72, C.cur, 3.5, 13); else arrow(c, 330, 72, 70, 72, C.cur, 3.5, 13);
+            c.globalAlpha = 1;
+          }
+          txt(c, pnp ? 'PNP' : 'NPN', 20, 30, pnp ? C.h : C.e, 15, 700, 'left');
+          cva.wm(c);
+        }
+        // ---- symbol ----
+        c = cvb.begin();
+        if (c) {
+          const bx = 170, by = 150;
+          bjtSym(c, bx, by, 1, pnp, { alpha: al, ghost: t > 0 ? (t * 0.7) % 1 : null });
+          txt(c, 'B', 62, by, C.text, 16, 700, 'right');
+          txt(c, 'C', 226, 32, C.text, 16, 700, 'right');
+          txt(c, 'E', 226, 268, C.text, 16, 700, 'right');
+          c.globalAlpha = al;
+          if (pnp) {
+            arrow(c, 150, 132, 78, 132, C.cur, 3, 11); arrow(c, 268, 74, 268, 28, C.cur, 3, 11); arrow(c, 268, 262, 268, 224, C.cur, 3, 11);
+          } else {
+            arrow(c, 78, 132, 150, 132, C.cur, 3, 11); arrow(c, 268, 28, 268, 74, C.cur, 3, 11); arrow(c, 268, 224, 268, 262, C.cur, 3, 11);
+          }
+          sub(c, 'I', 'B', 114, 113, C.cur, 14, 'center');
+          sub(c, 'I', 'C', 284, 52, C.cur, 14, 'left');
+          sub(c, 'I', 'E', 284, 242, C.cur, 14, 'left');
+          c.globalAlpha = 1;
+          txt(c, pnp ? 'PNP' : 'NPN', 310, 150, pnp ? C.h : C.e, 15, 700, 'left');
+          cvb.wm(c);
+        }
+      }
+    });
+    root.querySelectorAll('[data-type]').forEach(b => b.addEventListener('click', () => {
+      tgt = +b.dataset.type; segSel(root, 'type', tgt); A.kick(() => { k = tgt; });
+    }));
+    carB.addEventListener('click', () => {
+      show = !show; carB.setAttribute('aria-pressed', String(show)); A.kick(() => { sa = show ? 1 : 0; });
+    });
+  })();
+
+  /* =========================================================
+     3. NPN and PNP symbols side by side
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv4', 600, 280);
+    let t = 0;
+    new Anim('anim4', {
+      reset() { t = 0; },
+      step(dt) { t += dt; },
+      draw() {
+        const c = cv.begin(); if (!c) return;
+        const glow = t > 0 ? 0.5 + 0.5 * Math.sin(t * 3) : 0;
+        [[140, false, 'NPN', C.e], [420, true, 'PNP', C.h]].forEach(q => {
+          const bx = q[0], by = 140, s = 0.8;
+          bjtSym(c, bx, by, s, q[1], { glow: glow, ghost: t > 0 ? (t * 0.6) % 1 : null });
+          txt(c, q[2], bx - 50, 40, q[3], 16, 700, 'center');
+          txt(c, 'B', bx - 88, by, C.text, 14, 700, 'right');
+          txt(c, 'C', bx + 70, 48, C.text, 14, 700, 'left');
+          txt(c, 'E', bx + 70, 232, C.text, 14, 700, 'left');
+        });
+        cv.wm(c);
+      }
+    });
+  })();
+
+  /* ---------- sticky mini-nav highlight ---------- */
+  (function () {
+    const links = Array.from(document.querySelectorAll('.toc a'));
+    const secs = links.map(l => document.querySelector(l.getAttribute('href')));
+    function upd() {
+      let cur = 0;
+      secs.forEach((s, i) => { if (s.getBoundingClientRect().top < 120) cur = i; });
+      links.forEach((l, i) => l.classList.toggle('active', i === cur));
+    }
+    window.addEventListener('scroll', upd, { passive: true }); upd();
+  })();
+
+  let last = performance.now();
+  function frame(ts) {
+    const dt = Math.min(0.05, Math.max(0, (ts - last) / 1000)); last = ts;
+    anims.forEach(a => {
+      if (!a.visible) return;
+      if (a.playing) { a.o.step(dt); a.o.draw(); }
+      else if (a.dirty) a.o.draw();
+      a.dirty = false;
+    });
+    requestAnimationFrame(frame);
+  }
+  function onResize() { anims.forEach(a => { a.dirty = true; }); }
+  window.addEventListener('resize', onResize);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(onResize);
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
