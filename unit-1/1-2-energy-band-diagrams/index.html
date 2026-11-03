@@ -348,9 +348,9 @@
         <div class="prose">
           <p>The full picture has many bands, but for electronics only two matter, so the simplified band diagram keeps just those two.</p>
           <ul>
-            <li><strong class="t-vb">Valence band (VB)</strong>: the highest band that is full at 0 K. Its electrons are the ones locked in covalent bonds. Its top edge is called <strong>E<sub>v</sub></strong>.</li>
-            <li><strong class="t-cb">Conduction band (CB)</strong>: the lowest band that is empty at 0 K. An electron that reaches it is free to move through the crystal and carry current. Its bottom edge is called <strong>E<sub>c</sub></strong>.</li>
-            <li><strong class="t-en">Band gap</strong>: <strong>E<sub>g</sub> = E<sub>c</sub> − E<sub>v</sub></strong>. In a perfect crystal no electron can have an energy inside it. It is the minimum energy needed to free a bonded electron.</li>
+            <li><strong class="t-vb">Valence band (VB)</strong>: the highest band that is full at 0 K. Its electrons are the ones locked in covalent bonds. Its top edge is called <strong><span class="m" data-tex="E_{v}">E<sub>v</sub></span></strong>.</li>
+            <li><strong class="t-cb">Conduction band (CB)</strong>: the lowest band that is empty at 0 K. An electron that reaches it is free to move through the crystal and carry current. Its bottom edge is called <strong><span class="m" data-tex="E_{c}">E<sub>c</sub></span></strong>.</li>
+            <li><strong class="t-en">Band gap</strong>: <strong><span class="m" data-tex="E_{g}">E<sub>g</sub></span> = <span class="m" data-tex="E_{c}">E<sub>c</sub></span> − <span class="m" data-tex="E_{v}">E<sub>v</sub></span></strong>. In a perfect crystal no electron can have an energy inside it. It is the minimum energy needed to free a bonded electron.</li>
           </ul>
           <p>When an electron jumps from the VB to the CB, it leaves an empty state behind in the VB. This empty state is called a <strong class="t-h">hole</strong>. A neighbouring bonded electron can move into it, so the hole moves too, and it behaves like a <strong>positive</strong> charge carrier. One jump always makes one <strong>electron–hole pair</strong>.</p>
           <p>An electric field pushes the two carriers in opposite directions: electrons move against the field and holes move with it. Both movements give current in the <strong>same</strong> direction, the direction of the field, because the charges are opposite.</p>
@@ -377,8 +377,8 @@
         <aside class="keypoints" aria-label="Key points: reading a band diagram">
           <h3>Key points</h3>
           <ul>
-            <li><strong>VB</strong>: highest band full at 0 K, top edge <strong>E<sub>v</sub></strong>. <strong>CB</strong>: lowest band empty at 0 K, bottom edge <strong>E<sub>c</sub></strong>.</li>
-            <li><strong>E<sub>g</sub> = E<sub>c</sub> − E<sub>v</sub></strong>: no states inside; minimum energy to free a bonded electron.</li>
+            <li><strong>VB</strong>: highest band full at 0 K, top edge <strong><span class="m" data-tex="E_{v}">E<sub>v</sub></span></strong>. <strong>CB</strong>: lowest band empty at 0 K, bottom edge <strong><span class="m" data-tex="E_{c}">E<sub>c</sub></span></strong>.</li>
+            <li><strong><span class="m" data-tex="E_{g}">E<sub>g</sub></span> = <span class="m" data-tex="E_{c}">E<sub>c</sub></span> − <span class="m" data-tex="E_{v}">E<sub>v</sub></span></strong>: no states inside; minimum energy to free a bonded electron.</li>
             <li>Each jump makes an <strong class="t-e">electron</strong> in the CB and a <strong class="t-h">hole</strong> in the VB. Both carry current.</li>
             <li>In a field, electrons and holes move opposite ways but their currents add.</li>
             <li>Horizontal axis = position. Flat lines = uniform material.</li>
@@ -403,7 +403,7 @@
           <div class="ctrls">
             <button class="btn" type="button" data-act="play">Pause</button>
             <button class="btn" type="button" data-act="reset">Reset</button>
-            <label class="field" for="m4Sel"><span>Semiconductor (E<sub>g</sub> at 300 K)</span>
+            <label class="field" for="m4Sel"><span>Semiconductor (<span class="m" data-tex="E_{g}">E<sub>g</sub></span> at 300 K)</span>
               <select id="m4Sel">
                 <option value="Ge">Germanium (Ge): 0.66 eV</option>
                 <option value="Si" selected>Silicon (Si): 1.12 eV</option>
@@ -429,8 +429,8 @@
         <aside class="keypoints" aria-label="Key points: materials">
           <h3>Key points</h3>
           <ul>
-            <li><strong>Insulator</strong>: E<sub>g</sub> &gt; ~4–5 eV (SiO<sub>2</sub> ≈ 9, diamond ≈ 5.5). kT ≈ 0.026 eV is far too small; CB stays empty.</li>
-            <li><strong>Semiconductor</strong>: small E<sub>g</sub> (Ge 0.66, Si 1.12, GaAs 1.42 eV at 300 K). Heat makes a few electron–hole pairs, more when hotter.</li>
+            <li><strong>Insulator</strong>: <span class="m" data-tex="E_{g}">E<sub>g</sub></span> &gt; ~4–5 eV (SiO<sub>2</sub> ≈ 9, diamond ≈ 5.5). kT ≈ 0.026 eV is far too small; CB stays empty.</li>
+            <li><strong>Semiconductor</strong>: small <span class="m" data-tex="E_{g}">E<sub>g</sub></span> (Ge 0.66, Si 1.12, GaAs 1.42 eV at 300 K). Heat makes a few electron–hole pairs, more when hotter.</li>
             <li><strong>Metal</strong>: bands overlap or are partly filled. No gap, many free electrons always.</li>
           </ul>
         </aside>
@@ -442,18 +442,18 @@
       <section id="crossing" aria-labelledby="h5s">
         <h2 id="h5s">How electrons cross the gap</h2>
         <div class="prose">
-          <p>An electron needs at least E<sub>g</sub> of energy to cross from the VB to the CB. There are two main ways to get it.</p>
-          <p><strong>Thermal excitation.</strong> The atoms of a crystal are always vibrating, and these lattice vibrations pass energy to electrons. The chance that an electron gets enough energy to cross falls very steeply as the gap gets bigger, roughly like <strong><span class="m" data-tex="e^{-E_g/2kT}">e<sup>−Eg/2kT</sup></span></strong>. At 300 K, 2kT ≈ 0.052 eV, so making E<sub>g</sub> bigger by just 0.1 eV divides the rate by about e<sup>2</sup> ≈ 7. That is why Ge, Si and GaAs behave so differently even though their gaps look similar.</p>
-          <p><strong>Optical excitation.</strong> A photon carries energy <strong>E = hc/λ</strong>. In handy units, <strong>λ(nm) = 1240 / E(eV)</strong>. If E ≥ E<sub>g</sub>, the photon can be absorbed and lift an electron across, making an electron–hole pair. If E &lt; E<sub>g</sub>, the photon passes straight through. Silicon (E<sub>g</sub> = 1.12 eV) absorbs light with wavelength shorter than about <strong>1107 nm</strong>, which includes all visible light. Any extra energy above E<sub>g</sub> is quickly lost as heat while the electron settles to E<sub>c</sub>.</p>
-          <p><strong>Recombination.</strong> A CB electron can fall back into a VB hole. Both carriers disappear and about E<sub>g</sub> of energy is released. In silicon and germanium this energy mainly becomes heat. In <strong>direct-gap</strong> materials like GaAs it often comes out as light, which is how LEDs work (topic 3.2).</p>
-          <p><strong>Note:</strong> E<sub>g</sub> itself shrinks slightly as temperature rises. For silicon it is about 1.17 eV at 0 K and 1.12 eV at 300 K. The animation includes this change.</p>
+          <p>An electron needs at least <span class="m" data-tex="E_{g}">E<sub>g</sub></span> of energy to cross from the VB to the CB. There are two main ways to get it.</p>
+          <p><strong>Thermal excitation.</strong> The atoms of a crystal are always vibrating, and these lattice vibrations pass energy to electrons. The chance that an electron gets enough energy to cross falls very steeply as the gap gets bigger, roughly like <strong><span class="m" data-tex="e^{-E_g/2kT}">e<sup>−Eg/2kT</sup></span></strong>. At 300 K, 2kT ≈ 0.052 eV, so making <span class="m" data-tex="E_{g}">E<sub>g</sub></span> bigger by just 0.1 eV divides the rate by about e<sup>2</sup> ≈ 7. That is why Ge, Si and GaAs behave so differently even though their gaps look similar.</p>
+          <p><strong>Optical excitation.</strong> A photon carries energy <strong>E = hc/λ</strong>. In handy units, <strong>λ(nm) = 1240 / E(eV)</strong>. If E ≥ <span class="m" data-tex="E_{g}">E<sub>g</sub></span>, the photon can be absorbed and lift an electron across, making an electron–hole pair. If E &lt; <span class="m" data-tex="E_{g}">E<sub>g</sub></span>, the photon passes straight through. Silicon (<span class="m" data-tex="E_{g}">E<sub>g</sub></span> = 1.12 eV) absorbs light with wavelength shorter than about <strong>1107 nm</strong>, which includes all visible light. Any extra energy above <span class="m" data-tex="E_{g}">E<sub>g</sub></span> is quickly lost as heat while the electron settles to <span class="m" data-tex="E_{c}">E<sub>c</sub></span>.</p>
+          <p><strong>Recombination.</strong> A CB electron can fall back into a VB hole. Both carriers disappear and about <span class="m" data-tex="E_{g}">E<sub>g</sub></span> of energy is released. In silicon and germanium this energy mainly becomes heat. In <strong>direct-gap</strong> materials like GaAs it often comes out as light, which is how LEDs work (topic 3.2).</p>
+          <p><strong>Note:</strong> <span class="m" data-tex="E_{g}">E<sub>g</sub></span> itself shrinks slightly as temperature rises. For silicon it is about 1.17 eV at 0 K and 1.12 eV at 300 K. The animation includes this change.</p>
         </div>
 
         <figure class="anim" id="anim5">
           <div class="ctrls">
             <button class="btn" type="button" data-act="play">Pause</button>
             <button class="btn" type="button" data-act="reset">Reset</button>
-            <label class="field" for="m5Sel"><span>Material (E<sub>g</sub> at 300 K)</span>
+            <label class="field" for="m5Sel"><span>Material (<span class="m" data-tex="E_{g}">E<sub>g</sub></span> at 300 K)</span>
               <select id="m5Sel">
                 <option value="Ge">Germanium (Ge): 0.66 eV</option>
                 <option value="Si" selected>Silicon (Si): 1.12 eV</option>
@@ -478,7 +478,7 @@
             <button class="btn photon" type="button" id="fire5">Fire photon</button>
           </div>
           <canvas id="cv5" class="narrow" style="aspect-ratio:440/386" role="img" aria-label="Band diagram of the chosen material, energy axis to scale in eV. Photons arrive from the left; electrons (blue) cross to the conduction band leaving holes (orange); recombination releases heat or, in GaAs, light."></canvas>
-          <p class="readout" aria-live="polite">E<sub>g</sub>(<span id="t5b">300</span> K) = <b id="eg5">1.12 eV</b> · cut-off 1240/E<sub>g</sub> = <b id="lc5">1107 nm</b> · thermal rate <b id="r5">×1.0</b> vs Si at 300 K · free electrons <b id="n5">0</b></p>
+          <p class="readout" aria-live="polite"><span class="m" data-tex="E_{g}">E<sub>g</sub></span>(<span id="t5b">300</span> K) = <b id="eg5">1.12 eV</b> · cut-off 1240/<span class="m" data-tex="E_{g}">E<sub>g</sub></span> = <b id="lc5">1107 nm</b> · thermal rate <b id="r5">×1.0</b> vs Si at 300 K · free electrons <b id="n5">0</b></p>
           <p class="msg" id="pMsg" aria-live="polite">Choose a wavelength and press <strong>Fire photon</strong>.</p>
           <p class="exag"><b>Rate exaggerated for visibility.</b> Thermal jumps scale by the real factor <span class="m" data-tex="e^{-E_g/2kT}">e<sup>−Eg/2kT</sup></span> (Si at 300 K ≈ 1 per second on screen, capped at 12 per second). Carrier lifetime is shortened to a few seconds. Energy axis is to scale.</p>
         </figure>
@@ -487,9 +487,9 @@
           <h3>Key points</h3>
           <ul>
             <li><strong>Thermal</strong>: rate ∝ <span class="m" data-tex="e^{-E_g/2kT}">e<sup>−Eg/2kT</sup></span>, so a slightly bigger gap means far fewer carriers.</li>
-            <li><strong>Optical</strong>: absorbed only if E = hc/λ ≥ E<sub>g</sub>. λ(nm) = 1240/E(eV). Si absorbs λ &lt; ~1107 nm.</li>
-            <li><strong>Recombination</strong> releases ≈ E<sub>g</sub>: mostly heat in Si/Ge, light in direct-gap GaAs (LEDs).</li>
-            <li>E<sub>g</sub> falls slightly with temperature: Si ≈ 1.17 eV at 0 K, 1.12 eV at 300 K.</li>
+            <li><strong>Optical</strong>: absorbed only if E = hc/λ ≥ <span class="m" data-tex="E_{g}">E<sub>g</sub></span>. λ(nm) = 1240/E(eV). Si absorbs λ &lt; ~1107 nm.</li>
+            <li><strong>Recombination</strong> releases ≈ <span class="m" data-tex="E_{g}">E<sub>g</sub></span>: mostly heat in Si/Ge, light in direct-gap GaAs (LEDs).</li>
+            <li><span class="m" data-tex="E_{g}">E<sub>g</sub></span> falls slightly with temperature: Si ≈ 1.17 eV at 0 K, 1.12 eV at 300 K.</li>
           </ul>
         </aside>
       </section>
@@ -501,7 +501,7 @@
         <h2 id="h6s">Summary</h2>
         <div class="table-box">
           <table class="vt">
-            <thead><tr><th scope="col">Material</th><th scope="col">E<sub>g</sub> at 300 K (eV)</th><th scope="col">Cut-off 1240/E<sub>g</sub> (nm)</th><th scope="col">Type</th></tr></thead>
+            <thead><tr><th scope="col">Material</th><th scope="col"><span class="m" data-tex="E_{g}">E<sub>g</sub></span> at 300 K (eV)</th><th scope="col">Cut-off 1240/<span class="m" data-tex="E_{g}">E<sub>g</sub></span> (nm)</th><th scope="col">Type</th></tr></thead>
             <tbody>
               <tr><td>Germanium (Ge)</td><td class="n">0.66</td><td class="n">1879</td><td>Semiconductor</td></tr>
               <tr><td>Silicon (Si)</td><td class="n">1.12</td><td class="n">1107</td><td>Semiconductor</td></tr>
@@ -516,10 +516,10 @@
         <div class="formulas">
           <div class="fcard"><div class="f" data-tex="E_g = E_c - E_v">E<sub>g</sub> = E<sub>c</sub> − E<sub>v</sub></div><p>Band gap = bottom of CB minus top of VB.</p></div>
           <div class="fcard"><div class="f" data-tex="E = \dfrac{hc}{\lambda}">E = hc / λ</div><p>Photon energy; h = 6.626 × 10<sup>−34</sup> J·s, c = 2.998 × 10<sup>8</sup> m/s.</p></div>
-          <div class="fcard"><div class="f" data-tex="\lambda\,(\text{nm}) = \dfrac{1240}{E\,(\text{eV})}">λ (nm) = 1240 / E (eV)</div><p>Same formula in handy units (hc = 1239.8 eV·nm). Absorption needs λ ≤ 1240/E<sub>g</sub>.</p></div>
+          <div class="fcard"><div class="f" data-tex="\lambda\,(\text{nm}) = \dfrac{1240}{E\,(\text{eV})}">λ (nm) = 1240 / E (eV)</div><p>Same formula in handy units (hc = 1239.8 eV·nm). Absorption needs λ ≤ 1240/<span class="m" data-tex="E_{g}">E<sub>g</sub></span>.</p></div>
           <div class="fcard"><div class="f" data-tex="1\ \text{eV} = 1.602 \times 10^{-19}\ \text{J}">1 eV = 1.602 × 10<sup>−19</sup> J</div><p>Energy gained by one electron moving through 1 V.</p></div>
           <div class="fcard"><div class="f" data-tex="kT = 0.0259\ \text{eV}\ \ \text{at } 300\ \text{K}">kT = 0.0259 eV at 300 K</div><p>k = 8.617 × 10<sup>−5</sup> eV/K. Thermal rate ∝ <span class="m" data-tex="e^{-E_g/2kT}">e<sup>−Eg/2kT</sup></span>.</p></div>
-          <div class="fcard"><div class="f" data-tex="\text{Si: }\ E_g = 1.12\ \text{eV},\quad a = 5.43\ \text{\AA}">Si: E<sub>g</sub> = 1.12 eV, a = 5.43 Å</div><p>Values at 300 K. About 5 × 10<sup>22</sup> atoms/cm³; E<sub>g</sub> ≈ 1.17 eV at 0 K.</p></div>
+          <div class="fcard"><div class="f" data-tex="\text{Si: }\ E_g = 1.12\ \text{eV},\quad a = 5.43\ \text{\AA}">Si: E<sub>g</sub> = 1.12 eV, a = 5.43 Å</div><p>Values at 300 K. About 5 × 10<sup>22</sup> atoms/cm³; <span class="m" data-tex="E_{g}">E<sub>g</sub></span> ≈ 1.17 eV at 0 K.</p></div>
         </div>
       </section>
 
@@ -1548,14 +1548,15 @@
 })();
 </script>
 <script>
-  // Typeset every [data-tex] element as maths once KaTeX has loaded.
-  document.addEventListener('DOMContentLoaded', function () {
+  // Typeset [data-tex] elements as maths once KaTeX has loaded; pages call mathify(el) after changing text.
+  window.mathify = function (root) {
     if (!window.katex) return;
-    document.querySelectorAll('[data-tex]').forEach(function (el) {
+    (root || document).querySelectorAll('[data-tex]').forEach(function (el) {
       var block = (el.classList.contains('eq') || el.classList.contains('f')) && el.tagName !== 'TD';
       try { katex.render(el.getAttribute('data-tex'), el, { displayMode: block, throwOnError: false }); } catch (e) {}
     });
-  });
+  };
+  document.addEventListener('DOMContentLoaded', function () { window.mathify(); });
 </script>
 </body>
 </html>

@@ -171,7 +171,7 @@
 
   <nav class="toc" aria-label="Sections">
     <ul>
-      <li><a href="#s0">Why E<sub>F</sub>?</a></li>
+      <li><a href="#s0">Why <span class="m" data-tex="E_{F}">E<sub>F</sub></span>?</a></li>
       <li><a href="#s1">Fermi-Dirac</a></li>
       <li><a href="#s2">Carriers</a></li>
       <li><a href="#s3">Intrinsic</a></li>
@@ -199,9 +199,9 @@
         <h2 id="h0">Why we need the Fermi level</h2>
         <div class="prose">
           <p>A silicon crystal contains an enormous number of allowed energy states, grouped into the valence band and the conduction band. Each state can hold one electron. To understand a semiconductor we must answer a simple question: <strong>which of these states are actually filled with electrons, and which are empty?</strong></p>
-          <p>The answer depends on <strong>temperature</strong> and on <strong>doping</strong>. Instead of listing every state, we describe the whole picture with one reference energy called the <span class="t-f">Fermi level, E<sub>F</sub></span>.</p>
-          <p>If we know where E<sub>F</sub> sits on the band diagram, we can tell at a glance whether the material is intrinsic, N-type or P-type, and we can calculate how many free <span class="t-e">electrons</span> and <span class="t-h">holes</span> it has.</p>
-          <p>A useful picture is a stadium whose seats are filled from the bottom row upwards. E<sub>F</sub> is roughly the <strong>"water level"</strong> of the electrons: below it, the seats are almost all taken; above it, they are almost all empty. When the crowd warms up, a few people near the top jump to higher rows and leave gaps behind them.</p>
+          <p>The answer depends on <strong>temperature</strong> and on <strong>doping</strong>. Instead of listing every state, we describe the whole picture with one reference energy called the <span class="t-f">Fermi level, <span class="m" data-tex="E_{F}">E<sub>F</sub></span></span>.</p>
+          <p>If we know where <span class="m" data-tex="E_{F}">E<sub>F</sub></span> sits on the band diagram, we can tell at a glance whether the material is intrinsic, N-type or P-type, and we can calculate how many free <span class="t-e">electrons</span> and <span class="t-h">holes</span> it has.</p>
+          <p>A useful picture is a stadium whose seats are filled from the bottom row upwards. <span class="m" data-tex="E_{F}">E<sub>F</sub></span> is roughly the <strong>"water level"</strong> of the electrons: below it, the seats are almost all taken; above it, they are almost all empty. When the crowd warms up, a few people near the top jump to higher rows and leave gaps behind them.</p>
         </div>
 
         <figure class="anim" id="anim0">
@@ -216,11 +216,11 @@
           <canvas id="cv0" class="narrow" style="aspect-ratio:420/330" role="img" aria-label="Rows of energy states drawn like stadium seats, filled with blue electrons from the bottom row up to a yellow line labelled EF. Raising the temperature makes a few electrons near the line jump to empty seats above it, leaving empty seats below it."></canvas>
           <ul class="legend">
             <li><span class="sw e"></span><span>electron in a state</span></li>
-            <li><span class="ln"></span><span>E<sub>F</sub></span></li>
+            <li><span class="ln"></span><span><span class="m" data-tex="E_{F}">E<sub>F</sub></span></span></li>
           </ul>
           <div class="counters" aria-live="polite">
-            <div class="ctr n">Electrons above E<sub>F</sub><b id="c0a">0</b></div>
-            <div class="ctr p">Empty states below E<sub>F</sub><b id="c0b">0</b></div>
+            <div class="ctr n">Electrons above <span class="m" data-tex="E_{F}">E<sub>F</sub></span><b id="c0a">0</b></div>
+            <div class="ctr p">Empty states below <span class="m" data-tex="E_{F}">E<sub>F</sub></span><b id="c0b">0</b></div>
           </div>
           <p class="exag"><b>Not to scale:</b> a real crystal has about 10²² states per cm³ in each band, and the temperature spread is exaggerated so it shows on 12 rows.</p>
         </figure>
@@ -230,8 +230,8 @@
           <ul>
             <li>A crystal has a huge number of allowed states; the question is which are filled.</li>
             <li>The filling depends on temperature and doping.</li>
-            <li>The <strong>Fermi level E<sub>F</sub></strong> is one reference energy that describes the filling.</li>
-            <li>Where E<sub>F</sub> sits tells us the type of material and its electron and hole numbers.</li>
+            <li>The <strong>Fermi level <span class="m" data-tex="E_{F}">E<sub>F</sub></span></strong> is one reference energy that describes the filling.</li>
+            <li>Where <span class="m" data-tex="E_{F}">E<sub>F</sub></span> sits tells us the type of material and its electron and hole numbers.</li>
           </ul>
         </aside>
       </section>
@@ -244,13 +244,13 @@
           <p>The <strong>Fermi-Dirac function</strong> gives the probability that an allowed state at energy E is occupied by an electron:</p>
           <span class="eq" data-tex="f(E) = \dfrac{1}{1 + e^{(E - E_F)/kT}}">f(E) = 1 / (1 + exp((E − E<sub>F</sub>)/kT))</span>
           <p>Here k is Boltzmann's constant and T is the absolute temperature. The product kT is the typical thermal energy: at 300 K, <strong>kT = 0.0259 eV</strong>.</p>
-          <p><strong>At 0 K</strong>, every state below E<sub>F</sub> is filled (f = 1) and every state above it is empty (f = 0). The graph is a sharp step.</p>
-          <p><strong>Above 0 K</strong>, the step softens over a range of a few kT around E<sub>F</sub>. Some electrons in states just below E<sub>F</sub> gain thermal energy and move to states just above it. Far from E<sub>F</sub> nothing changes: deep states stay full and high states stay empty.</p>
-          <p>At <strong>E = E<sub>F</sub></strong> exactly, the exponential equals 1, so <strong>f = 1/2 at any temperature</strong>. This gives the definition: <em>the Fermi level is the energy at which the probability of occupation is 50%.</em> E<sub>F</sub> does not need to be an allowed state; in a semiconductor it usually lies inside the band gap.</p>
+          <p><strong>At 0 K</strong>, every state below <span class="m" data-tex="E_{F}">E<sub>F</sub></span> is filled (f = 1) and every state above it is empty (f = 0). The graph is a sharp step.</p>
+          <p><strong>Above 0 K</strong>, the step softens over a range of a few kT around <span class="m" data-tex="E_{F}">E<sub>F</sub></span>. Some electrons in states just below <span class="m" data-tex="E_{F}">E<sub>F</sub></span> gain thermal energy and move to states just above it. Far from <span class="m" data-tex="E_{F}">E<sub>F</sub></span> nothing changes: deep states stay full and high states stay empty.</p>
+          <p>At <strong>E = <span class="m" data-tex="E_{F}">E<sub>F</sub></span></strong> exactly, the exponential equals 1, so <strong>f = 1/2 at any temperature</strong>. This gives the definition: <em>the Fermi level is the energy at which the probability of occupation is 50%.</em> <span class="m" data-tex="E_{F}">E<sub>F</sub></span> does not need to be an allowed state; in a semiconductor it usually lies inside the band gap.</p>
           <p>The probability that a state is <strong>empty</strong> is <strong>1 − f(E)</strong>. In the valence band an empty state is a hole, so 1 − f(E) is the probability of finding a <span class="t-h">hole</span>.</p>
-          <p>When E − E<sub>F</sub> is more than about 3kT, the 1 in the denominator is small next to the exponential, and</p>
+          <p>When E − <span class="m" data-tex="E_{F}">E<sub>F</sub></span> is more than about 3kT, the 1 in the denominator is small next to the exponential, and</p>
           <span class="eq" data-tex="f(E) \approx e^{-(E - E_F)/kT}">f(E) ≈ exp(−(E − E<sub>F</sub>)/kT)</span>
-          <p>This is the <strong>Boltzmann approximation</strong>; at 3kT its error is about 5%, and it shrinks quickly further out. It is used in most semiconductor calculations, because the conduction band is usually many kT above E<sub>F</sub>.</p>
+          <p>This is the <strong>Boltzmann approximation</strong>; at 3kT its error is about 5%, and it shrinks quickly further out. It is used in most semiconductor calculations, because the conduction band is usually many kT above <span class="m" data-tex="E_{F}">E<sub>F</sub></span>.</p>
         </div>
 
         <figure class="anim" id="anim1">
@@ -263,7 +263,7 @@
               <input type="range" id="t1" min="0" max="1000" step="5" value="300">
             </div>
             <div class="slider">
-              <label for="e1"><span>Probe energy E − E<sub>F</sub></span><output id="e1o" for="e1">+0.060 eV</output></label>
+              <label for="e1"><span>Probe energy E − <span class="m" data-tex="E_{F}">E<sub>F</sub></span></span><output id="e1o" for="e1">+0.060 eV</output></label>
               <input type="range" id="e1" min="-0.38" max="0.38" step="0.002" value="0.06">
             </div>
           </div>
@@ -271,10 +271,10 @@
           <ul class="legend">
             <li><span class="ln fe"></span><span>f(E)</span></li>
             <li><span class="ln bz"></span><span>Boltzmann <span class="m" data-tex="e^{-(E - E_F)/kT}">exp(−(E−E<sub>F</sub>)/kT)</span></span></li>
-            <li><span class="ln"></span><span>E<sub>F</sub></span></li>
+            <li><span class="ln"></span><span><span class="m" data-tex="E_{F}">E<sub>F</sub></span></span></li>
           </ul>
           <div class="counters" aria-live="polite">
-            <div class="ctr en">E − E<sub>F</sub><b id="c1a">+0.060 eV</b></div>
+            <div class="ctr en">E − <span class="m" data-tex="E_{F}">E<sub>F</sub></span><b id="c1a">+0.060 eV</b></div>
             <div class="ctr en">In units of kT<b id="c1b">+2.3 kT</b></div>
             <div class="ctr n">f(E) filled<b id="c1c">0.090</b></div>
             <div class="ctr p">1 − f(E) empty<b id="c1d">0.910</b></div>
@@ -287,9 +287,9 @@
           <ul>
             <li><span class="m" data-tex="f(E) = \frac{1}{1 + e^{(E - E_F)/kT}}">f(E) = 1/(1 + exp((E − E<sub>F</sub>)/kT))</span> is the probability a state is filled.</li>
             <li>At 0 K it is a sharp step; above 0 K it softens over a few kT.</li>
-            <li><strong>f(E<sub>F</sub>) = 1/2 at any temperature</strong>: this defines E<sub>F</sub>.</li>
+            <li><strong>f(<span class="m" data-tex="E_{F}">E<sub>F</sub></span>) = 1/2 at any temperature</strong>: this defines <span class="m" data-tex="E_{F}">E<sub>F</sub></span>.</li>
             <li>1 − f(E) is the probability a state is empty (a hole in the valence band).</li>
-            <li>For E − E<sub>F</sub> &gt; 3kT, <span class="m" data-tex="f(E) \approx e^{-(E - E_F)/kT}">f(E) ≈ exp(−(E − E<sub>F</sub>)/kT)</span> (Boltzmann).</li>
+            <li>For E − <span class="m" data-tex="E_{F}">E<sub>F</sub></span> &gt; 3kT, <span class="m" data-tex="f(E) \approx e^{-(E - E_F)/kT}">f(E) ≈ exp(−(E − E<sub>F</sub>)/kT)</span> (Boltzmann).</li>
           </ul>
         </aside>
       </section>
@@ -301,12 +301,12 @@
         <div class="prose">
           <p>The number of electrons at a given energy depends on two things: how many states are available at that energy, and the probability that each one is filled.</p>
           <span class="eq" data-tex="\text{electrons at } E = \big(\text{states available at } E\big) \times \big(\text{probability filled}\big)">electrons at E = (states available at E) × (probability filled)</span>
-          <p>The number of available states per unit energy per unit volume is called the <strong>density of states, g(E)</strong>. It is <strong>zero inside the band gap</strong>, because there are no allowed states there. Above E<sub>c</sub> it grows with energy (roughly as <span class="m" data-tex="\sqrt{E - E_c}">√(E − E<sub>c</sub>)</span>), and below E<sub>v</sub> it grows as we go deeper into the valence band.</p>
-          <p>In the conduction band, <span class="t-e">electrons</span> are given by <strong>g<sub>c</sub>(E) × f(E)</strong>. In the valence band, <span class="t-h">holes</span> are given by <strong>g<sub>v</sub>(E) × (1 − f(E))</strong>. Because f(E) falls off exponentially above E<sub>F</sub>, and 1 − f(E) falls off exponentially below it, almost all electrons sit within a few kT of E<sub>c</sub>, and almost all holes within a few kT of E<sub>v</sub>.</p>
+          <p>The number of available states per unit energy per unit volume is called the <strong>density of states, g(E)</strong>. It is <strong>zero inside the band gap</strong>, because there are no allowed states there. Above <span class="m" data-tex="E_{c}">E<sub>c</sub></span> it grows with energy (roughly as <span class="m" data-tex="\sqrt{E - E_c}">√(E − E<sub>c</sub>)</span>), and below <span class="m" data-tex="E_{v}">E<sub>v</sub></span> it grows as we go deeper into the valence band.</p>
+          <p>In the conduction band, <span class="t-e">electrons</span> are given by <strong><span class="m" data-tex="g_{c}">g<sub>c</sub></span>(E) × f(E)</strong>. In the valence band, <span class="t-h">holes</span> are given by <strong><span class="m" data-tex="g_{v}">g<sub>v</sub></span>(E) × (1 − f(E))</strong>. Because f(E) falls off exponentially above <span class="m" data-tex="E_{F}">E<sub>F</sub></span>, and 1 − f(E) falls off exponentially below it, almost all electrons sit within a few kT of <span class="m" data-tex="E_{c}">E<sub>c</sub></span>, and almost all holes within a few kT of <span class="m" data-tex="E_{v}">E<sub>v</sub></span>.</p>
           <p>Adding up (integrating) these distributions gives the two results used throughout the course:</p>
           <span class="eq" data-tex="\begin{aligned} n &amp;= N_c\, e^{-(E_c - E_F)/kT} \\ p &amp;= N_v\, e^{-(E_F - E_v)/kT} \end{aligned}">n = N<sub>c</sub>·exp(−(E<sub>c</sub> − E<sub>F</sub>)/kT)<br>p = N<sub>v</sub>·exp(−(E<sub>F</sub> − E<sub>v</sub>)/kT)</span>
-          <p>N<sub>c</sub> and N<sub>v</sub> are the <strong>effective densities of states</strong> of the conduction and valence bands. Values for Si at 300 K: <strong>N<sub>c</sub> ≈ 2.8 × 10¹⁹ cm⁻³</strong> and <strong>N<sub>v</sub> ≈ 1.04 × 10¹⁹ cm⁻³</strong>. The formulas hold while E<sub>F</sub> stays more than about 3kT inside the gap.</p>
-          <p>The key idea: <strong>the closer E<sub>F</sub> is to E<sub>c</sub>, the more electrons; the closer E<sub>F</sub> is to E<sub>v</sub>, the more holes.</strong> Moving E<sub>F</sub> by just kT changes n or p by a factor of e ≈ 2.7.</p>
+          <p><span class="m" data-tex="N_{c}">N<sub>c</sub></span> and <span class="m" data-tex="N_{v}">N<sub>v</sub></span> are the <strong>effective densities of states</strong> of the conduction and valence bands. Values for Si at 300 K: <strong><span class="m" data-tex="N_{c}">N<sub>c</sub></span> ≈ 2.8 × 10¹⁹ cm⁻³</strong> and <strong><span class="m" data-tex="N_{v}">N<sub>v</sub></span> ≈ 1.04 × 10¹⁹ cm⁻³</strong>. The formulas hold while <span class="m" data-tex="E_{F}">E<sub>F</sub></span> stays more than about 3kT inside the gap.</p>
+          <p>The key idea: <strong>the closer <span class="m" data-tex="E_{F}">E<sub>F</sub></span> is to <span class="m" data-tex="E_{c}">E<sub>c</sub></span>, the more electrons; the closer <span class="m" data-tex="E_{F}">E<sub>F</sub></span> is to <span class="m" data-tex="E_{v}">E<sub>v</sub></span>, the more holes.</strong> Moving <span class="m" data-tex="E_{F}">E<sub>F</sub></span> by just kT changes n or p by a factor of e ≈ 2.7.</p>
         </div>
 
         <figure class="anim" id="anim2">
@@ -314,32 +314,32 @@
             <button class="btn" type="button" data-act="play">Pause</button>
             <button class="btn" type="button" data-act="reset">Reset</button>
             <div class="slider">
-              <label for="f2"><span>E<sub>F</sub> − E<sub>v</sub></span><output id="f2o" for="f2">0.55 eV</output></label>
+              <label for="f2"><span><span class="m" data-tex="E_{F}">E<sub>F</sub></span> − <span class="m" data-tex="E_{v}">E<sub>v</sub></span></span><output id="f2o" for="f2">0.55 eV</output></label>
               <input type="range" id="f2" min="0.08" max="1.04" step="0.005" value="0.55">
             </div>
           </div>
           <canvas id="cv2" class="drag" style="aspect-ratio:480/380" role="img" aria-label="Four panels sharing one energy axis: the band diagram with a draggable Fermi level, the density of states g(E) which is zero in the gap, the Fermi function f(E), and the carrier distributions. Electrons are shaded blue just above Ec and holes are shaded orange just below Ev. Moving EF up grows the blue area and shrinks the orange one."></canvas>
           <ul class="legend">
-            <li><span class="ln"></span><span>E<sub>F</sub></span></li>
-            <li><span class="sw e"></span><span>electrons g<sub>c</sub>·f</span></li>
-            <li><span class="sw h"></span><span>holes g<sub>v</sub>·(1 − f)</span></li>
+            <li><span class="ln"></span><span><span class="m" data-tex="E_{F}">E<sub>F</sub></span></span></li>
+            <li><span class="sw e"></span><span>electrons <span class="m" data-tex="g_{c}">g<sub>c</sub></span>·f</span></li>
+            <li><span class="sw h"></span><span>holes <span class="m" data-tex="g_{v}">g<sub>v</sub></span>·(1 − f)</span></li>
           </ul>
           <div class="counters" aria-live="polite">
             <div class="ctr n">n (cm⁻³)<b id="c2a">–</b></div>
             <div class="ctr p">p (cm⁻³)<b id="c2b">–</b></div>
-            <div class="ctr en">E<sub>c</sub> − E<sub>F</sub><b id="c2c">–</b></div>
-            <div class="ctr en">E<sub>F</sub> − E<sub>v</sub><b id="c2d">–</b></div>
+            <div class="ctr en"><span class="m" data-tex="E_{c}">E<sub>c</sub></span> − <span class="m" data-tex="E_{F}">E<sub>F</sub></span><b id="c2c">–</b></div>
+            <div class="ctr en"><span class="m" data-tex="E_{F}">E<sub>F</sub></span> − <span class="m" data-tex="E_{v}">E<sub>v</sub></span><b id="c2d">–</b></div>
           </div>
-          <p class="exag"><b>Exaggerated:</b> the width of each shaded area grows with log₁₀ of the concentration, not the concentration itself, so that both stay visible. Drag E<sub>F</sub> on the band panel. Values for Si at 300 K.</p>
+          <p class="exag"><b>Exaggerated:</b> the width of each shaded area grows with log₁₀ of the concentration, not the concentration itself, so that both stay visible. Drag <span class="m" data-tex="E_{F}">E<sub>F</sub></span> on the band panel. Values for Si at 300 K.</p>
         </figure>
 
         <aside class="keypoints" aria-label="Key points: carrier concentration">
           <h3>Key points</h3>
           <ul>
             <li>Carriers at E = density of states g(E) × probability of occupation.</li>
-            <li>g(E) = 0 in the gap; electrons crowd near E<sub>c</sub>, holes near E<sub>v</sub>.</li>
+            <li>g(E) = 0 in the gap; electrons crowd near <span class="m" data-tex="E_{c}">E<sub>c</sub></span>, holes near <span class="m" data-tex="E_{v}">E<sub>v</sub></span>.</li>
             <li><span class="m" data-tex="n = N_c\, e^{-(E_c - E_F)/kT}">n = N<sub>c</sub>·exp(−(E<sub>c</sub> − E<sub>F</sub>)/kT)</span>, <span class="m" data-tex="p = N_v\, e^{-(E_F - E_v)/kT}">p = N<sub>v</sub>·exp(−(E<sub>F</sub> − E<sub>v</sub>)/kT)</span>.</li>
-            <li>E<sub>F</sub> near E<sub>c</sub> → many electrons; E<sub>F</sub> near E<sub>v</sub> → many holes.</li>
+            <li><span class="m" data-tex="E_{F}">E<sub>F</sub></span> near <span class="m" data-tex="E_{c}">E<sub>c</sub></span> → many electrons; <span class="m" data-tex="E_{F}">E<sub>F</sub></span> near <span class="m" data-tex="E_{v}">E<sub>v</sub></span> → many holes.</li>
           </ul>
         </aside>
       </section>
@@ -349,12 +349,12 @@
       <section id="s3" aria-labelledby="h3s">
         <h2 id="h3s">Fermi level in an intrinsic semiconductor</h2>
         <div class="prose">
-          <p>In an intrinsic (pure) semiconductor, every free electron comes from a broken bond that also leaves a hole, so <strong>n = p</strong>. Setting the two formulas equal and solving for E<sub>F</sub> gives:</p>
+          <p>In an intrinsic (pure) semiconductor, every free electron comes from a broken bond that also leaves a hole, so <strong>n = p</strong>. Setting the two formulas equal and solving for <span class="m" data-tex="E_{F}">E<sub>F</sub></span> gives:</p>
           <span class="eq" data-tex="E_i = \dfrac{E_c + E_v}{2} + \dfrac{kT}{2}\ln\!\left(\dfrac{N_v}{N_c}\right)">E<sub>i</sub> = (E<sub>c</sub> + E<sub>v</sub>)/2 + (kT/2)·ln(N<sub>v</sub>/N<sub>c</sub>)</span>
-          <p>This position of the Fermi level is called the <strong>intrinsic level, E<sub>i</sub></strong>. The first term is exactly mid-gap; the second is a small correction. For Si, N<sub>c</sub> is larger than N<sub>v</sub>, so <span class="m" data-tex="\ln(N_v/N_c)">ln(N<sub>v</sub>/N<sub>c</sub>)</span> is negative and E<sub>i</sub> sits slightly <strong>below</strong> mid-gap: by only about <strong>0.013 eV</strong> at 300 K, about 1% of the 1.12 eV gap. For most purposes, <strong>E<sub>i</sub> ≈ mid-gap</strong>.</p>
-          <p>Using E<sub>i</sub> as the reference, the carrier formulas take a neat form:</p>
+          <p>This position of the Fermi level is called the <strong>intrinsic level, <span class="m" data-tex="E_{i}">E<sub>i</sub></span></strong>. The first term is exactly mid-gap; the second is a small correction. For Si, <span class="m" data-tex="N_{c}">N<sub>c</sub></span> is larger than <span class="m" data-tex="N_{v}">N<sub>v</sub></span>, so <span class="m" data-tex="\ln(N_v/N_c)">ln(N<sub>v</sub>/N<sub>c</sub>)</span> is negative and <span class="m" data-tex="E_{i}">E<sub>i</sub></span> sits slightly <strong>below</strong> mid-gap: by only about <strong>0.013 eV</strong> at 300 K, about 1% of the 1.12 eV gap. For most purposes, <strong><span class="m" data-tex="E_{i}">E<sub>i</sub></span> ≈ mid-gap</strong>.</p>
+          <p>Using <span class="m" data-tex="E_{i}">E<sub>i</sub></span> as the reference, the carrier formulas take a neat form:</p>
           <span class="eq" data-tex="\begin{aligned} n &amp;= n_i\, e^{(E_F - E_i)/kT} \\ p &amp;= n_i\, e^{(E_i - E_F)/kT} \end{aligned}">n = n<sub>i</sub>·exp((E<sub>F</sub> − E<sub>i</sub>)/kT)<br>p = n<sub>i</sub>·exp((E<sub>i</sub> − E<sub>F</sub>)/kT)</span>
-          <p>When E<sub>F</sub> = E<sub>i</sub>, both give n = p = n<sub>i</sub> ≈ 1 × 10¹⁰ cm⁻³ for Si at 300 K.</p>
+          <p>When <span class="m" data-tex="E_{F}">E<sub>F</sub></span> = <span class="m" data-tex="E_{i}">E<sub>i</sub></span>, both give n = p = <span class="m" data-tex="n_{i}">n<sub>i</sub></span> ≈ 1 × 10¹⁰ cm⁻³ for Si at 300 K.</p>
         </div>
 
         <figure class="anim" id="anim3">
@@ -366,23 +366,23 @@
           <ul class="legend">
             <li><span class="sw e"></span><span>electron</span></li>
             <li><span class="sw h"></span><span>hole</span></li>
-            <li><span class="ln"></span><span>E<sub>F</sub></span></li>
-            <li><span class="ln ei"></span><span>E<sub>i</sub></span></li>
+            <li><span class="ln"></span><span><span class="m" data-tex="E_{F}">E<sub>F</sub></span></span></li>
+            <li><span class="ln ei"></span><span><span class="m" data-tex="E_{i}">E<sub>i</sub></span></span></li>
           </ul>
           <div class="counters" aria-live="polite">
             <div class="ctr n">Electrons in CB<b id="c3a">0</b></div>
             <div class="ctr p">Holes in VB<b id="c3b">0</b></div>
-            <div class="ctr ok">n = p = n<sub>i</sub><b>1×10¹⁰ cm⁻³</b></div>
+            <div class="ctr ok">n = p = <span class="m" data-tex="n_{i}">n<sub>i</sub></span><b>1×10¹⁰ cm⁻³</b></div>
           </div>
-          <p class="exag"><b>Not to scale:</b> the 0.013 eV gap between E<sub>i</sub> and mid-gap is drawn 4× larger. Values for Si at 300 K.</p>
+          <p class="exag"><b>Not to scale:</b> the 0.013 eV gap between <span class="m" data-tex="E_{i}">E<sub>i</sub></span> and mid-gap is drawn 4× larger. Values for Si at 300 K.</p>
         </figure>
 
         <aside class="keypoints" aria-label="Key points: intrinsic level">
           <h3>Key points</h3>
           <ul>
-            <li>Intrinsic: n = p, so E<sub>F</sub> sits at the <strong>intrinsic level E<sub>i</sub></strong>.</li>
+            <li>Intrinsic: n = p, so <span class="m" data-tex="E_{F}">E<sub>F</sub></span> sits at the <strong>intrinsic level <span class="m" data-tex="E_{i}">E<sub>i</sub></span></strong>.</li>
             <li><span class="m" data-tex="E_i = \frac{E_c + E_v}{2} + \frac{kT}{2}\ln\frac{N_v}{N_c}">E<sub>i</sub> = (E<sub>c</sub> + E<sub>v</sub>)/2 + (kT/2)·ln(N<sub>v</sub>/N<sub>c</sub>)</span> ≈ mid-gap.</li>
-            <li>For Si, E<sub>i</sub> is only about 0.013 eV below mid-gap at 300 K.</li>
+            <li>For Si, <span class="m" data-tex="E_{i}">E<sub>i</sub></span> is only about 0.013 eV below mid-gap at 300 K.</li>
             <li><span class="m" data-tex="n = n_i\, e^{(E_F - E_i)/kT}">n = n<sub>i</sub>·exp((E<sub>F</sub> − E<sub>i</sub>)/kT)</span>, <span class="m" data-tex="p = n_i\, e^{(E_i - E_F)/kT}">p = n<sub>i</sub>·exp((E<sub>i</sub> − E<sub>F</sub>)/kT)</span>.</li>
           </ul>
         </aside>
@@ -391,18 +391,18 @@
 
       <!-- ================= SECTION 4 ================= -->
       <section id="s4" aria-labelledby="h4s">
-        <h2 id="h4s">N-type: E<sub>F</sub> moves up</h2>
+        <h2 id="h4s">N-type: <span class="m" data-tex="E_{F}">E<sub>F</sub></span> moves up</h2>
         <div class="prose">
-          <p>Adding donor atoms (topic 1.4) puts extra electrons into the conduction band. At room temperature almost every donor is ionised, so <strong>n ≈ N<sub>D</sub></strong>. From <span class="m" data-tex="n = n_i\, e^{(E_F - E_i)/kT}">n = n<sub>i</sub>·exp((E<sub>F</sub> − E<sub>i</sub>)/kT)</span>, a larger n needs a larger E<sub>F</sub> − E<sub>i</sub>, so <strong>the Fermi level must rise toward E<sub>c</sub></strong>. Taking the logarithm gives its position:</p>
+          <p>Adding donor atoms (topic 1.4) puts extra electrons into the conduction band. At room temperature almost every donor is ionised, so <strong>n ≈ <span class="m" data-tex="N_{D}">N<sub>D</sub></span></strong>. From <span class="m" data-tex="n = n_i\, e^{(E_F - E_i)/kT}">n = n<sub>i</sub>·exp((E<sub>F</sub> − E<sub>i</sub>)/kT)</span>, a larger n needs a larger <span class="m" data-tex="E_{F}">E<sub>F</sub></span> − <span class="m" data-tex="E_{i}">E<sub>i</sub></span>, so <strong>the Fermi level must rise toward <span class="m" data-tex="E_{c}">E<sub>c</sub></span></strong>. Taking the logarithm gives its position:</p>
           <span class="eq" data-tex="\begin{aligned} E_F - E_i &amp;= kT \ln\!\left(\frac{N_D}{n_i}\right) \\ E_c - E_F &amp;= kT \ln\!\left(\frac{N_c}{N_D}\right) \end{aligned}">E<sub>F</sub> − E<sub>i</sub> = kT·ln(N<sub>D</sub>/n<sub>i</sub>)<br>E<sub>c</sub> − E<sub>F</sub> = kT·ln(N<sub>c</sub>/N<sub>D</sub>)</span>
-          <p>Values for Si at 300 K (n<sub>i</sub> = 1 × 10¹⁰ cm⁻³):</p>
+          <p>Values for Si at 300 K (<span class="m" data-tex="n_{i}">n<sub>i</sub></span> = 1 × 10¹⁰ cm⁻³):</p>
           <ul>
-            <li>N<sub>D</sub> = 10¹⁴ cm⁻³ → E<sub>F</sub> − E<sub>i</sub> ≈ 0.24 eV</li>
-            <li>N<sub>D</sub> = 10¹⁶ cm⁻³ → E<sub>F</sub> − E<sub>i</sub> ≈ 0.36 eV</li>
-            <li>N<sub>D</sub> = 10¹⁸ cm⁻³ → E<sub>F</sub> − E<sub>i</sub> ≈ 0.48 eV (E<sub>c</sub> − E<sub>F</sub> ≈ 0.086 eV)</li>
+            <li><span class="m" data-tex="N_{D}">N<sub>D</sub></span> = 10¹⁴ cm⁻³ → <span class="m" data-tex="E_{F}">E<sub>F</sub></span> − <span class="m" data-tex="E_{i}">E<sub>i</sub></span> ≈ 0.24 eV</li>
+            <li><span class="m" data-tex="N_{D}">N<sub>D</sub></span> = 10¹⁶ cm⁻³ → <span class="m" data-tex="E_{F}">E<sub>F</sub></span> − <span class="m" data-tex="E_{i}">E<sub>i</sub></span> ≈ 0.36 eV</li>
+            <li><span class="m" data-tex="N_{D}">N<sub>D</sub></span> = 10¹⁸ cm⁻³ → <span class="m" data-tex="E_{F}">E<sub>F</sub></span> − <span class="m" data-tex="E_{i}">E<sub>i</sub></span> ≈ 0.48 eV (<span class="m" data-tex="E_{c}">E<sub>c</sub></span> − <span class="m" data-tex="E_{F}">E<sub>F</sub></span> ≈ 0.086 eV)</li>
           </ul>
-          <p>Notice how slowly E<sub>F</sub> moves. Each 10× increase in doping raises E<sub>F</sub> by only <strong>kT·ln 10 ≈ 0.06 eV</strong>. The shift is <strong>logarithmic</strong>: a ten-thousand-fold increase in doping, from 10¹⁴ to 10¹⁸ cm⁻³, moves E<sub>F</sub> by only about 0.24 eV.</p>
-          <p>Even at 10¹⁸ cm⁻³, E<sub>F</sub> is still a few kT below E<sub>c</sub>, so these formulas remain usable. At much heavier doping E<sub>F</sub> reaches the conduction band; the material is then called <strong>degenerate</strong>, and the simple formulas no longer apply.</p>
+          <p>Notice how slowly <span class="m" data-tex="E_{F}">E<sub>F</sub></span> moves. Each 10× increase in doping raises <span class="m" data-tex="E_{F}">E<sub>F</sub></span> by only <strong>kT·ln 10 ≈ 0.06 eV</strong>. The shift is <strong>logarithmic</strong>: a ten-thousand-fold increase in doping, from 10¹⁴ to 10¹⁸ cm⁻³, moves <span class="m" data-tex="E_{F}">E<sub>F</sub></span> by only about 0.24 eV.</p>
+          <p>Even at 10¹⁸ cm⁻³, <span class="m" data-tex="E_{F}">E<sub>F</sub></span> is still a few kT below <span class="m" data-tex="E_{c}">E<sub>c</sub></span>, so these formulas remain usable. At much heavier doping <span class="m" data-tex="E_{F}">E<sub>F</sub></span> reaches the conduction band; the material is then called <strong>degenerate</strong>, and the simple formulas no longer apply.</p>
         </div>
 
         <figure class="anim" id="anim4">
@@ -410,7 +410,7 @@
             <button class="btn" type="button" data-act="play">Pause</button>
             <button class="btn" type="button" data-act="reset">Reset</button>
             <div class="slider">
-              <label for="d4"><span>Donor concentration N<sub>D</sub></span><output id="d4o" for="d4">1.0×10¹⁶ cm⁻³</output></label>
+              <label for="d4"><span>Donor concentration <span class="m" data-tex="N_{D}">N<sub>D</sub></span></span><output id="d4o" for="d4">1.0×10¹⁶ cm⁻³</output></label>
               <input type="range" id="d4" min="14" max="18" step="0.05" value="16">
             </div>
           </div>
@@ -418,23 +418,23 @@
           <ul class="legend">
             <li><span class="sw e"></span><span>electron</span></li>
             <li><span class="ionsw d">+</span><span>ionised donor</span></li>
-            <li><span class="ln"></span><span>E<sub>F</sub></span></li>
-            <li><span class="ln ei"></span><span>E<sub>i</sub></span></li>
+            <li><span class="ln"></span><span><span class="m" data-tex="E_{F}">E<sub>F</sub></span></span></li>
+            <li><span class="ln ei"></span><span><span class="m" data-tex="E_{i}">E<sub>i</sub></span></span></li>
           </ul>
           <div class="counters" aria-live="polite">
-            <div class="ctr en">E<sub>F</sub> − E<sub>i</sub><b id="c4a">–</b></div>
-            <div class="ctr en">E<sub>c</sub> − E<sub>F</sub><b id="c4b">–</b></div>
-            <div class="ctr n">n ≈ N<sub>D</sub><b id="c4c">–</b></div>
+            <div class="ctr en"><span class="m" data-tex="E_{F}">E<sub>F</sub></span> − <span class="m" data-tex="E_{i}">E<sub>i</sub></span><b id="c4a">–</b></div>
+            <div class="ctr en"><span class="m" data-tex="E_{c}">E<sub>c</sub></span> − <span class="m" data-tex="E_{F}">E<sub>F</sub></span><b id="c4b">–</b></div>
+            <div class="ctr n">n ≈ <span class="m" data-tex="N_{D}">N<sub>D</sub></span><b id="c4c">–</b></div>
           </div>
-          <p class="exag"><b>Not to scale:</b> E<sub>D</sub> is drawn farther below E<sub>c</sub> than its true 0.045 eV, the E<sub>i</sub> offset is drawn 4× larger, and the number of dots grows with log₁₀ N<sub>D</sub>. Values for Si at 300 K.</p>
+          <p class="exag"><b>Not to scale:</b> <span class="m" data-tex="E_{D}">E<sub>D</sub></span> is drawn farther below <span class="m" data-tex="E_{c}">E<sub>c</sub></span> than its true 0.045 eV, the <span class="m" data-tex="E_{i}">E<sub>i</sub></span> offset is drawn 4× larger, and the number of dots grows with log₁₀ <span class="m" data-tex="N_{D}">N<sub>D</sub></span>. Values for Si at 300 K.</p>
         </figure>
 
         <aside class="keypoints" aria-label="Key points: N-type Fermi level">
           <h3>Key points</h3>
           <ul>
-            <li>Donors raise n, so E<sub>F</sub> moves <strong>up</strong> toward E<sub>c</sub>.</li>
+            <li>Donors raise n, so <span class="m" data-tex="E_{F}">E<sub>F</sub></span> moves <strong>up</strong> toward <span class="m" data-tex="E_{c}">E<sub>c</sub></span>.</li>
             <li><span class="m" data-tex="E_F - E_i = kT \ln(N_D/n_i)">E<sub>F</sub> − E<sub>i</sub> = kT·ln(N<sub>D</sub>/n<sub>i</sub>)</span>; <span class="m" data-tex="E_c - E_F = kT \ln(N_c/N_D)">E<sub>c</sub> − E<sub>F</sub> = kT·ln(N<sub>c</sub>/N<sub>D</sub>)</span>.</li>
-            <li>Si at 300 K: 0.24, 0.36, 0.48 eV above E<sub>i</sub> for N<sub>D</sub> = 10¹⁴, 10¹⁶, 10¹⁸ cm⁻³.</li>
+            <li>Si at 300 K: 0.24, 0.36, 0.48 eV above <span class="m" data-tex="E_{i}">E<sub>i</sub></span> for <span class="m" data-tex="N_{D}">N<sub>D</sub></span> = 10¹⁴, 10¹⁶, 10¹⁸ cm⁻³.</li>
             <li>About 0.06 eV per decade of doping: the shift is logarithmic.</li>
           </ul>
         </aside>
@@ -443,12 +443,12 @@
 
       <!-- ================= SECTION 5 ================= -->
       <section id="s5" aria-labelledby="h5s">
-        <h2 id="h5s">P-type: E<sub>F</sub> moves down</h2>
+        <h2 id="h5s">P-type: <span class="m" data-tex="E_{F}">E<sub>F</sub></span> moves down</h2>
         <div class="prose">
-          <p>Adding acceptor atoms gives <strong>p ≈ N<sub>A</sub></strong>. From <span class="m" data-tex="p = n_i\, e^{(E_i - E_F)/kT}">p = n<sub>i</sub>·exp((E<sub>i</sub> − E<sub>F</sub>)/kT)</span>, a larger p needs E<sub>F</sub> to fall below E<sub>i</sub>, so <strong>the Fermi level moves down toward E<sub>v</sub></strong>:</p>
+          <p>Adding acceptor atoms gives <strong>p ≈ <span class="m" data-tex="N_{A}">N<sub>A</sub></span></strong>. From <span class="m" data-tex="p = n_i\, e^{(E_i - E_F)/kT}">p = n<sub>i</sub>·exp((E<sub>i</sub> − E<sub>F</sub>)/kT)</span>, a larger p needs <span class="m" data-tex="E_{F}">E<sub>F</sub></span> to fall below <span class="m" data-tex="E_{i}">E<sub>i</sub></span>, so <strong>the Fermi level moves down toward <span class="m" data-tex="E_{v}">E<sub>v</sub></span></strong>:</p>
           <span class="eq" data-tex="\begin{aligned} E_i - E_F &amp;= kT \ln\!\left(\frac{N_A}{n_i}\right) \\ E_F - E_v &amp;= kT \ln\!\left(\frac{N_v}{N_A}\right) \end{aligned}">E<sub>i</sub> − E<sub>F</sub> = kT·ln(N<sub>A</sub>/n<sub>i</sub>)<br>E<sub>F</sub> − E<sub>v</sub> = kT·ln(N<sub>v</sub>/N<sub>A</sub>)</span>
-          <p>The idea is the mirror image of N-type: about <strong>0.06 eV per decade</strong> of doping. For example, N<sub>A</sub> = 10¹⁶ cm⁻³ puts E<sub>F</sub> about 0.36 eV below E<sub>i</sub>.</p>
-          <p>Whatever the doping, the product <strong>n·p = n<sub>i</sub>² = 10²⁰ cm⁻⁶</strong> (Si, 300 K) stays the same, so raising one carrier type lowers the other. The position of E<sub>F</sub> alone tells you the majority carrier: <strong>above E<sub>i</sub> means N-type, below E<sub>i</sub> means P-type, at E<sub>i</sub> means intrinsic</strong>.</p>
+          <p>The idea is the mirror image of N-type: about <strong>0.06 eV per decade</strong> of doping. For example, <span class="m" data-tex="N_{A}">N<sub>A</sub></span> = 10¹⁶ cm⁻³ puts <span class="m" data-tex="E_{F}">E<sub>F</sub></span> about 0.36 eV below <span class="m" data-tex="E_{i}">E<sub>i</sub></span>.</p>
+          <p>Whatever the doping, the product <strong>n·p = <span class="m" data-tex="n_{i}^2">n<sub>i</sub>²</span> = 10²⁰ cm⁻⁶</strong> (Si, 300 K) stays the same, so raising one carrier type lowers the other. The position of <span class="m" data-tex="E_{F}">E<sub>F</sub></span> alone tells you the majority carrier: <strong>above <span class="m" data-tex="E_{i}">E<sub>i</sub></span> means N-type, below <span class="m" data-tex="E_{i}">E<sub>i</sub></span> means P-type, at <span class="m" data-tex="E_{i}">E<sub>i</sub></span> means intrinsic</strong>.</p>
         </div>
 
         <figure class="anim" id="anim5">
@@ -456,7 +456,7 @@
             <button class="btn" type="button" data-act="play">Pause</button>
             <button class="btn" type="button" data-act="reset">Reset</button>
             <div class="slider">
-              <label for="x5"><span>Acceptor concentration N<sub>A</sub></span><output id="x5o" for="x5">1.0×10¹⁶ cm⁻³</output></label>
+              <label for="x5"><span>Acceptor concentration <span class="m" data-tex="N_{A}">N<sub>A</sub></span></span><output id="x5o" for="x5">1.0×10¹⁶ cm⁻³</output></label>
               <input type="range" id="x5" min="14" max="18" step="0.05" value="16">
             </div>
           </div>
@@ -464,25 +464,25 @@
           <ul class="legend">
             <li><span class="sw h"></span><span>hole</span></li>
             <li><span class="ionsw a">−</span><span>ionised acceptor</span></li>
-            <li><span class="ln"></span><span>E<sub>F</sub></span></li>
-            <li><span class="ln ei"></span><span>E<sub>i</sub></span></li>
+            <li><span class="ln"></span><span><span class="m" data-tex="E_{F}">E<sub>F</sub></span></span></li>
+            <li><span class="ln ei"></span><span><span class="m" data-tex="E_{i}">E<sub>i</sub></span></span></li>
           </ul>
           <div class="counters" aria-live="polite">
-            <div class="ctr en">E<sub>i</sub> − E<sub>F</sub><b id="c5d">–</b></div>
-            <div class="ctr en">E<sub>F</sub> − E<sub>v</sub><b id="c5c">–</b></div>
-            <div class="ctr p">p ≈ N<sub>A</sub><b id="c5b">–</b></div>
-            <div class="ctr n">n = n<sub>i</sub>²/N<sub>A</sub><b id="c5a">–</b></div>
+            <div class="ctr en"><span class="m" data-tex="E_{i}">E<sub>i</sub></span> − <span class="m" data-tex="E_{F}">E<sub>F</sub></span><b id="c5d">–</b></div>
+            <div class="ctr en"><span class="m" data-tex="E_{F}">E<sub>F</sub></span> − <span class="m" data-tex="E_{v}">E<sub>v</sub></span><b id="c5c">–</b></div>
+            <div class="ctr p">p ≈ <span class="m" data-tex="N_{A}">N<sub>A</sub></span><b id="c5b">–</b></div>
+            <div class="ctr n">n = <span class="m" data-tex="n_{i}^2">n<sub>i</sub>²</span>/<span class="m" data-tex="N_{A}">N<sub>A</sub></span><b id="c5a">–</b></div>
           </div>
-          <p class="exag"><b>Energies to scale</b> (E<sub>A</sub> is 0.045 eV above E<sub>v</sub>); the number of dots grows with log₁₀ N<sub>A</sub>. Minority electrons (only 10²–10⁶ cm⁻³) are too few to show. Values for Si at 300 K.</p>
+          <p class="exag"><b>Energies to scale</b> (<span class="m" data-tex="E_{A}">E<sub>A</sub></span> is 0.045 eV above <span class="m" data-tex="E_{v}">E<sub>v</sub></span>); the number of dots grows with log₁₀ <span class="m" data-tex="N_{A}">N<sub>A</sub></span>. Minority electrons (only 10²–10⁶ cm⁻³) are too few to show. Values for Si at 300 K.</p>
         </figure>
 
         <aside class="keypoints" aria-label="Key points: P-type Fermi level">
           <h3>Key points</h3>
           <ul>
-            <li>Acceptors raise p, so E<sub>F</sub> moves <strong>down</strong> toward E<sub>v</sub>.</li>
+            <li>Acceptors raise p, so <span class="m" data-tex="E_{F}">E<sub>F</sub></span> moves <strong>down</strong> toward <span class="m" data-tex="E_{v}">E<sub>v</sub></span>.</li>
             <li><span class="m" data-tex="E_i - E_F = kT \ln(N_A/n_i)">E<sub>i</sub> − E<sub>F</sub> = kT·ln(N<sub>A</sub>/n<sub>i</sub>)</span>; <span class="m" data-tex="E_F - E_v = kT \ln(N_v/N_A)">E<sub>F</sub> − E<sub>v</sub> = kT·ln(N<sub>v</sub>/N<sub>A</sub>)</span>.</li>
             <li>About 0.06 eV per decade, the mirror image of N-type.</li>
-            <li>n·p = n<sub>i</sub>² at every doping; E<sub>F</sub> above, at or below E<sub>i</sub> means N-type, intrinsic or P-type.</li>
+            <li>n·p = <span class="m" data-tex="n_{i}^2">n<sub>i</sub>²</span> at every doping; <span class="m" data-tex="E_{F}">E<sub>F</sub></span> above, at or below <span class="m" data-tex="E_{i}">E<sub>i</sub></span> means N-type, intrinsic or P-type.</li>
           </ul>
         </aside>
       </section>
@@ -490,12 +490,12 @@
 
       <!-- ================= SECTION 6 ================= -->
       <section id="s6" aria-labelledby="h6s">
-        <h2 id="h6s">Effect of temperature, and E<sub>F</sub> in equilibrium</h2>
+        <h2 id="h6s">Effect of temperature, and <span class="m" data-tex="E_{F}">E<sub>F</sub></span> in equilibrium</h2>
         <div class="prose">
-          <p><strong>Temperature.</strong> As temperature rises, n<sub>i</sub> grows very rapidly (topic 1.3), while the doping stays fixed. For an N-type sample, <span class="m" data-tex="E_F - E_i = kT \ln(N_D/n_i)">E<sub>F</sub> − E<sub>i</sub> = kT·ln(N<sub>D</sub>/n<sub>i</sub>)</span>, and the ratio N<sub>D</sub>/n<sub>i</sub> keeps falling, so <strong>E<sub>F</sub> moves back toward E<sub>i</sub></strong>. Once n<sub>i</sub> becomes comparable to N<sub>D</sub>, heat-generated carriers outnumber the donor electrons: the sample behaves as intrinsic and E<sub>F</sub> ≈ E<sub>i</sub>. For Si with N<sub>D</sub> = 10¹⁵ cm⁻³, n<sub>i</sub> reaches N<sub>D</sub> at about 550 K.</p>
-          <p>At very low temperature the opposite happens: the donors "freeze out" and hold on to their electrons, and E<sub>F</sub> rises to lie between E<sub>D</sub> and E<sub>c</sub>.</p>
-          <p><strong>Equilibrium rule.</strong> In thermal equilibrium (no applied voltage, no light, steady temperature), <strong>the Fermi level is flat</strong>: it has the same value everywhere in a connected system. If E<sub>F</sub> were higher in one region, electrons there would flow into empty states at the same energy in the other region until the levels matched.</p>
-          <p>So when N-type and P-type material are joined, E<sub>F</sub> must line up into a single flat line, and the bands <strong>bend</strong> near the junction to make this possible. This is the starting point of the PN junction (topic 2.1).</p>
+          <p><strong>Temperature.</strong> As temperature rises, <span class="m" data-tex="n_{i}">n<sub>i</sub></span> grows very rapidly (topic 1.3), while the doping stays fixed. For an N-type sample, <span class="m" data-tex="E_F - E_i = kT \ln(N_D/n_i)">E<sub>F</sub> − E<sub>i</sub> = kT·ln(N<sub>D</sub>/n<sub>i</sub>)</span>, and the ratio <span class="m" data-tex="N_{D}">N<sub>D</sub></span>/<span class="m" data-tex="n_{i}">n<sub>i</sub></span> keeps falling, so <strong><span class="m" data-tex="E_{F}">E<sub>F</sub></span> moves back toward <span class="m" data-tex="E_{i}">E<sub>i</sub></span></strong>. Once <span class="m" data-tex="n_{i}">n<sub>i</sub></span> becomes comparable to <span class="m" data-tex="N_{D}">N<sub>D</sub></span>, heat-generated carriers outnumber the donor electrons: the sample behaves as intrinsic and <span class="m" data-tex="E_{F}">E<sub>F</sub></span> ≈ <span class="m" data-tex="E_{i}">E<sub>i</sub></span>. For Si with <span class="m" data-tex="N_{D}">N<sub>D</sub></span> = 10¹⁵ cm⁻³, <span class="m" data-tex="n_{i}">n<sub>i</sub></span> reaches <span class="m" data-tex="N_{D}">N<sub>D</sub></span> at about 550 K.</p>
+          <p>At very low temperature the opposite happens: the donors "freeze out" and hold on to their electrons, and <span class="m" data-tex="E_{F}">E<sub>F</sub></span> rises to lie between <span class="m" data-tex="E_{D}">E<sub>D</sub></span> and <span class="m" data-tex="E_{c}">E<sub>c</sub></span>.</p>
+          <p><strong>Equilibrium rule.</strong> In thermal equilibrium (no applied voltage, no light, steady temperature), <strong>the Fermi level is flat</strong>: it has the same value everywhere in a connected system. If <span class="m" data-tex="E_{F}">E<sub>F</sub></span> were higher in one region, electrons there would flow into empty states at the same energy in the other region until the levels matched.</p>
+          <p>So when N-type and P-type material are joined, <span class="m" data-tex="E_{F}">E<sub>F</sub></span> must line up into a single flat line, and the bands <strong>bend</strong> near the junction to make this possible. This is the starting point of the PN junction (topic 2.1).</p>
         </div>
 
         <figure class="anim" id="anim6">
@@ -503,7 +503,7 @@
             <button class="btn" type="button" data-act="play">Pause</button>
             <button class="btn" type="button" data-act="reset">Reset</button>
             <div class="slider">
-              <label for="t6"><span>Temperature (N<sub>D</sub> = 10¹⁵ cm⁻³)</span><output id="t6o" for="t6">300 K</output></label>
+              <label for="t6"><span>Temperature (<span class="m" data-tex="N_{D}">N<sub>D</sub></span> = 10¹⁵ cm⁻³)</span><output id="t6o" for="t6">300 K</output></label>
               <input type="range" id="t6" min="300" max="700" step="5" value="300">
             </div>
           </div>
@@ -511,16 +511,16 @@
           <ul class="legend">
             <li><span class="sw e"></span><span>electron</span></li>
             <li><span class="sw h"></span><span>hole</span></li>
-            <li><span class="ln"></span><span>E<sub>F</sub></span></li>
-            <li><span class="ln ei"></span><span>E<sub>i</sub></span></li>
+            <li><span class="ln"></span><span><span class="m" data-tex="E_{F}">E<sub>F</sub></span></span></li>
+            <li><span class="ln ei"></span><span><span class="m" data-tex="E_{i}">E<sub>i</sub></span></span></li>
           </ul>
           <div class="counters" aria-live="polite">
-            <div class="ctr ok">n<sub>i</sub> (cm⁻³)<b id="c6a">–</b></div>
-            <div class="ctr en">E<sub>F</sub> − E<sub>i</sub><b id="c6b">–</b></div>
+            <div class="ctr ok"><span class="m" data-tex="n_{i}">n<sub>i</sub></span> (cm⁻³)<b id="c6a">–</b></div>
+            <div class="ctr en"><span class="m" data-tex="E_{F}">E<sub>F</sub></span> − <span class="m" data-tex="E_{i}">E<sub>i</sub></span><b id="c6b">–</b></div>
             <div class="ctr n">n (cm⁻³)<b id="c6c">–</b></div>
             <div class="ctr p">p (cm⁻³)<b id="c6d">–</b></div>
           </div>
-          <p class="exag"><b>Not to scale:</b> the E<sub>i</sub> offset is drawn 4× larger and dot counts grow with log₁₀ of the concentration. The band gap shrinks with temperature as in real Si. Play sweeps 300 → 700 K and back.</p>
+          <p class="exag"><b>Not to scale:</b> the <span class="m" data-tex="E_{i}">E<sub>i</sub></span> offset is drawn 4× larger and dot counts grow with log₁₀ of the concentration. The band gap shrinks with temperature as in real Si. Play sweeps 300 → 700 K and back.</p>
         </figure>
 
         <figure class="anim" id="anim7">
@@ -531,19 +531,19 @@
           </div>
           <canvas id="cv7" class="narrow" style="aspect-ratio:420/320" role="img" aria-label="Two separate band diagrams: N-type on the left with EF near Ec, and P-type on the right with EF near Ev. Pressing Join slides them together; the bands bend near the junction so that the two Fermi levels become one flat line. This is a preview of the PN junction."></canvas>
           <ul class="legend">
-            <li><span class="ln"></span><span>E<sub>F</sub></span></li>
-            <li><span class="ln ei"></span><span>E<sub>i</sub></span></li>
+            <li><span class="ln"></span><span><span class="m" data-tex="E_{F}">E<sub>F</sub></span></span></li>
+            <li><span class="ln ei"></span><span><span class="m" data-tex="E_{i}">E<sub>i</sub></span></span></li>
           </ul>
-          <p class="exag"><b>Simplified:</b> N<sub>D</sub> = N<sub>A</sub> = 10¹⁶ cm⁻³, E<sub>i</sub> drawn at mid-gap, and the bend is drawn as a smooth curve; its true shape and width are the subject of topic 2.1.</p>
+          <p class="exag"><b>Simplified:</b> <span class="m" data-tex="N_{D}">N<sub>D</sub></span> = <span class="m" data-tex="N_{A}">N<sub>A</sub></span> = 10¹⁶ cm⁻³, <span class="m" data-tex="E_{i}">E<sub>i</sub></span> drawn at mid-gap, and the bend is drawn as a smooth curve; its true shape and width are the subject of topic 2.1.</p>
         </figure>
 
         <aside class="keypoints" aria-label="Key points: temperature and equilibrium">
           <h3>Key points</h3>
           <ul>
-            <li>Higher temperature → larger n<sub>i</sub> → E<sub>F</sub> moves back toward E<sub>i</sub>.</li>
-            <li>When n<sub>i</sub> ≈ N<sub>D</sub> the sample behaves as intrinsic (≈ 550 K for Si with 10¹⁵ cm⁻³).</li>
-            <li>At very low temperature donors freeze out and E<sub>F</sub> lies between E<sub>D</sub> and E<sub>c</sub>.</li>
-            <li><strong>In equilibrium E<sub>F</sub> is flat</strong> through a connected system; joining N and P bends the bands.</li>
+            <li>Higher temperature → larger <span class="m" data-tex="n_{i}">n<sub>i</sub></span> → <span class="m" data-tex="E_{F}">E<sub>F</sub></span> moves back toward <span class="m" data-tex="E_{i}">E<sub>i</sub></span>.</li>
+            <li>When <span class="m" data-tex="n_{i}">n<sub>i</sub></span> ≈ <span class="m" data-tex="N_{D}">N<sub>D</sub></span> the sample behaves as intrinsic (≈ 550 K for Si with 10¹⁵ cm⁻³).</li>
+            <li>At very low temperature donors freeze out and <span class="m" data-tex="E_{F}">E<sub>F</sub></span> lies between <span class="m" data-tex="E_{D}">E<sub>D</sub></span> and <span class="m" data-tex="E_{c}">E<sub>c</sub></span>.</li>
+            <li><strong>In equilibrium <span class="m" data-tex="E_{F}">E<sub>F</sub></span> is flat</strong> through a connected system; joining N and P bends the bands.</li>
           </ul>
         </aside>
       </section>
@@ -554,25 +554,25 @@
         <h2 id="h7s">Summary</h2>
         <div class="table-box">
           <table class="vt">
-            <thead><tr><th scope="col">Case</th><th scope="col">Where E<sub>F</sub> sits</th><th scope="col">Position formula</th><th scope="col">Majority carrier</th></tr></thead>
+            <thead><tr><th scope="col">Case</th><th scope="col">Where <span class="m" data-tex="E_{F}">E<sub>F</sub></span> sits</th><th scope="col">Position formula</th><th scope="col">Majority carrier</th></tr></thead>
             <tbody>
-              <tr><th scope="row">Intrinsic</th><td>At E<sub>i</sub>, about mid-gap</td><td class="f" data-tex="\displaystyle E_i = \frac{E_c + E_v}{2} + \frac{kT}{2}\ln\!\left(\frac{N_v}{N_c}\right)">E<sub>i</sub> = (E<sub>c</sub>+E<sub>v</sub>)/2 + (kT/2)·ln(N<sub>v</sub>/N<sub>c</sub>)</td><td>None: n = p = n<sub>i</sub></td></tr>
-              <tr><th scope="row" class="t-e">N-type</th><td>Above E<sub>i</sub>, toward E<sub>c</sub></td><td class="f" data-tex="\displaystyle \begin{aligned} E_F - E_i &amp;= kT \ln\frac{N_D}{n_i} \\ E_c - E_F &amp;= kT \ln\frac{N_c}{N_D} \end{aligned}">E<sub>F</sub> − E<sub>i</sub> = kT·ln(N<sub>D</sub>/n<sub>i</sub>)<br>E<sub>c</sub> − E<sub>F</sub> = kT·ln(N<sub>c</sub>/N<sub>D</sub>)</td><td>Electrons</td></tr>
-              <tr><th scope="row" class="t-h">P-type</th><td>Below E<sub>i</sub>, toward E<sub>v</sub></td><td class="f" data-tex="\displaystyle \begin{aligned} E_i - E_F &amp;= kT \ln\frac{N_A}{n_i} \\ E_F - E_v &amp;= kT \ln\frac{N_v}{N_A} \end{aligned}">E<sub>i</sub> − E<sub>F</sub> = kT·ln(N<sub>A</sub>/n<sub>i</sub>)<br>E<sub>F</sub> − E<sub>v</sub> = kT·ln(N<sub>v</sub>/N<sub>A</sub>)</td><td>Holes</td></tr>
+              <tr><th scope="row">Intrinsic</th><td>At <span class="m" data-tex="E_{i}">E<sub>i</sub></span>, about mid-gap</td><td class="f" data-tex="\displaystyle E_i = \frac{E_c + E_v}{2} + \frac{kT}{2}\ln\!\left(\frac{N_v}{N_c}\right)">E<sub>i</sub> = (E<sub>c</sub>+E<sub>v</sub>)/2 + (kT/2)·ln(N<sub>v</sub>/N<sub>c</sub>)</td><td>None: n = p = <span class="m" data-tex="n_{i}">n<sub>i</sub></span></td></tr>
+              <tr><th scope="row" class="t-e">N-type</th><td>Above <span class="m" data-tex="E_{i}">E<sub>i</sub></span>, toward <span class="m" data-tex="E_{c}">E<sub>c</sub></span></td><td class="f" data-tex="\displaystyle \begin{aligned} E_F - E_i &amp;= kT \ln\frac{N_D}{n_i} \\ E_c - E_F &amp;= kT \ln\frac{N_c}{N_D} \end{aligned}">E<sub>F</sub> − E<sub>i</sub> = kT·ln(N<sub>D</sub>/n<sub>i</sub>)<br>E<sub>c</sub> − E<sub>F</sub> = kT·ln(N<sub>c</sub>/N<sub>D</sub>)</td><td>Electrons</td></tr>
+              <tr><th scope="row" class="t-h">P-type</th><td>Below <span class="m" data-tex="E_{i}">E<sub>i</sub></span>, toward <span class="m" data-tex="E_{v}">E<sub>v</sub></span></td><td class="f" data-tex="\displaystyle \begin{aligned} E_i - E_F &amp;= kT \ln\frac{N_A}{n_i} \\ E_F - E_v &amp;= kT \ln\frac{N_v}{N_A} \end{aligned}">E<sub>i</sub> − E<sub>F</sub> = kT·ln(N<sub>A</sub>/n<sub>i</sub>)<br>E<sub>F</sub> − E<sub>v</sub> = kT·ln(N<sub>v</sub>/N<sub>A</sub>)</td><td>Holes</td></tr>
             </tbody>
           </table>
         </div>
 
         <h3 class="sumhead">Key formulas</h3>
         <div class="formulas">
-          <div class="fcard"><div class="f" data-tex="f(E) = \dfrac{1}{1 + e^{(E - E_F)/kT}}">f(E) = 1/(1 + exp((E − E<sub>F</sub>)/kT))</div><p>Probability a state at E is filled; f(E<sub>F</sub>) = 1/2.</p></div>
-          <div class="fcard"><div class="f" data-tex="n = N_c\, e^{-(E_c - E_F)/kT}">n = N<sub>c</sub>·exp(−(E<sub>c</sub> − E<sub>F</sub>)/kT)</div><p>Electrons in the conduction band; N<sub>c</sub> ≈ 2.8 × 10¹⁹ cm⁻³.</p></div>
-          <div class="fcard"><div class="f" data-tex="p = N_v\, e^{-(E_F - E_v)/kT}">p = N<sub>v</sub>·exp(−(E<sub>F</sub> − E<sub>v</sub>)/kT)</div><p>Holes in the valence band; N<sub>v</sub> ≈ 1.04 × 10¹⁹ cm⁻³.</p></div>
+          <div class="fcard"><div class="f" data-tex="f(E) = \dfrac{1}{1 + e^{(E - E_F)/kT}}">f(E) = 1/(1 + exp((E − E<sub>F</sub>)/kT))</div><p>Probability a state at E is filled; f(<span class="m" data-tex="E_{F}">E<sub>F</sub></span>) = 1/2.</p></div>
+          <div class="fcard"><div class="f" data-tex="n = N_c\, e^{-(E_c - E_F)/kT}">n = N<sub>c</sub>·exp(−(E<sub>c</sub> − E<sub>F</sub>)/kT)</div><p>Electrons in the conduction band; <span class="m" data-tex="N_{c}">N<sub>c</sub></span> ≈ 2.8 × 10¹⁹ cm⁻³.</p></div>
+          <div class="fcard"><div class="f" data-tex="p = N_v\, e^{-(E_F - E_v)/kT}">p = N<sub>v</sub>·exp(−(E<sub>F</sub> − E<sub>v</sub>)/kT)</div><p>Holes in the valence band; <span class="m" data-tex="N_{v}">N<sub>v</sub></span> ≈ 1.04 × 10¹⁹ cm⁻³.</p></div>
           <div class="fcard"><div class="f" data-tex="n = n_i\, e^{(E_F - E_i)/kT}">n = n<sub>i</sub>·exp((E<sub>F</sub> − E<sub>i</sub>)/kT)</div><p>Electrons measured from the intrinsic level.</p></div>
           <div class="fcard"><div class="f" data-tex="p = n_i\, e^{(E_i - E_F)/kT}">p = n<sub>i</sub>·exp((E<sub>i</sub> − E<sub>F</sub>)/kT)</div><p>Holes measured from the intrinsic level.</p></div>
-          <div class="fcard"><div class="f" data-tex="E_F - E_i = kT \ln\!\left(\dfrac{N_D}{n_i}\right)">E<sub>F</sub> − E<sub>i</sub> = kT·ln(N<sub>D</sub>/n<sub>i</sub>)</div><p>N-type position of E<sub>F</sub>.</p></div>
-          <div class="fcard"><div class="f" data-tex="E_i - E_F = kT \ln\!\left(\dfrac{N_A}{n_i}\right)">E<sub>i</sub> − E<sub>F</sub> = kT·ln(N<sub>A</sub>/n<sub>i</sub>)</div><p>P-type position of E<sub>F</sub>.</p></div>
-          <div class="fcard"><div class="f" data-tex="kT = 0.0259\ \text{eV}">kT = 0.0259 eV</div><p>Thermal energy at 300 K. Values for Si at 300 K: n<sub>i</sub> ≈ 1 × 10¹⁰ cm⁻³, E<sub>g</sub> = 1.12 eV.</p></div>
+          <div class="fcard"><div class="f" data-tex="E_F - E_i = kT \ln\!\left(\dfrac{N_D}{n_i}\right)">E<sub>F</sub> − E<sub>i</sub> = kT·ln(N<sub>D</sub>/n<sub>i</sub>)</div><p>N-type position of <span class="m" data-tex="E_{F}">E<sub>F</sub></span>.</p></div>
+          <div class="fcard"><div class="f" data-tex="E_i - E_F = kT \ln\!\left(\dfrac{N_A}{n_i}\right)">E<sub>i</sub> − E<sub>F</sub> = kT·ln(N<sub>A</sub>/n<sub>i</sub>)</div><p>P-type position of <span class="m" data-tex="E_{F}">E<sub>F</sub></span>.</p></div>
+          <div class="fcard"><div class="f" data-tex="kT = 0.0259\ \text{eV}">kT = 0.0259 eV</div><p>Thermal energy at 300 K. Values for Si at 300 K: <span class="m" data-tex="n_{i}">n<sub>i</sub></span> ≈ 1 × 10¹⁰ cm⁻³, <span class="m" data-tex="E_{g}">E<sub>g</sub></span> = 1.12 eV.</p></div>
         </div>
       </section>
 
@@ -1258,14 +1258,15 @@
 })();
 </script>
 <script>
-  // Typeset every [data-tex] element as maths once KaTeX has loaded.
-  document.addEventListener('DOMContentLoaded', function () {
+  // Typeset [data-tex] elements as maths once KaTeX has loaded; pages call mathify(el) after changing text.
+  window.mathify = function (root) {
     if (!window.katex) return;
-    document.querySelectorAll('[data-tex]').forEach(function (el) {
+    (root || document).querySelectorAll('[data-tex]').forEach(function (el) {
       var block = (el.classList.contains('eq') || el.classList.contains('f')) && el.tagName !== 'TD';
       try { katex.render(el.getAttribute('data-tex'), el, { displayMode: block, throwOnError: false }); } catch (e) {}
     });
-  });
+  };
+  document.addEventListener('DOMContentLoaded', function () { window.mathify(); });
 </script>
 </body>
 </html>

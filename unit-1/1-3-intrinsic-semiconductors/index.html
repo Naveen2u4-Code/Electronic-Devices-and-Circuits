@@ -274,7 +274,7 @@
       <section id="s2" aria-labelledby="h2s">
         <h2 id="h2s">Thermal generation: electron-hole pairs</h2>
         <div class="prose">
-          <p>Above 0 K the atoms in the crystal <strong>vibrate</strong>, and the vibrations get stronger as temperature rises. This vibration energy is shared out at random. Usually a bonded electron gets only a little of it. Once in a while, though, one gets enough, at least <strong class="t-en">E<sub>g</sub> = 1.12 eV</strong> in silicon, to break out of its bond.</p>
+          <p>Above 0 K the atoms in the crystal <strong>vibrate</strong>, and the vibrations get stronger as temperature rises. This vibration energy is shared out at random. Usually a bonded electron gets only a little of it. Once in a while, though, one gets enough, at least <strong class="t-en"><span class="m" data-tex="E_{g}">E<sub>g</sub></span> = 1.12 eV</strong> in silicon, to break out of its bond.</p>
           <p>When that happens, <strong>two carriers appear at once</strong>:</p>
           <ul>
             <li>a <span class="t-e">free electron</span>, which can now wander through the whole crystal, and</li>
@@ -316,7 +316,7 @@
         <aside class="keypoints" aria-label="Key points: thermal generation">
           <h3>Key points</h3>
           <ul>
-            <li>Heat breaks a bond if an electron gains at least E<sub>g</sub> (1.12 eV for Si).</li>
+            <li>Heat breaks a bond if an electron gains at least <span class="m" data-tex="E_{g}">E<sub>g</sub></span> (1.12 eV for Si).</li>
             <li>Each break makes a <strong>pair</strong>: one free electron + one hole. So <strong>n = p</strong>.</li>
             <li>Band view: electron jumps from VB to CB, leaving an empty VB state (the hole).</li>
             <li>Higher T → many more pairs (exponential, <span class="m" data-tex="e^{-E_g/2kT}">exp(−E<sub>g</sub>/2kT)</span>).</li>
@@ -358,7 +358,7 @@
             <li>A hole is a <strong>missing electron in a bond</strong>, not a separate particle.</li>
             <li>A neighbouring bonded electron fills it, so the hole moves <strong>opposite</strong> to the electron's jump.</li>
             <li>A hole acts as a <strong>+q</strong> carrier and drifts <strong>along E</strong>.</li>
-            <li>Two carriers: electrons (CB) and holes (VB); holes are slower (μ<sub>p</sub> ≈ μ<sub>n</sub>/3 in Si).</li>
+            <li>Two carriers: electrons (CB) and holes (VB); holes are slower (<span class="m" data-tex="\mu_{p}">μ<sub>p</sub></span> ≈ <span class="m" data-tex="\mu_{n}">μ<sub>n</sub></span>/3 in Si).</li>
           </ul>
         </aside>
       </section>
@@ -368,13 +368,13 @@
       <section id="s4" aria-labelledby="h4s">
         <h2 id="h4s">Recombination and equilibrium</h2>
         <div class="prose">
-          <p>Generation has an opposite. When a free electron meets a hole, it can drop back into the empty bond. The bond is whole again and <strong>both carriers vanish</strong>. This is <strong>recombination</strong>. The energy released is about E<sub>g</sub>. In silicon it comes out mostly as <strong>heat</strong> (lattice vibrations), not as light.</p>
+          <p>Generation has an opposite. When a free electron meets a hole, it can drop back into the empty bond. The bond is whole again and <strong>both carriers vanish</strong>. This is <strong>recombination</strong>. The energy released is about <span class="m" data-tex="E_{g}">E<sub>g</sub></span>. In silicon it comes out mostly as <strong>heat</strong> (lattice vibrations), not as light.</p>
           <p>The two processes depend on different things:</p>
           <ul>
             <li><strong>Generation</strong> depends only on temperature. Heat breaks bonds at a steady rate, whether there are many carriers or none.</li>
             <li><strong>Recombination</strong> needs an electron to find a hole, so it happens more often when both are plentiful. Its rate grows with n × p.</li>
           </ul>
-          <p>Start from zero carriers. At first there is nothing to recombine, so n rises. As n and p grow, recombination speeds up until it matches generation. From then on, as many pairs are destroyed each second as are created, and n stays <strong>constant on average</strong>. This balance is <strong>thermal equilibrium</strong>, and the value n settles at is n<sub>i</sub>.</p>
+          <p>Start from zero carriers. At first there is nothing to recombine, so n rises. As n and p grow, recombination speeds up until it matches generation. From then on, as many pairs are destroyed each second as are created, and n stays <strong>constant on average</strong>. This balance is <strong>thermal equilibrium</strong>, and the value n settles at is <span class="m" data-tex="n_{i}">n<sub>i</sub></span>.</p>
           <p>Raise the temperature and generation increases, so the balance settles at a higher n. Lower it and n settles lower.</p>
           <p>Each carrier survives only a short time between being generated and recombining. This average time is its <strong>lifetime</strong>, τ. In the animation τ is a few seconds; in real silicon it ranges from nanoseconds to milliseconds, depending on purity.</p>
         </div>
@@ -407,9 +407,9 @@
         <aside class="keypoints" aria-label="Key points: recombination">
           <h3>Key points</h3>
           <ul>
-            <li>Recombination: an electron fills a hole and <strong>both disappear</strong>; energy ≈ E<sub>g</sub> is released (mostly heat in Si).</li>
+            <li>Recombination: an electron fills a hole and <strong>both disappear</strong>; energy ≈ <span class="m" data-tex="E_{g}">E<sub>g</sub></span> is released (mostly heat in Si).</li>
             <li>Generation depends on T only; recombination grows with n·p.</li>
-            <li><strong>Thermal equilibrium:</strong> generation rate = recombination rate, so n = p = n<sub>i</sub> stays constant.</li>
+            <li><strong>Thermal equilibrium:</strong> generation rate = recombination rate, so n = p = <span class="m" data-tex="n_{i}">n<sub>i</sub></span> stays constant.</li>
             <li>Average time a carrier survives = <strong>lifetime τ</strong>.</li>
           </ul>
         </aside>
@@ -429,8 +429,8 @@
           <span class="eq" data-tex="\text{total current} = \text{electron current} + \text{hole current}">total current = electron current + hole current</span>
           <p>How well the bar conducts is measured by its <strong>conductivity</strong>:</p>
           <span class="eq" data-tex="\sigma_i = q\, n_i\, (\mu_n + \mu_p)">σ<sub>i</sub> = q · n<sub>i</sub> · (μ<sub>n</sub> + μ<sub>p</sub>)</span>
-          <p>μ<sub>n</sub> and μ<sub>p</sub> are the <strong>mobilities</strong>: how fast each carrier drifts per unit field. In Si at 300 K, μ<sub>n</sub> ≈ 1350 and μ<sub>p</sub> ≈ 480 cm²/V·s, so electrons carry about 74% of the current. Mobility is covered in topic 1.7.</p>
-          <p>Putting in numbers, the resistivity <span class="m" data-tex="\rho_i = 1/\sigma_i">ρ<sub>i</sub> = 1/σ<sub>i</sub></span> of intrinsic silicon at 300 K is about <strong>3.4 × 10³ Ω·m</strong> with n<sub>i</sub> = 1 × 10¹⁰ cm⁻³. Many textbooks give <strong>2.3 × 10³ Ω·m</strong> because they use n<sub>i</sub> = 1.5 × 10¹⁰. Either way it is about 10¹¹ times higher than copper (1.7 × 10⁻⁸ Ω·m), simply because there are so few carriers.</p>
+          <p><span class="m" data-tex="\mu_{n}">μ<sub>n</sub></span> and <span class="m" data-tex="\mu_{p}">μ<sub>p</sub></span> are the <strong>mobilities</strong>: how fast each carrier drifts per unit field. In Si at 300 K, <span class="m" data-tex="\mu_{n}">μ<sub>n</sub></span> ≈ 1350 and <span class="m" data-tex="\mu_{p}">μ<sub>p</sub></span> ≈ 480 cm²/V·s, so electrons carry about 74% of the current. Mobility is covered in topic 1.7.</p>
+          <p>Putting in numbers, the resistivity <span class="m" data-tex="\rho_i = 1/\sigma_i">ρ<sub>i</sub> = 1/σ<sub>i</sub></span> of intrinsic silicon at 300 K is about <strong>3.4 × 10³ Ω·m</strong> with <span class="m" data-tex="n_{i}">n<sub>i</sub></span> = 1 × 10¹⁰ cm⁻³. Many textbooks give <strong>2.3 × 10³ Ω·m</strong> because they use <span class="m" data-tex="n_{i}">n<sub>i</sub></span> = 1.5 × 10¹⁰. Either way it is about 10¹¹ times higher than copper (1.7 × 10⁻⁸ Ω·m), simply because there are so few carriers.</p>
         </div>
 
         <figure class="anim" id="anim5">
@@ -454,8 +454,8 @@
           <h3>Key points</h3>
           <ul>
             <li>Electrons drift against E (towards +); holes drift along E (towards −).</li>
-            <li>Both currents point <strong>along E</strong> and add: I = I<sub>n</sub> + I<sub>p</sub>.</li>
-            <li><strong>σ<sub>i</sub> = q·n<sub>i</sub>·(μ<sub>n</sub> + μ<sub>p</sub>)</strong>; Si at 300 K: ρ<sub>i</sub> ≈ 3.4 × 10³ Ω·m (2.3 × 10³ with n<sub>i</sub> = 1.5 × 10¹⁰).</li>
+            <li>Both currents point <strong>along E</strong> and add: I = <span class="m" data-tex="I_{n}">I<sub>n</sub></span> + <span class="m" data-tex="I_{p}">I<sub>p</sub></span>.</li>
+            <li><strong><span class="m" data-tex="\sigma_{i}">σ<sub>i</sub></span> = q·<span class="m" data-tex="n_{i}">n<sub>i</sub></span>·(<span class="m" data-tex="\mu_{n}">μ<sub>n</sub></span> + <span class="m" data-tex="\mu_{p}">μ<sub>p</sub></span>)</strong>; Si at 300 K: <span class="m" data-tex="\rho_{i}">ρ<sub>i</sub></span> ≈ 3.4 × 10³ Ω·m (2.3 × 10³ with <span class="m" data-tex="n_{i}">n<sub>i</sub></span> = 1.5 × 10¹⁰).</li>
           </ul>
         </aside>
       </section>
@@ -465,17 +465,17 @@
       <section id="s6" aria-labelledby="h6s">
         <h2 id="h6s">Intrinsic carrier concentration and temperature</h2>
         <div class="prose">
-          <p>The <strong>intrinsic carrier concentration n<sub>i</sub></strong> is the number of free electrons per cm³ in a pure semiconductor at equilibrium. Since n = p, it is also the number of holes per cm³. It is given by:</p>
+          <p>The <strong>intrinsic carrier concentration <span class="m" data-tex="n_{i}">n<sub>i</sub></span></strong> is the number of free electrons per cm³ in a pure semiconductor at equilibrium. Since n = p, it is also the number of holes per cm³. It is given by:</p>
           <span class="eq" data-tex="n_i^2 = N_c N_v\, e^{-E_g/kT} \quad\Longleftrightarrow\quad n_i = \sqrt{N_c N_v}\; e^{-E_g/2kT}">n<sub>i</sub>² = N<sub>c</sub> · N<sub>v</sub> · exp(−E<sub>g</sub>/kT) &nbsp;⇔&nbsp; n<sub>i</sub> = √(N<sub>c</sub>N<sub>v</sub>) · exp(−E<sub>g</sub>/2kT)</span>
           <ul>
-            <li><strong>N<sub>c</sub></strong> and <strong>N<sub>v</sub></strong> are the effective densities of states of the conduction and valence bands: roughly, how many places per cm³ are available for electrons and holes near the band edges. Both grow as T<sup>3/2</sup>.</li>
+            <li><strong><span class="m" data-tex="N_{c}">N<sub>c</sub></span></strong> and <strong><span class="m" data-tex="N_{v}">N<sub>v</sub></span></strong> are the effective densities of states of the conduction and valence bands: roughly, how many places per cm³ are available for electrons and holes near the band edges. Both grow as T<sup>3/2</sup>.</li>
             <li><strong>k</strong> = 8.617 × 10⁻⁵ eV/K is Boltzmann's constant; <strong>kT = 0.0259 eV at 300 K</strong>.</li>
           </ul>
-          <p><strong>Values at 300 K:</strong> Si n<sub>i</sub> ≈ 1 × 10¹⁰ cm⁻³ (many older textbooks use 1.5 × 10¹⁰), Ge ≈ 2.4 × 10¹³ cm⁻³, GaAs ≈ 2 × 10⁶ cm⁻³.</p>
+          <p><strong>Values at 300 K:</strong> Si <span class="m" data-tex="n_{i}">n<sub>i</sub></span> ≈ 1 × 10¹⁰ cm⁻³ (many older textbooks use 1.5 × 10¹⁰), Ge ≈ 2.4 × 10¹³ cm⁻³, GaAs ≈ 2 × 10⁶ cm⁻³.</p>
           <p>Compare that with the number of atoms. Silicon has about 5 × 10²² atoms per cm³, so at room temperature only about <strong>1 atom in 5 × 10¹²</strong> gives up an electron.</p>
-          <p>Two things control n<sub>i</sub>, both through the exponential. <strong>Band gap:</strong> Ge's smaller gap (0.66 eV) gives over 1000 times more carriers than Si, and GaAs's larger gap (1.42 eV) gives far fewer. <strong>Temperature:</strong> in Si, n<sub>i</sub> roughly doubles for every 9 K rise near room temperature, and grows about 100 000 times between 300 K and 600 K.</p>
+          <p>Two things control <span class="m" data-tex="n_{i}">n<sub>i</sub></span>, both through the exponential. <strong>Band gap:</strong> Ge's smaller gap (0.66 eV) gives over 1000 times more carriers than Si, and GaAs's larger gap (1.42 eV) gives far fewer. <strong>Temperature:</strong> in Si, <span class="m" data-tex="n_{i}">n<sub>i</sub></span> roughly doubles for every 9 K rise near room temperature, and grows about 100 000 times between 300 K and 600 K.</p>
           <p>This is the problem with intrinsic silicon. It has too few carriers to make useful devices, and the number swings wildly with temperature. The solution is to add a tiny, controlled amount of impurity: <strong>doping</strong> (topic 1.4).</p>
-          <p>Drag across the plot (or use the slider) to read n<sub>i</sub> and the intrinsic resistivity at any temperature.</p>
+          <p>Drag across the plot (or use the slider) to read <span class="m" data-tex="n_{i}">n<sub>i</sub></span> and the intrinsic resistivity at any temperature.</p>
         </div>
 
         <figure class="anim" id="anim6">
@@ -490,7 +490,7 @@
           <canvas id="plot6" class="narrow" style="aspect-ratio:400/300" role="img" aria-label="Log-scale plot of intrinsic carrier concentration from 1 to 10 to the 18 per cubic centimetre against temperature from 200 to 700 K for germanium, silicon and gallium arsenide. Germanium is highest and gallium arsenide lowest. A dashed line marks 300 K and a draggable marker reads values at any temperature."></canvas>
           <div class="table-box inner">
             <table class="vt">
-              <thead><tr><th scope="col">At <span id="t6T">300 K</span></th><th scope="col">n<sub>i</sub> (cm⁻³)</th><th scope="col">ρ<sub>i</sub> (Ω·m)</th></tr></thead>
+              <thead><tr><th scope="col">At <span id="t6T">300 K</span></th><th scope="col"><span class="m" data-tex="n_{i}">n<sub>i</sub></span> (cm⁻³)</th><th scope="col"><span class="m" data-tex="\rho_{i}">ρ<sub>i</sub></span> (Ω·m)</th></tr></thead>
               <tbody>
                 <tr><td style="color:#4dd0e1">Ge</td><td class="n" id="ni6Ge">–</td><td class="n" id="rho6Ge">–</td></tr>
                 <tr><td style="color:#b39ddb">Si</td><td class="n" id="ni6Si">–</td><td class="n" id="rho6Si">–</td></tr>
@@ -498,16 +498,16 @@
               </tbody>
             </table>
           </div>
-          <p class="exag">Curves use <span class="m" data-tex="n_i = \sqrt{N_c N_v}\, e^{-E_g/2kT}">n<sub>i</sub> = √(N<sub>c</sub>N<sub>v</sub>)·exp(−E<sub>g</sub>/2kT)</span> with N<sub>c</sub>, N<sub>v</sub> ∝ T<sup>3/2</sup> and E<sub>g</sub> held at its 300 K value. Each is multiplied by a constant so that 300 K gives the values above (Si ×1.50, Ge ×1.06, GaAs ×0.93). Resistivity uses 300 K mobilities at every temperature.</p>
+          <p class="exag">Curves use <span class="m" data-tex="n_i = \sqrt{N_c N_v}\, e^{-E_g/2kT}">n<sub>i</sub> = √(N<sub>c</sub>N<sub>v</sub>)·exp(−E<sub>g</sub>/2kT)</span> with <span class="m" data-tex="N_{c}">N<sub>c</sub></span>, <span class="m" data-tex="N_{v}">N<sub>v</sub></span> ∝ T<sup>3/2</sup> and <span class="m" data-tex="E_{g}">E<sub>g</sub></span> held at its 300 K value. Each is multiplied by a constant so that 300 K gives the values above (Si ×1.50, Ge ×1.06, GaAs ×0.93). Resistivity uses 300 K mobilities at every temperature.</p>
         </figure>
 
         <aside class="keypoints" aria-label="Key points: intrinsic carrier concentration">
           <h3>Key points</h3>
           <ul>
-            <li><strong><span class="m" data-tex="n_i^2 = N_c N_v\, e^{-E_g/kT}">n<sub>i</sub>² = N<sub>c</sub>N<sub>v</sub>·exp(−E<sub>g</sub>/kT)</span></strong>, with N<sub>c</sub>, N<sub>v</sub> ∝ T<sup>3/2</sup>.</li>
+            <li><strong><span class="m" data-tex="n_i^2 = N_c N_v\, e^{-E_g/kT}">n<sub>i</sub>² = N<sub>c</sub>N<sub>v</sub>·exp(−E<sub>g</sub>/kT)</span></strong>, with <span class="m" data-tex="N_{c}">N<sub>c</sub></span>, <span class="m" data-tex="N_{v}">N<sub>v</sub></span> ∝ T<sup>3/2</sup>.</li>
             <li>At 300 K: Si ≈ 1 × 10¹⁰, Ge ≈ 2.4 × 10¹³, GaAs ≈ 2 × 10⁶ cm⁻³.</li>
             <li>Only 1 Si atom in about 5 × 10¹² gives a free electron at 300 K.</li>
-            <li>Smaller E<sub>g</sub> or higher T → far more carriers. Intrinsic Si is impractical, so we dope it.</li>
+            <li>Smaller <span class="m" data-tex="E_{g}">E<sub>g</sub></span> or higher T → far more carriers. Intrinsic Si is impractical, so we dope it.</li>
           </ul>
         </aside>
       </section>
@@ -518,7 +518,7 @@
         <h2 id="h7s">Summary</h2>
         <div class="table-box">
           <table class="vt">
-            <thead><tr><th scope="col">Material</th><th scope="col">E<sub>g</sub> (eV)</th><th scope="col">n<sub>i</sub> (cm⁻³)</th><th scope="col">ρ<sub>i</sub> approx.</th></tr></thead>
+            <thead><tr><th scope="col">Material</th><th scope="col"><span class="m" data-tex="E_{g}">E<sub>g</sub></span> (eV)</th><th scope="col"><span class="m" data-tex="n_{i}">n<sub>i</sub></span> (cm⁻³)</th><th scope="col"><span class="m" data-tex="\rho_{i}">ρ<sub>i</sub></span> approx.</th></tr></thead>
             <tbody>
               <tr><td>Ge<br><span class="dim">germanium</span></td><td class="n">0.66</td><td class="n">2.4&nbsp;×&nbsp;10¹³</td><td class="n">0.45&nbsp;Ω·m</td></tr>
               <tr><td>Si<br><span class="dim">silicon</span></td><td class="n">1.12</td><td class="n">1&nbsp;×&nbsp;10¹⁰<br><span class="dim">older: 1.5&nbsp;×&nbsp;10¹⁰</span></td><td class="n">3.4&nbsp;×&nbsp;10³&nbsp;Ω·m<br><span class="dim">older: 2.3&nbsp;×&nbsp;10³</span></td></tr>
@@ -526,11 +526,11 @@
             </tbody>
           </table>
         </div>
-        <p class="src">Values at 300 K. Resistivity from <span class="m" data-tex="\rho_i = \frac{1}{q\, n_i (\mu_n + \mu_p)}">ρ<sub>i</sub> = 1/[q·n<sub>i</sub>·(μ<sub>n</sub> + μ<sub>p</sub>)]</span> with μ<sub>n</sub>, μ<sub>p</sub> in cm²/V·s: Ge 3900, 1900; Si 1350, 480; GaAs 8500, 400.</p>
+        <p class="src">Values at 300 K. Resistivity from <span class="m" data-tex="\rho_i = \frac{1}{q\, n_i (\mu_n + \mu_p)}">ρ<sub>i</sub> = 1/[q·n<sub>i</sub>·(μ<sub>n</sub> + μ<sub>p</sub>)]</span> with <span class="m" data-tex="\mu_{n}">μ<sub>n</sub></span>, <span class="m" data-tex="\mu_{p}">μ<sub>p</sub></span> in cm²/V·s: Ge 3900, 1900; Si 1350, 480; GaAs 8500, 400.</p>
 
         <div class="formulas">
           <div class="fcard"><div class="f" data-tex="n = p = n_i">n = p = n<sub>i</sub></div><p>Pure crystal: carriers are made and destroyed in pairs.</p></div>
-          <div class="fcard"><div class="f" data-tex="n_i^2 = N_c N_v\, e^{-E_g/kT}">n<sub>i</sub>² = N<sub>c</sub>·N<sub>v</sub>·exp(−E<sub>g</sub>/kT)</div><p>N<sub>c</sub>, N<sub>v</sub> ∝ T<sup>3/2</sup>. Si: N<sub>c</sub> = 2.8 × 10¹⁹, N<sub>v</sub> = 1.04 × 10¹⁹ cm⁻³.</p></div>
+          <div class="fcard"><div class="f" data-tex="n_i^2 = N_c N_v\, e^{-E_g/kT}">n<sub>i</sub>² = N<sub>c</sub>·N<sub>v</sub>·exp(−E<sub>g</sub>/kT)</div><p><span class="m" data-tex="N_{c}">N<sub>c</sub></span>, <span class="m" data-tex="N_{v}">N<sub>v</sub></span> ∝ T<sup>3/2</sup>. Si: <span class="m" data-tex="N_{c}">N<sub>c</sub></span> = 2.8 × 10¹⁹, <span class="m" data-tex="N_{v}">N<sub>v</sub></span> = 1.04 × 10¹⁹ cm⁻³.</p></div>
           <div class="fcard"><div class="f" data-tex="\sigma_i = q\, n_i\, (\mu_n + \mu_p)">σ<sub>i</sub> = q·n<sub>i</sub>·(μ<sub>n</sub> + μ<sub>p</sub>)</div><p>Intrinsic conductivity; <span class="m" data-tex="\rho_i = 1/\sigma_i">ρ<sub>i</sub> = 1/σ<sub>i</sub></span>.</p></div>
           <div class="fcard"><div class="f" data-tex="kT = 0.0259\ \text{eV}\ \ \text{at } 300\ \text{K}">kT = 0.0259 eV at 300 K</div><p>k = 8.617 × 10⁻⁵ eV/K.</p></div>
           <div class="fcard"><div class="f" data-tex="q = 1.602 \times 10^{-19}\ \text{C}">q = 1.602 × 10⁻¹⁹ C</div><p>Electron charge magnitude; a hole carries +q.</p></div>
@@ -1445,14 +1445,15 @@
 })();
 </script>
 <script>
-  // Typeset every [data-tex] element as maths once KaTeX has loaded.
-  document.addEventListener('DOMContentLoaded', function () {
+  // Typeset [data-tex] elements as maths once KaTeX has loaded; pages call mathify(el) after changing text.
+  window.mathify = function (root) {
     if (!window.katex) return;
-    document.querySelectorAll('[data-tex]').forEach(function (el) {
+    (root || document).querySelectorAll('[data-tex]').forEach(function (el) {
       var block = (el.classList.contains('eq') || el.classList.contains('f')) && el.tagName !== 'TD';
       try { katex.render(el.getAttribute('data-tex'), el, { displayMode: block, throwOnError: false }); } catch (e) {}
     });
-  });
+  };
+  document.addEventListener('DOMContentLoaded', function () { window.mathify(); });
 </script>
 </body>
 </html>

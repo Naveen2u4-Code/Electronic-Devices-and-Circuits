@@ -8,6 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
   <style>
     :root {
       --bg: #0f1420;
@@ -169,6 +171,14 @@
     .pager small { display: block; color: var(--muted); font-size: 0.75rem; }
     .pager .next { text-align: right; }
     .pager .disabled { opacity: .55; }
+
+    /* Maths (KaTeX). The plain-text version inside each element stays as a fallback. */
+    .eq[data-tex], .f[data-tex] { font-family: var(--font); }
+    .eq .katex-display, .f .katex-display { margin: 0; text-align: left; overflow-x: auto; overflow-y: hidden; padding: 4px 0; }
+    .eq .katex-display > .katex, .f .katex-display > .katex { text-align: left; }
+    .eq .katex, .f .katex { font-size: 1.15em; }
+    td.f .katex { font-size: 1.05em; }
+    .m .katex { font-size: 1.06em; }
   </style>
 </head>
 <body>
@@ -245,7 +255,7 @@
         <div class="prose">
           <p>An <strong>insulator</strong> is a material that does not allow electric current to flow under normal conditions. Common examples are glass (mostly SiO<sub>2</sub>), rubber, plastic, mica, porcelain, dry wood and diamond.</p>
           <p><strong>Why?</strong> In an insulator every valence electron is locked in a strong chemical bond, either <em>covalent</em> (shared between two atoms) or <em>ionic</em> (handed from one atom to another). There are practically no free electrons, so there is nothing to carry a current.</p>
-          <p><strong>The energy view.</strong> Freeing an electron from its bond costs a minimum energy called the <strong class="t-en">band gap</strong>, E<sub>g</sub>. In an insulator this gap is large, more than about 4–5 eV: SiO<sub>2</sub> ≈ 9 eV and diamond ≈ 5.5 eV (300 K). The typical thermal energy at room temperature is only kT ≈ 0.026 eV, hundreds of times too small, so heat cannot free the electrons. The resistivity is enormous: about 10<sup>10</sup> to 10<sup>16</sup> Ω·m.</p>
+          <p><strong>The energy view.</strong> Freeing an electron from its bond costs a minimum energy called the <strong class="t-en">band gap</strong>, <span class="m" data-tex="E_{g}">E<sub>g</sub></span>. In an insulator this gap is large, more than about 4–5 eV: SiO<sub>2</sub> ≈ 9 eV and diamond ≈ 5.5 eV (300 K). The typical thermal energy at room temperature is only kT ≈ 0.026 eV, hundreds of times too small, so heat cannot free the electrons. The resistivity is enormous: about 10<sup>10</sup> to 10<sup>16</sup> Ω·m.</p>
           <p><strong>Under a voltage</strong> the bound electrons are pulled slightly towards the positive side, so each atom becomes a little stretched. This is called <strong>polarisation</strong>. The charges shift a tiny distance but they do not flow. If the voltage is made extremely high, the electric field can rip electrons out of their bonds all at once. The insulator then fails suddenly, which is called <strong>dielectric breakdown</strong>, and it is usually permanently damaged.</p>
           <p><strong>Uses:</strong> insulators are as important as conductors. They cover wires, form printed circuit boards, and a very thin gate oxide (traditionally SiO<sub>2</sub>) sits inside every MOSFET in a chip.</p>
         </div>
@@ -394,7 +404,7 @@
               <tr><th scope="row">Free carriers at 300 K</th>
                 <td data-label="Insulator">Practically none</td>
                 <td data-label="Metal">~10<sup>28</sup>–10<sup>29</sup> m<sup>−3</sup> (Cu 8.5 × 10<sup>28</sup>)</td>
-                <td data-label="Semiconductor">Few: Si n<sub>i</sub> ≈ 1.5 × 10<sup>16</sup> m<sup>−3</sup> electrons, same number of holes</td></tr>
+                <td data-label="Semiconductor">Few: Si <span class="m" data-tex="n_{i}">n<sub>i</sub></span> ≈ 1.5 × 10<sup>16</sup> m<sup>−3</sup> electrons, same number of holes</td></tr>
               <tr><th scope="row">Band gap (300 K)</th>
                 <td data-label="Insulator">Large, &gt; ~4–5 eV (SiO<sub>2</sub> ≈ 9, diamond ≈ 5.5)</td>
                 <td data-label="Metal">None (bands overlap or are partly filled)</td>
@@ -1382,6 +1392,17 @@
   renderAll();
   requestAnimationFrame(frame);
 })();
+</script>
+<script>
+  // Typeset [data-tex] elements as maths once KaTeX has loaded; pages call mathify(el) after changing text.
+  window.mathify = function (root) {
+    if (!window.katex) return;
+    (root || document).querySelectorAll('[data-tex]').forEach(function (el) {
+      var block = (el.classList.contains('eq') || el.classList.contains('f')) && el.tagName !== 'TD';
+      try { katex.render(el.getAttribute('data-tex'), el, { displayMode: block, throwOnError: false }); } catch (e) {}
+    });
+  };
+  document.addEventListener('DOMContentLoaded', function () { window.mathify(); });
 </script>
 </body>
 </html>
