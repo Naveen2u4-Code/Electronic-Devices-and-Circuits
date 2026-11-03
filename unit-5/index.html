@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>
+    // Slugs of topics that have been built.
+    // Add a slug here once unit-5/<slug>/index.html exists.
+    const builtTopics = [
+      "5-1-bjt-structure"
+    ];
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Unit 5: Bipolar Junction Transistor (BJT)</title>
+  <meta name="description" content="Unit 5: Bipolar Junction Transistor (BJT).">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1420;
+      --panel: #1a2132;
+      --panel-hover: #212a3f;
+      --border: #2a3448;
+      --text: #e6e9ef;
+      --muted: #9aa4b8;
+      --electron: #4fc3f7;
+      --hole: #ff8a65;
+      --energy: #ffd54f;
+      --success: #81c784;
+      --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+      --max: 960px;
+      --radius: 12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    a { color: var(--electron); }
+    code, .mono { font-family: var(--mono); }
+    .wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 16px; }
+
+
+    main { flex: 1; padding: 24px 0 48px; }
+    .crumbs { font-size: 0.875rem; color: var(--muted); margin: 0 0 16px; }
+    .crumbs a { color: var(--muted); }
+    .crumbs a:hover { color: var(--electron); }
+    .eyebrow { font-family: var(--mono); font-size: 0.8rem; color: var(--electron); letter-spacing: .04em; margin: 0; }
+    h1 { font-size: clamp(1.5rem, 6vw, 2.2rem); line-height: 1.2; margin: 4px 0 12px; }
+    .intro { color: var(--muted); margin: 0 0 28px; }
+
+    .topics { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+    .topic {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      color: var(--text);
+      text-decoration: none;
+      transition: background .15s, border-color .15s;
+    }
+    a.topic:hover, a.topic:focus-visible { background: var(--panel-hover); border-color: var(--electron); }
+    a.topic:focus-visible { outline: 2px solid var(--electron); outline-offset: 2px; }
+    .topic .num { font-family: var(--mono); color: var(--electron); font-size: 0.9rem; min-width: 2.2em; flex-shrink: 0; }
+    .topic .title { flex: 1; min-width: 0; font-weight: 500; overflow-wrap: anywhere; }
+    .badge { flex-shrink: 0; font-size: 0.75rem; font-weight: 600; padding: 3px 10px; border-radius: 999px; white-space: nowrap; }
+    .badge.ready { color: var(--bg); background: var(--success); }
+    .badge.soon { color: var(--muted); border: 1px solid var(--border); }
+    .topic.disabled { opacity: .6; }
+    .topic.disabled .num { color: var(--muted); }
+
+    .back { display: inline-block; margin-top: 28px; }
+
+    /* Justified paragraphs on desktop; phones stay left-aligned to avoid wide word gaps. */
+    @media (min-width: 768px) {
+      .prose p, .prose li, .intro, .keypoints li, .exag { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+    }
+  </style>
+</head>
+<body>
+
+  <main>
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Home</a> / Unit 5</nav>
+      <p class="eyebrow">UNIT 05</p>
+      <h1>Bipolar Junction Transistor (BJT)</h1>
+      <p class="intro">
+        Two PN junctions back to back, and suddenly a small current controls a large one.
+        This unit covers how a BJT is built, how carriers flow inside it, its three
+        configurations and regions of operation, and its use as a switch and an amplifier.
+      </p>
+
+      <ol class="topics" id="topic-list"></ol>
+      <noscript><p class="intro">Enable JavaScript to see the topic list.</p></noscript>
+
+      <a class="back" href="../index.html">← All units</a>
+    </div>
+  </main>
+
+  <script>
+    const topics = [
+      { num: "5.1",  title: "BJT structure: NPN vs PNP",                        slug: "5-1-bjt-structure" },
+      { num: "5.2",  title: "How a transistor works (carrier flow inside)",     slug: "5-2-transistor-action" },
+      { num: "5.3",  title: "Current components and the α, β relationship",     slug: "5-3-current-components-alpha-beta" },
+      { num: "5.4",  title: "Common base configuration and characteristics",    slug: "5-4-common-base" },
+      { num: "5.5",  title: "Common emitter configuration and characteristics", slug: "5-5-common-emitter" },
+      { num: "5.6",  title: "Common collector configuration",                   slug: "5-6-common-collector" },
+      { num: "5.7",  title: "Regions of operation: cutoff, active, saturation", slug: "5-7-regions-of-operation" },
+      { num: "5.8",  title: "Transistor as a switch",                           slug: "5-8-transistor-as-switch" },
+      { num: "5.9",  title: "Transistor as an amplifier",                       slug: "5-9-transistor-as-amplifier" },
+      { num: "5.10", title: "Early effect (base-width modulation)",             slug: "5-10-early-effect" },
+      { num: "5.11", title: "Punch-through and breakdown",                      slug: "5-11-punch-through-and-breakdown" }
+    ];
+
+    const list = document.getElementById("topic-list");
+    topics.forEach(function (t) {
+      const built = builtTopics.indexOf(t.slug) !== -1;
+      const li = document.createElement("li");
+      const row = document.createElement(built ? "a" : "div");
+      row.className = "topic" + (built ? "" : " disabled");
+      if (built) row.href = t.slug + "/index.html";
+      else row.setAttribute("aria-disabled", "true");
+      row.innerHTML =
+        '<span class="num"></span><span class="title"></span>' +
+        '<span class="badge ' + (built ? 'ready">Watch' : 'soon">Coming soon') + '</span>';
+      row.querySelector(".num").textContent = t.num;
+      row.querySelector(".title").textContent = t.title;
+      li.appendChild(row);
+      list.appendChild(li);
+    });
+  </script>
+</body>
+</html>
