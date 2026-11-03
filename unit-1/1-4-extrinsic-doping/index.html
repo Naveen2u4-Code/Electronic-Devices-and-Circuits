@@ -8,6 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
   <style>
     :root {
       --bg: #0f1420;
@@ -170,6 +172,14 @@
     .pager small { display: block; color: var(--muted); font-size: 0.75rem; }
     .pager .next { text-align: right; }
 
+
+    /* Maths (KaTeX). The plain-text version inside each element stays as a fallback. */
+    .eq[data-tex], .f[data-tex] { font-family: var(--font); }
+    .eq .katex-display, .f .katex-display { margin: 0; text-align: left; overflow-x: auto; overflow-y: hidden; padding: 4px 0; }
+    .eq .katex-display > .katex, .f .katex-display > .katex { text-align: left; }
+    .eq .katex, .f .katex { font-size: 1.15em; }
+    td.f .katex { font-size: 1.05em; }
+    .m .katex { font-size: 1.06em; }
   </style>
 </head>
 <body>
@@ -421,7 +431,7 @@
           <p>The hole concentration does not stay at the intrinsic value n<sub>i</sub>. Because there are now so many electrons, holes meet electrons and recombine much more often, and the hole concentration falls. In equilibrium, <strong>n × p = n<sub>i</sub>²</strong> (the <strong>mass action law</strong>, topic 1.8), so <strong>p = n<sub>i</sub>² / N<sub>D</sub></strong>.</p>
           <p>Example, silicon at 300 K with n<sub>i</sub> = 1 × 10¹⁰ cm⁻³ and N<sub>D</sub> = 1 × 10¹⁶ cm⁻³: n ≈ 1 × 10¹⁶ cm⁻³ and p = (10¹⁰)² / 10¹⁶ = 1 × 10⁴ cm⁻³. Electrons outnumber holes by a factor of <strong>10¹²</strong>.</p>
           <p>For P-type silicon with acceptor concentration N<sub>A</sub>: <strong>p ≈ N<sub>A</sub></strong> and <strong>n = n<sub>i</sub>² / N<sub>A</sub></strong>.</p>
-          <p>Since majority carriers dominate, conductivity is approximately <strong>σ ≈ q·N<sub>D</sub>·μ<sub>n</sub></strong> for N-type and <strong>σ ≈ q·N<sub>A</sub>·μ<sub>p</sub></strong> for P-type. For the example above (μ<sub>n</sub> ≈ 1350 cm²/V·s), σ ≈ 2.2 S/cm and the resistivity ρ ≈ 0.46 Ω·cm, roughly 500,000 times lower than pure silicon.</p>
+          <p>Since majority carriers dominate, conductivity is approximately <strong><span class="m" data-tex="\sigma \approx q N_D \mu_n">σ ≈ q·N<sub>D</sub>·μ<sub>n</sub></span></strong> for N-type and <strong><span class="m" data-tex="\sigma \approx q N_A \mu_p">σ ≈ q·N<sub>A</sub>·μ<sub>p</sub></span></strong> for P-type. For the example above (μ<sub>n</sub> ≈ 1350 cm²/V·s), σ ≈ 2.2 S/cm and the resistivity ρ ≈ 0.46 Ω·cm, roughly 500,000 times lower than pure silicon.</p>
         </div>
 
         <figure class="anim" id="anim5">
@@ -453,7 +463,7 @@
             <li>N-type: n ≈ N<sub>D</sub>, p = n<sub>i</sub>²/N<sub>D</sub>. P-type: p ≈ N<sub>A</sub>, n = n<sub>i</sub>²/N<sub>A</sub>.</li>
             <li>n × p = n<sub>i</sub>² = 10²⁰ cm⁻⁶ for Si at 300 K, whatever the doping.</li>
             <li>More majority carriers means fewer minority carriers.</li>
-            <li>σ ≈ q·N<sub>D</sub>·μ<sub>n</sub> or q·N<sub>A</sub>·μ<sub>p</sub>; N<sub>D</sub> = 10¹⁶ cm⁻³ gives ρ ≈ 0.46 Ω·cm.</li>
+            <li><span class="m" data-tex="\sigma \approx q N_D \mu_n \text{ or } q N_A \mu_p">σ ≈ q·N<sub>D</sub>·μ<sub>n</sub> or q·N<sub>A</sub>·μ<sub>p</sub></span>; N<sub>D</sub> = 10¹⁶ cm⁻³ gives ρ ≈ 0.46 Ω·cm.</li>
           </ul>
         </aside>
       </section>
@@ -464,7 +474,7 @@
         <h2 id="h6s">Charge neutrality and compensation</h2>
         <div class="prose">
           <p>Doping does not give the crystal a net charge. Every donor atom is neutral before it gives up its electron; afterwards, the free electron and the positive ion together still add up to zero. The same is true for each acceptor and its hole. This gives the <strong>charge neutrality equation</strong> (all dopants ionised):</p>
-          <span class="eq">n + N<sub>A</sub> = p + N<sub>D</sub></span>
+          <span class="eq" data-tex="n + N_A = p + N_D">n + N<sub>A</sub> = p + N<sub>D</sub></span>
           <p>If a crystal contains both donors and acceptors, the electrons released by donors fill the vacancies at acceptor atoms first, and the two partly cancel. This is called <strong>compensation</strong>. Only the difference produces free carriers:</p>
           <ul>
             <li>If N<sub>D</sub> &gt; N<sub>A</sub>, the material is <strong>N-type</strong> with <strong>n ≈ N<sub>D</sub> − N<sub>A</sub></strong>.</li>
@@ -575,10 +585,10 @@
 
         <h3 class="sumhead">Key formulas</h3>
         <div class="formulas">
-          <div class="fcard"><div class="f">n ≈ N<sub>D</sub>,&nbsp; p = n<sub>i</sub>²/N<sub>D</sub></div><p>N-type, all donors ionised.</p></div>
-          <div class="fcard"><div class="f">p ≈ N<sub>A</sub>,&nbsp; n = n<sub>i</sub>²/N<sub>A</sub></div><p>P-type, all acceptors ionised.</p></div>
-          <div class="fcard"><div class="f">n + N<sub>A</sub> = p + N<sub>D</sub></div><p>Charge neutrality.</p></div>
-          <div class="fcard"><div class="f">σ ≈ q·N<sub>D</sub>·μ<sub>n</sub> &nbsp;(N-type)<br>σ ≈ q·N<sub>A</sub>·μ<sub>p</sub> &nbsp;(P-type)</div><p>Conductivity from the majority carriers; ρ = 1/σ.</p></div>
+          <div class="fcard"><div class="f" data-tex="n \approx N_D, \qquad p = \dfrac{n_i^2}{N_D}">n ≈ N<sub>D</sub>,&nbsp; p = n<sub>i</sub>²/N<sub>D</sub></div><p>N-type, all donors ionised.</p></div>
+          <div class="fcard"><div class="f" data-tex="p \approx N_A, \qquad n = \dfrac{n_i^2}{N_A}">p ≈ N<sub>A</sub>,&nbsp; n = n<sub>i</sub>²/N<sub>A</sub></div><p>P-type, all acceptors ionised.</p></div>
+          <div class="fcard"><div class="f" data-tex="n + N_A = p + N_D">n + N<sub>A</sub> = p + N<sub>D</sub></div><p>Charge neutrality.</p></div>
+          <div class="fcard"><div class="f" data-tex="\begin{aligned} \sigma &amp;\approx q N_D \mu_n &amp;&amp; \text{(N-type)} \\ \sigma &amp;\approx q N_A \mu_p &amp;&amp; \text{(P-type)} \end{aligned}">σ ≈ q·N<sub>D</sub>·μ<sub>n</sub> &nbsp;(N-type)<br>σ ≈ q·N<sub>A</sub>·μ<sub>p</sub> &nbsp;(P-type)</div><p>Conductivity from the majority carriers; ρ = 1/σ.</p></div>
         </div>
       </section>
 
@@ -1498,6 +1508,16 @@
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(onResize);
   requestAnimationFrame(frame);
 })();
+</script>
+<script>
+  // Typeset every [data-tex] element as maths once KaTeX has loaded.
+  document.addEventListener('DOMContentLoaded', function () {
+    if (!window.katex) return;
+    document.querySelectorAll('[data-tex]').forEach(function (el) {
+      var block = (el.classList.contains('eq') || el.classList.contains('f')) && el.tagName !== 'TD';
+      try { katex.render(el.getAttribute('data-tex'), el, { displayMode: block, throwOnError: false }); } catch (e) {}
+    });
+  });
 </script>
 </body>
 </html>

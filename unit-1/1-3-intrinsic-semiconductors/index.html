@@ -8,6 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
   <style>
     :root {
       --bg: #0f1420;
@@ -165,6 +167,14 @@
     .pager small { display: block; color: var(--muted); font-size: 0.75rem; }
     .pager .next { text-align: right; }
 
+
+    /* Maths (KaTeX). The plain-text version inside each element stays as a fallback. */
+    .eq[data-tex], .f[data-tex] { font-family: var(--font); }
+    .eq .katex-display, .f .katex-display { margin: 0; text-align: left; overflow-x: auto; overflow-y: hidden; padding: 4px 0; }
+    .eq .katex-display > .katex, .f .katex-display > .katex { text-align: left; }
+    .eq .katex, .f .katex { font-size: 1.15em; }
+    td.f .katex { font-size: 1.05em; }
+    .m .katex { font-size: 1.06em; }
   </style>
 </head>
 <body>
@@ -273,7 +283,7 @@
           <p>This event is called <strong>electron-hole pair (EHP) generation</strong>. Because heat causes it, we call it <strong>thermal generation</strong>.</p>
           <p>The band diagram from topic 1.2 tells the same story in terms of energy. A bonded electron is an electron in the <strong>valence band</strong>. Breaking the bond means the electron jumps up across the gap into the <strong>conduction band</strong>. The empty state it leaves in the valence band is the hole. The lattice and the band diagram are two views of one event, which is why they flash together in the animation.</p>
           <p>Every generation event makes exactly one electron and one hole, so the counts always match. In an intrinsic semiconductor <strong>n = p</strong>, where n is the free electron concentration and p the hole concentration (both per cm³).</p>
-          <p>Temperature matters a lot. The number of pairs present follows <strong>exp(−E<sub>g</sub>/2kT)</strong>, where k is Boltzmann's constant. Because this is an exponential, a small rise in temperature breaks many more bonds. Slide to 0 K and generation stops completely.</p>
+          <p>Temperature matters a lot. The number of pairs present follows <strong><span class="m" data-tex="e^{-E_g/2kT}">exp(−E<sub>g</sub>/2kT)</span></strong>, where k is Boltzmann's constant. Because this is an exponential, a small rise in temperature breaks many more bonds. Slide to 0 K and generation stops completely.</p>
         </div>
 
         <figure class="anim" id="anim2">
@@ -300,7 +310,7 @@
             <div class="ctr p">holes p<b id="p2">0</b></div>
             <div class="ctr ok">check<b id="eq2">n=p ✓</b></div>
           </div>
-          <p class="exag"><b>Rate exaggerated for visibility:</b> the number of pairs on screen follows the shape of exp(−E<sub>g</sub>/2kT), squeezed so 600 K shows about 4× more than 300 K. In real Si it is about 10⁵× more, and at 300 K only about 1 bond in 10¹³ is broken.</p>
+          <p class="exag"><b>Rate exaggerated for visibility:</b> the number of pairs on screen follows the shape of <span class="m" data-tex="e^{-E_g/2kT}">exp(−E<sub>g</sub>/2kT)</span>, squeezed so 600 K shows about 4× more than 300 K. In real Si it is about 10⁵× more, and at 300 K only about 1 bond in 10¹³ is broken.</p>
         </figure>
 
         <aside class="keypoints" aria-label="Key points: thermal generation">
@@ -309,7 +319,7 @@
             <li>Heat breaks a bond if an electron gains at least E<sub>g</sub> (1.12 eV for Si).</li>
             <li>Each break makes a <strong>pair</strong>: one free electron + one hole. So <strong>n = p</strong>.</li>
             <li>Band view: electron jumps from VB to CB, leaving an empty VB state (the hole).</li>
-            <li>Higher T → many more pairs (exponential, exp(−E<sub>g</sub>/2kT)).</li>
+            <li>Higher T → many more pairs (exponential, <span class="m" data-tex="e^{-E_g/2kT}">exp(−E<sub>g</sub>/2kT)</span>).</li>
           </ul>
         </aside>
       </section>
@@ -416,11 +426,11 @@
             <li><span class="t-h">Holes</span> (charge +q) are pushed <strong>along</strong> the field, so they drift towards the <strong>−</strong> contact.</li>
           </ul>
           <p>They move in opposite directions, but their charges are also opposite. Negative charge moving left is the same current as positive charge moving right. So <strong>both currents point the same way, along E</strong>, and they add:</p>
-          <span class="eq">total current = electron current + hole current</span>
+          <span class="eq" data-tex="\text{total current} = \text{electron current} + \text{hole current}">total current = electron current + hole current</span>
           <p>How well the bar conducts is measured by its <strong>conductivity</strong>:</p>
-          <span class="eq">σ<sub>i</sub> = q · n<sub>i</sub> · (μ<sub>n</sub> + μ<sub>p</sub>)</span>
+          <span class="eq" data-tex="\sigma_i = q\, n_i\, (\mu_n + \mu_p)">σ<sub>i</sub> = q · n<sub>i</sub> · (μ<sub>n</sub> + μ<sub>p</sub>)</span>
           <p>μ<sub>n</sub> and μ<sub>p</sub> are the <strong>mobilities</strong>: how fast each carrier drifts per unit field. In Si at 300 K, μ<sub>n</sub> ≈ 1350 and μ<sub>p</sub> ≈ 480 cm²/V·s, so electrons carry about 74% of the current. Mobility is covered in topic 1.7.</p>
-          <p>Putting in numbers, the resistivity ρ<sub>i</sub> = 1/σ<sub>i</sub> of intrinsic silicon at 300 K is about <strong>3.4 × 10³ Ω·m</strong> with n<sub>i</sub> = 1 × 10¹⁰ cm⁻³. Many textbooks give <strong>2.3 × 10³ Ω·m</strong> because they use n<sub>i</sub> = 1.5 × 10¹⁰. Either way it is about 10¹¹ times higher than copper (1.7 × 10⁻⁸ Ω·m), simply because there are so few carriers.</p>
+          <p>Putting in numbers, the resistivity <span class="m" data-tex="\rho_i = 1/\sigma_i">ρ<sub>i</sub> = 1/σ<sub>i</sub></span> of intrinsic silicon at 300 K is about <strong>3.4 × 10³ Ω·m</strong> with n<sub>i</sub> = 1 × 10¹⁰ cm⁻³. Many textbooks give <strong>2.3 × 10³ Ω·m</strong> because they use n<sub>i</sub> = 1.5 × 10¹⁰. Either way it is about 10¹¹ times higher than copper (1.7 × 10⁻⁸ Ω·m), simply because there are so few carriers.</p>
         </div>
 
         <figure class="anim" id="anim5">
@@ -456,7 +466,7 @@
         <h2 id="h6s">Intrinsic carrier concentration and temperature</h2>
         <div class="prose">
           <p>The <strong>intrinsic carrier concentration n<sub>i</sub></strong> is the number of free electrons per cm³ in a pure semiconductor at equilibrium. Since n = p, it is also the number of holes per cm³. It is given by:</p>
-          <span class="eq">n<sub>i</sub>² = N<sub>c</sub> · N<sub>v</sub> · exp(−E<sub>g</sub>/kT) &nbsp;⇔&nbsp; n<sub>i</sub> = √(N<sub>c</sub>N<sub>v</sub>) · exp(−E<sub>g</sub>/2kT)</span>
+          <span class="eq" data-tex="n_i^2 = N_c N_v\, e^{-E_g/kT} \quad\Longleftrightarrow\quad n_i = \sqrt{N_c N_v}\; e^{-E_g/2kT}">n<sub>i</sub>² = N<sub>c</sub> · N<sub>v</sub> · exp(−E<sub>g</sub>/kT) &nbsp;⇔&nbsp; n<sub>i</sub> = √(N<sub>c</sub>N<sub>v</sub>) · exp(−E<sub>g</sub>/2kT)</span>
           <ul>
             <li><strong>N<sub>c</sub></strong> and <strong>N<sub>v</sub></strong> are the effective densities of states of the conduction and valence bands: roughly, how many places per cm³ are available for electrons and holes near the band edges. Both grow as T<sup>3/2</sup>.</li>
             <li><strong>k</strong> = 8.617 × 10⁻⁵ eV/K is Boltzmann's constant; <strong>kT = 0.0259 eV at 300 K</strong>.</li>
@@ -488,13 +498,13 @@
               </tbody>
             </table>
           </div>
-          <p class="exag">Curves use n<sub>i</sub> = √(N<sub>c</sub>N<sub>v</sub>)·exp(−E<sub>g</sub>/2kT) with N<sub>c</sub>, N<sub>v</sub> ∝ T<sup>3/2</sup> and E<sub>g</sub> held at its 300 K value. Each is multiplied by a constant so that 300 K gives the values above (Si ×1.50, Ge ×1.06, GaAs ×0.93). Resistivity uses 300 K mobilities at every temperature.</p>
+          <p class="exag">Curves use <span class="m" data-tex="n_i = \sqrt{N_c N_v}\, e^{-E_g/2kT}">n<sub>i</sub> = √(N<sub>c</sub>N<sub>v</sub>)·exp(−E<sub>g</sub>/2kT)</span> with N<sub>c</sub>, N<sub>v</sub> ∝ T<sup>3/2</sup> and E<sub>g</sub> held at its 300 K value. Each is multiplied by a constant so that 300 K gives the values above (Si ×1.50, Ge ×1.06, GaAs ×0.93). Resistivity uses 300 K mobilities at every temperature.</p>
         </figure>
 
         <aside class="keypoints" aria-label="Key points: intrinsic carrier concentration">
           <h3>Key points</h3>
           <ul>
-            <li><strong>n<sub>i</sub>² = N<sub>c</sub>N<sub>v</sub>·exp(−E<sub>g</sub>/kT)</strong>, with N<sub>c</sub>, N<sub>v</sub> ∝ T<sup>3/2</sup>.</li>
+            <li><strong><span class="m" data-tex="n_i^2 = N_c N_v\, e^{-E_g/kT}">n<sub>i</sub>² = N<sub>c</sub>N<sub>v</sub>·exp(−E<sub>g</sub>/kT)</span></strong>, with N<sub>c</sub>, N<sub>v</sub> ∝ T<sup>3/2</sup>.</li>
             <li>At 300 K: Si ≈ 1 × 10¹⁰, Ge ≈ 2.4 × 10¹³, GaAs ≈ 2 × 10⁶ cm⁻³.</li>
             <li>Only 1 Si atom in about 5 × 10¹² gives a free electron at 300 K.</li>
             <li>Smaller E<sub>g</sub> or higher T → far more carriers. Intrinsic Si is impractical, so we dope it.</li>
@@ -516,14 +526,14 @@
             </tbody>
           </table>
         </div>
-        <p class="src">Values at 300 K. Resistivity from ρ<sub>i</sub> = 1/[q·n<sub>i</sub>·(μ<sub>n</sub> + μ<sub>p</sub>)] with μ<sub>n</sub>, μ<sub>p</sub> in cm²/V·s: Ge 3900, 1900; Si 1350, 480; GaAs 8500, 400.</p>
+        <p class="src">Values at 300 K. Resistivity from <span class="m" data-tex="\rho_i = \frac{1}{q\, n_i (\mu_n + \mu_p)}">ρ<sub>i</sub> = 1/[q·n<sub>i</sub>·(μ<sub>n</sub> + μ<sub>p</sub>)]</span> with μ<sub>n</sub>, μ<sub>p</sub> in cm²/V·s: Ge 3900, 1900; Si 1350, 480; GaAs 8500, 400.</p>
 
         <div class="formulas">
-          <div class="fcard"><div class="f">n = p = n<sub>i</sub></div><p>Pure crystal: carriers are made and destroyed in pairs.</p></div>
-          <div class="fcard"><div class="f">n<sub>i</sub>² = N<sub>c</sub>·N<sub>v</sub>·exp(−E<sub>g</sub>/kT)</div><p>N<sub>c</sub>, N<sub>v</sub> ∝ T<sup>3/2</sup>. Si: N<sub>c</sub> = 2.8 × 10¹⁹, N<sub>v</sub> = 1.04 × 10¹⁹ cm⁻³.</p></div>
-          <div class="fcard"><div class="f">σ<sub>i</sub> = q·n<sub>i</sub>·(μ<sub>n</sub> + μ<sub>p</sub>)</div><p>Intrinsic conductivity; ρ<sub>i</sub> = 1/σ<sub>i</sub>.</p></div>
-          <div class="fcard"><div class="f">kT = 0.0259 eV at 300 K</div><p>k = 8.617 × 10⁻⁵ eV/K.</p></div>
-          <div class="fcard"><div class="f">q = 1.602 × 10⁻¹⁹ C</div><p>Electron charge magnitude; a hole carries +q.</p></div>
+          <div class="fcard"><div class="f" data-tex="n = p = n_i">n = p = n<sub>i</sub></div><p>Pure crystal: carriers are made and destroyed in pairs.</p></div>
+          <div class="fcard"><div class="f" data-tex="n_i^2 = N_c N_v\, e^{-E_g/kT}">n<sub>i</sub>² = N<sub>c</sub>·N<sub>v</sub>·exp(−E<sub>g</sub>/kT)</div><p>N<sub>c</sub>, N<sub>v</sub> ∝ T<sup>3/2</sup>. Si: N<sub>c</sub> = 2.8 × 10¹⁹, N<sub>v</sub> = 1.04 × 10¹⁹ cm⁻³.</p></div>
+          <div class="fcard"><div class="f" data-tex="\sigma_i = q\, n_i\, (\mu_n + \mu_p)">σ<sub>i</sub> = q·n<sub>i</sub>·(μ<sub>n</sub> + μ<sub>p</sub>)</div><p>Intrinsic conductivity; <span class="m" data-tex="\rho_i = 1/\sigma_i">ρ<sub>i</sub> = 1/σ<sub>i</sub></span>.</p></div>
+          <div class="fcard"><div class="f" data-tex="kT = 0.0259\ \text{eV}\ \ \text{at } 300\ \text{K}">kT = 0.0259 eV at 300 K</div><p>k = 8.617 × 10⁻⁵ eV/K.</p></div>
+          <div class="fcard"><div class="f" data-tex="q = 1.602 \times 10^{-19}\ \text{C}">q = 1.602 × 10⁻¹⁹ C</div><p>Electron charge magnitude; a hole carries +q.</p></div>
         </div>
 
         <p class="bridge">Pure silicon has too few carriers. Next: doping.</p>
@@ -1433,6 +1443,16 @@
   onResize();
   requestAnimationFrame(frame);
 })();
+</script>
+<script>
+  // Typeset every [data-tex] element as maths once KaTeX has loaded.
+  document.addEventListener('DOMContentLoaded', function () {
+    if (!window.katex) return;
+    document.querySelectorAll('[data-tex]').forEach(function (el) {
+      var block = (el.classList.contains('eq') || el.classList.contains('f')) && el.tagName !== 'TD';
+      try { katex.render(el.getAttribute('data-tex'), el, { displayMode: block, throwOnError: false }); } catch (e) {}
+    });
+  });
 </script>
 </body>
 </html>

@@ -8,6 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
   <style>
     :root {
       --bg: #0f1420;
@@ -180,6 +182,14 @@
     .pager small { display: block; color: var(--muted); font-size: 0.75rem; }
     .pager .next { text-align: right; }
 
+
+    /* Maths (KaTeX). The plain-text version inside each element stays as a fallback. */
+    .eq[data-tex], .f[data-tex] { font-family: var(--font); }
+    .eq .katex-display, .f .katex-display { margin: 0; text-align: left; overflow-x: auto; overflow-y: hidden; padding: 4px 0; }
+    .eq .katex-display > .katex, .f .katex-display > .katex { text-align: left; }
+    .eq .katex, .f .katex { font-size: 1.15em; }
+    td.f .katex { font-size: 1.05em; }
+    .m .katex { font-size: 1.06em; }
   </style>
 </head>
 <body>
@@ -412,7 +422,7 @@
             <figure><canvas id="cv4s" style="aspect-ratio:220/330" role="img" aria-label="Semiconductor: small gap, heat creates electron-hole pairs."></canvas><figcaption><b>Semiconductor</b><span id="m4Name">Si</span> · free electrons: <span class="cnt" id="c4s">0</span></figcaption></figure>
             <figure><canvas id="cv4m" style="aspect-ratio:220/330" role="img" aria-label="Metal: bands overlap, many free electrons at any temperature."></canvas><figcaption><b>Metal</b>copper · free electrons: <span class="cnt">always many</span></figcaption></figure>
           </div>
-          <p class="readout" aria-live="polite">Relative jump rate ∝ e<sup>−Eg/2kT</sup>: semiconductor <b id="r4s">×1.0</b>, insulator <b id="r4i">×0</b> (vs Si at 300 K)</p>
+          <p class="readout" aria-live="polite">Relative jump rate ∝ <span class="m" data-tex="e^{-E_g/2kT}">e<sup>−Eg/2kT</sup></span>: semiconductor <b id="r4s">×1.0</b>, insulator <b id="r4i">×0</b> (vs Si at 300 K)</p>
           <p class="exag"><b>Rate exaggerated for visibility.</b> Si at 300 K is shown as about one jump per second; the others scale by the real factor above, capped so the screen does not flood. Gaps are drawn to the same scale (24 px per eV) in all three panels; the gap shrinks slightly as temperature rises.</p>
         </figure>
 
@@ -433,7 +443,7 @@
         <h2 id="h5s">How electrons cross the gap</h2>
         <div class="prose">
           <p>An electron needs at least E<sub>g</sub> of energy to cross from the VB to the CB. There are two main ways to get it.</p>
-          <p><strong>Thermal excitation.</strong> The atoms of a crystal are always vibrating, and these lattice vibrations pass energy to electrons. The chance that an electron gets enough energy to cross falls very steeply as the gap gets bigger, roughly like <strong>e<sup>−Eg/2kT</sup></strong>. At 300 K, 2kT ≈ 0.052 eV, so making E<sub>g</sub> bigger by just 0.1 eV divides the rate by about e<sup>2</sup> ≈ 7. That is why Ge, Si and GaAs behave so differently even though their gaps look similar.</p>
+          <p><strong>Thermal excitation.</strong> The atoms of a crystal are always vibrating, and these lattice vibrations pass energy to electrons. The chance that an electron gets enough energy to cross falls very steeply as the gap gets bigger, roughly like <strong><span class="m" data-tex="e^{-E_g/2kT}">e<sup>−Eg/2kT</sup></span></strong>. At 300 K, 2kT ≈ 0.052 eV, so making E<sub>g</sub> bigger by just 0.1 eV divides the rate by about e<sup>2</sup> ≈ 7. That is why Ge, Si and GaAs behave so differently even though their gaps look similar.</p>
           <p><strong>Optical excitation.</strong> A photon carries energy <strong>E = hc/λ</strong>. In handy units, <strong>λ(nm) = 1240 / E(eV)</strong>. If E ≥ E<sub>g</sub>, the photon can be absorbed and lift an electron across, making an electron–hole pair. If E &lt; E<sub>g</sub>, the photon passes straight through. Silicon (E<sub>g</sub> = 1.12 eV) absorbs light with wavelength shorter than about <strong>1107 nm</strong>, which includes all visible light. Any extra energy above E<sub>g</sub> is quickly lost as heat while the electron settles to E<sub>c</sub>.</p>
           <p><strong>Recombination.</strong> A CB electron can fall back into a VB hole. Both carriers disappear and about E<sub>g</sub> of energy is released. In silicon and germanium this energy mainly becomes heat. In <strong>direct-gap</strong> materials like GaAs it often comes out as light, which is how LEDs work (topic 3.2).</p>
           <p><strong>Note:</strong> E<sub>g</sub> itself shrinks slightly as temperature rises. For silicon it is about 1.17 eV at 0 K and 1.12 eV at 300 K. The animation includes this change.</p>
@@ -470,13 +480,13 @@
           <canvas id="cv5" class="narrow" style="aspect-ratio:440/386" role="img" aria-label="Band diagram of the chosen material, energy axis to scale in eV. Photons arrive from the left; electrons (blue) cross to the conduction band leaving holes (orange); recombination releases heat or, in GaAs, light."></canvas>
           <p class="readout" aria-live="polite">E<sub>g</sub>(<span id="t5b">300</span> K) = <b id="eg5">1.12 eV</b> · cut-off 1240/E<sub>g</sub> = <b id="lc5">1107 nm</b> · thermal rate <b id="r5">×1.0</b> vs Si at 300 K · free electrons <b id="n5">0</b></p>
           <p class="msg" id="pMsg" aria-live="polite">Choose a wavelength and press <strong>Fire photon</strong>.</p>
-          <p class="exag"><b>Rate exaggerated for visibility.</b> Thermal jumps scale by the real factor e<sup>−Eg/2kT</sup> (Si at 300 K ≈ 1 per second on screen, capped at 12 per second). Carrier lifetime is shortened to a few seconds. Energy axis is to scale.</p>
+          <p class="exag"><b>Rate exaggerated for visibility.</b> Thermal jumps scale by the real factor <span class="m" data-tex="e^{-E_g/2kT}">e<sup>−Eg/2kT</sup></span> (Si at 300 K ≈ 1 per second on screen, capped at 12 per second). Carrier lifetime is shortened to a few seconds. Energy axis is to scale.</p>
         </figure>
 
         <aside class="keypoints" aria-label="Key points: crossing the gap">
           <h3>Key points</h3>
           <ul>
-            <li><strong>Thermal</strong>: rate ∝ e<sup>−Eg/2kT</sup>, so a slightly bigger gap means far fewer carriers.</li>
+            <li><strong>Thermal</strong>: rate ∝ <span class="m" data-tex="e^{-E_g/2kT}">e<sup>−Eg/2kT</sup></span>, so a slightly bigger gap means far fewer carriers.</li>
             <li><strong>Optical</strong>: absorbed only if E = hc/λ ≥ E<sub>g</sub>. λ(nm) = 1240/E(eV). Si absorbs λ &lt; ~1107 nm.</li>
             <li><strong>Recombination</strong> releases ≈ E<sub>g</sub>: mostly heat in Si/Ge, light in direct-gap GaAs (LEDs).</li>
             <li>E<sub>g</sub> falls slightly with temperature: Si ≈ 1.17 eV at 0 K, 1.12 eV at 300 K.</li>
@@ -504,12 +514,12 @@
         </div>
 
         <div class="formulas">
-          <div class="fcard"><div class="f">E<sub>g</sub> = E<sub>c</sub> − E<sub>v</sub></div><p>Band gap = bottom of CB minus top of VB.</p></div>
-          <div class="fcard"><div class="f">E = hc / λ</div><p>Photon energy; h = 6.626 × 10<sup>−34</sup> J·s, c = 2.998 × 10<sup>8</sup> m/s.</p></div>
-          <div class="fcard"><div class="f">λ (nm) = 1240 / E (eV)</div><p>Same formula in handy units (hc = 1239.8 eV·nm). Absorption needs λ ≤ 1240/E<sub>g</sub>.</p></div>
-          <div class="fcard"><div class="f">1 eV = 1.602 × 10<sup>−19</sup> J</div><p>Energy gained by one electron moving through 1 V.</p></div>
-          <div class="fcard"><div class="f">kT = 0.0259 eV at 300 K</div><p>k = 8.617 × 10<sup>−5</sup> eV/K. Thermal rate ∝ e<sup>−Eg/2kT</sup>.</p></div>
-          <div class="fcard"><div class="f">Si: E<sub>g</sub> = 1.12 eV, a = 5.43 Å</div><p>Values at 300 K. About 5 × 10<sup>22</sup> atoms/cm³; E<sub>g</sub> ≈ 1.17 eV at 0 K.</p></div>
+          <div class="fcard"><div class="f" data-tex="E_g = E_c - E_v">E<sub>g</sub> = E<sub>c</sub> − E<sub>v</sub></div><p>Band gap = bottom of CB minus top of VB.</p></div>
+          <div class="fcard"><div class="f" data-tex="E = \dfrac{hc}{\lambda}">E = hc / λ</div><p>Photon energy; h = 6.626 × 10<sup>−34</sup> J·s, c = 2.998 × 10<sup>8</sup> m/s.</p></div>
+          <div class="fcard"><div class="f" data-tex="\lambda\,(\text{nm}) = \dfrac{1240}{E\,(\text{eV})}">λ (nm) = 1240 / E (eV)</div><p>Same formula in handy units (hc = 1239.8 eV·nm). Absorption needs λ ≤ 1240/E<sub>g</sub>.</p></div>
+          <div class="fcard"><div class="f" data-tex="1\ \text{eV} = 1.602 \times 10^{-19}\ \text{J}">1 eV = 1.602 × 10<sup>−19</sup> J</div><p>Energy gained by one electron moving through 1 V.</p></div>
+          <div class="fcard"><div class="f" data-tex="kT = 0.0259\ \text{eV}\ \ \text{at } 300\ \text{K}">kT = 0.0259 eV at 300 K</div><p>k = 8.617 × 10<sup>−5</sup> eV/K. Thermal rate ∝ <span class="m" data-tex="e^{-E_g/2kT}">e<sup>−Eg/2kT</sup></span>.</p></div>
+          <div class="fcard"><div class="f" data-tex="\text{Si: }\ E_g = 1.12\ \text{eV},\quad a = 5.43\ \text{\AA}">Si: E<sub>g</sub> = 1.12 eV, a = 5.43 Å</div><p>Values at 300 K. About 5 × 10<sup>22</sup> atoms/cm³; E<sub>g</sub> ≈ 1.17 eV at 0 K.</p></div>
         </div>
       </section>
 
@@ -1536,6 +1546,16 @@
   onResize();
   requestAnimationFrame(frame);
 })();
+</script>
+<script>
+  // Typeset every [data-tex] element as maths once KaTeX has loaded.
+  document.addEventListener('DOMContentLoaded', function () {
+    if (!window.katex) return;
+    document.querySelectorAll('[data-tex]').forEach(function (el) {
+      var block = (el.classList.contains('eq') || el.classList.contains('f')) && el.tagName !== 'TD';
+      try { katex.render(el.getAttribute('data-tex'), el, { displayMode: block, throwOnError: false }); } catch (e) {}
+    });
+  });
 </script>
 </body>
 </html>
