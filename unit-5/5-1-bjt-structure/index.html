@@ -157,10 +157,8 @@
     .pager .next { text-align: right; }
     .site-foot { border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; text-align: center; padding: 18px 16px; }
 
-    /* Justified paragraphs on desktop; phones stay left-aligned to avoid wide word gaps. */
-    @media (min-width: 768px) {
-      .prose p, .prose li, .keypoints li, .exag { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
-    }
+    /* Justified paragraphs at every width; hyphenation keeps word gaps small on phones. */
+    .prose p, .prose li, .keypoints li, .exag { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
   </style>
 </head>
 <body>
