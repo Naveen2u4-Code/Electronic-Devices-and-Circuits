@@ -88,6 +88,10 @@
 
     .back { display: inline-block; margin-top: 28px; }
 
+    /* Justified paragraphs on desktop; phones stay left-aligned to avoid wide word gaps. */
+    @media (min-width: 768px) {
+      .prose p, .prose li, .intro, .keypoints li, .exag { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+    }
   </style>
 </head>
 <body>

@@ -168,6 +168,10 @@
     .m .katex { font-size: 1.12em; }
     td.f .katex { white-space: nowrap; }
     @media (max-width: 480px) { td.f .katex { font-size: 1em; } }
+    /* Justified paragraphs on desktop; phones stay left-aligned to avoid wide word gaps. */
+    @media (min-width: 768px) {
+      .prose p, .prose li, .intro, .keypoints li, .exag { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+    }
   </style>
 </head>
 <body>
