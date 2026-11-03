@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>5.3 Current Components, α and β</title>
+  <meta name="description" content="BJT current components and gains explained step by step: the three terminal currents, what each is made of, emitter injection efficiency and base transport factor, alpha and beta and how they are related, and the leakage currents ICBO and ICEO. An interactive lesson.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1420;
+      --panel: #1a2132;
+      --panel-hover: #212a3f;
+      --border: #2a3448;
+      --text: #e6e9ef;
+      --muted: #9aa4b8;
+      --electron: #4fc3f7;
+      --hole: #ff8a65;
+      --energy: #ffd54f;
+      --success: #81c784;
+      --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+      --max: 960px;
+      --radius: 12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: var(--font); font-size: 16px; line-height: 1.65;
+      overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column;
+    }
+    a { color: var(--electron); }
+    .wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 16px; }
+
+    /* Sticky mini-nav */
+    .toc {
+      position: sticky; top: 0; z-index: 10; background: rgba(15, 20, 32, .95);
+      border-bottom: 1px solid var(--border); backdrop-filter: blur(6px);
+    }
+    .toc ul { display: flex; gap: 4px; list-style: none; margin: 0 auto; padding: 8px 16px; max-width: var(--max); overflow-x: auto; scrollbar-width: none; }
+    .toc ul::-webkit-scrollbar { display: none; }
+    .toc a {
+      display: block; white-space: nowrap; text-decoration: none; color: var(--muted);
+      font-size: 0.85rem; font-weight: 500; padding: 6px 10px; border-radius: 999px;
+    }
+    .toc a:hover { color: var(--text); background: var(--panel); }
+    .toc a.active { color: var(--bg); background: var(--electron); }
+
+    main { flex: 1; padding: 24px 0 48px; }
+    .crumbs { font-size: 0.875rem; color: var(--muted); margin: 0 0 16px; }
+    .crumbs a { color: var(--muted); }
+    .crumbs a:hover { color: var(--electron); }
+    .eyebrow { font-family: var(--mono); font-size: 0.8rem; color: var(--electron); letter-spacing: .04em; margin: 0; }
+    h1 { font-size: clamp(1.5rem, 6vw, 2.2rem); line-height: 1.2; margin: 4px 0 6px; }
+    .subtitle { color: var(--muted); margin: 0 0 8px; }
+    section { scroll-margin-top: 64px; padding-top: 28px; }
+    h2 { font-size: clamp(1.3rem, 5vw, 1.6rem); line-height: 1.25; margin: 0 0 14px; }
+    h3 { font-size: 1.05rem; margin: 0 0 8px; }
+    .prose { font-size: 17px; line-height: 1.7; }
+    .prose p, .prose ul, .prose ol { margin: 0 0 14px; }
+    .prose ul, .prose ol { padding-left: 22px; }
+    .prose li { margin: 4px 0; }
+    .prose strong { color: #fff; }
+    .prose .note { border-left: 3px solid var(--energy); padding-left: 12px; }
+    .t-e { color: var(--electron); font-weight: 600; }
+    .t-h { color: var(--hole); font-weight: 600; }
+    hr.sep { border: 0; border-top: 1px solid var(--border); margin: 40px 0 0; }
+    .rm-note { font-size: 0.78rem; color: var(--muted); margin: 0 0 8px; }
+
+    /* Buttons & controls */
+    .btn {
+      font: inherit; font-size: 0.88rem; font-weight: 600; color: var(--text);
+      background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+      padding: 7px 12px; cursor: pointer; min-height: 38px;
+    }
+    .btn:hover:not(:disabled) { background: var(--panel-hover); border-color: var(--electron); }
+    .btn:focus-visible, input:focus-visible, canvas:focus-visible { outline: 2px solid var(--electron); outline-offset: 2px; }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
+    .btn[aria-pressed="true"] { background: rgba(255,213,79,.14); border-color: var(--energy); color: var(--energy); }
+    .seg { display: inline-flex; gap: 0; }
+    .seg .btn { border-radius: 0; }
+    .seg .btn:first-child { border-radius: 8px 0 0 8px; }
+    .seg .btn:last-child { border-radius: 0 8px 8px 0; }
+    .seg .btn + .btn { margin-left: -1px; }
+
+    figure.anim {
+      margin: 18px 0 0; background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 12px; min-width: 0;
+    }
+    .ctrls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-bottom: 12px; }
+    .slider { flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; }
+    .slider label { display: flex; justify-content: space-between; gap: 8px; font-size: 0.8rem; color: var(--muted); }
+    .slider output { font-family: var(--mono); color: var(--energy); white-space: nowrap; }
+    input[type="range"] { width: 100%; accent-color: var(--energy); margin: 4px 0 0; }
+    canvas { display: block; width: 100%; border-radius: 8px; background: #141b2b; }
+    .narrow { max-width: 480px; margin: 0 auto; }
+    .exag { font-size: 0.75rem; color: var(--muted); margin: 10px 0 0; }
+    .exag b { color: var(--energy); font-weight: 600; }
+
+    .counters { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px auto 0; }
+    .ctr {
+      flex: 1 1 90px; background: #141b2b; border: 1px solid var(--border); border-radius: 8px;
+      padding: 6px 10px; font-size: 0.78rem; color: var(--muted); min-width: 0;
+    }
+    .ctr b { display: block; font-family: var(--mono); font-size: 1.02rem; font-weight: 500; white-space: nowrap; color: var(--success); overflow: hidden; text-overflow: ellipsis; }
+
+    .legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 0.8rem; color: var(--muted); margin: 8px 0 0; padding: 0; list-style: none; }
+    .legend li { display: inline-flex; align-items: center; gap: 6px; }
+    .sw { display: inline-block; width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
+    .sw.e { background: var(--electron); }
+    .sw.h { border: 2px solid var(--hole); background: rgba(255,138,101,.2); }
+    .sq { display: inline-block; width: 14px; height: 11px; border-radius: 2px; flex-shrink: 0; }
+    .sq.n { background: #2e4a7d; } .sq.p { background: #7d3a3a; }
+    .sq.d { background: repeating-linear-gradient(135deg, #3a3f4f 0 3px, #6a7080 3px 4px); }
+    .ln { display: inline-block; width: 18px; height: 0; border-top: 3px solid var(--success); flex-shrink: 0; }
+
+    /* Section 1: diagram with info strip beside it (below it on phones) */
+    .withinfo { display: grid; grid-template-columns: 1fr; gap: 12px; align-items: start; }
+    @media (min-width: 720px) { .withinfo { grid-template-columns: 3fr 2fr; } }
+    .info { background: #141b2b; border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; min-width: 0; }
+    .info .info-h { margin: 0 0 8px; font-weight: 700; color: var(--energy); }
+    .info dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; font-size: 0.9rem; }
+    .info dt { color: var(--muted); }
+    .info dd { margin: 0; min-width: 0; }
+
+    /* Section 2 layout */
+    .duo { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    @media (min-width: 640px) { .duo { grid-template-columns: 1fr 1fr; } }
+
+    .keypoints {
+      margin-top: 16px; padding: 14px 16px; border-radius: var(--radius);
+      background: rgba(129,199,132,.07); border: 1px solid rgba(129,199,132,.35);
+    }
+    .keypoints h3 { color: var(--success); font-size: 0.95rem; text-transform: uppercase; letter-spacing: .05em; }
+    .keypoints ul { margin: 0; padding-left: 20px; }
+    .keypoints li { margin: 4px 0; }
+
+    .table-box { background: #141b2b; border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; margin-bottom: 12px; }
+    .vt { width: 100%; border-collapse: collapse; font-size: 0.9rem; table-layout: fixed; }
+    .vt th, .vt td { text-align: left; padding: 8px 6px; border-top: 1px solid var(--border); vertical-align: top; overflow-wrap: anywhere; }
+    .vt thead th, .vt thead td { border-top: 0; font-size: 1rem; }
+    .vt thead th.n { color: var(--electron); } .vt thead th.p { color: var(--hole); }
+    .vt tbody th { font-weight: 600; color: var(--muted); width: 32%; }
+    @media (max-width: 480px) { .vt { font-size: .8rem; } .vt th, .vt td { padding: 6px 4px; } }
+
+    .pager { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 48px; }
+    .pager a {
+      display: block; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 12px 14px; text-decoration: none; color: var(--text); min-width: 0;
+    }
+    .pager a:hover { border-color: var(--electron); }
+    .pager small { display: block; color: var(--muted); font-size: 0.75rem; }
+    .pager .next { text-align: right; }
+    .site-foot { border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; text-align: center; padding: 18px 16px; }
+
+    /* Justified paragraphs on desktop; phones stay left-aligned to avoid wide word gaps. */
+    @media (min-width: 768px) {
+      .prose p, .prose li, .intro, .keypoints li, .exag { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+    }
+      /* Topic 5.3 */
+    .ctr b { color: var(--text); }
+    .ctr.e b { color: var(--electron); } .ctr.h b { color: var(--hole); } .ctr.ok b { color: var(--success); } .ctr.l b { color: #ce93d8; }
+    .t-l { color: #ce93d8; font-weight: 600; } .t-r { color: #ef5350; font-weight: 600; }
+    .sw.r { border: 2px solid #ef5350; background: transparent; }
+    .sw.l { background: #ce93d8; }
+    .ln.l { border-top-color: #ce93d8; }
+    .eq { font-family: var(--mono); color: var(--energy); background: #141b2b; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; text-align: center !important; font-size: 16px; overflow-wrap: anywhere; }
+    .eqnote { font-family: var(--font); color: var(--muted); font-size: 0.85rem; }
+    .kcl { font-family: var(--mono); font-size: 0.9rem; color: var(--success); margin: 8px 0 0; text-align: center; overflow-wrap: anywhere; }
+    .toggles { display: flex; flex-wrap: wrap; gap: 6px; }
+    .sidecol { min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+    .vt.comp { font-size: 0.82rem; background: #141b2b; border: 1px solid var(--border); border-radius: 8px; }
+    .vt.comp th { width: auto; color: var(--text); }
+    .vt.comp td { font-family: var(--mono); color: var(--text); white-space: nowrap; }
+    .vt.comp tr:first-child th, .vt.comp tr:first-child td { border-top: 0; }
+    .ptitle { margin: 0 0 6px; font-size: 0.85rem; font-weight: 700; color: var(--muted); text-align: center; }
+    .conv { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 8px; }
+    @media (min-width: 640px) { .conv { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+    .conv label { display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem; font-weight: 600; color: var(--muted); min-width: 0; }
+    .conv input { font: inherit; font-family: var(--mono); font-size: 1rem; color: var(--text); background: #141b2b; border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; min-height: 40px; width: 100%; min-width: 0; }
+    .conv input:focus-visible { outline: 2px solid var(--electron); outline-offset: 1px; }
+    .conv input[readonly] { color: var(--success); border-style: dashed; }
+    .hint { font-size: 0.8rem; color: var(--muted); margin: 0 0 10px; }
+    .hint.bad { color: #ef5350; }
+    .formulas { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 16px; }
+    @media (min-width: 640px) { .formulas { grid-template-columns: 1fr 1fr; } }
+    .fcard { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; min-width: 0; }
+    .fcard .f { font-family: var(--mono); font-size: 1rem; color: var(--energy); overflow-wrap: anywhere; }
+    .fcard p { margin: 6px 0 0; font-size: 0.85rem; color: var(--muted); }
+</style>
+</head>
+<body>
+
+  <nav class="toc" aria-label="Sections">
+    <ul>
+      <li><a href="#s0">Terminal currents</a></li>
+      <li><a href="#s1">Current components</a></li>
+      <li><a href="#s2">Gain α</a></li>
+      <li><a href="#s3">Gain β</a></li>
+      <li><a href="#s4">Leakage</a></li>
+      <li><a href="#s5">Summary</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="wrap">
+      <header>
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="../../index.html">Home</a> / <a href="../index.html">Unit 5</a> / 5.3
+        </nav>
+        <p class="eyebrow">TOPIC 5.3</p>
+        <h1>Current Components and the α, β Relationship</h1>
+        <p class="subtitle">What each terminal current is made of, and the two current gains that describe a BJT</p>
+        <p class="rm-note" id="rmNote" hidden>Your device asks for reduced motion, so every animation starts paused. Press Play on any animation to run it. Sliders and buttons still update the picture.</p>
+      </header>
+
+      <!-- ================= SECTION 0 ================= -->
+      <section id="s0" aria-labelledby="h0">
+        <h2 id="h0">The three terminal currents</h2>
+        <div class="prose">
+          <p>A BJT has three terminal currents: the <strong>emitter current I<sub>E</sub></strong>, the <strong>base current I<sub>B</sub></strong> and the <strong>collector current I<sub>C</sub></strong>. For an NPN transistor in active mode, I<sub>B</sub> and I<sub>C</sub> flow <strong>into</strong> the transistor and I<sub>E</sub> flows <strong>out</strong> of it. For a PNP transistor all three directions are reversed.</p>
+          <p>Since charge cannot pile up inside the transistor, <strong>Kirchhoff’s current law</strong> always holds:</p>
+          <p class="eq">I<sub>E</sub> = I<sub>B</sub> + I<sub>C</sub></p>
+          <p>The emitter current is the largest, the collector current is slightly smaller, and the base current is very small. For example, I<sub>E</sub> = 1.01 mA, I<sub>C</sub> = 1.00 mA and I<sub>B</sub> = 0.01 mA.</p>
+        </div>
+
+        <figure class="anim" id="anim0">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="seg" role="group" aria-label="Transistor type">
+              <button class="btn" type="button" data-type="0" aria-pressed="true">NPN</button>
+              <button class="btn" type="button" data-type="1" aria-pressed="false">PNP</button>
+            </div>
+            <div class="slider">
+              <label for="ib0"><span>Base current I<sub>B</sub></span><output id="ib0o" for="ib0">10 µA</output></label>
+              <input type="range" id="ib0" min="0" max="50" step="1" value="10">
+            </div>
+          </div>
+          <canvas id="cv0" class="narrow" style="aspect-ratio:420/320" role="img" aria-label="Transistor symbol with green arrows for IB, IC and IE whose thickness follows their values. For NPN, IB and IC flow in and IE flows out; for PNP all three are reversed."></canvas>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr ok">I<sub>B</sub><b id="c0b">10 µA</b></div>
+            <div class="ctr ok">I<sub>C</sub><b id="c0c">1.00 mA</b></div>
+            <div class="ctr ok">I<sub>E</sub><b id="c0e">1.01 mA</b></div>
+          </div>
+          <p class="kcl" id="kcl0" aria-live="polite">I<sub>E</sub> = I<sub>B</sub> + I<sub>C</sub>: 1.01 mA = 0.01 mA + 1.00 mA</p>
+          <p class="exag"><b>Not to scale:</b> arrow widths are illustrative; here I<sub>C</sub> = 100 × I<sub>B</sub>.</p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: terminal currents">
+          <h3>Key points</h3>
+          <ul>
+            <li>Three terminal currents: I<sub>E</sub>, I<sub>B</sub>, I<sub>C</sub>.</li>
+            <li>NPN active mode: I<sub>B</sub> and I<sub>C</sub> flow in, I<sub>E</sub> flows out; PNP reverses all three.</li>
+            <li>Kirchhoff’s current law: I<sub>E</sub> = I<sub>B</sub> + I<sub>C</sub>.</li>
+            <li>I<sub>E</sub> is largest, I<sub>C</sub> slightly smaller, I<sub>B</sub> very small.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 1 ================= -->
+      <section id="s1" aria-labelledby="h1s">
+        <h2 id="h1s">What each current is made of</h2>
+        <div class="prose">
+          <p>Inside an NPN transistor in active mode, each terminal current is made of several components:</p>
+          <p><strong>Emitter current:</strong> I<sub>E</sub> = I<sub>En</sub> + I<sub>Ep</sub></p>
+          <ul>
+            <li><strong>I<sub>En</sub>:</strong> <span class="t-e">electrons</span> injected from the emitter into the base (the useful part, by far the largest).</li>
+            <li><strong>I<sub>Ep</sub>:</strong> <span class="t-h">holes</span> injected from the base into the emitter (wasted; small because the base is lightly doped).</li>
+          </ul>
+          <p><strong>Collector current:</strong> I<sub>C</sub> = I<sub>Cn</sub> + I<sub>CBO</sub></p>
+          <ul>
+            <li><strong>I<sub>Cn</sub>:</strong> the injected electrons that survive the trip across the base and are collected.</li>
+            <li><strong>I<sub>CBO</sub>:</strong> a small <span class="t-l">leakage current</span>. The collector-base junction is reverse biased, so like any reverse-biased diode it carries a small reverse saturation current made of thermally generated minority carriers. Its name means “<strong>c</strong>ollector-to-<strong>b</strong>ase current with the emitter <strong>O</strong>pen”.</li>
+          </ul>
+          <p><strong>Base current:</strong> I<sub>B</sub> = I<sub>Ep</sub> + I<sub>Br</sub> − I<sub>CBO</sub></p>
+          <ul>
+            <li><strong>I<sub>Ep</sub>:</strong> holes the base injects into the emitter.</li>
+            <li><strong>I<sub>Br</sub>:</strong> holes lost to <strong>recombination</strong> with electrons crossing the base.</li>
+            <li><strong>minus I<sub>CBO</sub>:</strong> the leakage flows in the opposite direction at the base terminal.</li>
+          </ul>
+          <p>Two efficiency factors describe the losses:</p>
+          <ul>
+            <li><strong>Emitter injection efficiency:</strong> γ = I<sub>En</sub> / I<sub>E</sub> (close to 1).</li>
+            <li><strong>Base transport factor:</strong> α<sub>T</sub> = I<sub>Cn</sub> / I<sub>En</sub> (close to 1).</li>
+          </ul>
+        </div>
+
+        <figure class="anim" id="anim1">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="toggles" role="group" aria-label="Show or hide current components">
+              <button class="btn" type="button" data-comp="IEn" aria-pressed="true">I<sub>En</sub></button>
+              <button class="btn" type="button" data-comp="IEp" aria-pressed="true">I<sub>Ep</sub></button>
+              <button class="btn" type="button" data-comp="IBr" aria-pressed="true">I<sub>Br</sub></button>
+              <button class="btn" type="button" data-comp="ICn" aria-pressed="true">I<sub>Cn</sub></button>
+              <button class="btn" type="button" data-comp="ICBO" aria-pressed="true">I<sub>CBO</sub></button>
+            </div>
+          </div>
+          <div class="ctrls">
+            <div class="slider">
+              <label for="g1"><span>γ</span><output id="g1o" for="g1">0.995</output></label>
+              <input type="range" id="g1" min="0.95" max="0.999" step="0.001" value="0.995">
+            </div>
+            <div class="slider">
+              <label for="a1"><span>α<sub>T</sub></span><output id="a1o" for="a1">0.995</output></label>
+              <input type="range" id="a1" min="0.95" max="0.999" step="0.001" value="0.995">
+            </div>
+          </div>
+          <div class="withinfo">
+            <canvas id="cv1a" style="aspect-ratio:600/300" role="img" aria-label="NPN block with separate streams: thick blue electron stream IEn from emitter into base, thin orange hole stream IEp from base into emitter, red recombination flashes IBr in the base, blue electrons ICn into the collector, and a small purple leakage stream ICBO across the collector-base junction."></canvas>
+            <div class="sidecol">
+              <canvas id="cv1b" style="aspect-ratio:360/280" role="img" aria-label="Stacked bars: IE split into IEn and IEp, IC split into ICn and ICBO, and IB, drawn ten times larger, split into IEp and IBr minus ICBO."></canvas>
+              <table class="vt comp" aria-live="polite">
+                <tbody>
+                  <tr><th scope="row"><span class="t-e">I<sub>En</sub></span></th><td id="v1En">1000 µA</td><th scope="row"><span class="t-h">I<sub>Ep</sub></span></th><td id="v1Ep">5.03 µA</td></tr>
+                  <tr><th scope="row"><span class="t-e">I<sub>Cn</sub></span></th><td id="v1Cn">995 µA</td><th scope="row"><span class="t-r">I<sub>Br</sub></span></th><td id="v1Br">5.00 µA</td></tr>
+                  <tr><th scope="row"><span class="t-l">I<sub>CBO</sub></span></th><td id="v1Co">0.01 µA</td><th scope="row">I<sub>E</sub></th><td id="v1E">1005 µA</td></tr>
+                  <tr><th scope="row">I<sub>C</sub></th><td id="v1C">995 µA</td><th scope="row">I<sub>B</sub></th><td id="v1B">10.0 µA</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <ul class="legend">
+            <li><span class="sw e"></span><span>electron</span></li>
+            <li><span class="sw h"></span><span>hole</span></li>
+            <li><span class="sw r"></span><span>recombination</span></li>
+            <li><span class="sw l"></span><span>leakage carriers</span></li>
+          </ul>
+          <p class="exag"><b>Not to scale:</b> the small streams (I<sub>Ep</sub>, recombination, I<sub>CBO</sub>) are drawn far more often than their true share so they can be seen. The bars are to scale (I<sub>B</sub> row zoomed ×10). Fixed example: I<sub>En</sub> = 1000 µA, I<sub>CBO</sub> = 0.01 µA; I<sub>Ep</sub> and I<sub>Br</sub> follow γ and α<sub>T</sub> (5 µA each at the start values).</p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: current components">
+          <h3>Key points</h3>
+          <ul>
+            <li>I<sub>E</sub> = I<sub>En</sub> + I<sub>Ep</sub>: injected electrons (useful) plus injected holes (wasted).</li>
+            <li>I<sub>C</sub> = I<sub>Cn</sub> + I<sub>CBO</sub>: collected electrons plus a small reverse leakage.</li>
+            <li>I<sub>B</sub> = I<sub>Ep</sub> + I<sub>Br</sub> − I<sub>CBO</sub>.</li>
+            <li>γ = I<sub>En</sub>/I<sub>E</sub> and α<sub>T</sub> = I<sub>Cn</sub>/I<sub>En</sub>, both close to 1.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 2 ================= -->
+      <section id="s2" aria-labelledby="h2s">
+        <h2 id="h2s">Common-base current gain, α</h2>
+        <div class="prose">
+          <p>The <strong>common-base current gain α</strong> (alpha) tells what fraction of the emitter current reaches the collector:</p>
+          <p class="eq">α = I<sub>C</sub> / I<sub>E</sub> <span class="eqnote">(ignoring the tiny leakage I<sub>CBO</sub>)</span></p>
+          <p>It is the product of the two efficiencies: <strong>α = γ × α<sub>T</sub></strong>.</p>
+          <p>Since some current is always lost, α is always <strong>less than 1</strong>. In practical transistors α is typically between 0.95 and 0.995.</p>
+          <p>Including leakage, the collector current is: <strong>I<sub>C</sub> = α·I<sub>E</sub> + I<sub>CBO</sub></strong>.</p>
+        </div>
+
+        <figure class="anim" id="anim2">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="slider">
+              <label for="g2"><span>γ</span><output id="g2o" for="g2">0.995</output></label>
+              <input type="range" id="g2" min="0.95" max="0.999" step="0.001" value="0.995">
+            </div>
+            <div class="slider">
+              <label for="a2"><span>α<sub>T</sub></span><output id="a2o" for="a2">0.995</output></label>
+              <input type="range" id="a2" min="0.95" max="0.999" step="0.001" value="0.995">
+            </div>
+          </div>
+          <canvas id="cv2" class="narrow" style="aspect-ratio:600/300;max-width:700px" role="img" aria-label="Current funnel: a wide IE stream enters from the left, a small part turns downward as IB and the rest leaves to the right as IC."></canvas>
+          <div class="counters narrow" style="max-width:700px" aria-live="polite">
+            <div class="ctr">α = γ × α<sub>T</sub><b id="c2a">0.9900</b></div>
+            <div class="ctr ok">I<sub>C</sub> (for I<sub>E</sub> = 1 mA)<b id="c2c">0.990 mA</b></div>
+            <div class="ctr ok">I<sub>B</sub><b id="c2b">10.0 µA</b></div>
+          </div>
+          <p class="exag"><b>Not to scale:</b> the I<sub>B</sub> branch is drawn 5 times wider than its true share. I<sub>CBO</sub> is ignored here.</p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: alpha">
+          <h3>Key points</h3>
+          <ul>
+            <li>α = I<sub>C</sub>/I<sub>E</sub>: the fraction of emitter current that reaches the collector.</li>
+            <li>α = γ × α<sub>T</sub>, always less than 1.</li>
+            <li>Typical α: 0.95 to 0.995.</li>
+            <li>With leakage: I<sub>C</sub> = α·I<sub>E</sub> + I<sub>CBO</sub>.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 3 ================= -->
+      <section id="s3" aria-labelledby="h3s">
+        <h2 id="h3s">Common-emitter current gain, β</h2>
+        <div class="prose">
+          <p>In most circuits the input current is the <strong>base</strong> current, so a more useful gain is the <strong>common-emitter current gain β</strong> (beta), also written <strong>h<sub>FE</sub></strong>:</p>
+          <p class="eq">β = I<sub>C</sub> / I<sub>B</sub></p>
+          <p>β is large, typically between 50 and 400 for small-signal transistors.</p>
+          <p>α and β are connected. Using I<sub>E</sub> = I<sub>B</sub> + I<sub>C</sub> and I<sub>C</sub> = α·I<sub>E</sub>:</p>
+          <p class="eq">β = α / (1 − α) &nbsp;&nbsp; and &nbsp;&nbsp; α = β / (1 + β)</p>
+          <p>Examples: α = 0.98 gives β = 49; α = 0.99 gives β = 99; α = 0.995 gives β = 199.</p>
+          <p>Notice that a tiny change in α near 1 causes a <strong>big change in β</strong>. That is why β varies widely between transistors of the same type, and why good circuits are designed not to depend on its exact value (Unit 6).</p>
+        </div>
+
+        <figure class="anim" id="anim3">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="slider">
+              <label for="a3"><span>α</span><output id="a3o" for="a3">0.990</output></label>
+              <input type="range" id="a3" min="0.9" max="0.999" step="0.001" value="0.99">
+            </div>
+          </div>
+          <div class="duo">
+            <canvas id="cv3a" style="aspect-ratio:420/320" role="img" aria-label="Plot of beta against alpha from 0.90 to 1. The curve stays low and then rises steeply near alpha equals 1. A dot follows the slider."></canvas>
+            <canvas id="cv3b" style="aspect-ratio:420/320" role="img" aria-label="NPN symbol with a fixed thin IB arrow of 10 microamps and an IC arrow whose thickness grows with beta."></canvas>
+          </div>
+          <div class="counters" aria-live="polite">
+            <div class="ctr">β = α/(1 − α)<b id="c3b">99.0</b></div>
+            <div class="ctr ok">I<sub>B</sub><b>10 µA</b></div>
+            <div class="ctr ok">I<sub>C</sub> = β·I<sub>B</sub><b id="c3c">0.990 mA</b></div>
+            <div class="ctr ok">I<sub>E</sub><b id="c3e">1.00 mA</b></div>
+          </div>
+          <p class="exag"><b>Not to scale:</b> arrow widths are illustrative.</p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: beta">
+          <h3>Key points</h3>
+          <ul>
+            <li>β = I<sub>C</sub>/I<sub>B</sub> (also h<sub>FE</sub>), typically 50 to 400.</li>
+            <li>β = α/(1 − α) and α = β/(1 + β).</li>
+            <li>α = 0.98, 0.99, 0.995 gives β = 49, 99, 199.</li>
+            <li>A tiny change in α near 1 changes β a lot, so circuits should not depend on its exact value.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 4 ================= -->
+      <section id="s4" aria-labelledby="h4s">
+        <h2 id="h4s">Leakage currents I<sub>CBO</sub> and I<sub>CEO</sub></h2>
+        <div class="prose">
+          <p><strong>I<sub>CBO</sub></strong> is the collector-base leakage current with the emitter open. In silicon transistors it is very small (nanoamperes or less at room temperature), but it rises rapidly with temperature, roughly <strong>doubling for every 10 °C</strong> rise.</p>
+          <p>In the common-emitter connection, leakage is worse. With the base open, the leakage I<sub>CBO</sub> flowing into the base region acts just like a base current and is <strong>amplified</strong> by the transistor. The resulting collector current with the base open is:</p>
+          <p class="eq">I<sub>CEO</sub> = (1 + β)·I<sub>CBO</sub></p>
+          <p>So the full common-emitter relation is:</p>
+          <p class="eq">I<sub>C</sub> = β·I<sub>B</sub> + (1 + β)·I<sub>CBO</sub> = β·I<sub>B</sub> + I<sub>CEO</sub></p>
+          <p>With β = 100, I<sub>CEO</sub> is about 100 times I<sub>CBO</sub>. This temperature-dependent leakage is one cause of the thermal problems studied in Unit 6.</p>
+        </div>
+
+        <figure class="anim" id="anim4">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="slider">
+              <label for="t4"><span>Temperature</span><output id="t4o" for="t4">25 °C</output></label>
+              <input type="range" id="t4" min="25" max="125" step="1" value="25">
+            </div>
+            <div class="slider">
+              <label for="b4"><span>β</span><output id="b4o" for="b4">100</output></label>
+              <input type="range" id="b4" min="50" max="300" step="5" value="100">
+            </div>
+          </div>
+          <div class="duo">
+            <div>
+              <p class="ptitle">Emitter open</p>
+              <canvas id="cv4a" style="aspect-ratio:400/340" role="img" aria-label="Circuit with the emitter lead open and a VCB battery between collector and base. A small purple leakage current ICBO flows into the collector and out of the base."></canvas>
+            </div>
+            <div>
+              <p class="ptitle">Base open</p>
+              <canvas id="cv4b" style="aspect-ratio:400/340" role="img" aria-label="Circuit with the base lead open and a VCE battery between collector and emitter. The leakage ICBO enters the base region and appears multiplied as ICEO flowing into the collector and out of the emitter."></canvas>
+            </div>
+          </div>
+          <canvas id="cv4c" style="aspect-ratio:600/210;margin-top:12px" role="img" aria-label="Log-scale bar chart from 1 nanoamp to 1 milliamp comparing ICBO and ICEO."></canvas>
+          <div class="counters" aria-live="polite">
+            <div class="ctr l">I<sub>CBO</sub><b id="c4a">1.00 nA</b></div>
+            <div class="ctr l">I<sub>CEO</sub> = (1 + β)·I<sub>CBO</sub><b id="c4b">101 nA</b></div>
+          </div>
+          <ul class="legend">
+            <li><span class="ln l"></span><span>leakage current</span></li>
+          </ul>
+          <p class="exag"><b>Not to scale:</b> arrow widths follow the logarithm of the current. Illustrative values: I<sub>CBO</sub> = 1 nA at 25 °C, doubling every 10 °C.</p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: leakage">
+          <h3>Key points</h3>
+          <ul>
+            <li>I<sub>CBO</sub>: collector-base leakage with the emitter open, nanoamperes or less in silicon.</li>
+            <li>It roughly doubles for every 10 °C rise.</li>
+            <li>Base open: the leakage is amplified, I<sub>CEO</sub> = (1 + β)·I<sub>CBO</sub>.</li>
+            <li>Full relation: I<sub>C</sub> = β·I<sub>B</sub> + I<sub>CEO</sub>.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 5 ================= -->
+      <section id="s5" aria-labelledby="h5s">
+        <h2 id="h5s">Summary</h2>
+        <div class="prose">
+          <p>The terminal currents obey <strong>I<sub>E</sub> = I<sub>B</sub> + I<sub>C</sub></strong>. The emitter current is mostly electrons injected into the base (NPN), almost all of which reach the collector. <strong>α = I<sub>C</sub>/I<sub>E</sub></strong> is just below 1, <strong>β = I<sub>C</sub>/I<sub>B</sub></strong> is large, and they are related by <strong>β = α/(1 − α)</strong>. Leakage currents I<sub>CBO</sub> and <strong>I<sub>CEO</sub> = (1 + β)I<sub>CBO</sub></strong> are small but grow quickly with temperature.</p>
+        </div>
+
+        <figure class="anim" id="anim5">
+          <div class="conv" id="conv5">
+            <label><span>α</span><input type="text" inputmode="decimal" id="in5a" value="0.99" autocomplete="off"></label>
+            <label><span>β</span><input type="text" inputmode="decimal" id="in5b" value="99" autocomplete="off"></label>
+            <label><span>I<sub>B</sub> (µA)</span><input type="text" inputmode="decimal" id="in5ib" value="10" autocomplete="off"></label>
+            <label><span>I<sub>C</sub> (mA)</span><input type="text" inputmode="decimal" id="in5ic" value="0.99" autocomplete="off"></label>
+            <label><span>I<sub>E</sub> (mA)</span><input type="text" id="in5ie" value="1" readonly tabindex="-1"></label>
+          </div>
+          <p class="hint" id="hint5" aria-live="polite">Type α or β (I<sub>B</sub> is kept), or type I<sub>B</sub> and I<sub>C</sub>: the other values follow.</p>
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <canvas id="cv5" class="narrow" style="aspect-ratio:600/230;max-width:700px" role="img" aria-label="Current split diagram for the converter values: IE enters from the left and splits into IC to the right and IB downward."></canvas>
+          <p class="exag"><b>Not to scale:</b> the I<sub>B</sub> branch is drawn 5 times wider than its true share.</p>
+        </figure>
+
+        <div class="formulas" aria-label="Key formulas">
+          <div class="fcard"><div class="f">I<sub>E</sub> = I<sub>B</sub> + I<sub>C</sub></div><p>Kirchhoff’s current law</p></div>
+          <div class="fcard"><div class="f">α = I<sub>C</sub>/I<sub>E</sub> = γ·α<sub>T</sub></div><p>Common-base current gain</p></div>
+          <div class="fcard"><div class="f">β = I<sub>C</sub>/I<sub>B</sub></div><p>Common-emitter current gain (h<sub>FE</sub>)</p></div>
+          <div class="fcard"><div class="f">β = α/(1 − α)</div><p>β from α</p></div>
+          <div class="fcard"><div class="f">α = β/(1 + β)</div><p>α from β</p></div>
+          <div class="fcard"><div class="f">I<sub>C</sub> = α·I<sub>E</sub> + I<sub>CBO</sub></div><p>Common base, with leakage</p></div>
+          <div class="fcard"><div class="f">I<sub>C</sub> = β·I<sub>B</sub> + (1 + β)·I<sub>CBO</sub></div><p>Common emitter, with leakage</p></div>
+          <div class="fcard"><div class="f">I<sub>CEO</sub> = (1 + β)·I<sub>CBO</sub></div><p>Leakage with the base open</p></div>
+        </div>
+
+        <aside class="keypoints" aria-label="Key points: summary">
+          <h3>Key points</h3>
+          <ul>
+            <li>I<sub>E</sub> = I<sub>B</sub> + I<sub>C</sub>; I<sub>E</sub> is mostly injected electrons (NPN).</li>
+            <li>α = I<sub>C</sub>/I<sub>E</sub> just below 1; β = I<sub>C</sub>/I<sub>B</sub> large; β = α/(1 − α).</li>
+            <li>Leakage I<sub>CBO</sub> and I<sub>CEO</sub> = (1 + β)I<sub>CBO</sub> grow quickly with temperature.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <nav class="pager" aria-label="Topic navigation">
+        <a href="../5-2-transistor-action/index.html"><small>← Previous</small>5.2 How a Transistor Works</a>
+        <a class="next" href="../5-4-common-base/index.html"><small>Next →</small>5.4 Common base configuration</a>
+      </nav>
+    </div>
+  </main>
+
+  <footer class="site-foot">© 2026 Naveen Bokka</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  const C = {
+    text: '#e6e9ef', muted: '#9aa4b8', e: '#4fc3f7', h: '#ff8a65', v: '#ffd54f', cur: '#81c784', wire: '#cfd8dc',
+    N: '#2e4a7d', P: '#7d3a3a', dep: '#3a3f4f', Nh: '#1b3260', Pl: '#a35a5a', line: '#33405e'
+  };
+  const FONT = 'Inter, system-ui, sans-serif';
+  const RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const TAU = Math.PI * 2;
+  const $ = id => document.getElementById(id);
+  if (RM) $('rmNote').hidden = false;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const ease = x => x * x * (3 - 2 * x);
+  const approach = (v, t, r) => v < t ? Math.min(t, v + r) : Math.max(t, v - r);
+  function hex(h) { return [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)); }
+  function mix(a, b, t) { const A = hex(a), B = hex(b); return 'rgb(' + A.map((v, i) => Math.round(v + (B[i] - v) * t)).join(',') + ')'; }
+  let seed = 7;
+  const srnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+
+  /* ---------- Canvas helpers ---------- */
+  let FS = 1;
+  function Cv(id, W, H) { this.el = $(id); this.W = W; this.H = H; this.ctx = this.el.getContext('2d'); }
+  Cv.prototype.begin = function () {
+    const w = this.el.clientWidth; if (!w) return null;
+    const dpr = window.devicePixelRatio || 1;
+    const pw = Math.round(w * dpr), ph = Math.round(w * dpr * this.H / this.W);
+    if (this.el.width !== pw || this.el.height !== ph) { this.el.width = pw; this.el.height = ph; }
+    const c = this.ctx, s = pw / this.W;
+    FS = Math.min(1.6, Math.max(1, 1.15 * this.W / w));
+    c.setTransform(s, 0, 0, s, 0, 0); c.clearRect(0, 0, this.W, this.H);
+    c.textBaseline = 'middle'; c.textAlign = 'left'; c.globalAlpha = 1; c.setLineDash([]);
+    return c;
+  };
+  // Watermark: drawn inside the canvas, bottom-right, 13 px on screen at any size.
+  Cv.prototype.wm = function (c) {
+    const k = this.W / this.el.clientWidth, s = 13 * k;
+    c.save(); c.globalAlpha = 1; c.font = '500 ' + s.toFixed(1) + 'px ' + FONT; c.fillStyle = 'rgba(255,255,255,.35)';
+    c.textAlign = 'right'; c.textBaseline = 'bottom'; c.fillText('© Naveen Bokka', this.W - 6 * k, this.H - 5 * k); c.restore();
+  };
+  Cv.prototype.pt = function (e) {
+    const r = this.el.getBoundingClientRect();
+    return { x: (e.clientX - r.left) * this.W / r.width, y: (e.clientY - r.top) * this.H / r.height };
+  };
+  function circ(c, x, y, r, fill, stroke, lw) {
+    c.beginPath(); c.arc(x, y, Math.max(0, r), 0, TAU);
+    if (fill) { c.fillStyle = fill; c.fill(); }
+    if (stroke) { c.strokeStyle = stroke; c.lineWidth = lw || 1.5; c.stroke(); }
+  }
+  function txt(c, s, x, y, col, size, weight, align) {
+    c.font = (weight || 600) + ' ' + ((size || 12) * FS).toFixed(1) + 'px ' + FONT;
+    c.fillStyle = col || C.text; c.textAlign = align || 'left'; c.fillText(s, x, y);
+  }
+  // Label with subscript, e.g. sub(c, 'I', 'B', …)
+  function sub(c, a, b, x, y, col, size, align) {
+    const z = (size || 13) * FS;
+    c.font = '700 ' + z.toFixed(1) + 'px ' + FONT; const wa = c.measureText(a).width;
+    c.font = '700 ' + (z * 0.72).toFixed(1) + 'px ' + FONT; const wb = c.measureText(b).width;
+    const w = wa + wb, x0 = align === 'right' ? x - w : align === 'center' ? x - w / 2 : x;
+    c.fillStyle = col; c.textAlign = 'left';
+    c.font = '700 ' + z.toFixed(1) + 'px ' + FONT; c.fillText(a, x0, y);
+    c.font = '700 ' + (z * 0.72).toFixed(1) + 'px ' + FONT; c.fillText(b, x0 + wa, y + z * 0.3);
+  }
+  function line(c, x0, y0, x1, y1, col, lw, dash) {
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []);
+    c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke(); c.setLineDash([]);
+  }
+  function arrow(c, x0, y0, x1, y1, col, lw, head) {
+    const dx = x1 - x0, dy = y1 - y0, L = Math.hypot(dx, dy); if (L < 2) return;
+    const ux = dx / L, uy = dy / L, hs = Math.min(head || 10, L * 0.8);
+    line(c, x0, y0, x1 - ux * hs * 0.7, y1 - uy * hs * 0.7, col, lw || 3);
+    c.fillStyle = col; c.beginPath(); c.moveTo(x1, y1);
+    c.lineTo(x1 - ux * hs - uy * hs * 0.55, y1 - uy * hs + ux * hs * 0.55);
+    c.lineTo(x1 - ux * hs + uy * hs * 0.55, y1 - uy * hs - ux * hs * 0.55); c.closePath(); c.fill();
+  }
+  function poly(c, pts, fill, stroke, lw) {
+    c.beginPath(); c.moveTo(pts[0][0], pts[0][1]); for (let k = 1; k < pts.length; k++) c.lineTo(pts[k][0], pts[k][1]); c.closePath();
+    if (fill) { c.fillStyle = fill; c.fill(); }
+    if (stroke) { c.strokeStyle = stroke; c.lineWidth = lw || 1.2; c.stroke(); }
+  }
+  // Thick "block" arrow whose shaft width is w, with moving stripes (phase ph) to show flow
+  function blockArrow(c, x0, y0, x1, y1, w, col, ph) {
+    const dx = x1 - x0, dy = y1 - y0, L = Math.hypot(dx, dy); if (L < 4 || w <= 0) return;
+    const ux = dx / L, uy = dy / L, nx = -uy, ny = ux;
+    const hw = Math.max(w * 0.95 + 5, w / 2 + 6), hl = Math.min(L * 0.5, w * 0.9 + 10);
+    const bx = x1 - ux * hl, by = y1 - uy * hl, s = w / 2;
+    const pts = [[x0 + nx * s, y0 + ny * s], [bx + nx * s, by + ny * s], [bx + nx * hw, by + ny * hw], [x1, y1],
+      [bx - nx * hw, by - ny * hw], [bx - nx * s, by - ny * s], [x0 - nx * s, y0 - ny * s]];
+    poly(c, pts, col);
+    if (ph == null) return;
+    c.save(); poly(c, pts); c.clip();
+    c.strokeStyle = 'rgba(255,255,255,.35)'; c.lineWidth = 3;
+    const gap = 16, off = (ph % 1) * gap;
+    for (let d = -gap + off; d < L; d += gap) {
+      const px = x0 + ux * d, py = y0 + uy * d;
+      c.beginPath(); c.moveTo(px + nx * hw, py + ny * hw); c.lineTo(px - nx * hw, py - ny * hw); c.stroke();
+    }
+    c.restore();
+  }
+  // Depletion region: grey with light hatching
+  function hatch(c, x, y, w, h) {
+    c.save(); c.fillStyle = C.dep; c.fillRect(x, y, w, h);
+    c.beginPath(); c.rect(x, y, w, h); c.clip();
+    c.strokeStyle = 'rgba(255,255,255,.28)'; c.lineWidth = 1;
+    for (let k = -h; k < w + h; k += 5) { c.beginPath(); c.moveTo(x + k, y + h); c.lineTo(x + k + h, y); c.stroke(); }
+    c.restore();
+  }
+  // Terminal leads on a block: E out of the left end, C out of the right end, B down from the base
+  function leadL(c, x, ym, lab, al) {
+    c.fillStyle = C.wire; c.fillRect(x - 6, ym - 12, 6, 24); line(c, x - 6, ym, x - 34, ym, C.wire, 3);
+    c.globalAlpha = al == null ? 1 : al; txt(c, lab, x - 46, ym, C.text, 17, 700, 'center'); c.globalAlpha = 1;
+  }
+  function leadR(c, x, ym, lab, al) {
+    c.fillStyle = C.wire; c.fillRect(x, ym - 12, 6, 24); line(c, x + 6, ym, x + 34, ym, C.wire, 3);
+    c.globalAlpha = al == null ? 1 : al; txt(c, lab, x + 46, ym, C.text, 17, 700, 'center'); c.globalAlpha = 1;
+  }
+  function leadB(c, x, y, yEnd, lab, pad) {
+    if (pad !== false) { c.fillStyle = C.wire; c.fillRect(x - 11, y, 22, 6); }
+    line(c, x, y + (pad !== false ? 6 : 0), x, yEnd, C.wire, 3);
+    txt(c, lab, x, yEnd + 16, C.text, 17, 700, 'center');
+  }
+  function elec(c, x, y, r) { circ(c, x, y, (r || 4) * 1.9, 'rgba(79,195,247,.15)'); circ(c, x, y, r || 4, C.e); }
+  function holeRing(c, x, y, r) { circ(c, x, y, r || 4.5, 'rgba(255,138,101,.22)', C.h, 2); }
+  function segSel(root, attr, val) {
+    root.querySelectorAll('[data-' + attr + ']').forEach(b => b.setAttribute('aria-pressed', String(b.dataset[attr] === String(val))));
+  }
+
+  /* BJT circuit symbol. (bx, by) = middle of the base bar, s = scale.
+     o.alpha: arrow opacity, o.ghost: 0..1 phase of a moving arrow, o.glow: 0..1 */
+  function bjtSym(c, bx, by, s, pnp, o) {
+    o = o || {};
+    const P = (x, y) => [bx + x * s, by + y * s];
+    const L = (a, b, w) => { const A = P(a[0], a[1]), B = P(b[0], b[1]); line(c, A[0], A[1], B[0], B[1], C.wire, (w || 3) * s); };
+    const cc = P(35, 0); circ(c, cc[0], cc[1], 72 * s, null, 'rgba(207,216,220,.3)', 1.5);
+    L([-100, 0], [0, 0]); L([0, -50], [0, 50], 6); L([0, -28], [70, -70]); L([70, -70], [70, -125]);
+    L([0, 28], [70, 70]); L([70, 70], [70, 125]);
+    const A = [0, 28], B = [70, 70], ll = Math.hypot(70, 42);
+    let ux = 70 / ll, uy = 42 / ll; if (pnp) { ux = -ux; uy = -uy; }
+    const head = (f, col, al) => {
+      const T = P(A[0] + (B[0] - A[0]) * f, A[1] + (B[1] - A[1]) * f), hs = 17 * s;
+      c.globalAlpha = al;
+      poly(c, [[T[0], T[1]], [T[0] - ux * hs - uy * hs * 0.6, T[1] - uy * hs + ux * hs * 0.6], [T[0] - ux * hs + uy * hs * 0.6, T[1] - uy * hs - ux * hs * 0.6]], col);
+      c.globalAlpha = 1;
+      return T;
+    };
+    const al = o.alpha == null ? 1 : o.alpha;
+    const f0 = pnp ? 0.3 : 0.82;
+    if (o.glow) { const T = P(A[0] + (B[0] - A[0]) * (f0 + (pnp ? 0.12 : -0.12)), A[1] + (B[1] - A[1]) * (f0 + (pnp ? 0.12 : -0.12))); c.globalAlpha = al * o.glow; circ(c, T[0], T[1], 20 * s, 'rgba(129,199,132,.45)'); c.globalAlpha = 1; }
+    head(f0, C.wire, al);
+    if (o.ghost != null) {
+      const g = o.ghost, f = pnp ? 0.95 - 0.8 * g : 0.15 + 0.8 * g;
+      head(f, C.cur, al * 0.75 * Math.sin(Math.PI * g));
+    }
+  }
+
+  /* ---------- Animation framework: own Play/Pause/Reset, runs only while visible ---------- */
+  const anims = [];
+  function Anim(rootId, o) {
+    this.root = $(rootId); this.o = o; this.playing = !RM; this.visible = true; this.dirty = true;
+    this.pb = this.root.querySelector('[data-act="play"]');
+    this.pb.addEventListener('click', () => this.setPlaying(!this.playing));
+    this.root.querySelector('[data-act="reset"]').addEventListener('click', () => { o.reset(); this.setPlaying(!RM); });
+    o.reset(); this.sync(); anims.push(this);
+    if ('IntersectionObserver' in window) {
+      this.visible = false;
+      new IntersectionObserver(es => es.forEach(e => { this.visible = e.isIntersecting; if (this.visible) this.dirty = true; }))
+        .observe(this.root);
+    }
+  }
+  Anim.prototype.setPlaying = function (p) { this.playing = p; this.sync(); this.dirty = true; };
+  Anim.prototype.sync = function () { this.pb.textContent = this.playing ? 'Pause' : 'Play'; };
+  // After a button press: run the transition, or snap to it under reduced motion
+  Anim.prototype.kick = function (snap) { if (RM) { snap(); this.dirty = true; } else this.setPlaying(true); };
+
+  /* ---------- 5.2 shared helpers ---------- */
+  Object.assign(C, { rec: '#ef5350' });
+  const VT = 0.02585;
+  function gauss() { let u = 0, v = 0; while (u === 0) u = Math.random(); v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(TAU * v); }
+  function fmtA(a) {
+    const P = [['mA', 1e-3], ['µA', 1e-6], ['nA', 1e-9]];
+    let k = 0; for (; k < P.length - 1; k++) if (a >= P[k][1]) break;
+    const m = a / P[k][1];
+    return (m >= 100 ? m.toFixed(0) : m >= 10 ? m.toFixed(1) : m.toFixed(2)) + ' ' + P[k][0];
+  }
+  function flash(c, f) {   // recombination flash, f.t from 0 to 0.5 s
+    const a = 1 - f.t / 0.5;
+    c.globalAlpha = Math.max(0, a); circ(c, f.x, f.y, 4 + 14 * (f.t / 0.5), null, C.rec, 2.5); circ(c, f.x, f.y, 3.5, C.rec); c.globalAlpha = 1;
+  }
+  // Battery on a horizontal wire at (x, y): the long (+) plate is on the right when plusRight.
+  function battery(c, x, y, plusRight, al, subs) {
+    const xl = x - 6, xr = x + 6, xL = plusRight ? xr : xl, xS = plusRight ? xl : xr, sg = plusRight ? 1 : -1;
+    c.globalAlpha = al;
+    line(c, xL, y - 17, xL, y + 17, C.v, 3); line(c, xS, y - 9, xS, y + 9, C.v, 5);
+    txt(c, '+', xL + sg * 12, y - 20, C.v, 15, 700, 'center'); txt(c, '−', xS - sg * 12, y - 20, C.v, 15, 700, 'center');
+    c.globalAlpha = 1;
+    sub(c, 'V', subs, x, y + 32, C.v, 14, 'center');
+  }
+  function badge(c, s, x, y, col) {
+    c.font = '700 ' + (12.5 * FS).toFixed(1) + 'px ' + FONT;
+    const w = c.measureText(s).width + 22, h = 12.5 * FS + 12;
+    c.beginPath();
+    if (c.roundRect) c.roundRect(x - w / 2, y - h / 2, w, h, h / 2); else c.rect(x - w / 2, y - h / 2, w, h);
+    c.fillStyle = 'rgba(15,20,32,.9)'; c.fill(); c.strokeStyle = col; c.lineWidth = 1.5; c.stroke();
+    c.fillStyle = col; c.textAlign = 'center'; c.fillText(s, x, y + 0.5);
+  }
+
+  /* ---------- 5.3 helpers ---------- */
+  Object.assign(C, { leak: '#ce93d8' });
+  const fmtUA = v => (v >= 100 ? v.toFixed(0) : v >= 10 ? v.toFixed(1) : v.toFixed(2)) + ' µA';
+  function leakDot(c, x, y, hole) { if (hole) circ(c, x, y, 3.8, 'rgba(206,147,216,.2)', C.leak, 2); else { circ(c, x, y, 6.5, 'rgba(206,147,216,.15)'); circ(c, x, y, 3.4, C.leak); } }
+  // Battery on a vertical wire at (x, y): long (+) plate on top when plusTop.
+  function vbattery(c, x, y, plusTop, subs, lx, align) {
+    const yt = y - 6, yb = y + 6, yL = plusTop ? yt : yb, yS = plusTop ? yb : yt, sg = plusTop ? -1 : 1;
+    line(c, x - 17, yL, x + 17, yL, C.v, 3); line(c, x - 9, yS, x + 9, yS, C.v, 5);
+    txt(c, '+', x + 24, yL + sg * 6, C.v, 14, 700, 'center'); txt(c, '−', x + 24, yS - sg * 6, C.v, 14, 700, 'center');
+    sub(c, 'V', subs, lx, y, C.v, 13, align);
+  }
+  // Current "funnel": IE band (x0..xs) splits into IC (to x1, with arrow head) and a leak bending down to yEnd.
+  function funnel(c, x0, xs, x1, yT, H, leak, yEnd, ph) {
+    const Hl = clamp(leak, 0, 1) * H, Hc = H - Hl, yB = yT + H, xl = xs + 40;
+    const pIE = new Path2D(); pIE.rect(x0, yT, xs - x0 + 1, H);
+    const pIC = new Path2D(); pIC.moveTo(xs, yT); pIC.lineTo(x1, yT); pIC.lineTo(x1, yT - 8); pIC.lineTo(x1 + 28, yT + Hc / 2); pIC.lineTo(x1, yT + Hc + 8); pIC.lineTo(x1, yT + Hc); pIC.lineTo(xs, yT + Hc); pIC.closePath();
+    const pL = new Path2D();
+    pL.moveTo(xs, yB - Hl); pL.quadraticCurveTo(xl + Hl, yB - Hl, xl + Hl, yB + 30);
+    pL.lineTo(xl + Hl, yEnd); pL.lineTo(xl + Hl + 7, yEnd); pL.lineTo(xl + Hl / 2, yEnd + 16); pL.lineTo(xl - 7, yEnd); pL.lineTo(xl, yEnd);
+    pL.lineTo(xl, yB + 30); pL.quadraticCurveTo(xl, yB, xs, yB); pL.closePath();
+    c.fillStyle = 'rgba(129,199,132,.85)'; c.fill(pIE); c.fill(pIC); c.fill(pL);
+    const off = (ph % 1) * 22;
+    c.save(); c.strokeStyle = 'rgba(255,255,255,.3)'; c.lineWidth = 4;
+    c.save(); c.clip(pIE); for (let x = x0 - 22 + off; x < xs + 22; x += 22) line(c, x, yT - 2, x, yB + 2, 'rgba(255,255,255,.3)', 4); c.restore();
+    c.save(); c.clip(pIC); for (let x = xs - 22 + off; x < x1 + 30; x += 22) line(c, x, yT - 10, x, yT + Hc + 10, 'rgba(255,255,255,.3)', 4); c.restore();
+    c.save(); c.clip(pL); for (let y = yB - 22 + off; y < yEnd + 20; y += 22) line(c, xs, y, xl + Hl + 10, y, 'rgba(255,255,255,.3)', 4); c.restore();
+    c.restore();
+    return { Hc: Hc, Hl: Hl, xl: xl };
+  }
+
+  /* =========================================================
+     0. Terminal currents on the symbol, NPN / PNP
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv0', 420, 320), root = $('anim0'), sl = $('ib0');
+    let ib = 10, k = 0, tgt = 0, ph = 0;
+    function upd() {
+      const ic = ib * 0.1, ie = ic + ib / 1000;   // mA
+      $('ib0o').textContent = ib + ' µA'; $('c0b').textContent = ib + ' µA';
+      $('c0c').textContent = ic.toFixed(2) + ' mA'; $('c0e').textContent = ie.toFixed(2) + ' mA';
+      $('kcl0').innerHTML = 'I<sub>E</sub> = I<sub>B</sub> + I<sub>C</sub>: ' + ie.toFixed(2) + ' mA = ' + (ib / 1000).toFixed(2) + ' mA + ' + ic.toFixed(2) + ' mA';
+    }
+    const A = new Anim('anim0', {
+      reset() { ib = 10; sl.value = 10; k = 0; tgt = 0; ph = 0; segSel(root, 'type', 0); upd(); },
+      step(dt) { ph += dt * 1.5; k = approach(k, tgt, 1.2 * dt); },
+      draw() {
+        const c = cv.begin(); if (!c) return;
+        const pnp = k > 0.5, al = Math.abs(2 * k - 1), bx = 150, by = 160;
+        bjtSym(c, bx, by, 1, pnp, { alpha: al });
+        txt(c, 'B', 42, by, C.text, 16, 700, 'right'); txt(c, 'C', 206, 40, C.text, 16, 700, 'right'); txt(c, 'E', 206, 280, C.text, 16, 700, 'right');
+        c.globalAlpha = al;
+        txt(c, pnp ? 'PNP' : 'NPN', 404, 24, pnp ? C.h : C.e, 15, 700, 'right');
+        if (ib > 0) {
+          const f = ib / 50, wb = 1.5 + 2.5 * f, wc = 3 + 25 * f;
+          if (!pnp) { blockArrow(c, 58, 140, 128, 140, wb, C.cur, ph); blockArrow(c, 262, 28, 262, 98, wc, C.cur, ph); blockArrow(c, 262, 220, 262, 276, wc + 0.25, C.cur, ph); }
+          else { blockArrow(c, 128, 140, 58, 140, wb, C.cur, ph); blockArrow(c, 262, 98, 262, 28, wc, C.cur, ph); blockArrow(c, 262, 276, 262, 220, wc + 0.25, C.cur, ph); }
+          sub(c, 'I', 'B', 92, 118, C.cur, 14, 'center'); sub(c, 'I', 'C', 300, 62, C.cur, 14, 'left'); sub(c, 'I', 'E', 300, 248, C.cur, 14, 'left');
+        }
+        c.globalAlpha = 1;
+        cv.wm(c);
+      }
+    });
+    root.querySelectorAll('[data-type]').forEach(b => b.addEventListener('click', () => { tgt = +b.dataset.type; segSel(root, 'type', tgt); A.kick(() => { k = tgt; }); }));
+    sl.addEventListener('input', () => { ib = +sl.value; upd(); A.dirty = true; });
+  })();
+
+  /* =========================================================
+     1. Current components: streams, toggles, stacked bars
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv1a', 600, 300), cb = new Cv('cv1b', 360, 280), root = $('anim1'), sg = $('g1'), sa = $('a1');
+    const y0 = 70, y1 = 180, ym = 125, xE0 = 80, xJ1 = 250, xJ2 = 320, xC1 = 500, xB = 285, IEn = 1000, ICBO = 0.01, K = 4, RATE = 26;
+    const show = { IEn: true, IEp: true, IBr: true, ICn: true, ICBO: true };
+    let g = 0.995, aT = 0.995, el = [], ho = [], lk = [], fl = [], aE = 0, aH = 0, aL = 0, t = 0, bg = [];
+    const vals = () => { const IEp = IEn * (1 / g - 1), IBr = IEn * (1 - aT), ICn = IEn * aT; return { IEp, IBr, ICn, IE: IEn + IEp, IC: ICn + ICBO, IB: IEp + IBr - ICBO }; };
+    function upd() {
+      const v = vals();
+      $('g1o').textContent = g.toFixed(3); $('a1o').textContent = aT.toFixed(3);
+      $('v1En').textContent = fmtUA(IEn); $('v1Ep').textContent = fmtUA(v.IEp); $('v1Cn').textContent = fmtUA(v.ICn); $('v1Br').textContent = fmtUA(v.IBr);
+      $('v1Co').textContent = '0.01 µA'; $('v1E').textContent = fmtUA(v.IE); $('v1C').textContent = fmtUA(v.IC); $('v1B').textContent = fmtUA(v.IB);
+    }
+    function sync() { root.querySelectorAll('[data-comp]').forEach(b => b.setAttribute('aria-pressed', String(show[b.dataset.comp]))); }
+    const A = new Anim('anim1', {
+      reset() {
+        g = 0.995; aT = 0.995; sg.value = g; sa.value = aT; Object.keys(show).forEach(k => show[k] = true); sync();
+        el = []; ho = []; lk = []; fl = []; aE = aH = aL = 0; t = 0;
+        bg = []; for (let i = 0; i < 5; i++) bg.push({ x: lerp(xJ1 + 10, xJ2 - 16, Math.random()), y: lerp(y0 + 10, y1 - 10, Math.random()), ph: Math.random() * TAU });
+        upd();
+      },
+      step(dt) {
+        t += dt;
+        const ry = () => lerp(y0 + 9, y1 - 9, Math.random()), pr = Math.min(0.3, (1 - aT) * K);
+        aE += RATE * dt; while (aE >= 1) { aE -= 1; el.push({ x: xE0 + 3, y: ry(), rec: Math.random() < pr ? lerp(xJ1 + 6, xJ2 - 8, Math.random()) : null }); }
+        aH += RATE * (1 / g - 1) * K * dt; while (aH >= 1) { aH -= 1; ho.push({ x: xJ1 + 2, y: ry(), d: 0 }); }
+        aL += 1.2 * dt; while (aL >= 1) { aL -= 1; const y = ry(), x = lerp(xJ2 - 8, xJ2 + 10, Math.random()); lk.push({ x: x, y: y, e: true, d: 0 }); lk.push({ x: x, y: y, e: false, d: 0, ph: 0 }); }
+        const keep = [];
+        el.forEach(q => {
+          const v = q.x < xJ1 ? 95 : q.x < xJ2 ? 60 : 120;
+          q.x += (v + gauss() * (q.x >= xJ1 && q.x < xJ2 ? 40 : 12)) * dt; q.y = clamp(q.y + gauss() * 30 * dt, y0 + 7, y1 - 7);
+          if (q.rec !== null && q.x >= q.rec) { fl.push({ x: q.x, y: q.y, t: 0 }); return; }
+          if (q.x < xC1) keep.push(q);
+        });
+        el = keep;
+        ho = ho.filter(h => { h.x -= 55 * dt; h.d += 55 * dt; return h.d < 60; });
+        lk = lk.filter(q => {
+          q.d += dt;
+          if (q.e) { q.x += 90 * dt; return q.x < xC1; }
+          if (q.x > xB + 6) q.x -= 50 * dt; else q.y += 70 * dt;   // hole: into the base, then out of the base lead
+          return q.y < 236;
+        });
+        fl = fl.filter(f => (f.t += dt) < 0.5);
+      },
+      draw() {
+        let c = cv.begin();
+        if (c) {
+          c.fillStyle = C.N; c.fillRect(xE0, y0, xJ1 - xE0, y1 - y0);
+          c.fillStyle = C.P; c.fillRect(xJ1, y0, xJ2 - xJ1, y1 - y0);
+          c.fillStyle = C.N; c.fillRect(xJ2, y0, xC1 - xJ2, y1 - y0);
+          hatch(c, xJ1 - 1, y0, 6, y1 - y0); hatch(c, xJ2 - 12, y0, 22, y1 - y0);
+          c.strokeStyle = 'rgba(207,216,220,.5)'; c.lineWidth = 1.2; c.strokeRect(xE0, y0, xC1 - xE0, y1 - y0);
+          bg.forEach(b => holeRing(c, b.x + 2 * Math.sin(t * 2 + b.ph), b.y + 2 * Math.cos(t * 1.7 + b.ph), 3.5));
+          el.forEach(q => { if (q.x < xJ2 ? show.IEn : show.ICn) elec(c, q.x, q.y, 3.5); });
+          if (show.IEp) ho.forEach(h => { c.globalAlpha = 1 - h.d / 62; holeRing(c, h.x, h.y, 4); c.globalAlpha = 1; });
+          if (show.IBr) fl.forEach(f => flash(c, f));
+          if (show.ICBO) lk.forEach(q => leakDot(c, q.x, q.y, !q.e));
+          leadL(c, xE0, ym, 'E'); leadR(c, xC1, ym, 'C'); leadB(c, xB, y1, 232, 'B');
+          const L = (s, b, x, y, col, on, al) => { c.globalAlpha = on ? 1 : 0.3; sub(c, s, b, x, y, col, 14, al || 'center'); c.globalAlpha = 1; };
+          L('I', 'En', 165, 48, C.e, show.IEn); L('I', 'Br', 285, 48, C.rec, show.IBr); L('I', 'Cn', 410, 48, C.e, show.ICn);
+          L('I', 'Ep', 268, 212, C.h, show.IEp, 'right'); L('I', 'CBO', 302, 212, C.leak, show.ICBO, 'left');
+          cv.wm(c);
+        }
+        c = cb.begin();
+        if (c) {
+          const v = vals(), X0 = 60, WB = 280, S = WB / 1100, SB = WB / 110;
+          const seg = (x, w, y, col, on) => { c.globalAlpha = on ? 1 : 0.3; c.fillStyle = col; c.fillRect(x, y, Math.max(w, 0), 26); c.globalAlpha = 1; return x + w; };
+          const row = (lab, y) => { sub(c, 'I', lab, 30, y + 13, C.text, 14, 'center'); c.strokeStyle = C.line; c.lineWidth = 1; c.strokeRect(X0, y, WB, 26); };
+          row('E', 34); let x = seg(X0, IEn * S, 34, C.e, show.IEn); seg(x, Math.max(1.5, v.IEp * S), 34, C.h, show.IEp);
+          row('C', 104); x = seg(X0, v.ICn * S, 104, C.e, show.ICn); seg(x, Math.max(1.5, ICBO * S), 104, C.leak, show.ICBO);
+          row('B', 174); x = seg(X0, v.IEp * SB, 174, C.h, show.IEp); seg(x, v.IBr * SB, 174, C.rec, show.IBr);
+          txt(c, '×10', X0 + WB, 214, C.muted, 11, 600, 'right');
+          txt(c, fmtUA(v.IE), X0, 74, C.text, 12, 600, 'left'); txt(c, fmtUA(v.IC), X0, 144, C.text, 12, 600, 'left'); txt(c, fmtUA(v.IB), X0, 214, C.text, 12, 600, 'left');
+          cb.wm(c);
+        }
+      }
+    });
+    root.querySelectorAll('[data-comp]').forEach(b => b.addEventListener('click', () => { show[b.dataset.comp] = !show[b.dataset.comp]; sync(); A.dirty = true; }));
+    sg.addEventListener('input', () => { g = +sg.value; upd(); A.dirty = true; });
+    sa.addEventListener('input', () => { aT = +sa.value; upd(); A.dirty = true; });
+  })();
+
+  /* =========================================================
+     2. Alpha: the current funnel
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv2', 600, 300), sg = $('g2'), sa = $('a2');
+    let g = 0.995, aT = 0.995, ph = 0;
+    function upd() {
+      const a = g * aT;
+      $('g2o').textContent = g.toFixed(3); $('a2o').textContent = aT.toFixed(3);
+      $('c2a').textContent = a.toFixed(4); $('c2c').textContent = a.toFixed(3) + ' mA'; $('c2b').textContent = ((1 - a) * 1000).toFixed(1) + ' µA';
+    }
+    const A = new Anim('anim2', {
+      reset() { g = 0.995; aT = 0.995; sg.value = g; sa.value = aT; ph = 0; upd(); },
+      step(dt) { ph += dt * 1.2; },
+      draw() {
+        const c = cv.begin(); if (!c) return;
+        const a = g * aT, r = funnel(c, 30, 250, 530, 60, 120, (1 - a) * 5, 250, ph);
+        sub(c, 'I', 'E', 140, 40, C.cur, 16, 'center');
+        sub(c, 'I', 'C', 400, 40, C.cur, 16, 'center');
+        sub(c, 'I', 'B', r.xl + r.Hl + 16, 240, C.cur, 16, 'left');
+        txt(c, 'α', 400, 60 + r.Hc + 22, C.v, 16, 700, 'center');
+        cv.wm(c);
+      }
+    });
+    sg.addEventListener('input', () => { g = +sg.value; upd(); A.dirty = true; });
+    sa.addEventListener('input', () => { aT = +sa.value; upd(); A.dirty = true; });
+  })();
+
+  /* =========================================================
+     3. Beta: plot of beta vs alpha, symbol with IB fixed
+     ========================================================= */
+  (function () {
+    const cp = new Cv('cv3a', 420, 320), cs = new Cv('cv3b', 420, 320), sl = $('a3');
+    const X0 = 70, X1 = 400, Y0 = 250, Y1 = 30, X = a => X0 + (a - 0.9) / 0.1 * (X1 - X0), Y = b => Y0 - Math.min(b, 1000) / 1000 * (Y0 - Y1);
+    let al = 0.99, ph = 0, t = 0;
+    const beta = () => al / (1 - al);
+    function upd() {
+      const b = beta(), ic = b * 0.01;   // mA for IB = 10 µA
+      $('a3o').textContent = al.toFixed(3); $('c3b').textContent = b >= 100 ? b.toFixed(0) : b.toFixed(1);
+      $('c3c').textContent = ic.toFixed(ic >= 1 ? 2 : 3) + ' mA'; $('c3e').textContent = (ic + 0.01).toFixed(2) + ' mA';
+    }
+    const A = new Anim('anim3', {
+      reset() { al = 0.99; sl.value = 0.99; ph = 0; t = 0; upd(); },
+      step(dt) { ph += dt * 1.5; t += dt; },
+      draw() {
+        let c = cp.begin();
+        if (c) {
+          for (let b = 0; b <= 1000; b += 250) { line(c, X0, Y(b), X1, Y(b), C.grid || '#25304a', 1); }
+          line(c, X0, Y0, X1, Y0, C.muted, 1.3); line(c, X0, Y0, X0, Y1 - 6, C.muted, 1.3);
+          [0, 500, 1000].forEach(b => txt(c, String(b), X0 - 8, Y(b), C.muted, 10.5, 600, 'right'));
+          [0.9, 0.95, 1.0].forEach(a => txt(c, a.toFixed(2), X(a), Y0 + 15, C.muted, 10.5, 600, 'center'));
+          txt(c, 'α', (X0 + X1) / 2, Y0 + 36, C.v, 15, 700, 'center'); txt(c, 'β', X0 - 8, Y1 - 14, C.v, 15, 700, 'right');
+          c.strokeStyle = C.e; c.lineWidth = 2.5; c.beginPath();
+          for (let i = 0; i <= 300; i++) { const a = 0.9 + 0.0999 * i / 300, b = a / (1 - a); i ? c.lineTo(X(a), Y(b)) : c.moveTo(X(a), Y(b)); }
+          c.stroke();
+          const b = beta(), px = X(al), py = Y(b);
+          line(c, px, py, px, Y0, C.v, 1.2, [4, 4]); line(c, X0, py, px, py, C.v, 1.2, [4, 4]);
+          circ(c, px, py, 10 + 3 * Math.sin(t * 4), 'rgba(255,213,79,.18)'); circ(c, px, py, 6, C.v, '#0f1420', 1.5);
+          cp.wm(c);
+        }
+        c = cs.begin();
+        if (c) {
+          const b = beta(), f = Math.min(1, b / 999);
+          bjtSym(c, 150, 160, 1, false);
+          txt(c, 'B', 42, 160, C.text, 16, 700, 'right'); txt(c, 'C', 206, 40, C.text, 16, 700, 'right'); txt(c, 'E', 206, 280, C.text, 16, 700, 'right');
+          blockArrow(c, 58, 140, 128, 140, 2.5, C.cur, ph); sub(c, 'I', 'B', 92, 118, C.cur, 14, 'center');
+          blockArrow(c, 262, 28, 262, 98, 3 + 25 * f, C.cur, ph); sub(c, 'I', 'C', 302, 62, C.cur, 14, 'left');
+          blockArrow(c, 262, 220, 262, 276, 3.2 + 25 * f, C.cur, ph); sub(c, 'I', 'E', 302, 248, C.cur, 14, 'left');
+          txt(c, 'β', 404, 24, C.v, 15, 700, 'right');
+          cs.wm(c);
+        }
+      }
+    });
+    sl.addEventListener('input', () => { al = +sl.value; upd(); A.dirty = true; });
+  })();
+
+  /* =========================================================
+     4. Leakage: emitter open vs base open, log bars
+     ========================================================= */
+  (function () {
+    const ca = new Cv('cv4a', 400, 340), cb = new Cv('cv4b', 400, 340), cl = new Cv('cv4c', 600, 210), sT = $('t4'), sB = $('b4');
+    const bx = 190, by = 170, s = 0.85, cT = [249.5, 63.75], eB = [249.5, 276.25], bL = [105, 170];
+    let T = 25, beta = 100, ph = 0;
+    const ICBO = () => 1e-9 * Math.pow(2, (T - 25) / 10), ICEO = () => (1 + beta) * ICBO();
+    const wOf = I => Math.max(2, 2 + 3 * Math.log10(I / 1e-9));
+    function upd() {
+      $('t4o').textContent = T + ' °C'; $('b4o').textContent = beta;
+      $('c4a').textContent = fmtA(ICBO()); $('c4b').textContent = fmtA(ICEO());
+    }
+    function openEnd(c, x, y) { circ(c, x, y, 5, '#141b2b', C.wire, 2); }
+    const A = new Anim('anim4', {
+      reset() { T = 25; beta = 100; sT.value = 25; sB.value = 100; ph = 0; upd(); },
+      step(dt) { ph += dt * 1.2; },
+      draw() {
+        const i1 = ICBO(), i2 = ICEO();
+        // ---- emitter open ----
+        let c = ca.begin();
+        if (c) {
+          bjtSym(c, bx, by, s, false);
+          line(c, cT[0], cT[1], cT[0], 30, C.wire, 3); line(c, cT[0], 30, 50, 30, C.wire, 3); line(c, 50, 30, 50, 94, C.wire, 3); line(c, 50, 106, 50, by, C.wire, 3); line(c, 50, by, bL[0], by, C.wire, 3);
+          vbattery(c, 50, 100, true, 'CB', 82, 'left');
+          openEnd(c, eB[0], eB[1] + 2); txt(c, 'open', eB[0] + 14, eB[1] + 2, C.muted, 12, 600, 'left');
+          txt(c, 'C', cT[0] - 12, 48, C.text, 15, 700, 'right'); txt(c, 'B', bL[0] + 8, by + 18, C.text, 15, 700, 'left'); txt(c, 'E', eB[0] - 12, eB[1] - 4, C.text, 15, 700, 'right');
+          const w = wOf(i1);
+          blockArrow(c, 274, 30, 274, 74, w, C.leak, ph); sub(c, 'I', 'CBO', 290 + w / 2, 52, C.leak, 13, 'left');
+          blockArrow(c, 176, by - 22, 112, by - 22, w, C.leak, ph); sub(c, 'I', 'CBO', 144, by - 46 - w / 2, C.leak, 13, 'center');
+          ca.wm(c);
+        }
+        // ---- base open ----
+        c = cb.begin();
+        if (c) {
+          bjtSym(c, bx, by, s, false);
+          line(c, cT[0], cT[1], cT[0], 30, C.wire, 3); line(c, cT[0], 30, 360, 30, C.wire, 3); line(c, 360, 30, 360, 159, C.wire, 3); line(c, 360, 171, 360, 300, C.wire, 3);
+          line(c, 360, 300, eB[0], 300, C.wire, 3); line(c, eB[0], 300, eB[0], eB[1], C.wire, 3);
+          vbattery(c, 360, 165, true, 'CE', 330, 'right');
+          openEnd(c, bL[0] - 2, by); txt(c, 'open', bL[0] - 2, by - 20, C.muted, 12, 600, 'center');
+          txt(c, 'C', cT[0] + 12, 48, C.text, 15, 700, 'left'); txt(c, 'B', bL[0] + 10, by + 18, C.text, 15, 700, 'left'); txt(c, 'E', eB[0] + 12, 286, C.text, 15, 700, 'left');
+          const w1 = wOf(i1), w2 = wOf(i2);
+          blockArrow(c, 226, 124, 200, 146, Math.min(w1, 8), C.leak, ph); sub(c, 'I', 'CBO', 214, 106, C.leak, 12, 'center');
+          blockArrow(c, 222, 30, 222, 66, w2, C.leak, ph); sub(c, 'I', 'CEO', 208 - w2 / 2, 48, C.leak, 13, 'right');
+          blockArrow(c, 222, 262, 222, 298, w2, C.leak, ph); sub(c, 'I', 'CEO', 208 - w2 / 2, 280, C.leak, 13, 'right');
+          cb.wm(c);
+        }
+        // ---- log-scale bars ----
+        c = cl.begin();
+        if (c) {
+          const X0 = 90, X1 = 560, Xl = I => X0 + clamp((Math.log10(I) + 9) / 6, 0, 1) * (X1 - X0);
+          for (let d = 0; d <= 6; d++) { const x = X0 + d / 6 * (X1 - X0); line(c, x, 28, x, 150, d % 3 ? '#25304a' : C.line, 1); }
+          [[0, '1 nA'], [3, '1 µA'], [6, '1 mA']].forEach(q => txt(c, q[1], X0 + q[0] / 6 * (X1 - X0), 166, C.muted, 11, 600, q[0] === 6 ? 'right' : q[0] ? 'center' : 'left'));
+          sub(c, 'I', 'CBO', 46, 58, C.leak, 13, 'center'); sub(c, 'I', 'CEO', 46, 118, C.leak, 13, 'center');
+          c.fillStyle = 'rgba(206,147,216,.55)'; c.fillRect(X0, 46, Xl(i1) - X0, 26);
+          c.fillStyle = C.leak; c.fillRect(X0, 106, Xl(i2) - X0, 26);
+          const val = (I, y) => { const x = Xl(I); if (x > X1 - 90) txt(c, fmtA(I), x - 8, y, '#0f1420', 12, 700, 'right'); else txt(c, fmtA(I), x + 8, y, C.text, 12, 700, 'left'); };
+          val(i1, 59); val(i2, 119);
+          cl.wm(c);
+        }
+      }
+    });
+    sT.addEventListener('input', () => { T = +sT.value; upd(); A.dirty = true; });
+    sB.addEventListener('input', () => { beta = +sB.value; upd(); A.dirty = true; });
+  })();
+
+  /* =========================================================
+     5. Converter and current split
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv5', 600, 230), ia = $('in5a'), ib = $('in5b'), iIB = $('in5ib'), iIC = $('in5ic'), iIE = $('in5ie'), hint = $('hint5');
+    const HINT = hint.innerHTML;
+    let st = { a: 0.99, b: 99, IB: 10, IC: 0.99 }, ph = 0;   // IB in µA, IC in mA
+    const num = el => { const v = parseFloat(String(el.value).replace(',', '.')); return isFinite(v) ? v : NaN; };
+    const f = (v, d) => String(+v.toPrecision(d));
+    function fill(except) {
+      if (except !== ia) ia.value = f(st.a, 6);
+      if (except !== ib) ib.value = f(st.b, 5);
+      if (except !== iIB) iIB.value = f(st.IB, 5);
+      if (except !== iIC) iIC.value = f(st.IC, 5);
+      iIE.value = f(st.IC + st.IB / 1000, 5);
+    }
+    function bad(msg) { hint.textContent = msg; hint.classList.add('bad'); }
+    function ok() { hint.innerHTML = HINT; hint.classList.remove('bad'); }
+    ia.addEventListener('input', () => { const a = num(ia); if (!(a > 0 && a < 1)) return bad('α must be between 0 and 1.'); ok(); st.a = a; st.b = a / (1 - a); st.IC = st.b * st.IB / 1000; fill(ia); A.dirty = true; });
+    ib.addEventListener('input', () => { const b = num(ib); if (!(b > 0)) return bad('β must be greater than 0.'); ok(); st.b = b; st.a = b / (1 + b); st.IC = b * st.IB / 1000; fill(ib); A.dirty = true; });
+    const pair = el => () => { const IBv = num(iIB), ICv = num(iIC); if (!(IBv > 0) || !(ICv > 0)) return bad('I_B and I_C must both be greater than 0.'); ok(); st.IB = IBv; st.IC = ICv; st.b = ICv * 1000 / IBv; st.a = st.b / (1 + st.b); fill(el); A.dirty = true; };
+    iIB.addEventListener('input', pair(iIB)); iIC.addEventListener('input', pair(iIC));
+    [ia, ib, iIB, iIC].forEach(el => el.addEventListener('blur', () => { ok(); fill(null); }));
+    const A = new Anim('anim5', {
+      reset() { st = { a: 0.99, b: 99, IB: 10, IC: 0.99 }; ph = 0; ok(); fill(null); },
+      step(dt) { ph += dt * 1.2; },
+      draw() {
+        const c = cv.begin(); if (!c) return;
+        const IE = st.IC + st.IB / 1000, r = funnel(c, 30, 230, 520, 50, 100, Math.min(1, st.IB / 1000 / IE * 5), 186, ph);
+        sub(c, 'I', 'E', 130, 30, C.cur, 15, 'center'); sub(c, 'I', 'C', 380, 30, C.cur, 15, 'center'); sub(c, 'I', 'B', r.xl + r.Hl + 16, 178, C.cur, 15, 'left');
+        cv.wm(c);
+      }
+    });
+  })();
+
+  /* ---------- sticky mini-nav highlight ---------- */
+  (function () {
+    const links = Array.from(document.querySelectorAll('.toc a'));
+    const secs = links.map(l => document.querySelector(l.getAttribute('href')));
+    function upd() {
+      let cur = 0;
+      secs.forEach((s, i) => { if (s.getBoundingClientRect().top < 120) cur = i; });
+      links.forEach((l, i) => l.classList.toggle('active', i === cur));
+    }
+    window.addEventListener('scroll', upd, { passive: true }); upd();
+  })();
+
+  let last = performance.now();
+  function frame(ts) {
+    const dt = Math.min(0.05, Math.max(0, (ts - last) / 1000)); last = ts;
+    anims.forEach(a => {
+      if (!a.visible) return;
+      if (a.playing) { a.o.step(dt); a.o.draw(); }
+      else if (a.dirty) a.o.draw();
+      a.dirty = false;
+    });
+    requestAnimationFrame(frame);
+  }
+  function onResize() { anims.forEach(a => { a.dirty = true; }); }
+  window.addEventListener('resize', onResize);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(onResize);
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
