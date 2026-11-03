@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>1.7 Mobility &amp; Hall Effect</title>
+  <meta name="description" content="Mobility, conductivity and the Hall effect explained step by step: what sets mobility, lattice and impurity scattering, Matthiessen's rule, conductivity and resistivity, the Hall voltage and its sign, Hall coefficient and Hall mobility. An interactive lesson.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <style>
+    :root {
+      --bg: #0f1420;
+      --panel: #1a2132;
+      --panel-hover: #212a3f;
+      --border: #2a3448;
+      --text: #e6e9ef;
+      --muted: #9aa4b8;
+      --electron: #4fc3f7;
+      --hole: #ff8a65;
+      --energy: #ffd54f;
+      --success: #81c784;
+      --donor: #66bb6a;
+      --acceptor: #f06292;
+      --vb: #3949ab;
+      --cb: #00838f;
+      --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+      --max: 960px;
+      --radius: 12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: var(--font); font-size: 16px; line-height: 1.65;
+      overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column;
+    }
+    a { color: var(--electron); }
+    .wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 16px; }
+
+    /* Sticky mini-nav */
+    .toc {
+      position: sticky; top: 0; z-index: 10; background: rgba(15, 20, 32, .95);
+      border-bottom: 1px solid var(--border); backdrop-filter: blur(6px);
+    }
+    .toc ul { display: flex; gap: 4px; list-style: none; margin: 0 auto; padding: 8px 16px; max-width: var(--max); overflow-x: auto; scrollbar-width: none; }
+    .toc ul::-webkit-scrollbar { display: none; }
+    .toc a {
+      display: block; white-space: nowrap; text-decoration: none; color: var(--muted);
+      font-size: 0.85rem; font-weight: 500; padding: 6px 10px; border-radius: 999px;
+    }
+    .toc a:hover { color: var(--text); background: var(--panel); }
+    .toc a.active { color: var(--bg); background: var(--electron); }
+
+    main { flex: 1; padding: 24px 0 48px; }
+    .crumbs { font-size: 0.875rem; color: var(--muted); margin: 0 0 16px; }
+    .crumbs a { color: var(--muted); }
+    .crumbs a:hover { color: var(--electron); }
+    .eyebrow { font-family: var(--mono); font-size: 0.8rem; color: var(--electron); letter-spacing: .04em; margin: 0; }
+    h1 { font-size: clamp(1.5rem, 6vw, 2.2rem); line-height: 1.2; margin: 4px 0 6px; }
+    .subtitle { color: var(--muted); margin: 0 0 8px; }
+    section { scroll-margin-top: 64px; padding-top: 28px; }
+    h2 { font-size: clamp(1.3rem, 5vw, 1.6rem); line-height: 1.25; margin: 0 0 14px; }
+    h3 { font-size: 1.05rem; margin: 0 0 8px; }
+    .prose { font-size: 17px; line-height: 1.7; }
+    .prose p, .prose ul { margin: 0 0 14px; }
+    .prose ul { padding-left: 20px; }
+    .prose li { margin: 4px 0; }
+    .prose strong { color: #fff; }
+    .eq { font-family: var(--mono); color: var(--energy); background: #141b2b; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; display: block; overflow-wrap: anywhere; margin: 0 0 14px; font-size: 15px; }
+    .t-e { color: var(--electron); font-weight: 600; }
+    .t-h { color: var(--hole); font-weight: 600; }
+    .t-f { color: var(--energy); font-weight: 600; }
+    hr.sep { border: 0; border-top: 1px solid var(--border); margin: 40px 0 0; }
+    .rm-note { font-size: 0.78rem; color: var(--muted); margin: 0 0 8px; }
+
+    /* Buttons & controls */
+    .btn {
+      font: inherit; font-size: 0.88rem; font-weight: 600; color: var(--text);
+      background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+      padding: 7px 12px; cursor: pointer; min-height: 38px;
+    }
+    .btn:hover:not(:disabled) { background: var(--panel-hover); border-color: var(--electron); }
+    .btn:focus-visible, input:focus-visible { outline: 2px solid var(--electron); outline-offset: 2px; }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
+    .btn[aria-pressed="true"] { background: rgba(255,213,79,.14); border-color: var(--energy); color: var(--energy); }
+
+    figure.anim {
+      margin: 18px 0 0; background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 12px; min-width: 0;
+    }
+    .ctrls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-bottom: 12px; }
+    .slider { flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; }
+    .slider label { display: flex; justify-content: space-between; gap: 8px; font-size: 0.8rem; color: var(--muted); }
+    .slider output { font-family: var(--mono); color: var(--energy); white-space: nowrap; }
+    input[type="range"] { width: 100%; accent-color: var(--energy); margin: 4px 0 0; }
+    canvas { display: block; width: 100%; border-radius: 8px; background: #141b2b; }
+    canvas.drag { touch-action: none; cursor: ns-resize; }
+    .narrow { max-width: 640px; margin: 0 auto; }
+    .exag { font-size: 0.75rem; color: var(--muted); margin: 10px 0 0; }
+    .exag b { color: var(--energy); font-weight: 600; }
+
+    .counters { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 0; }
+    .ctr {
+      flex: 1 1 120px; background: #141b2b; border: 1px solid var(--border); border-radius: 8px;
+      padding: 6px 10px; font-size: 0.78rem; color: var(--muted); min-width: 0;
+    }
+    .ctr b { display: block; font-family: var(--mono); font-size: 1.02rem; font-weight: 500; white-space: nowrap; color: var(--text); overflow: hidden; text-overflow: ellipsis; }
+    .ctr.n b { color: var(--electron); }
+    .ctr.p b { color: var(--hole); }
+    .ctr.ok b { color: var(--success); }
+    .ctr.en b { color: var(--energy); }
+
+    .legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 0.8rem; color: var(--muted); margin: 8px 0 0; padding: 0; list-style: none; }
+    .legend li { display: inline-flex; align-items: center; gap: 6px; }
+    .sw { display: inline-block; width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
+    .sw.e { background: var(--electron); }
+    .sw.h { border: 2px solid var(--hole); background: rgba(255,138,101,.2); }
+    .ln { display: inline-block; width: 18px; height: 0; border-top: 2px solid var(--energy); flex-shrink: 0; }
+    .ln.ei { border-top: 2px dashed var(--muted); }
+    .ln.bz { border-top: 2px dashed var(--success); }
+    .ln.fe { border-top-color: var(--electron); }
+    .ionsw { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; font-size: 11px; font-weight: 700; line-height: 1; flex-shrink: 0; }
+    .ionsw.d { border: 1.5px solid var(--donor); color: var(--donor); }
+    .ionsw.a { border: 1.5px solid var(--acceptor); color: var(--acceptor); }
+
+    .keypoints {
+      margin-top: 16px; padding: 14px 16px; border-radius: var(--radius);
+      background: rgba(129,199,132,.07); border: 1px solid rgba(129,199,132,.35);
+    }
+    .keypoints h3 { color: var(--success); font-size: 0.95rem; text-transform: uppercase; letter-spacing: .05em; }
+    .keypoints ul { margin: 0; padding-left: 20px; }
+    .keypoints li { margin: 4px 0; }
+
+    .sumhead { margin: 28px 0 10px; font-size: 1.15rem; }
+    .table-box { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 12px; overflow-x: auto; }
+    .vt { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    .vt th, .vt td { text-align: left; padding: 7px 6px; border-top: 1px solid var(--border); vertical-align: top; }
+    .vt thead th { color: var(--muted); font-weight: 600; border-top: 0; }
+    .vt tbody th { font-weight: 600; width: 20%; }
+    .vt .f { font-family: var(--mono); color: var(--energy); font-size: .82rem; }
+    @media (max-width: 480px) { .vt { font-size: .8rem; } .vt th, .vt td { padding: 6px 4px; } .vt .f { font-size: .74rem; } }
+    .formulas { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    @media (min-width: 640px) { .formulas { grid-template-columns: 1fr 1fr; } }
+    .fcard { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; min-width: 0; }
+    .fcard .f { font-family: var(--mono); font-size: 1rem; color: var(--energy); overflow-wrap: anywhere; }
+    .fcard p { margin: 6px 0 0; font-size: 0.85rem; color: var(--muted); }
+
+    .pager { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 48px; }
+    .pager a {
+      display: block; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 12px 14px; text-decoration: none; color: var(--text); min-width: 0;
+    }
+    .pager a:hover { border-color: var(--electron); }
+    .pager small { display: block; color: var(--muted); font-size: 0.75rem; }
+    .pager .next { text-align: right; }
+
+    /* Maths (KaTeX). The plain-text version inside each element stays as a fallback. */
+    .eq[data-tex], .f[data-tex] { font-family: var(--font); }
+    .eq[data-tex], .f[data-tex] { text-align: center; }
+    .eq .katex-display, .f .katex-display { margin: 0; text-align: center; overflow-x: auto; overflow-y: hidden; padding: 6px 0; }
+    .eq .katex-display > .katex, .f .katex-display > .katex { text-align: center; }
+    .eq .katex, .f .katex { font-size: 1.3em; }
+    td.f .katex { font-size: 1.15em; }
+    .m .katex { font-size: 1.12em; }
+    td.f .katex { white-space: nowrap; }
+    @media (max-width: 480px) { td.f .katex { font-size: 1em; } }
+    /* Justified paragraphs on desktop; phones stay left-aligned to avoid wide word gaps. */
+    @media (min-width: 768px) {
+      .prose p, .prose li, .intro, .keypoints li, .exag { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+    }
+    /* Topic 1.7 colours */
+    :root { --mag: #ce93d8; --cur: #81c784; --lat: #b39ddb; --ion: #f06292; }
+    .sw.lat { background: rgba(179,157,219,.45); }
+    .sw.ring { background: transparent; border: 2px solid var(--energy); }
+    .sw.ring.pk { border-color: var(--ion); }
+    .ln.lt { border-top: 2px dashed var(--lat); }
+    .ln.im { border-top: 2px dashed var(--ion); }
+    .ln.fl { border-top: 3px solid #fff; }
+    .ln.mg { border-top-color: var(--mag); }
+    .ln.dr { border-top-color: var(--cur); }
+    .ctr.lt b { color: var(--lat); }
+    .ctr.im b { color: var(--ion); }
+    .vt th.cn { color: var(--electron); } .vt th.cp { color: var(--hole); }
+    .vt.rt td { font-family: var(--mono); white-space: nowrap; }
+    @media (max-width: 480px) { .vt.rt { font-size: .74rem; } }
+  </style>
+</head>
+<body>
+
+  <nav class="toc" aria-label="Sections">
+    <ul>
+      <li><a href="#s0">Introduction</a></li>
+      <li><a href="#s1">Mobility</a></li>
+      <li><a href="#s2">Scattering</a></li>
+      <li><a href="#s3">Conductivity</a></li>
+      <li><a href="#s4">Hall effect</a></li>
+      <li><a href="#s5">Hall measurements</a></li>
+      <li><a href="#s6">Summary</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="wrap">
+      <header>
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="../../index.html">Home</a> / <a href="../index.html">Unit 1</a> / 1.7
+        </nav>
+        <p class="eyebrow">TOPIC 1.7</p>
+        <h1>Mobility, Conductivity and the Hall Effect</h1>
+        <p class="subtitle">How easily carriers move, how that sets the resistance of a sample, and how a magnet lets us measure it all</p>
+        <p class="rm-note" id="rmNote" hidden>Your device asks for reduced motion, so every animation starts paused. Press Play on any animation to run it. Sliders and buttons still update the picture.</p>
+      </header>
+
+      <!-- ================= SECTION 0 ================= -->
+      <section id="s0" aria-labelledby="h0">
+        <h2 id="h0">Introduction</h2>
+        <div class="prose">
+          <p>In topic 1.6 we saw that an electric field makes carriers drift with a velocity <span class="m" data-tex="v_d = \mu E">v<sub>d</sub> = μ E</span>. There the mobility <span class="m" data-tex="\mu">μ</span> was simply given as a number. This topic looks inside that number and answers three questions:</p>
+          <ul>
+            <li><strong>1. Mobility.</strong> What decides <span class="m" data-tex="\mu">μ</span>, and why is it different for electrons and holes?</li>
+            <li><strong>2. Conductivity.</strong> How do the <em>number</em> of carriers and their <em>mobility</em> together decide how well a sample conducts?</li>
+            <li><strong>3. The Hall effect.</strong> How can we <em>measure</em> the carrier type, the carrier concentration and the mobility of a real sample?</li>
+          </ul>
+          <p>The three icons below stand for these three questions. Each one lights up when you scroll down to its part of the page, so you can see how far through the story you are. Tap an icon to jump straight to that part.</p>
+        </div>
+
+        <figure class="anim" id="anim0">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <canvas id="cv0" class="narrow" style="aspect-ratio:420/170;cursor:pointer" role="img" aria-label="Three icons in a row: a running carrier for mobility, a resistor bar for conductivity, and a magnet above a slab for the Hall effect. Each icon lights up when you reach its section."></canvas>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: introduction">
+          <h3>Key points</h3>
+          <ul>
+            <li>Drift velocity <span class="m" data-tex="v_d = \mu E">v<sub>d</sub> = μ E</span>; this topic explains what sets <span class="m" data-tex="\mu">μ</span>.</li>
+            <li>Conductivity depends on both carrier number and mobility.</li>
+            <li>The Hall effect measures carrier type, concentration and mobility.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 1 ================= -->
+      <section id="s1" aria-labelledby="h1s">
+        <h2 id="h1s">Mobility</h2>
+        <div class="prose">
+          <p><strong>Mobility</strong> <span class="m" data-tex="\mu">μ</span> tells us how easily a carrier moves through the crystal when an electric field pushes it. It is the drift velocity per unit field:</p>
+          <span class="eq" data-tex="\mu = \frac{v_d}{E} \qquad \text{unit: cm}^2/\text{V·s}">μ = v<sub>d</sub>/E unit: cm<sup>2</sup>/V·s</span>
+          <p>Where does it come from? Between two collisions a carrier is pushed by the force <span class="m" data-tex="qE">qE</span>, so it accelerates at <span class="m" data-tex="a = qE/m^*">a = qE/m<sup>*</sup></span>. On average it has a time <span class="m" data-tex="\tau">τ</span> (the <strong>mean free time</strong>) to pick up speed before a collision resets it. Its average extra velocity is therefore <span class="m" data-tex="v_d = (q\tau/m^*)\,E">v<sub>d</sub> = (qτ/m<sup>*</sup>) E</span>, which gives</p>
+          <span class="eq" data-tex="\mu = \frac{q\,\tau}{m^*}">μ = q τ/m<sup>*</sup></span>
+          <p>Here <span class="m" data-tex="m^*">m<sup>*</sup></span> is the <strong>effective mass</strong>: inside the crystal a carrier does not respond to a force like a free electron, and <span class="m" data-tex="m^*">m<sup>*</sup></span> describes how "heavy" it behaves. So mobility is high when the carrier is <strong>light</strong> and when it travels a <strong>long time between collisions</strong>.</p>
+          <p>In silicon, electrons behave as lighter particles than holes (roughly 0.26 <span class="m" data-tex="m_0">m<sub>0</sub></span> against about 0.4 <span class="m" data-tex="m_0">m<sub>0</sub></span>, where <span class="m" data-tex="m_0">m<sub>0</sub></span> is the free-electron mass), and they also go a little longer between collisions. Both effects favour electrons, so electrons are more mobile.</p>
+          <p>Values at 300 K for lightly doped material, in cm²/V·s:</p>
+          <ul>
+            <li><strong>Si</strong>: <span class="m" data-tex="\mu_n \approx 1350">μ<sub>n</sub> ≈ 1350</span>, <span class="m" data-tex="\mu_p \approx 480">μ<sub>p</sub> ≈ 480</span></li>
+            <li><strong>Ge</strong>: <span class="m" data-tex="\mu_n \approx 3900">μ<sub>n</sub> ≈ 3900</span>, <span class="m" data-tex="\mu_p \approx 1900">μ<sub>p</sub> ≈ 1900</span></li>
+            <li><strong>GaAs</strong>: <span class="m" data-tex="\mu_n \approx 8500">μ<sub>n</sub> ≈ 8500</span>, <span class="m" data-tex="\mu_p \approx 400">μ<sub>p</sub> ≈ 400</span></li>
+          </ul>
+          <p>Higher mobility means carriers respond faster, so devices can switch faster. That is why GaAs is used in high-frequency circuits, and why an NMOS transistor (electrons) is faster than a PMOS transistor (holes) of the same size. In CMOS logic the PMOS is usually made two to three times wider to make up for this.</p>
+        </div>
+
+        <figure class="anim" id="anim1">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <span class="seg" role="group" aria-label="Materials shown">
+              <button class="btn" type="button" data-mat="Si" aria-pressed="true">Si</button>
+              <button class="btn" type="button" data-mat="Ge" aria-pressed="true">Ge</button>
+              <button class="btn" type="button" data-mat="GaAs" aria-pressed="true">GaAs</button>
+            </span>
+            <div class="slider">
+              <label for="e1"><span>Electric field E</span><output id="e1o" for="e1">500 V/cm</output></label>
+              <input type="range" id="e1" min="0" max="1000" step="10" value="500">
+            </div>
+          </div>
+          <canvas id="cv1" style="aspect-ratio:420/310" role="img" aria-label="A race track with three blocks, one each for silicon, germanium and gallium arsenide. In each block an electron races to the left and a hole races to the right under the same field. Each carrier zig-zags from collisions. The electron wins in every material; gallium arsenide electrons are fastest."></canvas>
+          <ul class="legend">
+            <li><span class="sw e"></span><span>electron (moves against E)</span></li>
+            <li><span class="sw h"></span><span>hole (moves along E)</span></li>
+            <li><span class="ln"></span><span>field E</span></li>
+          </ul>
+          <div class="table-box" style="margin-top:10px">
+            <table class="vt rt" aria-live="polite">
+              <thead><tr><th scope="col">Material</th><th scope="col" class="cn"><span class="m" data-tex="\mu_n">μ<sub>n</sub></span></th><th scope="col" class="cn"><span class="m" data-tex="v_{d,n}">v<sub>d,n</sub></span> (cm/s)</th><th scope="col" class="cp"><span class="m" data-tex="\mu_p">μ<sub>p</sub></span></th><th scope="col" class="cp"><span class="m" data-tex="v_{d,p}">v<sub>d,p</sub></span> (cm/s)</th></tr></thead>
+              <tbody>
+                <tr><th scope="row">Si</th><td>1350</td><td id="r1Si0">–</td><td>480</td><td id="r1Si1">–</td></tr>
+                <tr><th scope="row">Ge</th><td>3900</td><td id="r1Ge0">–</td><td>1900</td><td id="r1Ge1">–</td></tr>
+                <tr><th scope="row">GaAs</th><td>8500</td><td id="r1GaAs0">–</td><td>400</td><td id="r1GaAs1">–</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="exag"><b>Exaggerated scale:</b> on-screen speeds are proportional to <span class="m" data-tex="\mu E">μ E</span>, scaled so the fastest carrier shown crosses the track in a few seconds; turning a material off rescales the rest. Real collisions happen about every 0.1–0.3 ps, far faster than the zig-zag here. Low-field mobilities, values at 300 K; at higher fields the velocity saturates (topic 1.6).</p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: mobility">
+          <h3>Key points</h3>
+          <ul>
+            <li><span class="m" data-tex="\mu = v_d/E">μ = v<sub>d</sub>/E</span>, unit cm²/V·s.</li>
+            <li><span class="m" data-tex="\mu = q\tau/m^*">μ = qτ/m<sup>*</sup></span>: light carriers with long times between collisions are most mobile.</li>
+            <li>Electrons beat holes in Si, Ge and GaAs (Si: 1350 vs 480).</li>
+            <li>High mobility → fast devices: GaAs for high frequency, NMOS faster than PMOS.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 2 ================= -->
+      <section id="s2" aria-labelledby="h2s">
+        <h2 id="h2s">What limits mobility: scattering</h2>
+        <div class="prose">
+          <p>Every collision interrupts the carrier's acceleration and throws away the velocity it gained from the field. More collisions mean a shorter <span class="m" data-tex="\tau">τ</span>, and so a <strong>lower mobility</strong>. In a semiconductor there are two main things to collide with.</p>
+          <p><strong>1. Lattice (phonon) scattering.</strong> The atoms of the crystal are always vibrating, and a carrier is scattered by these vibrations (a quantum of lattice vibration is called a <strong>phonon</strong>). A hotter crystal vibrates more strongly, so the carrier scatters more often. Lattice-limited mobility therefore <strong>falls</strong> as temperature rises, roughly as</p>
+          <span class="eq" data-tex="\mu_L \propto T^{-3/2}">μ<sub>L</sub> ∝ T<sup>-3/2</sup></span>
+          <p><strong>2. Impurity (ionised dopant) scattering.</strong> Every donor or acceptor that has given up its carrier is a fixed charged ion. A passing carrier is pulled or pushed by its charge and deflected. More doping means more ions and more scattering. A fast (hot) carrier rushes past an ion and is deflected less, so this mobility <strong>rises</strong> with temperature, roughly as</p>
+          <span class="eq" data-tex="\mu_I \propto \frac{T^{3/2}}{N_I}">μ<sub>I</sub> ∝ fracT<sup>3/2</sup>N<sub>I</sub></span>
+          <p>where <span class="m" data-tex="N_I">N<sub>I</sub></span> is the concentration of ionised impurities. The two effects add up like resistors in parallel. This is <strong>Matthiessen's rule</strong>:</p>
+          <span class="eq" data-tex="\frac{1}{\mu} = \frac{1}{\mu_L} + \frac{1}{\mu_I}">1/μ = 1/μ<sub>L</sub> + 1/μ<sub>I</sub></span>
+          <p>The smaller of the two mobilities wins. At low temperature, impurity scattering dominates; in lightly and moderately doped silicon at room temperature and above, lattice scattering dominates. So the total mobility first rises and then falls with temperature. Heavy doping lowers the mobility a lot: near <span class="m" data-tex="10^{18}">10<sup>18</sup></span> cm⁻³ the electron mobility in Si falls to a few hundred cm²/V·s.</p>
+        </div>
+
+        <figure class="anim" id="anim2">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="slider">
+              <label for="t2"><span>Temperature T</span><output id="t2o" for="t2">300 K</output></label>
+              <input type="range" id="t2" min="100" max="600" step="10" value="300">
+            </div>
+            <div class="slider">
+              <label for="d2"><span>Doping <span class="m" data-tex="N_I">N<sub>I</sub></span></span><output id="d2o" for="d2">1.0×10¹⁶ cm⁻³</output></label>
+              <input type="range" id="d2" min="14" max="18" step="0.1" value="16">
+            </div>
+          </div>
+          <canvas id="cv2" class="narrow" style="aspect-ratio:420/284" role="img" aria-label="A box of vibrating lattice atoms with some circled positive dopant ions. One electron drifts to the right through the box, leaving a trail. Collisions flash yellow for lattice scattering and pink for impurity scattering. Higher temperature makes the atoms vibrate more; more doping adds more ions."></canvas>
+          <ul class="legend">
+            <li><span class="sw e"></span><span>electron</span></li>
+            <li><span class="sw lat"></span><span>lattice atom</span></li>
+            <li><span class="ionsw a">+</span><span>dopant ion</span></li>
+            <li><span class="sw ring y"></span><span>lattice collision</span></li>
+            <li><span class="sw ring pk"></span><span>impurity collision</span></li>
+          </ul>
+          <div class="counters" aria-live="polite">
+            <div class="ctr lt">Lattice collisions<b id="c2a">0</b></div>
+            <div class="ctr im">Impurity collisions<b id="c2b">0</b></div>
+          </div>
+          <canvas id="cv2g" class="narrow" style="aspect-ratio:420/300;margin-top:10px" role="img" aria-label="Log-log graph of electron mobility against temperature for silicon. The lattice-limited mobility falls with temperature, the impurity-limited mobility rises, and the total mobility follows whichever is lower, giving a peaked curve. A marker shows the current temperature."></canvas>
+          <ul class="legend">
+            <li><span class="ln lt"></span><span><span class="m" data-tex="\mu_L">μ<sub>L</sub></span> lattice</span></li>
+            <li><span class="ln im"></span><span><span class="m" data-tex="\mu_I">μ<sub>I</sub></span> impurity</span></li>
+            <li><span class="ln fl"></span><span><span class="m" data-tex="\mu">μ</span> total</span></li>
+          </ul>
+          <div class="counters" aria-live="polite">
+            <div class="ctr lt"><span class="m" data-tex="\mu_L">μ<sub>L</sub></span> (cm²/V·s)<b id="c2c">–</b></div>
+            <div class="ctr im"><span class="m" data-tex="\mu_I">μ<sub>I</sub></span> (cm²/V·s)<b id="c2d">–</b></div>
+            <div class="ctr ok"><span class="m" data-tex="\mu_n">μ<sub>n</sub></span> total<b id="c2e">–</b></div>
+          </div>
+          <p class="exag"><b>Simplified model for electrons in Si:</b> <span class="m" data-tex="\mu_L = 1400\,(T/300)^{-3/2}">μ<sub>L</sub> = 1400 (T/300)<sup>-3/2</sup></span> and <span class="m" data-tex="\mu_I = 3.5\times10^{20}\,(T/300)^{3/2}/N_I">μ<sub>I</sub> = 3.5×10<sup>20</sup> (T/300)<sup>3/2</sup>/N<sub>I</sub></span>, combined with Matthiessen's rule. <b>Exaggerated:</b> atom vibrations are drawn far larger than real, collisions are slowed enormously (and capped at about 20 per second on screen) and the drift is drawn much faster than real compared with the random motion. The ratio of yellow to pink collisions follows the model.</p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: scattering">
+          <h3>Key points</h3>
+          <ul>
+            <li>More collisions → shorter <span class="m" data-tex="\tau">τ</span> → lower mobility.</li>
+            <li>Lattice scattering grows with temperature: <span class="m" data-tex="\mu_L \propto T^{-3/2}">μ<sub>L</sub> ∝ T<sup>-3/2</sup></span>.</li>
+            <li>Impurity scattering grows with doping and weakens when hot: <span class="m" data-tex="\mu_I \propto T^{3/2}/N_I">μ<sub>I</sub> ∝ T<sup>3/2</sup>/N<sub>I</sub></span>.</li>
+            <li>Matthiessen's rule: <span class="m" data-tex="1/\mu = 1/\mu_L + 1/\mu_I">1/μ = 1/μ<sub>L</sub> + 1/μ<sub>I</sub></span>; the smaller one dominates.</li>
+            <li>Heavily doped Si (<span class="m" data-tex="\sim 10^{18}">~ 10<sup>18</sup></span> cm⁻³) has <span class="m" data-tex="\mu_n">μ<sub>n</sub></span> of only a few hundred cm²/V·s.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 3 ================= -->
+      <section id="s3" aria-labelledby="h3s">
+        <h2 id="h3s">Conductivity and resistivity</h2>
+        <div class="prose">
+          <p><strong>Conductivity</strong> <span class="m" data-tex="\sigma">σ</span> combines <em>how many</em> carriers there are with <em>how easily</em> they move. Both electrons and holes contribute:</p>
+          <span class="eq" data-tex="\sigma = q\,(n\mu_n + p\mu_p) \qquad \rho = \frac{1}{\sigma} \qquad R = \rho\,\frac{L}{A}">σ = q (nμ<sub>n</sub> + pμ<sub>p</sub>) ρ = 1/σ R = ρ L/A</span>
+          <p>Here <span class="m" data-tex="\rho">ρ</span> is the <strong>resistivity</strong> (in Ω·cm) and <span class="m" data-tex="R">R</span> is the resistance of a bar of length <span class="m" data-tex="L">L</span> and cross-section area <span class="m" data-tex="A">A</span>.</p>
+          <p><strong>Intrinsic Si</strong> at 300 K has <span class="m" data-tex="n = p = n_i \approx 10^{10}">n = p = n<sub>i</sub> ≈ 10<sup>10</sup></span> cm⁻³. Then <span class="m" data-tex="\sigma \approx 2.9\times10^{-6}">σ ≈ 2.9×10<sup>-6</sup></span> S/cm and <span class="m" data-tex="\rho \approx 3.4\times10^{5}">ρ ≈ 3.4×10<sup>5</sup></span> Ω·cm (about <span class="m" data-tex="3.4\times10^{3}">3.4×10<sup>3</sup></span> Ω·m). Pure silicon is a poor conductor.</p>
+          <p><strong>N-type Si</strong> with <span class="m" data-tex="N_D = 10^{16}">N<sub>D</sub> = 10<sup>16</sup></span> cm⁻³: now <span class="m" data-tex="n \approx N_D">n ≈ N<sub>D</sub></span> and the hole term is negligible, so <span class="m" data-tex="\sigma \approx qN_D\mu_n \approx 2.2">σ ≈ qN<sub>D</sub>μ<sub>n</sub> ≈ 2.2</span> S/cm and <span class="m" data-tex="\rho \approx 0.46">ρ ≈ 0.46</span> Ω·cm. A tiny amount of doping (one atom in about five million) lowers the resistivity by nearly a million times.</p>
+          <p>In doped material the majority carriers dominate: <span class="m" data-tex="\sigma \approx qN_D\mu_n">σ ≈ qN<sub>D</sub>μ<sub>n</sub></span> for N-type, <span class="m" data-tex="\sigma \approx qN_A\mu_p">σ ≈ qN<sub>A</sub>μ<sub>p</sub></span> for P-type. Because doping can change <span class="m" data-tex="\rho">ρ</span> over many orders of magnitude, it is the main way resistors are made inside integrated circuits (diffused and well resistors).</p>
+          <p><strong>Temperature.</strong> In the normal (extrinsic) range the number of carriers is fixed by the doping, but mobility falls as lattice scattering grows. So the resistance <strong>rises slightly</strong> with temperature, like a metal. At very high temperature, intrinsic carriers (<span class="m" data-tex="n_i">n<sub>i</sub></span> grows very fast) outnumber the dopants and the resistance <strong>falls</strong> sharply.</p>
+        </div>
+
+        <figure class="anim" id="anim3">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <span class="seg" role="group" aria-label="Doping type">
+              <button class="btn" type="button" data-ty="n" aria-pressed="true">N-type</button>
+              <button class="btn" type="button" data-ty="p" aria-pressed="false">P-type</button>
+              <button class="btn" type="button" data-ty="i" aria-pressed="false">Intrinsic</button>
+            </span>
+          </div>
+          <div class="ctrls">
+            <div class="slider">
+              <label for="d3"><span>Doping</span><output id="d3o" for="d3">1.0×10¹⁶ cm⁻³</output></label>
+              <input type="range" id="d3" min="14" max="18" step="0.1" value="16">
+            </div>
+            <div class="slider">
+              <label for="t3"><span>Temperature T</span><output id="t3o" for="t3">300 K</output></label>
+              <input type="range" id="t3" min="200" max="600" step="10" value="300">
+            </div>
+            <div class="slider">
+              <label for="l3"><span>Length L</span><output id="l3o" for="l3">5.0 mm</output></label>
+              <input type="range" id="l3" min="1" max="10" step="0.1" value="5">
+            </div>
+            <div class="slider">
+              <label for="w3"><span>Width W</span><output id="w3o" for="w3">2.0 mm</output></label>
+              <input type="range" id="w3" min="0.5" max="4" step="0.1" value="2">
+            </div>
+          </div>
+          <canvas id="cv3" class="narrow" style="aspect-ratio:420/300;touch-action:pan-y" role="img" aria-label="Top view of a silicon bar with metal contacts at each end, wired to an ohmmeter that shows the resistance. Round handles on the right end and the bottom edge can be dragged to change the length and width. The bar colour gets stronger with more carriers."></canvas>
+          <div class="counters" aria-live="polite">
+            <div class="ctr n"><span class="m" data-tex="n">n</span> (cm⁻³)<b id="c3a">–</b></div>
+            <div class="ctr p"><span class="m" data-tex="p">p</span> (cm⁻³)<b id="c3b">–</b></div>
+            <div class="ctr n"><span class="m" data-tex="\mu_n">μ<sub>n</sub></span> (cm²/V·s)<b id="c3c">–</b></div>
+            <div class="ctr p"><span class="m" data-tex="\mu_p">μ<sub>p</sub></span> (cm²/V·s)<b id="c3d">–</b></div>
+            <div class="ctr en"><span class="m" data-tex="\sigma">σ</span> (S/cm)<b id="c3e">–</b></div>
+            <div class="ctr en"><span class="m" data-tex="\rho">ρ</span> (Ω·cm)<b id="c3f">–</b></div>
+            <div class="ctr ok"><span class="m" data-tex="R">R</span><b id="c3g">–</b></div>
+          </div>
+          <p class="exag"><b>Model:</b> silicon, all dopants ionised, <span class="m" data-tex="n_i">n<sub>i</sub></span> = 10¹⁰ cm⁻³ at 300 K and rising with temperature as <span class="m" data-tex="T^{3/2}e^{-E_g/2kT}">T<sup>3/2</sup>e<sup>-E<sub>g</sub>/2kT</sup></span>; mobilities from the scattering model of Section 2 (holes: <span class="m" data-tex="\mu_L = 490\,(T/300)^{-3/2}">μ<sub>L</sub> = 490 (T/300)<sup>-3/2</sup></span>). The bar thickness is fixed at 0.5 mm. Dots show carrier density on a log scale, not real numbers.</p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: conductivity">
+          <h3>Key points</h3>
+          <ul>
+            <li><span class="m" data-tex="\sigma = q(n\mu_n + p\mu_p)">σ = q(nμ<sub>n</sub> + pμ<sub>p</sub>)</span>, <span class="m" data-tex="\rho = 1/\sigma">ρ = 1/σ</span>, <span class="m" data-tex="R = \rho L/A">R = ρ L/A</span>.</li>
+            <li>Intrinsic Si: <span class="m" data-tex="\rho \approx 3.4\times10^{5}">ρ ≈ 3.4×10<sup>5</sup></span> Ω·cm. N-type <span class="m" data-tex="10^{16}">10<sup>16</sup></span>: <span class="m" data-tex="\rho \approx 0.46">ρ ≈ 0.46</span> Ω·cm.</li>
+            <li>Doped material: the majority term dominates, <span class="m" data-tex="\sigma \approx qN_D\mu_n">σ ≈ qN<sub>D</sub>μ<sub>n</sub></span> or <span class="m" data-tex="qN_A\mu_p">qN<sub>A</sub>μ<sub>p</sub></span>.</li>
+            <li>Extrinsic range: R rises slightly with T. Intrinsic range: R falls sharply.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 4 ================= -->
+      <section id="s4" aria-labelledby="h4s">
+        <h2 id="h4s">The Hall effect: how it works</h2>
+        <div class="prose">
+          <p><strong>The set-up.</strong> Take a rectangular slab of semiconductor. A current <span class="m" data-tex="I">I</span> flows along its length (the <span class="m" data-tex="x">x</span> direction). A magnetic field <span class="m" data-tex="B">B</span> is applied at right angles to its large face (the <span class="m" data-tex="z">z</span> direction). The slab has width <span class="m" data-tex="w">w</span> (along <span class="m" data-tex="y">y</span>) and thickness <span class="m" data-tex="t">t</span> (along <span class="m" data-tex="B">B</span>).</p>
+          <p><strong>The sideways push.</strong> A charge moving through a magnetic field feels the <strong>Lorentz force</strong></p>
+          <span class="eq" data-tex="\vec F = q\,(\vec v \times \vec B)">F = q ( v × B)</span>
+          <p>which is at right angles to both its velocity and <span class="m" data-tex="B">B</span>. So the moving carriers are pushed sideways, toward one of the side faces (the <span class="m" data-tex="y">y</span> direction).</p>
+          <p><strong>Charge piles up.</strong> Carriers collect on that face, and the opposite face is left with the opposite charge (the fixed dopant ions that the carriers came from). These two charged faces create a sideways electric field across the slab, called the <strong>Hall field</strong> <span class="m" data-tex="E_H">E<sub>H</sub></span>.</p>
+          <p><strong>Balance.</strong> The Hall field pushes the carriers back. The pile-up keeps growing until the electric force exactly cancels the magnetic force:</p>
+          <span class="eq" data-tex="qE_H = q\,v_d B \quad\Rightarrow\quad E_H = v_d B">qE<sub>H</sub> = q v<sub>d</sub> B ⇒ E<sub>H</sub> = v<sub>d</sub> B</span>
+          <p>After that, new carriers flow straight along the slab again. This takes well under a nanosecond in a real sample.</p>
+          <p><strong>The Hall voltage.</strong> Using <span class="m" data-tex="v_d = I/(q\,n\,w\,t)">v<sub>d</sub> = I/(q n w t)</span> for N-type material, the voltage across the width is <span class="m" data-tex="V_H = E_H w">V<sub>H</sub> = E<sub>H</sub> w</span>:</p>
+          <span class="eq" data-tex="V_H = \frac{I\,B}{q\,n\,t}">V<sub>H</sub> = I B/q n t</span>
+          <p>For P-type, replace <span class="m" data-tex="n">n</span> with <span class="m" data-tex="p">p</span>. Fewer carriers means each must drift faster to carry the same current, so the Hall voltage is <strong>larger</strong> in lightly doped material.</p>
+          <p><strong>The key point: the sign.</strong> For the same current direction and the same <span class="m" data-tex="B">B</span>, electrons and holes are pushed to the <strong>same</strong> face. Electrons move backwards but carry negative charge, and the two minus signs cancel in <span class="m" data-tex="q(\vec v \times \vec B)">q( v × B)</span>. In our picture (<span class="m" data-tex="I">I</span> along <span class="m" data-tex="+x">+x</span>, <span class="m" data-tex="B">B</span> along <span class="m" data-tex="+z">+z</span>) both go to the front face. But electrons make that face <strong>negative</strong> and holes make it <strong>positive</strong>. So the Hall voltage has <strong>opposite sign</strong> for N-type and P-type, and its sign tells you the carrier type. Reversing <span class="m" data-tex="B">B</span> or <span class="m" data-tex="I">I</span> also reverses the sign.</p>
+        </div>
+
+        <figure class="anim" id="anim4">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <span class="seg" role="group" aria-label="Carrier type">
+              <button class="btn" type="button" data-ty="n" aria-pressed="true">N-type</button>
+              <button class="btn" type="button" data-ty="p" aria-pressed="false">P-type</button>
+            </span>
+            <button class="btn" type="button" id="rb4" aria-pressed="false">Reverse B</button>
+            <button class="btn" type="button" id="ri4" aria-pressed="false">Reverse I</button>
+          </div>
+          <canvas id="cv4" style="aspect-ratio:420/320" role="img" aria-label="An isometric slab carries current I along x, with purple magnetic field arrows B through its top face. Carriers flow along the top face and curve toward the front face, where charge builds up; the opposite charge builds up on the back face. A yellow Hall field arrow grows, and a voltmeter wired across the two side faces swings. One highlighted carrier shows the magnetic force and the electric force becoming equal and opposite."></canvas>
+          <ul class="legend">
+            <li><span class="sw e"></span><span>electron</span></li>
+            <li><span class="sw h"></span><span>hole</span></li>
+            <li><span class="ionsw a">±</span><span>fixed dopant ions left behind</span></li>
+            <li><span class="ln mg"></span><span>B and magnetic force</span></li>
+            <li><span class="ln"></span><span>Hall field and electric force</span></li>
+            <li><span class="ln dr"></span><span>current I</span></li>
+          </ul>
+          <div class="counters" aria-live="polite">
+            <div class="ctr">Carriers pushed to<b id="c4a">–</b></div>
+            <div class="ctr en">Hall field <span class="m" data-tex="E_H">E<sub>H</sub></span><b id="c4b">–</b></div>
+            <div class="ctr ok">Sign of <span class="m" data-tex="V_H">V<sub>H</sub></span><b id="c4c">–</b></div>
+          </div>
+          <p class="exag"><b>Exaggerated:</b> the sideways curving and the amount of piled-up charge are drawn far larger than real, and the build-up is slowed from under a nanosecond to a few seconds. The meter reads <span class="m" data-tex="V_H">V<sub>H</sub></span> = (front face) − (back face).</p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: Hall effect">
+          <h3>Key points</h3>
+          <ul>
+            <li>Lorentz force <span class="m" data-tex="q(\vec v\times\vec B)">q( v× B)</span> pushes moving carriers to one side face.</li>
+            <li>Piled-up charge creates the Hall field <span class="m" data-tex="E_H">E<sub>H</sub></span>; at balance <span class="m" data-tex="E_H = v_d B">E<sub>H</sub> = v<sub>d</sub> B</span>.</li>
+            <li><span class="m" data-tex="V_H = IB/(qnt)">V<sub>H</sub> = IB/(qnt)</span> (use <span class="m" data-tex="p">p</span> for P-type): fewer carriers → bigger <span class="m" data-tex="V_H">V<sub>H</sub></span>.</li>
+            <li>Electrons and holes go to the <strong>same</strong> face, so <span class="m" data-tex="V_H">V<sub>H</sub></span> has <strong>opposite sign</strong> for N and P.</li>
+            <li>Reversing <span class="m" data-tex="B">B</span> or <span class="m" data-tex="I">I</span> also flips the sign.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 5 ================= -->
+      <section id="s5" aria-labelledby="h5s">
+        <h2 id="h5s">Hall measurements and applications</h2>
+        <div class="prose">
+          <p>The <strong>Hall coefficient</strong> <span class="m" data-tex="R_H">R<sub>H</sub></span> collects the result into one number that depends only on the material:</p>
+          <span class="eq" data-tex="R_H = \frac{E_H}{J\,B} = -\frac{1}{q\,n}\ \text{(N-type)}, \qquad R_H = +\frac{1}{q\,p}\ \text{(P-type)}">R<sub>H</sub> = E<sub>H</sub>/J B = −1/q n (N-type), R<sub>H</sub> = +1/q p (P-type)</span>
+          <p>Measuring <span class="m" data-tex="V_H">V<sub>H</sub></span> with known <span class="m" data-tex="I">I</span>, <span class="m" data-tex="B">B</span> and <span class="m" data-tex="t">t</span> gives <span class="m" data-tex="R_H = V_H t/(IB)">R<sub>H</sub> = V<sub>H</sub> t/(IB)</span>. From it we read off:</p>
+          <ul>
+            <li><strong>Carrier type</strong> from the sign of <span class="m" data-tex="R_H">R<sub>H</sub></span>: negative means electrons (N-type), positive means holes (P-type).</li>
+            <li><strong>Carrier concentration</strong>: <span class="m" data-tex="n = 1/(q\lvert R_H\rvert)">n = 1/(q| R<sub>H</sub>|)</span> (or <span class="m" data-tex="p">p</span>).</li>
+            <li><strong>Mobility</strong>, by also measuring the resistivity: <span class="m" data-tex="\mu_H = \sigma\lvert R_H\rvert = \lvert R_H\rvert/\rho">μ<sub>H</sub> = σ| R<sub>H</sub>| = | R<sub>H</sub>|/ρ</span>. This is called the <strong>Hall mobility</strong>. It is close to the drift mobility; strictly they differ by a factor of order one (the Hall factor, between about 1 and 2) which this page takes as 1.</li>
+          </ul>
+          <p>This combined Hall and resistivity measurement is the standard laboratory method for characterising semiconductor wafers.</p>
+          <p><strong>Applications.</strong> Because <span class="m" data-tex="V_H">V<sub>H</sub></span> is proportional to <span class="m" data-tex="B">B</span>, a small slab with a known current is a <strong>Hall-effect sensor</strong>. Such sensors measure magnetic fields and, from the field around a wire, electric current without touching it. They detect position and speed: the rotor position in brushless DC motors, wheel speed in car anti-lock brakes. They also act as contactless switches, for example sensing a magnet when a phone cover or laptop lid is closed.</p>
+        </div>
+
+        <figure class="anim" id="anim5">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <span class="seg" role="group" aria-label="Carrier type">
+              <button class="btn" type="button" data-ty="n" aria-pressed="true">N-type</button>
+              <button class="btn" type="button" data-ty="p" aria-pressed="false">P-type</button>
+            </span>
+            <button class="btn" type="button" id="si5">Use ρ of Si</button>
+          </div>
+          <div class="ctrls">
+            <div class="slider">
+              <label for="i5"><span>Current I</span><output id="i5o" for="i5">1.0 mA</output></label>
+              <input type="range" id="i5" min="0.1" max="10" step="0.1" value="1">
+            </div>
+            <div class="slider">
+              <label for="b5"><span>Magnetic field B</span><output id="b5o" for="b5">0.50 T</output></label>
+              <input type="range" id="b5" min="0.01" max="1" step="0.01" value="0.5">
+            </div>
+            <div class="slider">
+              <label for="h5"><span>Thickness t</span><output id="h5o" for="h5">500 µm</output></label>
+              <input type="range" id="h5" min="10" max="1000" step="10" value="500">
+            </div>
+            <div class="slider">
+              <label for="n5"><span>Carrier concentration</span><output id="n5o" for="n5">1.0×10¹⁶ cm⁻³</output></label>
+              <input type="range" id="n5" min="14" max="18" step="0.1" value="16">
+            </div>
+            <div class="slider">
+              <label for="r5"><span>Resistivity ρ</span><output id="r5o" for="r5">0.46 Ω·cm</output></label>
+              <input type="range" id="r5" min="-3" max="3" step="0.001" value="-0.33">
+            </div>
+          </div>
+          <canvas id="cv5" class="narrow" style="aspect-ratio:420/180" role="img" aria-label="A small slab with current I and field B, wired to a voltmeter whose needle and display show the computed Hall voltage with its sign."></canvas>
+          <div class="counters" aria-live="polite">
+            <div class="ctr en">Hall voltage <span class="m" data-tex="V_H">V<sub>H</sub></span><b id="c5a">–</b></div>
+            <div class="ctr en"><span class="m" data-tex="R_H">R<sub>H</sub></span> (cm³/C)<b id="c5b">–</b></div>
+            <div class="ctr">Type from sign<b id="c5c">–</b></div>
+            <div class="ctr ok"><span class="m" data-tex="1/(q\lvert R_H\rvert)">1/(q| R<sub>H</sub>|)</span> (cm⁻³)<b id="c5d">–</b></div>
+            <div class="ctr ok"><span class="m" data-tex="\mu_H">μ<sub>H</sub></span> (cm²/V·s)<b id="c5e">–</b></div>
+          </div>
+          <p class="exag"><b>Note:</b> the meter reads <span class="m" data-tex="V_H">V<sub>H</sub></span> with the same sign as <span class="m" data-tex="R_H">R<sub>H</sub></span> (I and B positive). The "Use ρ of Si" button sets ρ to the value for silicon at 300 K with this doping, using the mobility model of Section 2; any other ρ gives a different Hall mobility. Hall factor taken as 1.</p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: Hall measurements">
+          <h3>Key points</h3>
+          <ul>
+            <li><span class="m" data-tex="R_H = -1/(qn)">R<sub>H</sub> = −1/(qn)</span> for N-type, <span class="m" data-tex="+1/(qp)">+1/(qp)</span> for P-type.</li>
+            <li>Sign of <span class="m" data-tex="R_H">R<sub>H</sub></span> → carrier type; <span class="m" data-tex="1/(q\lvert R_H\rvert)">1/(q| R<sub>H</sub>|)</span> → concentration.</li>
+            <li>With resistivity: Hall mobility <span class="m" data-tex="\mu_H = \sigma\lvert R_H\rvert">μ<sub>H</sub> = σ| R<sub>H</sub>|</span>.</li>
+            <li>Hall sensors: magnetic field, contactless current sensing, position and speed, lid and cover switches.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 6 ================= -->
+      <section id="s6" aria-labelledby="h6s">
+        <h2 id="h6s">Summary</h2>
+        <div class="table-box">
+          <table class="vt">
+            <thead><tr><th scope="col">Quantity</th><th scope="col">Symbol</th><th scope="col">Formula</th><th scope="col">Unit</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Mobility</th><td><span class="m" data-tex="\mu">μ</span></td><td class="f" data-tex="\mu = v_d/E = q\tau/m^*">μ = v<sub>d</sub>/E = qτ/m<sup>*</sup></td><td>cm²/V·s</td></tr>
+              <tr><th scope="row">Conductivity</th><td><span class="m" data-tex="\sigma">σ</span></td><td class="f" data-tex="\sigma = q(n\mu_n + p\mu_p)">σ = q(nμ<sub>n</sub> + pμ<sub>p</sub>)</td><td>S/cm</td></tr>
+              <tr><th scope="row">Resistivity</th><td><span class="m" data-tex="\rho">ρ</span></td><td class="f" data-tex="\rho = 1/\sigma">ρ = 1/σ</td><td>Ω·cm</td></tr>
+              <tr><th scope="row">Hall voltage</th><td><span class="m" data-tex="V_H">V<sub>H</sub></span></td><td class="f" data-tex="V_H = IB/(qnt)">V<sub>H</sub> = IB/(qnt)</td><td>V</td></tr>
+              <tr><th scope="row">Hall coefficient</th><td><span class="m" data-tex="R_H">R<sub>H</sub></span></td><td class="f" data-tex="R_H = \mp 1/(qn)">R<sub>H</sub> = ∓ 1/(qn)</td><td>cm³/C</td></tr>
+              <tr><th scope="row">Hall mobility</th><td><span class="m" data-tex="\mu_H">μ<sub>H</sub></span></td><td class="f" data-tex="\mu_H = \sigma\lvert R_H\rvert">μ<sub>H</sub> = σ| R<sub>H</sub>|</td><td>cm²/V·s</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="sumhead">Key formulas</h3>
+        <div class="formulas">
+          <div class="fcard"><div class="f" data-tex="v_d = \mu E">v<sub>d</sub> = μ E</div><p>Drift velocity at low and moderate fields.</p></div>
+          <div class="fcard"><div class="f" data-tex="\mu = \frac{q\tau}{m^*}">μ = qτ/m<sup>*</sup></div><p>Mobility from mean free time and effective mass.</p></div>
+          <div class="fcard"><div class="f" data-tex="\frac{1}{\mu} = \frac{1}{\mu_L} + \frac{1}{\mu_I}">1/μ = 1/μ<sub>L</sub> + 1/μ<sub>I</sub></div><p>Matthiessen's rule: lattice and impurity scattering combine.</p></div>
+          <div class="fcard"><div class="f" data-tex="\sigma = q(n\mu_n + p\mu_p)">σ = q(nμ<sub>n</sub> + pμ<sub>p</sub>)</div><p>Conductivity; in doped material the majority term dominates.</p></div>
+          <div class="fcard"><div class="f" data-tex="\rho = \frac{1}{\sigma}, \quad R = \rho\frac{L}{A}">ρ = 1/σ, R = ρL/A</div><p>Resistivity and the resistance of a bar.</p></div>
+          <div class="fcard"><div class="f" data-tex="V_H = \frac{IB}{qnt}">V<sub>H</sub> = IB/qnt</div><p>Hall voltage (<span class="m" data-tex="p">p</span> in place of <span class="m" data-tex="n">n</span> for P-type).</p></div>
+          <div class="fcard"><div class="f" data-tex="R_H = -\frac{1}{qn}\ (\text{N}), \quad +\frac{1}{qp}\ (\text{P})">R<sub>H</sub> = −1/qn (N), +1/qp (P)</div><p>Hall coefficient; its sign gives the carrier type.</p></div>
+          <div class="fcard"><div class="f" data-tex="\mu_H = \sigma\lvert R_H\rvert">μ<sub>H</sub> = σ| R<sub>H</sub>|</div><p>Hall mobility from a Hall and a resistivity measurement.</p></div>
+        </div>
+        <p class="exag" style="margin-top:12px">Values at 300 K.</p>
+      </section>
+
+      <nav class="pager" aria-label="Topic navigation">
+        <a href="../1-6-drift-and-diffusion/index.html"><small>← Previous</small>1.6 Drift and Diffusion Currents</a>
+        <a class="next" href="../1-8-mass-action-law/index.html"><small>Next →</small>1.8 Mass Action Law</a>
+      </nav>
+    </div>
+  </main>
+
+<script>
+(function () {
+  'use strict';
+
+  const C = {
+    text: '#e6e9ef', muted: '#9aa4b8', e: '#4fc3f7', h: '#ff8a65', en: '#ffd54f', ok: '#81c784', cur: '#81c784',
+    mag: '#ce93d8', lat: '#b39ddb', ion: '#f06292', metal: '#7d8aa3', line: '#33405e', grid: '#25304a'
+  };
+  const FONT = 'Inter, system-ui, sans-serif', MONO = '"JetBrains Mono", ui-monospace, monospace';
+  const RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const TAU = Math.PI * 2, rnd = Math.random;
+  const $ = id => document.getElementById(id);
+  if (RM) $('rmNote').hidden = false;
+
+  const SUP = { '-': '⁻', '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹' };
+  const sup = n => String(n).split('').map(ch => SUP[ch] || ch).join('');
+  function fmtX(x, d) {
+    if (!(x > 0)) return '0';
+    d = d == null ? 1 : d;
+    let e = Math.floor(Math.log10(x));
+    let ms = (x / Math.pow(10, e)).toFixed(d);
+    if (parseFloat(ms) >= 10) { e++; ms = (1).toFixed(d); }
+    return ms + '×10' + sup(e);
+  }
+  // 3 significant figures, switching to ×10ⁿ outside 0.01 … 99 999
+  function fmtG(x) {
+    const a = Math.abs(x);
+    if (a === 0) return '0';
+    if (a >= 1e5 || a < 0.01) return (x < 0 ? '−' : '') + fmtX(a, 2);
+    const s = a >= 100 ? a.toFixed(0) : a.toPrecision(3);
+    return (x < 0 ? '−' : '') + s;
+  }
+  function fmtUnit(v, unit, prefixes) {     // engineering prefix, 3 significant figures
+    const a = Math.abs(v); let k = 0;
+    const P = prefixes || [['G', 1e9], ['M', 1e6], ['k', 1e3], ['', 1], ['m', 1e-3], ['µ', 1e-6], ['n', 1e-9]];
+    for (; k < P.length - 1; k++) if (a >= P[k][1]) break;
+    const m = a / P[k][1];
+    return (v < 0 ? '−' : '') + (m >= 100 ? m.toFixed(0) : m.toPrecision(3)) + ' ' + P[k][0] + unit;
+  }
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const lerp = (a, b, t) => a + (b - a) * t;
+
+  /* ---------- shared silicon model (Sections 2, 3, 5) ---------- */
+  const QE = 1.602e-19;
+  const MOB = { n: [1400, 3.5e20], p: [490, 2.16e20] };          // [lattice μ at 300 K, impurity constant]
+  const muL = (k, T) => MOB[k][0] * Math.pow(T / 300, -1.5);
+  const muI = (k, T, N) => N > 0 ? MOB[k][1] / N * Math.pow(T / 300, 1.5) : Infinity;
+  const muT = (k, T, N) => 1 / (1 / muL(k, T) + 1 / muI(k, T, N));
+  const Eg = T => 1.17 - 4.73e-4 * T * T / (T + 636);
+  const KB = 8.617e-5;
+  const niOf = T => 1e10 * Math.pow(T / 300, 1.5) * Math.exp(-Eg(T) / (2 * KB * T) + Eg(300) / (2 * KB * 300));
+
+  /* =========================================================
+     Canvas helpers
+     ========================================================= */
+  let FS = 1;
+  function Cv(id, W, H) { this.el = $(id); this.W = W; this.H = H; this.ctx = this.el.getContext('2d'); }
+  Cv.prototype.begin = function () {
+    const w = this.el.clientWidth; if (!w) return null;
+    const dpr = window.devicePixelRatio || 1;
+    const pw = Math.round(w * dpr), ph = Math.round(w * dpr * this.H / this.W);
+    if (this.el.width !== pw || this.el.height !== ph) { this.el.width = pw; this.el.height = ph; }
+    const c = this.ctx, s = pw / this.W;
+    FS = Math.min(1.6, Math.max(1, 1.15 * this.W / w));
+    c.setTransform(s, 0, 0, s, 0, 0); c.clearRect(0, 0, this.W, this.H);
+    c.textBaseline = 'middle'; c.textAlign = 'left'; c.globalAlpha = 1; c.setLineDash([]);
+    return c;
+  };
+  // Watermark: drawn inside the canvas, bottom-right, ~22 px on screen at any size.
+  Cv.prototype.wm = function (c) {
+    const s = 22 * this.W / this.el.clientWidth;
+    c.save(); c.globalAlpha = 1; c.font = '600 ' + s.toFixed(1) + 'px ' + FONT; c.fillStyle = 'rgba(255,255,255,.35)';
+    c.textAlign = 'right'; c.textBaseline = 'bottom'; c.fillText('@NaveenBokka', this.W - 10, this.H - 8); c.restore();
+  };
+  // Pointer position in canvas units
+  Cv.prototype.pt = function (e) {
+    const r = this.el.getBoundingClientRect();
+    return { x: (e.clientX - r.left) * this.W / r.width, y: (e.clientY - r.top) * this.H / r.height };
+  };
+  function circ(c, x, y, r, fill, stroke, lw) {
+    c.beginPath(); c.arc(x, y, Math.max(0, r), 0, TAU);
+    if (fill) { c.fillStyle = fill; c.fill(); }
+    if (stroke) { c.strokeStyle = stroke; c.lineWidth = lw || 1.5; c.stroke(); }
+  }
+  function txt(c, s, x, y, col, size, weight, align, font) {
+    c.font = (weight || 500) + ' ' + ((size || 11) * FS).toFixed(1) + 'px ' + (font || FONT);
+    c.fillStyle = col || C.text; c.textAlign = align || 'left'; c.fillText(s, x, y);
+    return c.measureText(s).width;
+  }
+  function tag(c, s, x, y, col, align, size) {
+    c.font = '600 ' + ((size || 10) * FS).toFixed(1) + 'px ' + FONT;
+    const w = c.measureText(s).width + 8, hh = (size || 10) * 0.8 * FS;
+    const x0 = align === 'right' ? x - w : align === 'center' ? x - w / 2 : x;
+    c.fillStyle = 'rgba(15,20,32,.88)'; c.fillRect(x0, y - hh, w, 2 * hh);
+    c.fillStyle = col || C.text; c.textAlign = 'left'; c.fillText(s, x0 + 4, y + 0.5);
+    return w;
+  }
+  // Label with a subscript, e.g. sub(c, 'V', 'H', …)
+  function sub(c, a, b, x, y, col, size, align) {
+    c.font = '600 ' + ((size || 11) * FS).toFixed(1) + 'px ' + FONT;
+    const wa = c.measureText(a).width;
+    c.font = '600 ' + ((size || 11) * 0.72 * FS).toFixed(1) + 'px ' + FONT;
+    const wb = c.measureText(b).width, w = wa + wb;
+    let x0 = align === 'right' ? x - w : align === 'center' ? x - w / 2 : x;
+    c.fillStyle = col; c.textAlign = 'left';
+    c.font = '600 ' + ((size || 11) * FS).toFixed(1) + 'px ' + FONT; c.fillText(a, x0, y);
+    c.font = '600 ' + ((size || 11) * 0.72 * FS).toFixed(1) + 'px ' + FONT; c.fillText(b, x0 + wa, y + (size || 11) * 0.3 * FS);
+    return w;
+  }
+  function line(c, x0, y0, x1, y1, col, lw, dash) {
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []);
+    c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke(); c.setLineDash([]);
+  }
+  // Arrow from (x0,y0) to (x1,y1)
+  function arrow(c, x0, y0, x1, y1, col, lw, head) {
+    const dx = x1 - x0, dy = y1 - y0, L = Math.hypot(dx, dy); if (L < 2) return;
+    const ux = dx / L, uy = dy / L, hs = Math.min(head || 8, L * 0.8);
+    line(c, x0, y0, x1 - ux * hs * 0.7, y1 - uy * hs * 0.7, col, lw || 2.5);
+    c.fillStyle = col; c.beginPath(); c.moveTo(x1, y1);
+    c.lineTo(x1 - ux * hs - uy * hs * 0.55, y1 - uy * hs + ux * hs * 0.55);
+    c.lineTo(x1 - ux * hs + uy * hs * 0.55, y1 - uy * hs - ux * hs * 0.55); c.closePath(); c.fill();
+  }
+  function elec(c, x, y, r) { circ(c, x, y, (r || 3.6) * 1.9, 'rgba(79,195,247,.15)'); circ(c, x, y, r || 3.6, C.e); }
+  function holeRing(c, x, y, r) { circ(c, x, y, r || 4.2, 'rgba(255,138,101,.22)', C.h, 2); }
+  function ionMark(c, x, y, rr, col, plus) {
+    circ(c, x, y, rr, '#0f1420', col, 1.4);
+    line(c, x - rr * 0.55, y, x + rr * 0.55, y, col, 1.5);
+    if (plus) line(c, x, y - rr * 0.55, x, y + rr * 0.55, col, 1.5);
+  }
+  function poly(c, pts, fill, stroke, lw) {
+    c.beginPath(); c.moveTo(pts[0][0], pts[0][1]); for (let k = 1; k < pts.length; k++) c.lineTo(pts[k][0], pts[k][1]); c.closePath();
+    if (fill) { c.fillStyle = fill; c.fill(); }
+    if (stroke) { c.strokeStyle = stroke; c.lineWidth = lw || 1.2; c.stroke(); }
+  }
+  function segSel(root, attr, val) {
+    root.querySelectorAll('[data-' + attr + ']').forEach(b => b.setAttribute('aria-pressed', String(b.dataset[attr] === val)));
+  }
+
+  /* =========================================================
+     Animation framework: own Play/Pause/Reset, runs only while visible
+     ========================================================= */
+  const anims = [];
+  function Anim(rootId, o) {
+    this.root = $(rootId); this.o = o; this.playing = !RM; this.visible = true; this.dirty = true;
+    this.pb = this.root.querySelector('[data-act="play"]');
+    this.pb.addEventListener('click', () => this.setPlaying(!this.playing));
+    this.root.querySelector('[data-act="reset"]').addEventListener('click', () => { o.reset(); this.setPlaying(!RM); });
+    o.reset(); this.sync(); anims.push(this);
+    if ('IntersectionObserver' in window) {
+      this.visible = false;
+      new IntersectionObserver(es => es.forEach(e => { this.visible = e.isIntersecting; if (this.visible) this.dirty = true; }))
+        .observe(this.root);
+    }
+  }
+  Anim.prototype.setPlaying = function (p) { this.playing = p; this.sync(); this.dirty = true; };
+  Anim.prototype.sync = function () { this.pb.textContent = this.playing ? 'Pause' : 'Play'; };
+
+  /* =========================================================
+     SECTION 0: three icons that light up as the reader progresses
+     ========================================================= */
+  (function () {
+    const W = 420, H = 170, cv = new Cv('cv0', W, H), X = [70, 210, 350], Y = 60;
+    const groups = [['s1', 's2'], ['s3'], ['s4', 's5']], names = ['Mobility', 'Conductivity', 'Hall effect'];
+    const cols = [C.e, C.cur, C.mag];
+    let t, seen, now = -2;
+    function scan() {
+      const mid = innerHeight * 0.5; let k = -1;
+      groups.forEach((g, i) => { if ($(g[0]).getBoundingClientRect().top < mid) k = i; });
+      if (k !== now) { now = k; for (let i = 0; i <= k; i++) seen[i] = true; if (A) A.dirty = true; }
+    }
+    let A = null;
+    function icon(c, i, on, glow) {
+      const x = X[i], col = on ? cols[i] : '#4a5470', a = on ? 1 : 0.55;
+      if (glow) { const g = c.createRadialGradient(x, Y, 6, x, Y, 58); g.addColorStop(0, 'rgba(255,255,255,.10)'); g.addColorStop(1, 'rgba(255,255,255,0)'); c.fillStyle = g; c.fillRect(x - 60, Y - 60, 120, 120); }
+      circ(c, x, Y, 44, on ? 'rgba(255,255,255,.04)' : null, on ? col : C.grid, glow ? 2.4 : 1.4);
+      c.globalAlpha = a;
+      const tt = on ? t : 0;
+      if (i === 0) {                       // running carrier with zig-zag trail
+        const ph = (tt * 0.6) % 1, ex = x - 22 + 44 * ph, ey = Y + 6 * Math.sin(ph * TAU * 3);
+        c.strokeStyle = col; c.lineWidth = 1.4; c.globalAlpha = a * 0.6; c.beginPath();
+        for (let k = 0; k <= 20; k++) { const p = ph * k / 20, xx = x - 22 + 44 * p, yy = Y + 6 * Math.sin(p * TAU * 3); k ? c.lineTo(xx, yy) : c.moveTo(xx, yy); }
+        c.stroke(); c.globalAlpha = a;
+        for (let k = 1; k <= 3; k++) line(c, ex - 8 - 6 * k, ey - 6 + 6 * (k - 1), ex - 2 - 6 * k, ey - 6 + 6 * (k - 1), col, 1.2);
+        circ(c, ex, ey, 6, on ? C.e : col);
+      } else if (i === 1) {                // resistor bar with leads
+        line(c, x - 40, Y, x - 26, Y, C.metal, 2); line(c, x + 26, Y, x + 40, Y, C.metal, 2);
+        c.fillStyle = on ? 'rgba(129,199,132,.25)' : 'rgba(74,84,112,.25)'; c.fillRect(x - 26, Y - 11, 52, 22);
+        c.strokeStyle = col; c.lineWidth = 1.6; c.strokeRect(x - 26, Y - 11, 52, 22);
+        for (let k = 0; k < 4; k++) { const xx = x - 22 + ((k * 13 + tt * 18) % 44); circ(c, xx, Y + (k % 2 ? 4 : -4), 2.2, on ? C.e : col); }
+      } else {                             // magnet over a slab
+        poly(c, [[x - 28, Y + 18], [x + 16, Y + 18], [x + 28, Y + 8], [x - 16, Y + 8]], on ? 'rgba(206,147,216,.18)' : null, col, 1.4);
+        c.fillStyle = on ? '#c62828' : '#4a5470'; c.fillRect(x - 14, Y - 32, 28, 11);
+        c.fillStyle = on ? '#1565c0' : '#3a4360'; c.fillRect(x - 14, Y - 21, 28, 11);
+        txt(c, 'N', x, Y - 26, '#fff', 8, 700, 'center'); txt(c, 'S', x, Y - 15, '#fff', 8, 700, 'center');
+        const off = on ? (tt * 10) % 8 : 0;
+        [-8, 0, 8].forEach(dx => arrow(c, x + dx, Y - 8 + off * 0.3, x + dx, Y + 9, col, 1.4, 5));
+      }
+      c.globalAlpha = 1;
+      txt(c, names[i], x, Y + 62, on ? C.text : C.muted, 11, on ? 600 : 500, 'center');
+    }
+    A = new Anim('anim0', {
+      reset() { t = 0; seen = [false, false, false]; now = -2; scan(); },
+      step(dt) { t += dt; },
+      draw() {
+        const c = cv.begin(); if (!c) return;
+        line(c, X[0] + 48, Y, X[1] - 48, Y, C.grid, 1.5, [4, 4]); line(c, X[1] + 48, Y, X[2] - 48, Y, C.grid, 1.5, [4, 4]);
+        for (let i = 0; i < 3; i++) icon(c, i, seen[i], i === now);
+        cv.wm(c);
+      }
+    });
+    window.addEventListener('scroll', scan, { passive: true });
+    cv.el.addEventListener('click', e => {
+      const p = cv.pt(e), i = X.findIndex(x => Math.abs(p.x - x) < 66);
+      if (i >= 0) $(groups[i][0]).scrollIntoView({ behavior: RM ? 'auto' : 'smooth' });
+    });
+  })();
+
+  /* =========================================================
+     SECTION 1: mobility race (Si, Ge, GaAs; electron vs hole)
+     ========================================================= */
+  (function () {
+    const MAT = { Si: [1350, 480], Ge: [3900, 1900], GaAs: [8500, 400] }, KEYS = ['Si', 'Ge', 'GaAs'];
+    const W = 420, H = 310, cv = new Cv('cv1', W, H), X0 = 76, X1 = 404, LEN = X1 - X0, TOP = 48, BH = 78, VTH = 45;
+    const root = $('anim1'), sl = $('e1');
+    let on = { Si: true, Ge: true, GaAs: true }, E = 500, car, hold, win;
+    const laneY = (i, j) => TOP + i * BH + 16 + j * 30;
+    function mk() {
+      car = {}; KEYS.forEach(k => { car[k] = [0, 1].map(() => ({ p: 0, dy: (rnd() - 0.5) * 10, vx: 0, vy: 0, tl: 0, tr: [] })); });
+      hold = 0; win = null;
+    }
+    const kpx = () => 115 / (Math.max.apply(null, KEYS.filter(k => on[k]).map(k => Math.max(MAT[k][0], MAT[k][1]))) * 1000);
+    function upd() {
+      $('e1o').textContent = E + ' V/cm';
+      KEYS.forEach(k => [0, 1].forEach(j => { $('r1' + k + j).textContent = E ? fmtX(MAT[k][j] * E, 1) : '0'; }));
+      root.querySelectorAll('[data-mat]').forEach(b => b.setAttribute('aria-pressed', String(on[b.dataset.mat])));
+    }
+    const sx = (j, p) => j ? X0 + p : X1 - p;     // electrons (j=0) run right→left, holes left→right
+    const A = new Anim('anim1', {
+      reset() { mk(); upd(); },
+      step(dt) {
+        if (hold > 0) { hold -= dt; if (hold <= 0) mk(); return; }
+        const K = kpx();
+        KEYS.forEach(k => car[k].forEach((q, j) => {
+          q.tl -= dt;
+          if (q.tl <= 0) { const a = rnd() * TAU; q.vx = Math.cos(a) * VTH; q.vy = Math.sin(a) * VTH; q.tl = -0.16 * Math.log(1 - rnd()); }
+          q.p = Math.max(0, q.p + (K * MAT[k][j] * E + q.vx) * dt);
+          q.dy += q.vy * dt;
+          if (q.dy > 9) { q.dy = 18 - q.dy; q.vy = -Math.abs(q.vy); }
+          if (q.dy < -9) { q.dy = -18 - q.dy; q.vy = Math.abs(q.vy); }
+          q.tr.push(sx(j, q.p), q.dy); if (q.tr.length > 80) q.tr.splice(0, 2);
+          if (on[k] && q.p >= LEN && !win) { q.p = LEN; win = [k, j]; hold = 2.2; }
+        }));
+      },
+      draw() {
+        const c = cv.begin(); if (!c) return;
+        // field arrow
+        arrow(c, X0 + 40, 20, X1 - 40, 20, C.en, 3, 10);
+        txt(c, 'E', X0 + 22, 20, C.en, 13, 700, 'center');
+        KEYS.forEach((k, i) => {
+          const shown = on[k], y0 = TOP + i * BH;
+          c.globalAlpha = shown ? 1 : 0.3;
+          txt(c, k, 6, y0 + 31, C.text, 11.5, 700);
+          [0, 1].forEach(j => {
+            const y = laneY(i, j), col = j ? C.h : C.e;
+            c.fillStyle = 'rgba(255,255,255,.035)'; c.fillRect(X0, y - 12, LEN, 24);
+            // start line (dashed) and finish line (chequered)
+            const xs = j ? X0 : X1, xf = j ? X1 : X0;
+            line(c, xs, y - 12, xs, y + 12, C.muted, 1.2, [3, 3]);
+            for (let r = 0; r < 4; r++) { c.fillStyle = r % 2 ? '#e6e9ef' : '#0f1420'; c.fillRect(xf - (j ? 4 : 0), y - 12 + r * 6, 4, 6); }
+            const q = car[k][j];
+            c.strokeStyle = col; c.lineWidth = 1.3; c.globalAlpha = (shown ? 1 : 0.3) * 0.45; c.beginPath();
+            for (let m = 0; m < q.tr.length; m += 2) { const xx = q.tr[m], yy = y + q.tr[m + 1]; m ? c.lineTo(xx, yy) : c.moveTo(xx, yy); }
+            c.stroke(); c.globalAlpha = shown ? 1 : 0.3;
+            const x = sx(j, q.p);
+            j ? holeRing(c, x, y + q.dy, 5) : elec(c, x, y + q.dy, 4.4);
+            if (win && win[0] === k && win[1] === j) tag(c, 'winner', clamp(x + (j ? -6 : 6), X0 + 30, X1 - 30), y - 18, col, j ? 'right' : 'left', 10);
+          });
+          if (!shown) tag(c, 'off', X0 + LEN / 2, y0 + 31, C.muted, 'center', 10);
+          c.globalAlpha = 1;
+        });
+        cv.wm(c);
+      }
+    });
+    sl.addEventListener('input', () => { E = +sl.value; upd(); A.dirty = true; });
+    root.querySelectorAll('[data-mat]').forEach(b => b.addEventListener('click', () => {
+      const k = b.dataset.mat;
+      if (on[k] && KEYS.filter(m => on[m]).length === 1) return;   // keep at least one lane on
+      on[k] = !on[k]; mk(); upd(); A.dirty = true;
+    }));
+  })();
+
+  /* =========================================================
+     SECTION 2: lattice vs impurity scattering + μ(T) graph
+     ========================================================= */
+  (function () {
+    const W = 420, H = 284, cv = new Cv('cv2', W, H), gv = new Cv('cv2g', 420, 300);
+    const bx = { x0: 10, x1: 410, y0: 34, y1: 246 }, SP = 40;
+    const sites = [];
+    for (let y = bx.y0 + 18; y < bx.y1; y += SP) for (let x = bx.x0 + 20; x < bx.x1; x += SP) sites.push({ x, y, ph: rnd() * TAU, ph2: rnd() * TAU });
+    const order = sites.map((_, i) => i).sort(() => rnd() - 0.5);
+    const sT = $('t2'), sD = $('d2');
+    let T = 300, d = 16, el, hits, flashes, t;
+    const N = () => Math.pow(10, d);
+    const nIons = () => Math.round(1 + 4.5 * (d - 14));
+    function rates() {
+      const mL = muL('n', T), mI = muI('n', T, N()), rL = 3500 / mL, rI = 3500 / mI, s = Math.min(1, 20 / (rL + rI));
+      return { rL: rL * s, rI: rI * s, mL, mI, mu: muT('n', T, N()) };
+    }
+    function kick() { const v = 70 * Math.sqrt(T / 300), a = rnd() * TAU; el.vx = Math.cos(a) * v; el.vy = Math.sin(a) * v; }
+    function upd() {
+      $('t2o').textContent = T + ' K'; $('d2o').textContent = fmtX(N(), 1) + ' cm⁻³';
+      const r = rates();
+      $('c2c').textContent = fmtG(r.mL); $('c2d').textContent = fmtG(r.mI); $('c2e').textContent = fmtG(r.mu);
+    }
+    function drawGraph() {
+      const c = gv.begin(); if (!c) return;
+      const x0 = 54, x1 = 404, y0 = 22, y1 = 238, T0 = 50, T1 = 600;
+      const X = T => x0 + Math.log(T / T0) / Math.log(T1 / T0) * (x1 - x0);
+      const Y = m => y1 - (Math.log10(m) - 1) / 4 * (y1 - y0);
+      [50, 100, 200, 300, 600].forEach(v => { line(c, X(v), y0, X(v), y1, C.grid, 1); txt(c, String(v), X(v), y1 + 12, C.muted, 9, 500, 'center'); });
+      [1, 2, 3, 4, 5].forEach(e => { line(c, x0, Y(Math.pow(10, e)), x1, Y(Math.pow(10, e)), C.grid, 1); txt(c, '10' + sup(e), x0 - 6, Y(Math.pow(10, e)), C.muted, 9, 500, 'right'); });
+      c.strokeStyle = C.line; c.lineWidth = 1.2; c.strokeRect(x0, y0, x1 - x0, y1 - y0);
+      txt(c, 'T (K)', x0, y1 + 28, C.muted, 10, 500, 'left');
+      txt(c, 'μ (cm²/V·s)', x0, 10, C.muted, 10, 500, 'left');
+      c.save(); c.beginPath(); c.rect(x0, y0, x1 - x0, y1 - y0); c.clip();
+      const Nn = N();
+      const curve = (f, col, lw, dash) => {
+        c.strokeStyle = col; c.lineWidth = lw; c.setLineDash(dash || []); c.beginPath();
+        for (let k = 0; k <= 120; k++) { const TT = T0 * Math.pow(T1 / T0, k / 120), yy = Y(clamp(f(TT), 1, 1e7)); k ? c.lineTo(X(TT), yy) : c.moveTo(X(TT), yy); }
+        c.stroke(); c.setLineDash([]);
+      };
+      curve(TT => muL('n', TT), C.lat, 2, [6, 4]);
+      curve(TT => muI('n', TT, Nn), C.ion, 2, [6, 4]);
+      curve(TT => muT('n', TT, Nn), '#ffffff', 3);
+      line(c, X(T), y0, X(T), y1, C.en, 1.2, [3, 3]);
+      circ(c, X(T), Y(muL('n', T)), 4, C.lat); circ(c, X(T), Y(muI('n', T, Nn)), 4, C.ion); circ(c, X(T), Y(muT('n', T, Nn)), 5, '#fff', '#0f1420', 1.5);
+      c.restore();
+      // curve labels
+      // label each dashed curve at a point that is inside the plot
+      const place = (f, Ts) => { for (const TT of Ts) { const yy = Y(f(TT)); if (yy > y0 + 20 && yy < y1 - 14) return [X(TT), yy]; } return null; };
+      const pl = place(TT => muL('n', TT), [70, 90, 120, 160, 220]);
+      if (pl) sub(c, 'μ', 'L', pl[0] + 4, pl[1] - 13, C.lat, 12);
+      const pi = place(TT => muI('n', TT, Nn), [450, 380, 320, 260, 200, 150, 110, 80, 60]);
+      if (pi) sub(c, 'μ', 'I', pi[0] - 6, pi[1] - 13, C.ion, 12, 'right');
+      gv.wm(c);
+    }
+    const A = new Anim('anim2', {
+      reset() { el = { x: bx.x0 + 30, y: (bx.y0 + bx.y1) / 2, vx: 0, vy: 0, tr: [] }; kick(); hits = [0, 0]; flashes = []; t = 0; $('c2a').textContent = '0'; $('c2b').textContent = '0'; upd(); },
+      step(dt) {
+        t += dt;
+        const r = rates(), tot = r.rL + r.rI, vd = 22 * r.mu / 1400;
+        if (rnd() < tot * dt) {
+          const ty = rnd() < r.rL / tot ? 0 : 1; hits[ty]++; flashes.push({ x: el.x, y: el.y, t: 0, ty });
+          $(ty ? 'c2b' : 'c2a').textContent = hits[ty]; kick();
+        }
+        el.vx += vd * tot * dt;                                // field accelerates the electron to the right between collisions
+        el.x += el.vx * dt; el.y += el.vy * dt;
+        if (el.y < bx.y0 + 4) { el.y = 2 * (bx.y0 + 4) - el.y; el.vy = Math.abs(el.vy); }
+        if (el.y > bx.y1 - 4) { el.y = 2 * (bx.y1 - 4) - el.y; el.vy = -Math.abs(el.vy); }
+        let wrap = false;
+        if (el.x > bx.x1) { el.x -= bx.x1 - bx.x0; wrap = true; }
+        if (el.x < bx.x0) { el.x += bx.x1 - bx.x0; wrap = true; }
+        if (wrap) el.tr.length = 0;
+        el.tr.push(el.x, el.y); if (el.tr.length > 160) el.tr.splice(0, 2);
+        flashes.forEach(f => { f.t += dt; }); flashes = flashes.filter(f => f.t < 0.45);
+      },
+      draw() {
+        const c = cv.begin(); if (!c) return;
+        c.fillStyle = 'rgba(255,255,255,.025)'; c.fillRect(bx.x0, bx.y0, bx.x1 - bx.x0, bx.y1 - bx.y0);
+        c.strokeStyle = C.line; c.lineWidth = 1.2; c.strokeRect(bx.x0, bx.y0, bx.x1 - bx.x0, bx.y1 - bx.y0);
+        arrow(c, 300, 18, 140, 18, C.en, 3, 10); txt(c, 'E', 310, 18, C.en, 13, 700);
+        const amp = 2.6 * Math.sqrt(T / 300), ions = new Set(order.slice(0, nIons()));
+        sites.forEach((s, i) => {
+          const x = s.x + amp * Math.sin(17 * t + s.ph), y = s.y + amp * Math.sin(15 * t + s.ph2);
+          if (ions.has(i)) ionMark(c, x, y, 7, C.ion, true);
+          else circ(c, x, y, 4.2, 'rgba(179,157,219,.38)');
+        });
+        if (el.tr.length > 3) {
+          c.strokeStyle = C.e; c.globalAlpha = 0.45; c.lineWidth = 1.4; c.beginPath(); c.moveTo(el.tr[0], el.tr[1]);
+          for (let k = 2; k < el.tr.length; k += 2) c.lineTo(el.tr[k], el.tr[k + 1]);
+          c.stroke(); c.globalAlpha = 1;
+        }
+        flashes.forEach(f => { const a = 1 - f.t / 0.45; c.globalAlpha = a; circ(c, f.x, f.y, 5 + 14 * f.t / 0.45, null, f.ty ? C.ion : C.en, 2.4); c.globalAlpha = 1; });
+        elec(c, el.x, el.y, 4.6);
+        cv.wm(c);
+        drawGraph();
+      }
+    });
+    sT.addEventListener('input', () => { T = +sT.value; upd(); A.dirty = true; });
+    sD.addEventListener('input', () => { d = +sD.value; upd(); A.dirty = true; });
+  })();
+
+  /* =========================================================
+     SECTION 3: conductivity of a bar + ohmmeter
+     ========================================================= */
+  (function () {
+    const W = 420, H = 300, cv = new Cv('cv3', W, H), BX = 40, CY = 104, PX = 30, TH = 0.05;   // thickness 0.5 mm in cm
+    const root = $('anim3'), sD = $('d3'), sT = $('t3'), sL = $('l3'), sW = $('w3');
+    let ty = 'n', d = 16, T = 300, L = 5, Wd = 2, dots, drag = null, res;
+    function calc() {
+      const N = Math.pow(10, d), ni = niOf(T), NI = ty === 'i' ? 0 : N;
+      let n, p;
+      if (ty === 'i') { n = p = ni; }
+      else { const maj = N / 2 + Math.sqrt(N * N / 4 + ni * ni), mn = ni * ni / maj; if (ty === 'n') { n = maj; p = mn; } else { p = maj; n = mn; } }
+      const mn = muT('n', T, NI), mp = muT('p', T, NI), sg = QE * (n * mn + p * mp), rho = 1 / sg;
+      const R = rho * (L / 10) / ((Wd / 10) * TH);
+      res = { n, p, mn, mp, sg, rho, R, ni, N, intr: ty === 'i' || ni > N, mid: ty !== 'i' && ni > 0.1 * N && ni <= N };
+      return res;
+    }
+    function mkDots() { dots = Array.from({ length: 70 }, () => ({ u: rnd(), v: rnd(), s: rnd() < 0.5 })); }
+    function upd() {
+      const r = calc();
+      $('d3o').textContent = ty === 'i' ? '—' : fmtX(r.N, 1) + ' cm⁻³';
+      sD.disabled = ty === 'i';
+      $('t3o').textContent = T + ' K'; $('l3o').textContent = L.toFixed(1) + ' mm'; $('w3o').textContent = Wd.toFixed(1) + ' mm';
+      $('c3a').textContent = fmtX(r.n, 2); $('c3b').textContent = fmtX(r.p, 2);
+      $('c3c').textContent = fmtG(r.mn); $('c3d').textContent = fmtG(r.mp);
+      $('c3e').textContent = fmtG(r.sg); $('c3f').textContent = fmtG(r.rho);
+      $('c3g').textContent = fmtUnit(r.R, 'Ω');
+      segSel(root, 'ty', ty);
+    }
+    const geo = () => { const xr = BX + L * PX, h = Wd * PX; return { xr, top: CY - h / 2, bot: CY + h / 2, xm: BX + L * PX / 2 }; };
+    const A = new Anim('anim3', {
+      reset() { mkDots(); upd(); },
+      step(dt) { dots.forEach(q => { q.u += (q.s ? 0.05 : -0.05) * dt * (res.n >= res.p ? (q.s ? 0.4 : 1) : (q.s ? 1 : 0.4)); q.u -= Math.floor(q.u); }); },
+      draw() {
+        const c = cv.begin(); if (!c) return;
+        const g = geo(), r = res;
+        txt(c, 'L = ' + L.toFixed(1) + ' mm   W = ' + Wd.toFixed(1) + ' mm   t = 0.5 mm', W / 2, 18, C.muted, 10, 500, 'center');
+        // bar fill: colour = majority carrier, strength = log density
+        const maj = Math.max(r.n, r.p), str = clamp((Math.log10(maj) - 9) / 9, 0.05, 1);
+        const rgb = r.intr && Math.abs(Math.log10(r.n / r.p)) < 0.5 ? '179,157,219' : (r.n > r.p ? '79,195,247' : '255,138,101');
+        c.fillStyle = 'rgba(' + rgb + ',' + (0.08 + 0.55 * str).toFixed(3) + ')';
+        c.fillRect(BX, g.top, g.xr - BX, g.bot - g.top);
+        c.strokeStyle = C.line; c.lineWidth = 1.5; c.strokeRect(BX, g.top, g.xr - BX, g.bot - g.top);
+        // carrier dots, number ∝ log density
+        const showN = Math.round(clamp((Math.log10(r.n) - 9) / 9, 0, 1) * 34), showP = Math.round(clamp((Math.log10(r.p) - 9) / 9, 0, 1) * 34);
+        let kn = 0, kp = 0;
+        dots.forEach(q => {
+          const x = BX + 8 + q.u * (g.xr - BX - 16), y = g.top + 5 + q.v * (g.bot - g.top - 10);
+          if (q.s && kn < showN) { kn++; circ(c, x, y, 2.6, C.e); }
+          else if (!q.s && kp < showP) { kp++; circ(c, x, y, 2.8, null, C.h, 1.4); }
+        });
+        // contacts
+        c.fillStyle = C.metal; c.fillRect(BX - 6, g.top - 4, 6, g.bot - g.top + 8); c.fillRect(g.xr, g.top - 4, 6, g.bot - g.top + 8);
+        // ohmmeter and wires
+        const mx0 = 140, mx1 = 280, my0 = 200, my1 = 250;
+        c.strokeStyle = C.metal; c.lineWidth = 2; c.beginPath();
+        c.moveTo(BX - 6, CY); c.lineTo(BX - 22, CY); c.lineTo(BX - 22, 225); c.lineTo(mx0, 225);
+        c.moveTo(g.xr + 6, CY); c.lineTo(g.xr + 18, CY); c.lineTo(g.xr + 18, 186); c.lineTo(mx1 + 20, 186); c.lineTo(mx1 + 20, 225); c.lineTo(mx1, 225);
+        c.stroke();
+        c.fillStyle = '#0f1420'; c.fillRect(mx0, my0, mx1 - mx0, my1 - my0);
+        c.strokeStyle = C.ok; c.lineWidth = 1.6; c.strokeRect(mx0, my0, mx1 - mx0, my1 - my0);
+        txt(c, fmtUnit(r.R, 'Ω'), (mx0 + mx1) / 2, 227, C.ok, 15, 600, 'center', MONO);
+        txt(c, 'Ω', mx0 + 10, my0 + 10, C.muted, 9, 600);
+        tag(c, r.intr ? 'intrinsic' : r.mid ? 'extrinsic → intrinsic' : 'extrinsic', 12, 286, r.intr ? C.lat : C.en, 'left', 10);
+        // drag handles
+        [[g.xr + 3, CY, '↔'], [g.xm, g.bot, '↕']].forEach(([x, y, s], k) => {
+          circ(c, x, y, 9, drag === (k ? 'W' : 'L') ? C.en : '#0f1420', '#fff', 1.8);
+          txt(c, s, x, y + 0.5, drag === (k ? 'W' : 'L') ? '#0f1420' : '#fff', 10, 700, 'center');
+        });
+        cv.wm(c);
+      }
+    });
+    root.querySelectorAll('[data-ty]').forEach(b => b.addEventListener('click', () => { ty = b.dataset.ty; upd(); A.dirty = true; }));
+    sD.addEventListener('input', () => { d = +sD.value; upd(); A.dirty = true; });
+    sT.addEventListener('input', () => { T = +sT.value; upd(); A.dirty = true; });
+    sL.addEventListener('input', () => { L = +sL.value; upd(); A.dirty = true; });
+    sW.addEventListener('input', () => { Wd = +sW.value; upd(); A.dirty = true; });
+    const el = cv.el;
+    function hit(p) { const g = geo(); if (Math.hypot(p.x - g.xr - 3, p.y - CY) < 20) return 'L'; if (Math.hypot(p.x - g.xm, p.y - g.bot) < 20) return 'W'; return null; }
+    el.addEventListener('pointerdown', e => { drag = hit(cv.pt(e)); if (drag) { el.setPointerCapture(e.pointerId); e.preventDefault(); A.dirty = true; } });
+    el.addEventListener('pointermove', e => {
+      const p = cv.pt(e);
+      if (!drag) { el.style.cursor = hit(p) === 'L' ? 'ew-resize' : hit(p) === 'W' ? 'ns-resize' : 'default'; return; }
+      if (drag === 'L') { L = Math.round(clamp((p.x - BX) / PX, 1, 10) * 10) / 10; sL.value = L; }
+      else { Wd = Math.round(clamp((p.y - CY) * 2 / PX, 0.5, 4) * 10) / 10; sW.value = Wd; }
+      upd(); A.dirty = true;
+    });
+    const end = () => { if (drag) { drag = null; A.dirty = true; } };
+    el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end);
+  })();
+
+  /* =========================================================
+     SECTION 4: Hall effect on an isometric slab
+     ========================================================= */
+  (function () {
+    const W = 420, H = 320, cv = new Cv('cv4', W, H), root = $('anim4');
+    const OX = 40, OY = 196, LS = 250, WS = 110, TZ = 30, NC = 26, NBAL = 30, V0 = 62, VY = 34;
+    const P = (x, y, z) => [OX + x + 0.55 * y, OY - 0.45 * y - z];
+    let ty = 'n', sB = 1, sI = 1, Qb, cs, bal;
+    const pileFront = () => sI * sB > 0;                  // both carrier types go to −y (front) when I·B > 0
+    const sV = () => (ty === 'n' ? -1 : 1) * sI * sB;      // sign of V(front) − V(back)
+    function spawn(q, first) {
+      q.x = sI * (ty === 'n' ? -1 : 1) > 0 ? (first ? rnd() * LS : 6) : (first ? rnd() * LS : LS - 6);
+      q.y = q.hl ? WS / 2 : 8 + rnd() * (WS - 16);
+    }
+    function mk() {
+      Qb = 0; bal = false;
+      cs = Array.from({ length: NC }, (_, i) => { const q = { hl: i === 0 }; spawn(q, true); if (q.hl) q.x = sI * (ty === 'n' ? -1 : 1) > 0 ? LS * 0.1 : LS * 0.9; return q; });
+    }
+    function upd() {
+      segSel(root, 'ty', ty);
+      $('rb4').setAttribute('aria-pressed', String(sB < 0)); $('ri4').setAttribute('aria-pressed', String(sI < 0));
+      $('c4a').textContent = pileFront() ? 'front face' : 'back face';
+      $('c4b').textContent = bal ? 'balanced (100%)' : Math.round(Qb * 100) + '% of final';
+      $('c4c').textContent = sV() < 0 ? '− negative' : '+ positive';
+    }
+    const A = new Anim('anim4', {
+      reset() { mk(); upd(); },
+      step(dt) {
+        const dir = sI * (ty === 'n' ? -1 : 1), side = pileFront() ? -1 : 1;
+        cs.forEach(q => {
+          q.x += dir * V0 * dt;
+          q.y += side * VY * (1 - Qb) * dt + (q.hl ? 0 : (rnd() - 0.5) * 18 * dt);
+          if ((side < 0 && q.y <= 3) || (side > 0 && q.y >= WS - 3)) {
+            if (!bal) Qb = Math.min(1, Qb + (1 - Qb) * 2.2 / NBAL + 0.004);
+            spawn(q, false);
+          }
+          q.y = clamp(q.y, 2, WS - 2);
+          if (q.x < 0 || q.x > LS) spawn(q, false);
+        });
+        if (!bal && Qb > 0.97) { Qb = 1; bal = true; }
+        upd();
+      },
+      draw() {
+        const c = cv.begin(); if (!c) return;
+        const dir = sI * (ty === 'n' ? -1 : 1), front = pileFront(), carCol = ty === 'n' ? C.e : C.h;
+        // slab faces
+        const top = [P(0, 0, TZ), P(LS, 0, TZ), P(LS, WS, TZ), P(0, WS, TZ)];
+        poly(c, [P(0, 0, 0), P(LS, 0, 0), P(LS, 0, TZ), P(0, 0, TZ)], '#1b2438', '#3c4a68');
+        poly(c, [P(LS, 0, 0), P(LS, WS, 0), P(LS, WS, TZ), P(LS, 0, TZ)], '#5d6a82', '#3c4a68');
+        poly(c, top, ty === 'n' ? '#1d3348' : '#3a2a2a', '#4a5a7c');
+        poly(c, [P(0, 0, TZ), P(8, 0, TZ), P(8, WS, TZ), P(0, WS, TZ)], C.metal);
+        poly(c, [P(LS - 8, 0, TZ), P(LS, 0, TZ), P(LS, WS, TZ), P(LS - 8, WS, TZ)], C.metal);
+        // piled-up charge: carriers on the pile face, fixed ions (opposite sign) on the other face
+        const nS = Math.round(Qb * 11), pileSign = ty === 'n' ? '−' : '+', ionSign = ty === 'n' ? '+' : '−';
+        for (let k = 0; k < nS; k++) {
+          const x = 20 + (k + 0.5) * (LS - 40) / 11;
+          const fp = P(x, 0, TZ / 2), bp = P(x, WS - 7, TZ);
+          if (front) { txt(c, pileSign, fp[0], fp[1], carCol, 14, 800, 'center'); txt(c, ionSign, bp[0], bp[1], C.ion, 13, 800, 'center'); }
+          else { txt(c, ionSign, fp[0], fp[1], C.ion, 14, 800, 'center'); txt(c, pileSign, bp[0], bp[1], carCol, 13, 800, 'center'); }
+        }
+        // carriers on the top face
+        cs.forEach(q => { const p = P(q.x, q.y, TZ); if (q.hl) return; ty === 'n' ? elec(c, p[0], p[1], 3.2) : holeRing(c, p[0], p[1], 3.6); });
+        // Hall field arrow (from the + face to the − face)
+        if (Qb > 0.04) {
+          const toFront = (front && ty === 'n') || (!front && ty === 'p');   // − face is the front face
+          const xa = LS * 0.86, len = 76 * Qb, ya = WS / 2 + (toFront ? len / 2 : -len / 2), yb = WS / 2 + (toFront ? -len / 2 : len / 2);
+          const a0 = P(xa, ya, TZ), a1 = P(xa, yb, TZ);
+          arrow(c, a0[0], a0[1], a1[0], a1[1], C.en, 3.2, 10);
+          sub(c, 'E', 'H', a1[0] + 8, a1[1] + (toFront ? 4 : -4), C.en, 12);
+        }
+        // highlighted carrier with the two forces
+        const h = cs[0], hp = P(h.x, h.y, TZ), side = front ? -1 : 1;
+        const fm = P(h.x - 4, h.y + side * 34, TZ), fe = P(h.x + 4, h.y - side * 34 * Qb, TZ);
+        const hb = P(h.x - 4, h.y, TZ), he = P(h.x + 4, h.y, TZ);
+        arrow(c, hb[0], hb[1], fm[0], fm[1], C.mag, 2.6, 8);
+        if (Qb > 0.05) arrow(c, he[0], he[1], fe[0], fe[1], C.en, 2.6, 8);
+        circ(c, hp[0], hp[1], 9, null, '#fff', 1.4);
+        ty === 'n' ? elec(c, hp[0], hp[1], 4.4) : holeRing(c, hp[0], hp[1], 4.8);
+        txt(c, 'qvB', fm[0] + (side < 0 ? -6 : 6), fm[1] + (side < 0 ? 6 : -6), C.mag, 10, 700, side < 0 ? 'right' : 'left');
+        if (Qb > 0.25) txt(c, 'qE', fe[0] + (side < 0 ? 6 : -6), fe[1] + (side < 0 ? -6 : 6), C.en, 10, 700, side < 0 ? 'left' : 'right');
+        // B arrows through the top face
+        [[0.1, 0.5], [0.3, 0.5], [0.7, 0.5], [0.9, 0.5]].forEach(([fx, fy]) => {
+          const b = P(fx * LS, fy * WS, TZ);
+          if (sB > 0) arrow(c, b[0], b[1], b[0], b[1] - 40, C.mag, 2.2, 8); else arrow(c, b[0], b[1] - 40, b[0], b[1], C.mag, 2.2, 8);
+        });
+        { const b = P(0.9 * LS, 0.5 * WS, TZ); txt(c, 'B', b[0] + 10, b[1] - 34, C.mag, 13, 700); }
+        // current arrow
+        const iy = OY + 18, ia = OX + 160, ib = OX + 250;
+        arrow(c, dir * (ty === 'n' ? -1 : 1) > 0 ? ia : ib, iy, dir * (ty === 'n' ? -1 : 1) > 0 ? ib : ia, iy, C.cur, 3, 10);
+        txt(c, 'I', ia - 12, iy, C.cur, 13, 700, 'center');
+        // voltmeter with leads to the front and back faces
+        const fl = P(LS * 0.5, 0, TZ / 2), bl = P(LS * 0.5, WS, TZ);
+        const mx = 116, my = 276, mw = 104, mh = 62;
+        c.strokeStyle = '#c9d1e0'; c.lineWidth = 1.5; c.beginPath();
+        c.moveTo(fl[0], fl[1]); c.lineTo(fl[0], 226); c.lineTo(mx - 26, 226); c.lineTo(mx - 26, my - mh / 2 + 4);
+        c.moveTo(bl[0], bl[1]); c.lineTo(bl[0], 30); c.lineTo(410, 30); c.lineTo(410, my); c.lineTo(mx + mw / 2, my);
+        c.stroke();
+        circ(c, fl[0], fl[1], 3, '#c9d1e0'); circ(c, bl[0], bl[1], 3, '#c9d1e0');
+        c.fillStyle = '#0f1420'; c.fillRect(mx - mw / 2, my - mh / 2, mw, mh);
+        c.strokeStyle = C.en; c.lineWidth = 1.4; c.strokeRect(mx - mw / 2, my - mh / 2, mw, mh);
+        const cx = mx, cy = my + 22, R = 40;
+        c.strokeStyle = C.muted; c.lineWidth = 1.2; c.beginPath(); c.arc(cx, cy, R, Math.PI * 1.17, Math.PI * 1.83); c.stroke();
+        line(c, cx, cy - R - 3, cx, cy - R + 4, C.muted, 1.2);
+        txt(c, '−', cx - R * 0.86, cy - R * 0.62, C.muted, 11, 700, 'center'); txt(c, '+', cx + R * 0.86, cy - R * 0.62, C.muted, 11, 700, 'center');
+        const ang = sV() * Qb * 0.9;
+        line(c, cx, cy, cx + Math.sin(ang) * (R - 4), cy - Math.cos(ang) * (R - 4), C.en, 2.2);
+        sub(c, 'V', 'H', mx - mw / 2 + 6, my + mh / 2 - 10, C.en, 11);
+        txt(c, '+', mx - 26 - 7, my - mh / 2 + 10, C.text, 10, 700, 'center'); txt(c, '−', mx + mw / 2 - 7, my - 10, C.text, 10, 700, 'center');
+        // axes
+        const ax = 18, ay = 296;
+        arrow(c, ax, ay, ax + 22, ay, C.muted, 1.4, 5); txt(c, 'x', ax + 27, ay, C.muted, 9, 600);
+        arrow(c, ax, ay, ax + 12, ay - 10, C.muted, 1.4, 5); txt(c, 'y', ax + 16, ay - 14, C.muted, 9, 600);
+        arrow(c, ax, ay, ax, ay - 20, C.muted, 1.4, 5); txt(c, 'z', ax, ay - 26, C.muted, 9, 600, 'center');
+        txt(c, 'front', P(LS * 0.18, 0, 0)[0], OY + 9, C.muted, 9, 500, 'center');
+        cv.wm(c);
+      }
+    });
+    root.querySelectorAll('[data-ty]').forEach(b => b.addEventListener('click', () => { ty = b.dataset.ty; mk(); upd(); A.dirty = true; }));
+    $('rb4').addEventListener('click', () => { sB = -sB; mk(); upd(); A.dirty = true; });
+    $('ri4').addEventListener('click', () => { sI = -sI; mk(); upd(); A.dirty = true; });
+  })();
+
+  /* =========================================================
+     SECTION 5: Hall calculator
+     ========================================================= */
+  (function () {
+    const W = 420, H = 180, cv = new Cv('cv5', W, H), root = $('anim5');
+    const sI = $('i5'), sB = $('b5'), sT = $('h5'), sN = $('n5'), sR = $('r5');
+    let ty = 'n', out, needle = 0, t = 0;
+    function calc() {
+      const I = +sI.value * 1e-3, B = +sB.value, tm = +sT.value * 1e-6, Ncm = Math.pow(10, +sN.value), rho = Math.pow(10, +sR.value);
+      const RHsi = (ty === 'n' ? -1 : 1) / (QE * Ncm * 1e6);      // m³/C
+      const VH = RHsi * I * B / tm, RHcm = RHsi * 1e6;            // V, cm³/C
+      out = { VH, RHcm, nFrom: 1 / (QE * Math.abs(RHcm)), mu: Math.abs(RHcm) / rho, rho, tum: tm * 1e6, I, B };
+      return out;
+    }
+    function range(v) { const a = Math.abs(v) || 1e-9, e = Math.floor(Math.log10(a)); for (const m of [1, 2, 5, 10]) if (a <= m * Math.pow(10, e) * 1.0001) return m * Math.pow(10, e); return 10 * Math.pow(10, e); }
+    function upd() {
+      const r = calc();
+      $('i5o').textContent = (+sI.value).toFixed(1) + ' mA'; $('b5o').textContent = (+sB.value).toFixed(2) + ' T';
+      $('h5o').textContent = r.tum >= 100 ? r.tum.toFixed(0) + ' µm' : r.tum.toPrecision(2) + ' µm';
+      $('n5o').textContent = fmtX(Math.pow(10, +sN.value), 1) + ' cm⁻³'; $('r5o').textContent = fmtG(r.rho) + ' Ω·cm';
+      $('c5a').textContent = fmtUnit(r.VH, 'V'); $('c5b').textContent = fmtG(r.RHcm);
+      $('c5c').textContent = r.RHcm < 0 ? 'N-type' : 'P-type';
+      $('c5d').textContent = fmtX(r.nFrom, 2); $('c5e').textContent = fmtG(r.mu);
+      segSel(root, 'ty', ty);
+    }
+    function siRho() { const N = Math.pow(10, +sN.value), k = ty === 'n' ? 'n' : 'p'; sR.value = Math.log10(1 / (QE * N * muT(k, 300, N))).toFixed(3); }
+    const A = new Anim('anim5', {
+      reset() { needle = 0; t = 0; upd(); },
+      step(dt) { t += dt; const rg = range(out.VH), tgt = out.VH / rg; needle += (tgt - needle) * Math.min(1, dt * 4); },
+      draw() {
+        const c = cv.begin(); if (!c) return;
+        if (!A || !A.playing) needle = out.VH / range(out.VH);
+        const P = (x, y, z) => [30 + x + 0.55 * y, 118 - 0.45 * y - z];
+        const L = 150, Wd = 60, Z = 16;
+        poly(c, [P(0, 0, 0), P(L, 0, 0), P(L, 0, Z), P(0, 0, Z)], '#1b2438', '#3c4a68');
+        poly(c, [P(L, 0, 0), P(L, Wd, 0), P(L, Wd, Z), P(L, 0, Z)], '#5d6a82', '#3c4a68');
+        poly(c, [P(0, 0, Z), P(L, 0, Z), P(L, Wd, Z), P(0, Wd, Z)], ty === 'n' ? '#1d3348' : '#3a2a2a', '#4a5a7c');
+        // carriers flowing (direction from type), B arrows, I arrow
+        for (let k = 0; k < 8; k++) {
+          const u = ((k / 8) + (ty === 'n' ? -1 : 1) * t * 0.15) % 1, x = 10 + ((u + 1) % 1) * (L - 20), y = 12 + ((k * 37) % 40);
+          const p = P(x, y, Z); ty === 'n' ? elec(c, p[0], p[1], 2.6) : holeRing(c, p[0], p[1], 3);
+        }
+        [0.25, 0.75].forEach(fx => { const b = P(fx * L, Wd / 2, Z); arrow(c, b[0], b[1], b[0], b[1] - 28, C.mag, 2, 7); });
+        { const b = P(0.75 * L, Wd / 2, Z); txt(c, 'B', b[0] + 8, b[1] - 24, C.mag, 12, 700); }
+        arrow(c, 40, 134, 150, 134, C.cur, 2.6, 9); txt(c, 'I', 30, 134, C.cur, 12, 700, 'center');
+        // meter
+        const mx = 300, my = 84, mw = 196 / 1.5, mh = 104;
+        const fl = P(L * 0.5, 0, Z / 2), bl = P(L * 0.5, Wd, Z);
+        c.strokeStyle = '#c9d1e0'; c.lineWidth = 1.4; c.beginPath();
+        c.moveTo(fl[0], fl[1]); c.lineTo(fl[0], 150); c.lineTo(mx - mw / 2 - 10, 150); c.lineTo(mx - mw / 2 - 10, my + 20); c.lineTo(mx - mw / 2, my + 20);
+        c.moveTo(bl[0], bl[1]); c.lineTo(bl[0], 22); c.lineTo(mx - mw / 2 - 10, 22); c.lineTo(mx - mw / 2 - 10, my - 20); c.lineTo(mx - mw / 2, my - 20);
+        c.stroke();
+        c.fillStyle = '#0f1420'; c.fillRect(mx - mw / 2, my - mh / 2, mw, mh);
+        c.strokeStyle = C.en; c.lineWidth = 1.4; c.strokeRect(mx - mw / 2, my - mh / 2, mw, mh);
+        txt(c, '+', mx - mw / 2 + 7, my + 20, C.text, 9, 700, 'center'); txt(c, '−', mx - mw / 2 + 7, my - 20, C.text, 9, 700, 'center');
+        const cx = mx, cy = my - 2, R = 40;
+        c.strokeStyle = C.muted; c.lineWidth = 1.2; c.beginPath(); c.arc(cx, cy, R, Math.PI * 1.2, Math.PI * 1.8); c.stroke();
+        line(c, cx, cy - R - 3, cx, cy - R + 4, C.muted, 1.2);
+        txt(c, '−', cx - R * 0.95, cy - R * 0.62, C.muted, 10, 700, 'center'); txt(c, '+', cx + R * 0.95, cy - R * 0.62, C.muted, 10, 700, 'center');
+        txt(c, 'full scale ±' + fmtUnit(range(out.VH), 'V'), cx, my + 43, C.muted, 8, 500, 'center');
+        const ang = clamp(needle, -1, 1) * 0.94;
+        line(c, cx, cy, cx + Math.sin(ang) * (R - 3), cy - Math.cos(ang) * (R - 3), C.en, 2.2);
+        circ(c, cx, cy, 3, C.en);
+        txt(c, fmtUnit(out.VH, 'V'), cx, my + 26, C.en, 13, 600, 'center', MONO);
+        sub(c, 'V', 'H', mx - mw / 2 + 18, my - mh / 2 + 11, C.en, 10);
+        cv.wm(c);
+      }
+    });
+    [sI, sB, sT, sN, sR].forEach(s => s.addEventListener('input', () => { upd(); A.dirty = true; }));
+    root.querySelectorAll('[data-ty]').forEach(b => b.addEventListener('click', () => { ty = b.dataset.ty; siRho(); upd(); A.dirty = true; }));
+    $('si5').addEventListener('click', () => { siRho(); upd(); A.dirty = true; });
+    siRho(); upd();
+  })();
+
+  /* ---------- sticky mini-nav highlight ---------- */
+  (function () {
+    const links = Array.from(document.querySelectorAll('.toc a'));
+    const secs = links.map(l => document.querySelector(l.getAttribute('href')));
+    function upd() {
+      let cur = 0;
+      secs.forEach((s, i) => { if (s.getBoundingClientRect().top < 120) cur = i; });
+      links.forEach((l, i) => l.classList.toggle('active', i === cur));
+    }
+    window.addEventListener('scroll', upd, { passive: true }); upd();
+  })();
+
+  let last = performance.now();
+  function frame(ts) {
+    const dt = Math.min(0.05, Math.max(0, (ts - last) / 1000)); last = ts;
+    anims.forEach(a => {
+      if (!a.visible) return;
+      if (a.playing) { a.o.step(dt); a.o.draw(); }
+      else if (a.dirty) a.o.draw();
+      a.dirty = false;
+    });
+    requestAnimationFrame(frame);
+  }
+  function onResize() { anims.forEach(a => { a.dirty = true; }); }
+  window.addEventListener('resize', onResize);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(onResize);
+  requestAnimationFrame(frame);
+})();
+</script>
+<script>
+  // Typeset [data-tex] elements as maths once KaTeX has loaded; pages call mathify(el) after changing text.
+  window.mathify = function (root) {
+    if (!window.katex) return;
+    (root || document).querySelectorAll('[data-tex]').forEach(function (el) {
+      var block = (el.classList.contains('eq') || el.classList.contains('f')) && el.tagName !== 'TD';
+      try { katex.render(el.getAttribute('data-tex'), el, { displayMode: block, throwOnError: false }); } catch (e) {}
+    });
+  };
+  document.addEventListener('DOMContentLoaded', function () { window.mathify(); });
+</script>
+</body>
+</html>
