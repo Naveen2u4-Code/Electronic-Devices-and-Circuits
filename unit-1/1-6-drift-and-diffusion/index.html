@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>1.6 Drift and Diffusion</title>
+  <meta name="description" content="Drift and diffusion currents explained step by step: random thermal motion and scattering, drift velocity and mobility, velocity saturation, diffusion current and its sign, the Einstein relation, and how drift balances diffusion in a non-uniformly doped bar. An interactive lesson.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <style>
+    :root {
+      --bg: #0f1420;
+      --panel: #1a2132;
+      --panel-hover: #212a3f;
+      --border: #2a3448;
+      --text: #e6e9ef;
+      --muted: #9aa4b8;
+      --electron: #4fc3f7;
+      --hole: #ff8a65;
+      --energy: #ffd54f;
+      --success: #81c784;
+      --donor: #66bb6a;
+      --acceptor: #f06292;
+      --vb: #3949ab;
+      --cb: #00838f;
+      --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+      --max: 960px;
+      --radius: 12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: var(--font); font-size: 16px; line-height: 1.65;
+      overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column;
+    }
+    a { color: var(--electron); }
+    .wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 16px; }
+
+    /* Sticky mini-nav */
+    .toc {
+      position: sticky; top: 0; z-index: 10; background: rgba(15, 20, 32, .95);
+      border-bottom: 1px solid var(--border); backdrop-filter: blur(6px);
+    }
+    .toc ul { display: flex; gap: 4px; list-style: none; margin: 0 auto; padding: 8px 16px; max-width: var(--max); overflow-x: auto; scrollbar-width: none; }
+    .toc ul::-webkit-scrollbar { display: none; }
+    .toc a {
+      display: block; white-space: nowrap; text-decoration: none; color: var(--muted);
+      font-size: 0.85rem; font-weight: 500; padding: 6px 10px; border-radius: 999px;
+    }
+    .toc a:hover { color: var(--text); background: var(--panel); }
+    .toc a.active { color: var(--bg); background: var(--electron); }
+
+    main { flex: 1; padding: 24px 0 48px; }
+    .crumbs { font-size: 0.875rem; color: var(--muted); margin: 0 0 16px; }
+    .crumbs a { color: var(--muted); }
+    .crumbs a:hover { color: var(--electron); }
+    .eyebrow { font-family: var(--mono); font-size: 0.8rem; color: var(--electron); letter-spacing: .04em; margin: 0; }
+    h1 { font-size: clamp(1.5rem, 6vw, 2.2rem); line-height: 1.2; margin: 4px 0 6px; }
+    .subtitle { color: var(--muted); margin: 0 0 8px; }
+    section { scroll-margin-top: 64px; padding-top: 28px; }
+    h2 { font-size: clamp(1.3rem, 5vw, 1.6rem); line-height: 1.25; margin: 0 0 14px; }
+    h3 { font-size: 1.05rem; margin: 0 0 8px; }
+    .prose { font-size: 17px; line-height: 1.7; }
+    .prose p, .prose ul { margin: 0 0 14px; }
+    .prose ul { padding-left: 20px; }
+    .prose li { margin: 4px 0; }
+    .prose strong { color: #fff; }
+    .eq { font-family: var(--mono); color: var(--energy); background: #141b2b; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; display: block; overflow-wrap: anywhere; margin: 0 0 14px; font-size: 15px; }
+    .t-e { color: var(--electron); font-weight: 600; }
+    .t-h { color: var(--hole); font-weight: 600; }
+    .t-f { color: var(--energy); font-weight: 600; }
+    hr.sep { border: 0; border-top: 1px solid var(--border); margin: 40px 0 0; }
+    .rm-note { font-size: 0.78rem; color: var(--muted); margin: 0 0 8px; }
+
+    /* Buttons & controls */
+    .btn {
+      font: inherit; font-size: 0.88rem; font-weight: 600; color: var(--text);
+      background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+      padding: 7px 12px; cursor: pointer; min-height: 38px;
+    }
+    .btn:hover:not(:disabled) { background: var(--panel-hover); border-color: var(--electron); }
+    .btn:focus-visible, input:focus-visible { outline: 2px solid var(--electron); outline-offset: 2px; }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
+    .btn[aria-pressed="true"] { background: rgba(255,213,79,.14); border-color: var(--energy); color: var(--energy); }
+
+    figure.anim {
+      margin: 18px 0 0; background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 12px; min-width: 0;
+    }
+    .ctrls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-bottom: 12px; }
+    .slider { flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; }
+    .slider label { display: flex; justify-content: space-between; gap: 8px; font-size: 0.8rem; color: var(--muted); }
+    .slider output { font-family: var(--mono); color: var(--energy); white-space: nowrap; }
+    input[type="range"] { width: 100%; accent-color: var(--energy); margin: 4px 0 0; }
+    canvas { display: block; width: 100%; border-radius: 8px; background: #141b2b; }
+    canvas.drag { touch-action: none; cursor: ns-resize; }
+    .narrow { max-width: 640px; margin: 0 auto; }
+    .exag { font-size: 0.75rem; color: var(--muted); margin: 10px 0 0; }
+    .exag b { color: var(--energy); font-weight: 600; }
+
+    .counters { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 0; }
+    .ctr {
+      flex: 1 1 120px; background: #141b2b; border: 1px solid var(--border); border-radius: 8px;
+      padding: 6px 10px; font-size: 0.78rem; color: var(--muted); min-width: 0;
+    }
+    .ctr b { display: block; font-family: var(--mono); font-size: 1.02rem; font-weight: 500; white-space: nowrap; color: var(--text); overflow: hidden; text-overflow: ellipsis; }
+    .ctr.n b { color: var(--electron); }
+    .ctr.p b { color: var(--hole); }
+    .ctr.ok b { color: var(--success); }
+    .ctr.en b { color: var(--energy); }
+
+    .legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 0.8rem; color: var(--muted); margin: 8px 0 0; padding: 0; list-style: none; }
+    .legend li { display: inline-flex; align-items: center; gap: 6px; }
+    .sw { display: inline-block; width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
+    .sw.e { background: var(--electron); }
+    .sw.h { border: 2px solid var(--hole); background: rgba(255,138,101,.2); }
+    .ln { display: inline-block; width: 18px; height: 0; border-top: 2px solid var(--energy); flex-shrink: 0; }
+    .ln.ei { border-top: 2px dashed var(--muted); }
+    .ln.bz { border-top: 2px dashed var(--success); }
+    .ln.fe { border-top-color: var(--electron); }
+    .ionsw { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; font-size: 11px; font-weight: 700; line-height: 1; flex-shrink: 0; }
+    .ionsw.d { border: 1.5px solid var(--donor); color: var(--donor); }
+    .ionsw.a { border: 1.5px solid var(--acceptor); color: var(--acceptor); }
+
+    .keypoints {
+      margin-top: 16px; padding: 14px 16px; border-radius: var(--radius);
+      background: rgba(129,199,132,.07); border: 1px solid rgba(129,199,132,.35);
+    }
+    .keypoints h3 { color: var(--success); font-size: 0.95rem; text-transform: uppercase; letter-spacing: .05em; }
+    .keypoints ul { margin: 0; padding-left: 20px; }
+    .keypoints li { margin: 4px 0; }
+
+    .sumhead { margin: 28px 0 10px; font-size: 1.15rem; }
+    .table-box { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 12px; overflow-x: auto; }
+    .vt { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    .vt th, .vt td { text-align: left; padding: 7px 6px; border-top: 1px solid var(--border); vertical-align: top; }
+    .vt thead th { color: var(--muted); font-weight: 600; border-top: 0; }
+    .vt tbody th { font-weight: 600; width: 20%; }
+    .vt .f { font-family: var(--mono); color: var(--energy); font-size: .82rem; }
+    @media (max-width: 480px) { .vt { font-size: .8rem; } .vt th, .vt td { padding: 6px 4px; } .vt .f { font-size: .74rem; } }
+    .formulas { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    @media (min-width: 640px) { .formulas { grid-template-columns: 1fr 1fr; } }
+    .fcard { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; min-width: 0; }
+    .fcard .f { font-family: var(--mono); font-size: 1rem; color: var(--energy); overflow-wrap: anywhere; }
+    .fcard p { margin: 6px 0 0; font-size: 0.85rem; color: var(--muted); }
+
+    .pager { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 48px; }
+    .pager a {
+      display: block; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 12px 14px; text-decoration: none; color: var(--text); min-width: 0;
+    }
+    .pager a:hover { border-color: var(--electron); }
+    .pager small { display: block; color: var(--muted); font-size: 0.75rem; }
+    .pager .next { text-align: right; }
+
+    /* Maths (KaTeX). The plain-text version inside each element stays as a fallback. */
+    .eq[data-tex], .f[data-tex] { font-family: var(--font); }
+    .eq[data-tex], .f[data-tex] { text-align: center; }
+    .eq .katex-display, .f .katex-display { margin: 0; text-align: center; overflow-x: auto; overflow-y: hidden; padding: 6px 0; }
+    .eq .katex-display > .katex, .f .katex-display > .katex { text-align: center; }
+    .eq .katex, .f .katex { font-size: 1.3em; }
+    td.f .katex { font-size: 1.15em; }
+    .m .katex { font-size: 1.12em; }
+    td.f .katex { white-space: nowrap; }
+    @media (max-width: 480px) { td.f .katex { font-size: 1em; } }
+    /* Justified paragraphs on desktop; phones stay left-aligned to avoid wide word gaps. */
+    @media (min-width: 768px) {
+      .prose p, .prose li, .intro, .keypoints li, .exag { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+    }
+
+    /* Topic 1.6 colours */
+    :root { --drift: #81c784; --diff: #ce93d8; --lat: #b39ddb; }
+    .t-dr { color: var(--drift); } .t-df { color: var(--diff); }
+    .duo { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    @media (min-width: 640px) { .duo { grid-template-columns: 1fr 1fr; } }
+    .sw.tr { background: #fff59d; }
+    .sw.lat { background: rgba(179,157,219,.45); }
+    .sw.sp { background: transparent; border: 1.5px dashed #fff; }
+    .ln.dr { border-top-color: var(--drift); }
+    .ln.df { border-top-color: var(--diff); }
+    .ln.fl { border-top-color: #e6e9ef; }
+    .ctr.dr b { color: var(--drift); }
+    .vt thead th.dr-col { color: var(--drift); }
+    .vt thead th.df-col { color: var(--diff); }
+  </style>
+</head>
+<body>
+
+  <nav class="toc" aria-label="Sections">
+    <ul>
+      <li><a href="#s0">How carriers move</a></li>
+      <li><a href="#s1">Thermal motion</a></li>
+      <li><a href="#s2">Drift</a></li>
+      <li><a href="#s3">Diffusion</a></li>
+      <li><a href="#s4">Einstein relation</a></li>
+      <li><a href="#s5">Total current</a></li>
+      <li><a href="#s6">Summary</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="wrap">
+      <header>
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="../../index.html">Home</a> / <a href="../index.html">Unit 1</a> / 1.6
+        </nav>
+        <p class="eyebrow">TOPIC 1.6</p>
+        <h1>Drift and Diffusion Currents</h1>
+        <p class="subtitle">The two ways electrons and holes carry current: pushed by a field, or spreading out on their own</p>
+        <p class="rm-note" id="rmNote" hidden>Your device asks for reduced motion, so every animation starts paused. Press Play on any animation to run it. Sliders and buttons still update the picture.</p>
+      </header>
+
+      <!-- ================= SECTION 0 ================= -->
+      <section id="s0" aria-labelledby="h0">
+        <h2 id="h0">How do carriers move?</h2>
+        <div class="prose">
+          <p>Electric current is the <strong>net flow of charge</strong>. In a semiconductor the moving charges are free <span class="t-e">electrons</span> in the conduction band and <span class="t-h">holes</span> in the valence band.</p>
+          <p>Carriers can produce a net flow for two quite different reasons:</p>
+          <ul>
+            <li><strong class="t-dr">Drift</strong>: an electric field pushes them.</li>
+            <li><strong class="t-df">Diffusion</strong>: they spread out from where there are many of them to where there are few.</li>
+          </ul>
+          <p>Both can happen at the same time, in the same piece of material. Every semiconductor device (diodes, transistors, solar cells) works through some balance of these two mechanisms, so it pays to understand each one clearly.</p>
+          <p>Before we push the carriers, we first need to see how they move when <strong>nothing</strong> is pushing them.</p>
+        </div>
+
+        <figure class="anim" id="anim0">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="duo">
+            <canvas id="cv0a" style="aspect-ratio:300/210" role="img" aria-label="Drift preview: a yellow field arrow points right and blue electrons drift steadily to the left while jiggling randomly."></canvas>
+            <canvas id="cv0b" style="aspect-ratio:300/210" role="img" aria-label="Diffusion preview: a crowd of blue electrons starts packed at the left and spreads out to fill the box with no field applied."></canvas>
+          </div>
+          <ul class="legend">
+            <li><span class="sw e"></span><span>electron</span></li>
+            <li><span class="ln"></span><span>electric field E</span></li>
+          </ul>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: how carriers move">
+          <h3>Key points</h3>
+          <ul>
+            <li>Current is the net flow of charge carried by electrons and holes.</li>
+            <li><strong>Drift</strong>: carriers are pushed by an electric field.</li>
+            <li><strong>Diffusion</strong>: carriers spread from high to low concentration.</li>
+            <li>Real devices work through a balance of the two.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 1 ================= -->
+      <section id="s1" aria-labelledby="h1s">
+        <h2 id="h1s">Random thermal motion and scattering</h2>
+        <div class="prose">
+          <p>Even with no voltage applied, free carriers are never still. Their thermal energy makes them move very fast: about <strong>10⁷ cm/s (100 km/s)</strong> at room temperature. Each carrier moves in a random direction.</p>
+          <p>A carrier does not travel far in a straight line. It constantly <strong>collides</strong> (we say it <strong>scatters</strong>) with vibrating lattice atoms and with charged impurity ions, and every collision sends it off in a new direction. The average time between collisions is very short, about <strong>0.1 picosecond</strong> (10⁻¹³ s). The average distance between collisions, called the <strong>mean free path</strong>, is only <strong>tens of nanometres</strong>.</p>
+          <p>The result is a random zig-zag path. Because every direction is equally likely, as many carriers cross any imaginary line from left to right as from right to left. The net movement averages to zero, so <strong>no current flows</strong>, even though every carrier is moving very fast.</p>
+          <p>This random motion is the background for everything that follows. Drift and diffusion are both small, orderly effects added on top of it.</p>
+        </div>
+
+        <figure class="anim" id="anim1">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <canvas id="cv1" class="narrow" style="aspect-ratio:420/330" role="img" aria-label="A box of faint lattice atoms with about 30 electrons moving in straight lines and changing direction at collisions, each marked by a small spark. One electron leaves a zig-zag trail. A dashed vertical line counts crossings in each direction; the two counts stay about equal, so the net current is zero."></canvas>
+          <ul class="legend">
+            <li><span class="sw e"></span><span>electron</span></li>
+            <li><span class="sw tr"></span><span>tracked electron</span></li>
+            <li><span class="sw lat"></span><span>lattice atom</span></li>
+            <li><span class="sw sp"></span><span>collision</span></li>
+          </ul>
+          <div class="counters" aria-live="polite">
+            <div class="ctr">Crossings left → right<b id="c1a">0</b></div>
+            <div class="ctr">Crossings right → left<b id="c1b">0</b></div>
+            <div class="ctr ok">Net current<b id="c1c">≈ 0</b></div>
+          </div>
+          <p class="exag"><b>Slowed down:</b> real carriers scatter about 10¹³ times per second; here each one scatters roughly twice a second so the path can be followed.</p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: thermal motion">
+          <h3>Key points</h3>
+          <ul>
+            <li>Thermal speed of carriers ≈ 10⁷ cm/s at room temperature.</li>
+            <li>Carriers scatter off lattice vibrations and impurity ions about every 0.1 ps.</li>
+            <li>Mean free path: tens of nanometres.</li>
+            <li>Random directions → zero net movement → <strong>no current</strong>.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 2 ================= -->
+      <section id="s2" aria-labelledby="h2s">
+        <h2 id="h2s">Drift current</h2>
+        <div class="prose">
+          <p>Now apply an electric field <span class="m" data-tex="E">E</span>. Each carrier feels a force <span class="m" data-tex="F = qE">F = qE</span>. Between collisions it speeds up slightly in the direction of that force; each collision then randomises its direction again. On top of the fast random motion, a slow, steady average motion appears. Its average velocity is called the <strong>drift velocity</strong> <span class="m" data-tex="v_d">v<sub>d</sub></span>.</p>
+          <p>For low and moderate fields the drift velocity is proportional to the field:</p>
+          <span class="eq" data-tex="v_d = \mu E">v<sub>d</sub> = μ E</span>
+          <p>The constant <span class="m" data-tex="\mu">μ</span> is the <strong>mobility</strong>, measured in cm²/V·s. It tells us how easily a carrier moves through the crystal. Values for Si at 300 K: <span class="m" data-tex="\mu_n \approx 1350">μ<sub>n</sub> ≈ 1350</span> and <span class="m" data-tex="\mu_p \approx 480">μ<sub>p</sub> ≈ 480</span> cm²/V·s. Mobility is studied in detail in topic 1.7.</p>
+          <p><span class="t-e">Electrons</span> drift <strong>opposite</strong> to <span class="m" data-tex="E">E</span> because their charge is negative; <span class="t-h">holes</span> drift <strong>along</strong> <span class="m" data-tex="E">E</span>. They move in opposite directions, but they also carry opposite charges, so <strong>both drift currents point in the direction of <span class="m" data-tex="E">E</span></strong> and add together.</p>
+          <p>The drift current density is</p>
+          <span class="eq" data-tex="J_{\text{drift}} = q\,(n\mu_n + p\mu_p)\,E = \sigma E">J<sub>drift</sub> = q (nμ<sub>n</sub> + pμ<sub>p</sub>) E = σ E</span>
+          <p>where <span class="m" data-tex="\sigma">σ</span> is the conductivity. This is simply <strong>Ohm's law</strong> written at the microscopic level.</p>
+          <p>At very high fields, above about <strong>10⁴ V/cm</strong> in Si, the carriers lose energy to the lattice as fast as they gain it. The drift velocity stops increasing and levels off near <strong>10⁷ cm/s</strong>. This is called <strong>velocity saturation</strong>, and it limits the speed of very small transistors.</p>
+        </div>
+
+        <figure class="anim" id="anim2">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="slider">
+              <label for="e2"><span>Electric field E</span><output id="e2o" for="e2">1.0×10³ V/cm</output></label>
+              <input type="range" id="e2" min="0" max="100" step="1" value="40">
+            </div>
+          </div>
+          <canvas id="cv2" class="narrow" style="aspect-ratio:420/350" role="img" aria-label="A silicon box between a positive contact on the left and a negative contact on the right. The yellow field arrow points right. Blue electrons zig-zag but slowly drift to the left; orange holes drift to the right. Green current arrows for both carriers point right, along the field."></canvas>
+          <canvas id="cv2g" class="narrow" style="aspect-ratio:420/280;margin-top:10px" role="img" aria-label="Log-log graph of drift velocity against electric field for electrons and holes in silicon. Both rise in a straight line at low field and level off near 10 to the 7 centimetres per second above about 10 to the 4 volts per centimetre. A dot on each curve follows the slider."></canvas>
+          <ul class="legend">
+            <li><span class="sw e"></span><span>electron</span></li>
+            <li><span class="sw h"></span><span>hole</span></li>
+            <li><span class="ln"></span><span>field E</span></li>
+            <li><span class="ln dr"></span><span>drift current</span></li>
+          </ul>
+          <div class="counters" aria-live="polite">
+            <div class="ctr n">Electron <span class="m" data-tex="v_d">v<sub>d</sub></span> (←)<b id="c2a">–</b></div>
+            <div class="ctr p">Hole <span class="m" data-tex="v_d">v<sub>d</sub></span> (→)<b id="c2b">–</b></div>
+            <div class="ctr dr"><span class="m" data-tex="J_{\text{drift}}">J<sub>drift</sub></span> (<span class="m" data-tex="N_D = 10^{16}">N<sub>D</sub> = 10<sup>16</sup></span> cm⁻³)<b id="c2c">–</b></div>
+          </div>
+          <p class="exag"><b>Greatly exaggerated:</b> on screen the drift is a large fraction of the random thermal speed. In real Si at 10³ V/cm the drift velocity is only about 1/10 of the thermal speed, and at low fields far less. Values for Si at 300 K.</p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: drift">
+          <h3>Key points</h3>
+          <ul>
+            <li>A field adds a slow average <strong>drift velocity</strong> on top of the random motion.</li>
+            <li><span class="m" data-tex="v_d = \mu E">v<sub>d</sub> = μ E</span> at low and moderate fields; Si: <span class="m" data-tex="\mu_n \approx 1350">μ<sub>n</sub> ≈ 1350</span>, <span class="m" data-tex="\mu_p \approx 480">μ<sub>p</sub> ≈ 480</span> cm²/V·s.</li>
+            <li>Electrons drift against <span class="m" data-tex="E">E</span>, holes along it; both currents point along <span class="m" data-tex="E">E</span>.</li>
+            <li><span class="m" data-tex="J_{\text{drift}} = q(n\mu_n + p\mu_p)E = \sigma E">J<sub>drift</sub> = q(nμ<sub>n</sub> + pμ<sub>p</sub>)E = σ E</span> (Ohm's law).</li>
+            <li>Above ≈ 10⁴ V/cm, <span class="m" data-tex="v_d">v<sub>d</sub></span> saturates near 10⁷ cm/s.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 3 ================= -->
+      <section id="s3" aria-labelledby="h3s">
+        <h2 id="h3s">Diffusion current</h2>
+        <div class="prose">
+          <p>Diffusion needs <strong>no force at all</strong>. Suppose carriers are crowded on one side of a sample and sparse on the other; we say there is a <strong>concentration gradient</strong>. Every carrier still moves at random, but there are simply more carriers on the crowded side to wander across, so more cross from crowded to sparse than the other way. The net flow is from <strong>high concentration to low concentration</strong>, just as a drop of ink spreads out in still water.</p>
+          <p>The flow of carriers is proportional to the gradient: the steeper the change in concentration, the faster they spread. The constant of proportionality is the <strong>diffusion coefficient</strong> <span class="m" data-tex="D">D</span>, measured in cm²/s. Turning carrier flow into current gives</p>
+          <span class="eq" data-tex="\begin{aligned} J_{n,\text{diff}} &amp;= +\,q D_n \frac{dn}{dx} \\ J_{p,\text{diff}} &amp;= -\,q D_p \frac{dp}{dx} \end{aligned}">J<sub>n,diff</sub> = + q D<sub>n</sub> dn/dx <br> J<sub>p,diff</sub> = − q D<sub>p</sub> dp/dx</span>
+          <p><strong>Watch the signs.</strong> Electrons diffuse from high to low concentration, but because they are negative, the electron diffusion <strong>current</strong> points the opposite way: toward the high concentration. Holes are positive, so they diffuse and carry current in the <strong>same</strong> direction, from high to low.</p>
+          <p>Diffusion carries on as long as there is a gradient. It stops only when the concentration has become <strong>uniform</strong>.</p>
+        </div>
+
+        <figure class="anim" id="anim3">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <button class="btn" type="button" id="k3e" aria-pressed="true">Electrons</button>
+            <button class="btn" type="button" id="k3h" aria-pressed="false">Holes</button>
+          </div>
+          <canvas id="cv3" class="narrow" style="aspect-ratio:420/360" role="img" aria-label="A long box. Carriers start packed in the left third and spread to the right by random motion alone. Below, a concentration-versus-position graph flattens over time, with the steepest slope highlighted. A white arrow shows particle flow from high to low concentration; a purple arrow shows the diffusion current, opposite to the flow for electrons and the same as the flow for holes."></canvas>
+          <ul class="legend">
+            <li><span class="ln fl"></span><span>carrier flow</span></li>
+            <li><span class="ln df"></span><span>diffusion current</span></li>
+          </ul>
+          <p class="exag">No field is applied: the spreading comes only from random motion. Reset starts again from the packed state.</p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: diffusion">
+          <h3>Key points</h3>
+          <ul>
+            <li>Diffusion needs no field: random motion plus a concentration gradient.</li>
+            <li>Carriers flow from high to low concentration; the flow ∝ gradient, constant <span class="m" data-tex="D">D</span> (cm²/s).</li>
+            <li><span class="m" data-tex="J_{n,\text{diff}} = qD_n\,dn/dx">J<sub>n,diff</sub> = qD<sub>n</sub> dn/dx</span>, <span class="m" data-tex="J_{p,\text{diff}} = -qD_p\,dp/dx">J<sub>p,diff</sub> = −qD<sub>p</sub> dp/dx</span>.</li>
+            <li>Electron current points <strong>toward</strong> high concentration; hole current points away from it.</li>
+            <li>Diffusion stops when the concentration is uniform.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 4 ================= -->
+      <section id="s4" aria-labelledby="h4s">
+        <h2 id="h4s">The Einstein relation</h2>
+        <div class="prose">
+          <p>Drift and diffusion look like different processes, but both come from the same random scattering motion. A carrier that scatters rarely both drifts easily in a field and spreads quickly in a gradient. So mobility and diffusion coefficient must be linked. The link is the <strong>Einstein relation</strong>:</p>
+          <span class="eq" data-tex="\frac{D}{\mu} = \frac{kT}{q}">D/μ = kT/q</span>
+          <p>The quantity <span class="m" data-tex="kT/q">kT/q</span> is called the <strong>thermal voltage</strong>. At 300 K it is <strong>25.9 mV</strong>. Values for Si at 300 K:</p>
+          <span class="eq" data-tex="\begin{aligned} D_n &amp;= \mu_n \frac{kT}{q} \approx 1350 \times 0.0259 \approx 35\ \text{cm}^2/\text{s} \\ D_p &amp;= \mu_p \frac{kT}{q} \approx 480 \times 0.0259 \approx 12.4\ \text{cm}^2/\text{s} \end{aligned}">D<sub>n</sub> = μ<sub>n</sub> kT/q ≈ 1350 × 0.0259 ≈ 35 cm<sup>2</sup>/s <br> D<sub>p</sub> = μ<sub>p</sub> kT/q ≈ 480 × 0.0259 ≈ 12.4 cm<sup>2</sup>/s</span>
+          <p>Once you know a mobility, you know the diffusion coefficient too. Electrons in Si spread almost three times faster than holes, for the same reason that they drift almost three times faster.</p>
+        </div>
+
+        <figure class="anim" id="anim4">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <span class="seg" role="group" aria-label="Material">
+              <button class="btn" type="button" data-mat="Si" aria-pressed="true">Si</button>
+              <button class="btn" type="button" data-mat="Ge" aria-pressed="false">Ge</button>
+              <button class="btn" type="button" data-mat="GaAs" aria-pressed="false">GaAs</button>
+            </span>
+            <div class="slider">
+              <label for="t4"><span>Temperature</span><output id="t4o" for="t4">300 K</output></label>
+              <input type="range" id="t4" min="200" max="500" step="5" value="300">
+            </div>
+          </div>
+          <div class="counters" aria-live="polite">
+            <div class="ctr en"><span class="m" data-tex="kT/q">kT/q</span><b id="c4a">–</b></div>
+            <div class="ctr n"><span class="m" data-tex="D_n">D<sub>n</sub></span> (<span class="m" data-tex="\mu_n">μ<sub>n</sub></span> = <span id="c4mn">1350</span>)<b id="c4b">–</b></div>
+            <div class="ctr p"><span class="m" data-tex="D_p">D<sub>p</sub></span> (<span class="m" data-tex="\mu_p">μ<sub>p</sub></span> = <span id="c4mp">480</span>)<b id="c4c">–</b></div>
+          </div>
+          <canvas id="cv4" class="narrow" style="aspect-ratio:420/250;margin-top:12px" role="img" aria-label="Two lanes. In each, a group of carriers starts at the centre and spreads out by random motion: electrons in the top lane, holes in the bottom lane. Bracket marks show the expected spread from the diffusion coefficient. The lane with the larger D spreads faster and restarts sooner."></canvas>
+          <p class="exag"><b>Simplified:</b> mobilities are held at their 300 K values as the temperature changes, so only <span class="m" data-tex="kT/q">kT/q</span> changes. Spreading speed on screen is proportional to <span class="m" data-tex="D">D</span>; the bracket marks show ±√(2Dt).</p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: Einstein relation">
+          <h3>Key points</h3>
+          <ul>
+            <li><span class="m" data-tex="D/\mu = kT/q">D/μ = kT/q</span>: one random motion causes both drift and diffusion.</li>
+            <li>Thermal voltage <span class="m" data-tex="kT/q">kT/q</span> = 25.9 mV at 300 K.</li>
+            <li>Si at 300 K: <span class="m" data-tex="D_n \approx 35">D<sub>n</sub> ≈ 35</span> cm²/s, <span class="m" data-tex="D_p \approx 12.4">D<sub>p</sub> ≈ 12.4</span> cm²/s.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 5 ================= -->
+      <section id="s5" aria-labelledby="h5s">
+        <h2 id="h5s">Total current, and drift balancing diffusion</h2>
+        <div class="prose">
+          <p>In general both mechanisms act at once. The electron and hole current densities are each the sum of a drift part and a diffusion part, and the total current is their sum:</p>
+          <span class="eq" data-tex="\begin{aligned} J_n &amp;= q\,n\,\mu_n E + q D_n \frac{dn}{dx} \\ J_p &amp;= q\,p\,\mu_p E - q D_p \frac{dp}{dx} \\ J &amp;= J_n + J_p \end{aligned}">J<sub>n</sub> = q n μ<sub>n</sub> E + q D<sub>n</sub> dn/dx <br> J<sub>p</sub> = q p μ<sub>p</sub> E − q D<sub>p</sub> dp/dx <br> J = J<sub>n</sub> + J<sub>p</sub></span>
+          <p>An important case is a <strong>non-uniformly doped</strong> bar, with more donors on the left than on the right, and <strong>no external voltage</strong>. At first the electron concentration follows the donors, so there are more electrons on the left. Electrons therefore diffuse from left to right.</p>
+          <p>As they leave, the fixed positive donor ions they leave behind on the left are no longer balanced, and the extra electrons on the right make that side negative. This separated charge creates an <strong>internal (built-in) electric field</strong> pointing from left to right. The field pushes electrons back to the left by drift.</p>
+          <p>The process stops when the two effects balance. In <strong>equilibrium</strong> the drift current exactly cancels the diffusion current, so the total current is <strong>zero</strong>, even though both currents are still flowing. The same balance creates the built-in potential of a PN junction (topic 2.2). Applying an external voltage upsets the balance, and a net current flows.</p>
+        </div>
+
+        <figure class="anim" id="anim5">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <button class="btn" type="button" id="go5">Start</button>
+            <button class="btn" type="button" id="v5" aria-pressed="false">Apply external voltage</button>
+          </div>
+          <canvas id="cv5" class="narrow" style="aspect-ratio:420/360" role="img" aria-label="A bar with many fixed positive donor ions on the left and few on the right, plus free electrons. After Start, electrons diffuse right, leaving uncovered positive ions on the left; a yellow built-in field arrow grows. Below, a purple diffusion-current bar and a green drift-current bar become equal and opposite, and the total-current bar settles at zero. Applying an external voltage makes the total non-zero."></canvas>
+          <ul class="legend">
+            <li><span class="sw e"></span><span>free electron</span></li>
+            <li><span class="ionsw d">+</span><span>donor ion</span></li>
+            <li><span class="ln"></span><span>field E</span></li>
+            <li><span class="ln df"></span><span>diffusion current</span></li>
+            <li><span class="ln dr"></span><span>drift current</span></li>
+          </ul>
+          <p class="exag"><b>Not to scale:</b> the charge separation and the width of the charged regions are greatly exaggerated; currents are shown relative to the starting diffusion current.</p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: total current">
+          <h3>Key points</h3>
+          <ul>
+            <li><span class="m" data-tex="J_n = qn\mu_nE + qD_n\,dn/dx">J<sub>n</sub> = qnμ<sub>n</sub>E + qD<sub>n</sub> dn/dx</span>, <span class="m" data-tex="J_p = qp\mu_pE - qD_p\,dp/dx">J<sub>p</sub> = qpμ<sub>p</sub>E − qD<sub>p</sub> dp/dx</span>, <span class="m" data-tex="J = J_n + J_p">J = J<sub>n</sub> + J<sub>p</sub></span>.</li>
+            <li>Non-uniform doping: diffusion uncovers fixed ions and creates a <strong>built-in field</strong>.</li>
+            <li>In equilibrium, drift exactly cancels diffusion: total current = 0.</li>
+            <li>This balance is the origin of the PN junction built-in potential.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 6 ================= -->
+      <section id="s6" aria-labelledby="h6s">
+        <h2 id="h6s">Summary</h2>
+        <div class="table-box">
+          <table class="vt">
+            <thead><tr><th scope="col"></th><th scope="col" class="dr-col">Drift</th><th scope="col" class="df-col">Diffusion</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Cause</th><td>Electric field pushes carriers</td><td>Concentration gradient + random motion</td></tr>
+              <tr><th scope="row">Needs a field?</th><td>Yes</td><td>No</td></tr>
+              <tr><th scope="row">Electron flow</th><td>Opposite to <span class="m" data-tex="E">E</span></td><td>High → low concentration</td></tr>
+              <tr><th scope="row">Electron current</th><td>Along <span class="m" data-tex="E">E</span></td><td>Low → high concentration (opposite to flow)</td></tr>
+              <tr><th scope="row">Formula</th><td class="f" data-tex="J = q(n\mu_n + p\mu_p)E">J = q(nμ<sub>n</sub> + pμ<sub>p</sub>)E</td><td class="f" data-tex="J_n = qD_n \frac{dn}{dx},\ J_p = -qD_p \frac{dp}{dx}">J<sub>n</sub> = qD<sub>n</sub> dn/dx, J<sub>p</sub> = −qD<sub>p</sub> dp/dx</td></tr>
+              <tr><th scope="row">Constant</th><td>Mobility <span class="m" data-tex="\mu">μ</span> (cm²/V·s)</td><td>Diffusion coefficient <span class="m" data-tex="D">D</span> (cm²/s)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="sumhead">Key formulas</h3>
+        <div class="formulas">
+          <div class="fcard"><div class="f" data-tex="v_d = \mu E">v<sub>d</sub> = μ E</div><p>Drift velocity at low and moderate fields; saturates near 10⁷ cm/s above ≈ 10⁴ V/cm.</p></div>
+          <div class="fcard"><div class="f" data-tex="J_{\text{drift}} = q(n\mu_n + p\mu_p)E">J<sub>drift</sub> = q(nμ<sub>n</sub> + pμ<sub>p</sub>)E</div><p>Drift current density; <span class="m" data-tex="= \sigma E">= σ E</span> (Ohm's law).</p></div>
+          <div class="fcard"><div class="f" data-tex="J_{n,\text{diff}} = qD_n \frac{dn}{dx}">J<sub>n,diff</sub> = qD<sub>n</sub> dn/dx</div><p>Electron diffusion current; points toward higher n.</p></div>
+          <div class="fcard"><div class="f" data-tex="J_{p,\text{diff}} = -qD_p \frac{dp}{dx}">J<sub>p,diff</sub> = −qD<sub>p</sub> dp/dx</div><p>Hole diffusion current; points toward lower p.</p></div>
+          <div class="fcard"><div class="f" data-tex="\frac{D}{\mu} = \frac{kT}{q} = 25.9\ \text{mV}">D/μ = kT/q = 25.9 mV</div><p>Einstein relation at 300 K. Values for Si at 300 K: <span class="m" data-tex="D_n \approx 35">D<sub>n</sub> ≈ 35</span>, <span class="m" data-tex="D_p \approx 12.4">D<sub>p</sub> ≈ 12.4</span> cm²/s.</p></div>
+          <div class="fcard"><div class="f" data-tex="J = J_n + J_p">J = J<sub>n</sub> + J<sub>p</sub></div><p>Each of <span class="m" data-tex="J_n">J<sub>n</sub></span> and <span class="m" data-tex="J_p">J<sub>p</sub></span> is drift + diffusion; in equilibrium <span class="m" data-tex="J = 0">J = 0</span>.</p></div>
+        </div>
+      </section>
+
+      <nav class="pager" aria-label="Topic navigation">
+        <a href="../1-5-fermi-level/index.html"><small>← Previous</small>1.5 The Fermi Level</a>
+        <a class="next" href="../1-7-mobility-conductivity-hall-effect/index.html"><small>Next →</small>1.7 Mobility, Conductivity &amp; the Hall Effect</a>
+      </nav>
+    </div>
+  </main>
+
+<script>
+(function () {
+  'use strict';
+
+  const C = {
+    text: '#e6e9ef', muted: '#9aa4b8', e: '#4fc3f7', h: '#ff8a65', en: '#ffd54f', ok: '#81c784',
+    dr: '#81c784', df: '#ce93d8', lat: 'rgba(179,157,219,.22)', d: '#66bb6a', metal: '#7d8aa3', line: '#33405e', grid: '#25304a'
+  };
+  const FONT = 'Inter, system-ui, sans-serif', MONO = '"JetBrains Mono", ui-monospace, monospace';
+  const RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const TAU = Math.PI * 2, rnd = Math.random;
+  const $ = id => document.getElementById(id);
+  if (RM) $('rmNote').hidden = false;
+
+  const SUP = { '-': '⁻', '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹' };
+  const sup = n => String(n).split('').map(ch => SUP[ch] || ch).join('');
+  function fmtX(x, d) {
+    if (!(x > 0)) return '0';
+    d = d == null ? 1 : d;
+    let e = Math.floor(Math.log10(x));
+    let ms = (x / Math.pow(10, e)).toFixed(d);
+    if (parseFloat(ms) >= 10) { e++; ms = (1).toFixed(d); }
+    return ms + '×10' + sup(e);
+  }
+  const ease = t => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const lerp = (a, b, t) => a + (b - a) * t;
+  // Gaussian random number (Box-Muller)
+  const gauss = () => Math.sqrt(-2 * Math.log(1 - rnd())) * Math.cos(TAU * rnd());
+
+  /* =========================================================
+     Canvas helpers
+     ========================================================= */
+  let FS = 1;
+  function Cv(id, W, H) { this.el = $(id); this.W = W; this.H = H; this.ctx = this.el.getContext('2d'); }
+  Cv.prototype.begin = function () {
+    const w = this.el.clientWidth; if (!w) return null;
+    const dpr = window.devicePixelRatio || 1;
+    const pw = Math.round(w * dpr), ph = Math.round(w * dpr * this.H / this.W);
+    if (this.el.width !== pw || this.el.height !== ph) { this.el.width = pw; this.el.height = ph; }
+    const c = this.ctx, s = pw / this.W;
+    FS = Math.min(1.6, Math.max(1, 1.15 * this.W / w));
+    c.setTransform(s, 0, 0, s, 0, 0); c.clearRect(0, 0, this.W, this.H);
+    c.textBaseline = 'middle'; c.textAlign = 'left'; c.globalAlpha = 1; c.setLineDash([]);
+    return c;
+  };
+  // Watermark: drawn inside the canvas, bottom-right, ~22 px on screen at any size.
+  Cv.prototype.wm = function (c) {
+    const s = 22 * this.W / this.el.clientWidth;
+    c.save(); c.globalAlpha = 1; c.font = '600 ' + s.toFixed(1) + 'px ' + FONT; c.fillStyle = 'rgba(255,255,255,.35)';
+    c.textAlign = 'right'; c.textBaseline = 'bottom'; c.fillText('@NaveenBokka', this.W - 10, this.H - 8); c.restore();
+  };
+  function circ(c, x, y, r, fill, stroke, lw) {
+    c.beginPath(); c.arc(x, y, Math.max(0, r), 0, TAU);
+    if (fill) { c.fillStyle = fill; c.fill(); }
+    if (stroke) { c.strokeStyle = stroke; c.lineWidth = lw || 1.5; c.stroke(); }
+  }
+  function txt(c, s, x, y, col, size, weight, align, font) {
+    c.font = (weight || 500) + ' ' + ((size || 11) * FS).toFixed(1) + 'px ' + (font || FONT);
+    c.fillStyle = col || C.text; c.textAlign = align || 'left'; c.fillText(s, x, y);
+    return c.measureText(s).width;
+  }
+  function tag(c, s, x, y, col, align, size) {
+    c.font = '600 ' + ((size || 10) * FS).toFixed(1) + 'px ' + FONT;
+    const w = c.measureText(s).width + 8, hh = (size || 10) * 0.8 * FS;
+    const x0 = align === 'right' ? x - w : align === 'center' ? x - w / 2 : x;
+    c.fillStyle = 'rgba(15,20,32,.88)'; c.fillRect(x0, y - hh, w, 2 * hh);
+    c.fillStyle = col || C.text; c.textAlign = 'left'; c.fillText(s, x0 + 4, y + 0.5);
+    return w;
+  }
+  function line(c, x0, y0, x1, y1, col, lw, dash) {
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []);
+    c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke(); c.setLineDash([]);
+  }
+  // Horizontal arrow from x0 to x1 at y (direction from sign of x1 − x0)
+  function harrow(c, x0, x1, y, col, lw, head) {
+    const d = Math.sign(x1 - x0) || 1, hs = head || 8;
+    if (Math.abs(x1 - x0) < 2) return;
+    line(c, x0, y, x1 - d * hs * 0.7, y, col, lw || 3);
+    c.fillStyle = col; c.beginPath(); c.moveTo(x1, y); c.lineTo(x1 - d * hs, y - hs * 0.6); c.lineTo(x1 - d * hs, y + hs * 0.6); c.closePath(); c.fill();
+  }
+  function elec(c, x, y, r) { circ(c, x, y, (r || 3.6) * 1.9, 'rgba(79,195,247,.15)'); circ(c, x, y, r || 3.6, C.e); }
+  function holeRing(c, x, y, r) { circ(c, x, y, r || 4.2, 'rgba(255,138,101,.22)', C.h, 2); }
+  function ionMark(c, x, y, rr) {
+    circ(c, x, y, rr, '#0f1420', C.d, 1.4);
+    line(c, x - rr * 0.55, y, x + rr * 0.55, y, C.d, 1.5); line(c, x, y - rr * 0.55, x, y + rr * 0.55, C.d, 1.5);
+  }
+  function lattice(c, x0, y0, x1, y1, sp) {
+    c.fillStyle = C.lat;
+    for (let y = y0 + sp / 2; y < y1; y += sp) for (let x = x0 + sp / 2; x < x1; x += sp) { c.beginPath(); c.arc(x, y, 3.2, 0, TAU); c.fill(); }
+  }
+
+  /* =========================================================
+     Carrier gas: straight flights + random scattering (+ optional acceleration)
+     ========================================================= */
+  function Gas(o) {
+    Object.assign(this, { v: 70, tau: 0.45, wrapX: false, sparks: [], trailLen: 0 }, o);
+    this.p = [];
+    for (let k = 0; k < this.n; k++) this.p.push(this.make(o.init ? o.init(k) : null));
+    if (this.trailLen) this.p[0].trail = [];
+  }
+  Gas.prototype.make = function (pos) {
+    const a = rnd() * TAU, b = this.box;
+    return { x: pos ? pos[0] : lerp(b.x0, b.x1, rnd()), y: pos ? pos[1] : lerp(b.y0, b.y1, rnd()),
+      vx: Math.cos(a) * this.v, vy: Math.sin(a) * this.v, tl: -this.tau * Math.log(1 - rnd()) };
+  };
+  // ax: acceleration along x (px/s²); onCross(p, x0, x1) called for every move
+  Gas.prototype.step = function (dt, ax, onMove) {
+    const b = this.box;
+    this.p.forEach(q => {
+      q.tl -= dt;
+      if (q.tl <= 0) {
+        const a = rnd() * TAU; q.vx = Math.cos(a) * this.v; q.vy = Math.sin(a) * this.v;
+        q.tl = -this.tau * Math.log(1 - rnd());
+        if (this.sparks) this.sparks.push({ x: q.x, y: q.y, t: 0 });
+      }
+      if (ax) q.vx += ax * dt;
+      const ox = q.x;
+      q.x += q.vx * dt; q.y += q.vy * dt;
+      if (q.y < b.y0) { q.y = 2 * b.y0 - q.y; q.vy = Math.abs(q.vy); }
+      if (q.y > b.y1) { q.y = 2 * b.y1 - q.y; q.vy = -Math.abs(q.vy); }
+      let wrapped = false;
+      if (this.wrapX) {
+        if (q.x < b.x0) { q.x += b.x1 - b.x0; wrapped = true; }
+        if (q.x > b.x1) { q.x -= b.x1 - b.x0; wrapped = true; }
+      } else {
+        if (q.x < b.x0) { q.x = 2 * b.x0 - q.x; q.vx = Math.abs(q.vx); }
+        if (q.x > b.x1) { q.x = 2 * b.x1 - q.x; q.vx = -Math.abs(q.vx); }
+      }
+      if (onMove && !wrapped) onMove(ox, q.x);
+      if (q.trail) {
+        if (wrapped) q.trail.length = 0;
+        q.trail.push(q.x, q.y); if (q.trail.length > this.trailLen * 2) q.trail.splice(0, 2);
+      }
+    });
+    if (this.sparks) { this.sparks.forEach(s => { s.t += dt; }); this.sparks = this.sparks.filter(s => s.t < 0.35); }
+  };
+  Gas.prototype.drawSparks = function (c) {
+    this.sparks.forEach(s => {
+      const a = 1 - s.t / 0.35, r = 3 + 6 * (s.t / 0.35);
+      c.globalAlpha = a * 0.8; c.strokeStyle = '#ffffff'; c.lineWidth = 1.2;
+      for (let k = 0; k < 4; k++) { const an = k * Math.PI / 2 + 0.6; c.beginPath(); c.moveTo(s.x + Math.cos(an) * r * 0.4, s.y + Math.sin(an) * r * 0.4); c.lineTo(s.x + Math.cos(an) * r, s.y + Math.sin(an) * r); c.stroke(); }
+      c.globalAlpha = 1;
+    });
+  };
+  Gas.prototype.drawTrail = function (c, col) {
+    const q = this.p[0]; if (!q.trail || q.trail.length < 4) return;
+    c.strokeStyle = col; c.lineWidth = 1.6; c.globalAlpha = 0.8; c.beginPath(); c.moveTo(q.trail[0], q.trail[1]);
+    for (let k = 2; k < q.trail.length; k += 2) c.lineTo(q.trail[k], q.trail[k + 1]);
+    c.stroke(); c.globalAlpha = 1;
+  };
+
+  /* =========================================================
+     Animation framework: own Play/Pause/Reset, runs only while visible
+     ========================================================= */
+  const anims = [];
+  function Anim(rootId, o) {
+    this.root = $(rootId); this.o = o; this.playing = !RM; this.visible = true; this.dirty = true;
+    this.pb = this.root.querySelector('[data-act="play"]');
+    this.pb.addEventListener('click', () => this.setPlaying(!this.playing));
+    this.root.querySelector('[data-act="reset"]').addEventListener('click', () => { o.reset(); this.setPlaying(!RM); });
+    o.reset(); this.sync(); anims.push(this);
+    if ('IntersectionObserver' in window) {
+      this.visible = false;
+      new IntersectionObserver(es => es.forEach(e => { this.visible = e.isIntersecting; if (this.visible) this.dirty = true; }))
+        .observe(this.root);
+    }
+  }
+  Anim.prototype.setPlaying = function (p) { this.playing = p; this.sync(); this.dirty = true; };
+  Anim.prototype.sync = function () { this.pb.textContent = this.playing ? 'Pause' : 'Play'; };
+
+  /* =========================================================
+     SECTION 0: drift and diffusion previews
+     ========================================================= */
+  (function () {
+    const W = 300, H = 210, cA = new Cv('cv0a', W, H), cB = new Cv('cv0b', W, H);
+    const box = { x0: 14, x1: 286, y0: 62, y1: 152 };
+    let gA, gB, tB;
+    function mkB() {
+      gB = new Gas({ n: 40, v: 70, tau: 0.25, box, sparks: null, init: () => [lerp(box.x0 + 4, box.x0 + 50, rnd()), lerp(box.y0 + 4, box.y1 - 4, rnd())] });
+      tB = 0;
+    }
+    function frame(c, cv, title, col) {
+      c.fillStyle = 'rgba(255,255,255,.03)'; c.fillRect(box.x0, box.y0 - 6, box.x1 - box.x0, box.y1 - box.y0 + 12);
+      c.strokeStyle = C.line; c.lineWidth = 1.2; c.strokeRect(box.x0, box.y0 - 6, box.x1 - box.x0, box.y1 - box.y0 + 12);
+      tag(c, title, 12, 20, col, 'left', 12);
+    }
+    new Anim('anim0', {
+      reset() { gA = new Gas({ n: 22, v: 55, tau: 0.3, box, wrapX: true, sparks: null }); mkB(); },
+      step(dt) {
+        gA.step(dt, -60 / 0.3);
+        gB.step(dt); tB += dt; if (tB > 9) mkB();
+      },
+      draw() {
+        let c = cA.begin();
+        if (c) {
+          frame(c, cA, 'Drift', C.dr);
+          harrow(c, 150, 240, 38, C.en, 3); tag(c, 'E', 248, 38, C.en, 'left', 11);
+          gA.p.forEach(q => elec(c, q.x, q.y, 3.4));
+          cA.wm(c);
+        }
+        c = cB.begin();
+        if (c) {
+          frame(c, cB, 'Diffusion', C.df);
+          gB.p.forEach(q => elec(c, q.x, q.y, 3.4));
+          cB.wm(c);
+        }
+      }
+    });
+  })();
+
+  /* =========================================================
+     SECTION 1: random thermal motion, crossing counters
+     ========================================================= */
+  (function () {
+    const W = 420, H = 330, cv = new Cv('cv1', W, H);
+    const box = { x0: 16, x1: 404, y0: 34, y1: 274 }, XM = (box.x0 + box.x1) / 2;
+    let g, lr, rl;
+    function counts() {
+      $('c1a').textContent = lr; $('c1b').textContent = rl;
+      const tot = lr + rl;
+      $('c1c').textContent = tot ? (lr - rl > 0 ? '+' : lr - rl < 0 ? '−' : '') + Math.abs(lr - rl) + ' (' + (100 * Math.abs(lr - rl) / tot).toFixed(0) + '%) ≈ 0' : '≈ 0';
+    }
+    new Anim('anim1', {
+      reset() {
+        g = new Gas({ n: 30, v: 70, tau: 0.45, box: { x0: box.x0 + 4, x1: box.x1 - 4, y0: box.y0 + 4, y1: box.y1 - 4 }, sparks: [], trailLen: 160 });
+        lr = rl = 0; counts();
+      },
+      step(dt) {
+        g.step(dt, 0, (a, b) => { if (a < XM && b >= XM) lr++; else if (a >= XM && b < XM) rl++; });
+        counts();
+      },
+      draw() {
+        const c = cv.begin(); if (!c) return;
+        c.fillStyle = 'rgba(255,255,255,.025)'; c.fillRect(box.x0, box.y0, box.x1 - box.x0, box.y1 - box.y0);
+        lattice(c, box.x0, box.y0, box.x1, box.y1, 36);
+        c.strokeStyle = C.line; c.lineWidth = 1.2; c.strokeRect(box.x0, box.y0, box.x1 - box.x0, box.y1 - box.y0);
+        line(c, XM, box.y0, XM, box.y1, '#ffffff', 1.2, [5, 5]);
+        g.drawTrail(c, '#fff59d');
+        g.drawSparks(c);
+        g.p.forEach((q, i) => { if (i) elec(c, q.x, q.y); });
+        const q0 = g.p[0]; circ(c, q0.x, q0.y, 8, 'rgba(255,245,157,.2)'); circ(c, q0.x, q0.y, 4.4, '#fff59d');
+        tag(c, '→', XM + 6, 17, C.muted, 'left', 10); tag(c, '←', XM - 6, 17, C.muted, 'right', 10);
+        cv.wm(c);
+      }
+    });
+  })();
+
+  /* =========================================================
+     Velocity-field model for Si at 300 K (used in section 2)
+     ========================================================= */
+  const MUN = 1350, MUP = 480, VSN = 1.07e7, VSP = 8.37e6, Q = 1.602e-19;
+  const vdN = E => MUN * E / Math.pow(1 + Math.pow(MUN * E / VSN, 2), 0.5);   // electrons (β = 2)
+  const vdP = E => MUP * E / (1 + MUP * E / VSP);                            // holes (β = 1)
+  const EMIN = 100, EMAX = 5e4;
+  const eOf = s => s <= 0 ? 0 : Math.pow(10, Math.log10(EMIN) + (s / 100) * (Math.log10(EMAX) - Math.log10(EMIN)));
+
+  /* =========================================================
+     SECTION 2: drift
+     ========================================================= */
+  (function () {
+    const W = 420, H = 350, cv = new Cv('cv2', W, H), gv = new Cv('cv2g', 420, 280);
+    const box = { x0: 40, x1: 380, y0: 70, y1: 262 };
+    const sl = $('e2'), out = $('e2o');
+    const VIS = 48 / 1.07e7;               // px/s per cm/s of drift (exaggerated)
+    let ge, gh, E;
+    function setE() {
+      E = eOf(+sl.value);
+      out.textContent = E ? fmtX(E) + ' V/cm' : '0 V/cm';
+      const vn = vdN(E), vp = vdP(E);
+      $('c2a').textContent = E ? fmtX(vn) + ' cm/s' : '0';
+      $('c2b').textContent = E ? fmtX(vp) + ' cm/s' : '0';
+      $('c2c').textContent = E ? fmtX(Q * 1e16 * vn) + ' A/cm²' : '0';
+    }
+    const A = new Anim('anim2', {
+      reset() {
+        const b = { x0: box.x0 + 3, x1: box.x1 - 3, y0: box.y0 + 4, y1: box.y1 - 4 };
+        ge = new Gas({ n: 16, v: 70, tau: 0.45, box: b, wrapX: true, sparks: null, trailLen: 220 });
+        gh = new Gas({ n: 14, v: 70, tau: 0.45, box: b, wrapX: true, sparks: null });
+        sl.value = 40; setE();
+      },
+      step(dt) {
+        // Drude picture: acceleration a = v_d / τ gives an average drift v_d.
+        ge.step(dt, -vdN(E) * VIS / ge.tau); gh.step(dt, vdP(E) * VIS / gh.tau);
+      },
+      draw() {
+        let c = cv.begin();
+        if (c) {
+          c.fillStyle = 'rgba(255,255,255,.025)'; c.fillRect(box.x0, box.y0, box.x1 - box.x0, box.y1 - box.y0);
+          lattice(c, box.x0, box.y0, box.x1, box.y1, 38);
+          // contacts
+          c.fillStyle = C.metal; c.fillRect(box.x0 - 16, box.y0, 14, box.y1 - box.y0); c.fillRect(box.x1 + 2, box.y0, 14, box.y1 - box.y0);
+          txt(c, '+', box.x0 - 9, box.y0 - 10, '#ff8a80', 16, 700, 'center'); txt(c, '−', box.x1 + 9, box.y0 - 10, '#82b1ff', 16, 700, 'center');
+          ge.drawTrail(c, 'rgba(255,245,157,.85)');
+          gh.p.forEach(q => holeRing(c, q.x, q.y));
+          ge.p.forEach((q, i) => { if (i) elec(c, q.x, q.y); });
+          const q0 = ge.p[0]; circ(c, q0.x, q0.y, 8, 'rgba(255,245,157,.2)'); circ(c, q0.x, q0.y, 4.4, '#fff59d');
+          // arrows above the box
+          const fr = E ? clamp((Math.log10(E) - 1.5) / (Math.log10(EMAX) - 1.5), 0.12, 1) : 0;
+          if (E) { harrow(c, 110, 110 + 200 * fr, 16, C.en, 3); tag(c, 'E', 104, 16, C.en, 'right', 11); }
+          const ln = vdN(E) / 1.07e7, lp = vdP(E) / 1.07e7;
+          if (E) {
+            harrow(c, 300, 300 - 90 * ln, 40, C.e, 2.5, 7); tag(c, 'v e', 306, 40, C.e, 'left', 9);
+            harrow(c, 120, 120 + 90 * lp, 40, C.h, 2.5, 7); tag(c, 'v h', 114, 40, C.h, 'right', 9);
+            const jn = 110 * ln * 1350 / (1350 + 480) * 1.6, jp = 110 * lp * 480 / (1350 + 480) * 1.6;
+            harrow(c, 60, 60 + jn, box.y1 + 22, C.dr, 3); tag(c, 'J n', 54, box.y1 + 22, C.dr, 'right', 9);
+            harrow(c, 60 + jn + 26, 60 + jn + 26 + jp, box.y1 + 22, C.dr, 3); tag(c, 'J p', 60 + jn + 26 + jp + 4, box.y1 + 22, C.dr, 'left', 9);
+          }
+          cv.wm(c);
+        }
+        // v_d vs E graph (log-log)
+        c = gv.begin();
+        if (c) {
+          const X0 = 66, X1 = 400, Y0 = 16, Y1 = 196;
+          const lx = e => X0 + (Math.log10(e) - 2) / (Math.log10(EMAX) - 2) * (X1 - X0);
+          const ly = v => Y1 - (Math.log10(v) - 4.5) / (7.3 - 4.5) * (Y1 - Y0);
+          [100, 1e3, 1e4].forEach(e => { line(c, lx(e), Y0, lx(e), Y1, C.grid, 1); txt(c, fmtX(e, 0).replace('1×', ''), lx(e), Y1 + 12, C.muted, 9, 500, 'center', MONO); });
+          [1e5, 1e6, 1e7].forEach(v => { line(c, X0, ly(v), X1, ly(v), C.grid, 1); txt(c, fmtX(v, 0).replace('1×', ''), X0 - 6, ly(v), C.muted, 9, 500, 'right', MONO); });
+          line(c, X0, Y0, X0, Y1, C.line, 1.5); line(c, X0, Y1, X1, Y1, C.line, 1.5);
+          txt(c, 'E (V/cm)', X0 + 4, Y1 + 30, C.muted, 9, 600, 'left');
+          c.save(); c.translate(14, (Y0 + Y1) / 2); c.rotate(-Math.PI / 2); txt(c, 'v d (cm/s)', 0, 0, C.muted, 9, 600, 'center'); c.restore();
+          [[vdN, C.e], [vdP, C.h]].forEach(([f, col]) => {
+            c.strokeStyle = col; c.lineWidth = 2.2; c.beginPath();
+            for (let k = 0; k <= 120; k++) { const e = Math.pow(10, 2 + k / 120 * (Math.log10(EMAX) - 2)), y = ly(f(e)); k ? c.lineTo(lx(e), y) : c.moveTo(lx(e), y); }
+            c.stroke();
+          });
+          line(c, X0, ly(1.07e7), X1, ly(1.07e7), C.muted, 1, [4, 4]);
+          tag(c, 'saturation', X0 + 4, ly(1.07e7) - 10, C.muted, 'left', 8);
+          tag(c, 'electrons', lx(300), ly(vdN(300)) - 12, C.e, 'left', 9);
+          tag(c, 'holes', lx(1500), ly(vdP(1500)) + 14, C.h, 'left', 9);
+          if (E >= EMIN) { circ(c, lx(E), ly(vdN(E)), 5, '#0f1420', C.e, 2.2); circ(c, lx(E), ly(vdP(E)), 5, '#0f1420', C.h, 2.2); }
+          gv.wm(c);
+        }
+      }
+    });
+    sl.addEventListener('input', () => { setE(); A.dirty = true; });
+  })();
+
+  /* =========================================================
+     SECTION 3: diffusion, concentration plot
+     ========================================================= */
+  (function () {
+    const W = 420, H = 360, cv = new Cv('cv3', W, H), bE = $('k3e'), bH = $('k3h');
+    const box = { x0: 16, x1: 404, y0: 54, y1: 150 }, NB = 24;
+    const PY0 = 176, PY1 = 292;
+    let g, holes = false, prof, prof0;
+    function bins() {
+      const b = new Array(NB).fill(0), w = (box.x1 - box.x0) / NB;
+      g.p.forEach(q => { b[clamp(Math.floor((q.x - box.x0) / w), 0, NB - 1)]++; });
+      return b;
+    }
+    function reset() {
+      g = new Gas({ n: 200, v: 120, tau: 0.32, box: { x0: box.x0 + 3, x1: box.x1 - 3, y0: box.y0 + 4, y1: box.y1 - 4 }, sparks: null,
+        init: () => [lerp(box.x0 + 3, box.x0 + (box.x1 - box.x0) / 3, rnd()), lerp(box.y0 + 4, box.y1 - 4, rnd())] });
+      prof = bins(); prof0 = null;
+    }
+    function setKind(h) {
+      holes = h; bE.setAttribute('aria-pressed', String(!h)); bH.setAttribute('aria-pressed', String(h));
+      A.dirty = true;
+    }
+    const A = new Anim('anim3', {
+      reset() { reset(); },
+      step(dt) {
+        g.step(dt);
+        const b = bins(), k = Math.min(1, dt * 4);
+        prof = prof.map((v, i) => v + (b[i] - v) * k);
+      },
+      draw() {
+        const c = cv.begin(); if (!c) return;
+        const col = holes ? C.h : C.e;
+        c.fillStyle = 'rgba(255,255,255,.025)'; c.fillRect(box.x0, box.y0, box.x1 - box.x0, box.y1 - box.y0);
+        c.strokeStyle = C.line; c.lineWidth = 1.2; c.strokeRect(box.x0, box.y0, box.x1 - box.x0, box.y1 - box.y0);
+        g.p.forEach(q => holes ? holeRing(c, q.x, q.y, 3.4) : elec(c, q.x, q.y, 3));
+        // concentration plot
+        const w = (box.x1 - box.x0) / NB, mx = 200 / NB * 3;           // initial packed level
+        const yv = v => PY1 - clamp(v / mx, 0, 1.05) * (PY1 - PY0);
+        line(c, box.x0, PY1, box.x1, PY1, C.line, 1.5); line(c, box.x0, PY0 - 4, box.x0, PY1, C.line, 1.5);
+        txt(c, holes ? 'p(x)' : 'n(x)', box.x1 - 4, PY0 + 2, col, 11, 700, 'right');
+        txt(c, 'x', box.x1 - 4, PY1 + 12, C.muted, 10, 600, 'right');
+        c.strokeStyle = col; c.lineWidth = 2.2; c.beginPath();
+        prof.forEach((v, i) => { const x = box.x0 + (i + 0.5) * w; i ? c.lineTo(x, yv(v)) : c.moveTo(x, yv(v)); }); c.stroke();
+        // steepest (negative) slope → highlighted tangent
+        let bi = 1, bs = 0;
+        for (let i = 1; i < NB - 2; i++) { const s = (prof[i + 1] - prof[i - 1]) / 2; if (s < bs) { bs = s; bi = i; } }
+        const gx = box.x0 + (bi + 0.5) * w, gy = yv(prof[bi]), slope = (yv(prof[bi] + bs) - gy) / w;
+        if (bs < -0.15) {
+          line(c, gx - 34, gy - 34 * slope, gx + 34, gy + 34 * slope, C.df, 2.4);
+          tag(c, holes ? 'dp/dx' : 'dn/dx', gx + 38, gy + 34 * slope, C.df, 'left', 9);
+        }
+        // arrows: carrier flow (high → low = right) and current
+        const gnorm = clamp(-bs / (mx * 0.45), 0, 1), L = 150 * gnorm;
+        if (L > 6) {
+          harrow(c, 150, 150 + L, 18, '#e6e9ef', 2.6); tag(c, 'flow', 144, 18, '#e6e9ef', 'right', 9);
+          if (holes) { harrow(c, 150, 150 + L, 38, C.df, 3); tag(c, 'J diff', 144, 38, C.df, 'right', 9); }
+          else { harrow(c, 150 + L, 150, 38, C.df, 3); tag(c, 'J diff', 150 + L + 6, 38, C.df, 'left', 9); }
+        }
+        cv.wm(c);
+      }
+    });
+    bE.addEventListener('click', () => setKind(false));
+    bH.addEventListener('click', () => setKind(true));
+  })();
+
+  /* =========================================================
+     SECTION 4: Einstein relation calculator + spreading lanes
+     ========================================================= */
+  (function () {
+    const MAT = { Si: [1350, 480], Ge: [3900, 1900], GaAs: [8500, 400] };
+    const W = 420, H = 250, cv = new Cv('cv4', W, H), sl = $('t4'), out = $('t4o');
+    const btns = Array.from(document.querySelectorAll('#anim4 [data-mat]'));
+    const LX0 = 20, LX1 = 400, MID = (LX0 + LX1) / 2, LANES = [[34, 96], [128, 190]];
+    const K = 8;                           // on-screen D (px²/s) per cm²/s
+    let mat = 'Si', T = 300, lanes;
+    const vt = () => 0.0259 * T / 300;
+    const Dof = i => MAT[mat][i] * vt();
+    function mkLane(i) { const [y0, y1] = LANES[i]; return { t: 0, p: Array.from({ length: 70 }, () => ({ x: MID, y: lerp(y0 + 6, y1 - 6, rnd()) })) }; }
+    function upd() {
+      out.textContent = T + ' K';
+      $('c4a').textContent = (vt() * 1000).toFixed(1) + ' mV';
+      $('c4b').textContent = Dof(0).toFixed(1) + ' cm²/s'; $('c4mn').textContent = MAT[mat][0];
+      $('c4c').textContent = Dof(1).toFixed(1) + ' cm²/s'; $('c4mp').textContent = MAT[mat][1];
+      btns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mat === mat)));
+    }
+    const A = new Anim('anim4', {
+      reset() { lanes = [mkLane(0), mkLane(1)]; upd(); },
+      step(dt) {
+        lanes.forEach((ln, i) => {
+          const Dv = Dof(i) * K, s = Math.sqrt(2 * Dv * dt);
+          ln.t += dt;
+          ln.p.forEach(q => { q.x += s * gauss(); if (q.x < LX0) q.x = 2 * LX0 - q.x; if (q.x > LX1) q.x = 2 * LX1 - q.x; });
+          if (2 * Math.sqrt(2 * Dv * ln.t) > (LX1 - LX0) * 0.42) lanes[i] = mkLane(i);
+        });
+      },
+      draw() {
+        const c = cv.begin(); if (!c) return;
+        lanes.forEach((ln, i) => {
+          const [y0, y1] = LANES[i], col = i ? C.h : C.e;
+          c.fillStyle = 'rgba(255,255,255,.03)'; c.fillRect(LX0, y0, LX1 - LX0, y1 - y0);
+          c.strokeStyle = C.line; c.lineWidth = 1.2; c.strokeRect(LX0, y0, LX1 - LX0, y1 - y0);
+          line(c, MID, y0, MID, y1, C.grid, 1, [3, 3]);
+          ln.p.forEach(q => i ? holeRing(c, q.x, q.y, 3) : elec(c, q.x, q.y, 2.8));
+          const sp = Math.sqrt(2 * Dof(i) * K * ln.t);
+          [-1, 1].forEach(s => {
+            const x = MID + s * sp; if (x <= LX0 || x >= LX1) return;
+            line(c, x, y0 - 4, x, y1 + 4, col, 2); line(c, x, y0 - 4, x - s * 6, y0 - 4, col, 2); line(c, x, y1 + 4, x - s * 6, y1 + 4, col, 2);
+          });
+          tag(c, i ? 'holes' : 'electrons', LX0 + 4, y0 - 10, col, 'left', 9);
+        });
+        cv.wm(c);
+      }
+    });
+    btns.forEach(b => b.addEventListener('click', () => { mat = b.dataset.mat; upd(); lanes = [mkLane(0), mkLane(1)]; A.dirty = true; }));
+    sl.addEventListener('input', () => { T = +sl.value; upd(); A.dirty = true; });
+  })();
+
+  /* =========================================================
+     SECTION 5: drift-diffusion balance in a graded bar
+     Scaled 1-D model: D = μ = 1 (so kT/q = 1), Gauss's law with a
+     small permittivity. Electron flux Φ = −D·dn/dx − μ·n·E;
+     current Jn = −Φ = D·dn/dx + μ·n·E (q = 1).
+     ========================================================= */
+  (function () {
+    const W = 420, H = 360, cv = new Cv('cv5', W, H), go = $('go5'), vb = $('v5');
+    const N = 40, dx = 1 / N, EPS = 0.012, DT = 1.5e-4, RATE = 0.035, EAPP = 2.2;
+    const ND = Array.from({ length: N }, (_, i) => 0.12 + Math.exp(-3 * (i + 0.5) / N));
+    const bar = { x0: 30, x1: 390, y0: 58, y1: 158 }, COLS = 20, PER = 8;
+    let n, Ef, running, volt, acc, Jref, J, slots, Vref = 0, cOff = 0;
+    const vdrop = e => { let v = 0; for (let i = 0; i < N; i++) v += (e[i] + e[i + 1]) / 2 * dx; return v; };
+    function field() {
+      // E at the N+1 faces from Gauss's law, with E(0) = 0 at the left edge.
+      const e = new Array(N + 1); e[0] = 0;
+      for (let i = 0; i < N; i++) e[i + 1] = e[i] + (ND[i] - n[i]) * dx / EPS;
+      // With contacts connected, the battery fixes the total voltage across the bar:
+      // add a uniform field so that the integral of E = (built-in drop) + applied voltage.
+      cOff = volt ? Vref + EAPP - vdrop(e) : 0;
+      if (cOff) for (let k = 0; k <= N; k++) e[k] += cOff;
+      return e;
+    }
+    function currents() {
+      let jd = 0, jr = 0, m = 0;
+      for (let i = 6; i < N - 7; i++) {
+        const E = Ef[i + 1];
+        jd += (n[i + 1] - n[i]) / dx; jr += E * (E < 0 ? n[i] : n[i + 1]); m++;
+      }
+      return { diff: jd / m, drift: jr / m };
+    }
+    function sim(dt) {
+      const flux = new Array(N + 1).fill(0);
+      for (let i = 0; i < N - 1; i++) {
+        const E = Ef[i + 1], v = -E;                    // electron velocity = −μE
+        flux[i + 1] = -(n[i + 1] - n[i]) / dx + (v > 0 ? v * n[i] : v * n[i + 1]);
+      }
+      if (volt) {                                              // ohmic contacts: carriers enter/leave at the ends
+        const vL = -Ef[0], vR = -Ef[N];
+        flux[0] = -(n[0] - ND[0]) / (dx / 2) + (vL > 0 ? vL * ND[0] : vL * n[0]);
+        flux[N] = -(ND[N - 1] - n[N - 1]) / (dx / 2) + (vR > 0 ? vR * n[N - 1] : vR * ND[N - 1]);
+      }
+      for (let i = 0; i < N; i++) n[i] = Math.max(1e-4, n[i] - dt * (flux[i + 1] - flux[i]) / dx);
+      Ef = field();
+    }
+    function reset() {
+      volt = false; n = ND.slice(); Ef = field(); running = false; acc = 0;
+      go.disabled = false; vb.setAttribute('aria-pressed', 'false');
+      Jref = Math.abs(currents().diff); J = currents();
+      // fixed random spots for ions and electrons in each display column
+      slots = Array.from({ length: COLS }, () => ({
+        ion: Array.from({ length: 12 }, () => [rnd(), rnd()]),
+        el: Array.from({ length: 16 }, () => [rnd(), rnd(), rnd() * TAU])
+      }));
+    }
+    const A = new Anim('anim5', {
+      reset() { reset(); },
+      step(dt) {
+        slots.forEach(s => s.el.forEach(p => { p[2] += dt * 3; }));
+        if (!running) return;
+        acc += dt * RATE;
+        while (acc > DT) { sim(DT); acc -= DT; }
+        J = currents();
+      },
+      draw() {
+        const c = cv.begin(); if (!c) return;
+        const cw = (bar.x1 - bar.x0) / COLS;
+        c.fillStyle = 'rgba(255,255,255,.03)'; c.fillRect(bar.x0, bar.y0, bar.x1 - bar.x0, bar.y1 - bar.y0);
+        c.strokeStyle = C.line; c.lineWidth = 1.2; c.strokeRect(bar.x0, bar.y0, bar.x1 - bar.x0, bar.y1 - bar.y0);
+        for (let k = 0; k < COLS; k++) {
+          const nd = (ND[2 * k] + ND[2 * k + 1]) / 2, ne = (n[2 * k] + n[2 * k + 1]) / 2;
+          const ni = Math.round(nd * PER), nel = Math.round(ne * PER), s = slots[k];
+          for (let j = 0; j < Math.min(ni, 12); j++) ionMark(c, bar.x0 + (k + 0.15 + 0.7 * s.ion[j][0]) * cw, bar.y0 + 10 + s.ion[j][1] * (bar.y1 - bar.y0 - 20), 4.2);
+          for (let j = 0; j < Math.min(nel, 16); j++) {
+            const p = s.el[j];
+            elec(c, bar.x0 + (k + 0.15 + 0.7 * p[0]) * cw + Math.cos(p[2]) * 1.5, bar.y0 + 8 + p[1] * (bar.y1 - bar.y0 - 16) + Math.sin(p[2] * 1.3) * 1.5, 2.6);
+          }
+        }
+        tag(c, 'more donors', bar.x0 + 2, bar.y1 + 12, C.d, 'left', 8);
+        tag(c, 'fewer donors', bar.x1 - 2, bar.y1 + 12, C.d, 'right', 8);
+        // built-in field arrow (average interior field)
+        let eb = 0; for (let i = 8; i < N - 8; i++) eb += Ef[i] - cOff; eb /= (N - 16);
+        const L = clamp(eb / 3, -1, 1) * 150;
+        if (Math.abs(L) > 4) { harrow(c, 210 - L / 2, 210 + L / 2, 22, C.en, 3); tag(c, 'E built-in', 210 - Math.abs(L) / 2 - 6, 22, C.en, 'right', 9); }
+        if (volt) { harrow(c, 250, 370, 42, C.en, 2); line(c, 250, 42, 370, 42, '#0f1420', 1, [3, 4]); tag(c, 'E applied', 244, 42, C.en, 'right', 9); }
+        // current bars
+        const BX = 220, BW = 150, rows = [['J diff', J.diff, C.df], ['J drift', J.drift, C.dr], ['J total', J.diff + J.drift, '#e6e9ef']];
+        line(c, BX, 186, BX, 292, C.muted, 1.2);
+        rows.forEach(([lab, v, col], i) => {
+          const y = 198 + i * 34, w = clamp(v / (Jref || 1), -1.3, 1.3) * BW * 0.75;
+          c.fillStyle = col; c.globalAlpha = i === 2 ? 0.9 : 0.75;
+          c.fillRect(Math.min(BX, BX + w), y - 9, Math.abs(w), 18); c.globalAlpha = 1;
+          tag(c, lab, 18, y, col, 'left', 10);
+          txt(c, (v / (Jref || 1)).toFixed(2), BX + (w >= 0 ? -6 : 6), y, C.muted, 9, 500, w >= 0 ? 'right' : 'left', MONO);
+        });
+        cv.wm(c);
+      }
+    });
+    go.addEventListener('click', () => { running = true; go.disabled = true; if (!A.playing && !RM) A.setPlaying(true); if (RM) { for (let k = 0; k < 600; k++) sim(DT); J = currents(); } A.dirty = true; });
+    vb.addEventListener('click', () => {
+      if (!volt) { Vref = vdrop(Ef); volt = true; }
+      else {                                                   // disconnect: restore overall neutrality, contacts open
+        volt = false; let sn = 0, sd = 0; for (let i = 0; i < N; i++) { sn += n[i]; sd += ND[i]; }
+        for (let i = 0; i < N; i++) n[i] *= sd / sn;
+      }
+      Ef = field(); vb.setAttribute('aria-pressed', String(volt));
+      if (!running) { running = true; go.disabled = true; }
+      if (RM) { for (let k = 0; k < 600; k++) sim(DT); J = currents(); }
+      A.dirty = true;
+    });
+  })();
+
+  /* =========================================================
+     Mini-nav highlight + main loop
+     ========================================================= */
+  (function () {
+    const links = Array.from(document.querySelectorAll('.toc a'));
+    const secs = links.map(l => document.querySelector(l.getAttribute('href')));
+    function upd() {
+      let cur = 0;
+      secs.forEach((s, i) => { if (s.getBoundingClientRect().top < 120) cur = i; });
+      links.forEach((l, i) => l.classList.toggle('active', i === cur));
+    }
+    window.addEventListener('scroll', upd, { passive: true }); upd();
+  })();
+
+  let last = performance.now();
+  function frame(ts) {
+    const dt = Math.min(0.05, Math.max(0, (ts - last) / 1000)); last = ts;
+    anims.forEach(a => {
+      if (!a.visible) return;
+      if (a.playing) { a.o.step(dt); a.o.draw(); }
+      else if (a.dirty) a.o.draw();
+      a.dirty = false;
+    });
+    requestAnimationFrame(frame);
+  }
+  function onResize() { anims.forEach(a => { a.dirty = true; }); }
+  window.addEventListener('resize', onResize);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(onResize);
+  requestAnimationFrame(frame);
+})();
+</script>
+<script>
+  // Typeset [data-tex] elements as maths once KaTeX has loaded; pages call mathify(el) after changing text.
+  window.mathify = function (root) {
+    if (!window.katex) return;
+    (root || document).querySelectorAll('[data-tex]').forEach(function (el) {
+      var block = (el.classList.contains('eq') || el.classList.contains('f')) && el.tagName !== 'TD';
+      try { katex.render(el.getAttribute('data-tex'), el, { displayMode: block, throwOnError: false }); } catch (e) {}
+    });
+  };
+  document.addEventListener('DOMContentLoaded', function () { window.mathify(); });
+</script>
+</body>
+</html>
