@@ -675,11 +675,11 @@
     c.textBaseline = 'middle'; c.textAlign = 'left'; c.globalAlpha = 1;
     return c;
   };
-  // Watermark: drawn inside the canvas, bottom-right, ~13 px on screen at any size.
+  // Watermark: drawn inside the canvas, bottom-right, ~22 px on screen at any size.
   Cv.prototype.wm = function (c) {
-    const s = 13 * this.W / this.el.clientWidth;
-    c.save(); c.globalAlpha = 1; c.font = '500 ' + s.toFixed(1) + 'px ' + FONT; c.fillStyle = 'rgba(255,255,255,.35)';
-    c.textAlign = 'right'; c.textBaseline = 'bottom'; c.fillText('© Naveen Bokka', this.W - 6, this.H - 4); c.restore();
+    const s = 22 * this.W / this.el.clientWidth;
+    c.save(); c.globalAlpha = 1; c.font = '600 ' + s.toFixed(1) + 'px ' + FONT; c.fillStyle = 'rgba(255,255,255,.35)';
+    c.textAlign = 'right'; c.textBaseline = 'bottom'; c.fillText('@NaveenBokka', this.W - 10, this.H - 8); c.restore();
   };
   function circ(c, x, y, r, fill, stroke, lw) {
     c.beginPath(); c.arc(x, y, Math.max(0, r), 0, TAU);
