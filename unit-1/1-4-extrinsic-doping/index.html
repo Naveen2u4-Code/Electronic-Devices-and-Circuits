@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>1.4 Extrinsic Semiconductors</title>
+  <meta name="description" content="Extrinsic semiconductors explained step by step: why we dope silicon, donor and acceptor atoms, N-type and P-type band diagrams, majority and minority carrier concentrations, charge neutrality, compensation and the effect of temperature. An interactive lesson.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1420;
+      --panel: #1a2132;
+      --panel-hover: #212a3f;
+      --border: #2a3448;
+      --text: #e6e9ef;
+      --muted: #9aa4b8;
+      --electron: #4fc3f7;
+      --hole: #ff8a65;
+      --energy: #ffd54f;
+      --success: #81c784;
+      --si: #b39ddb;
+      --donor: #66bb6a;
+      --acceptor: #f06292;
+      --vb: #3949ab;
+      --cb: #00838f;
+      --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+      --max: 960px;
+      --radius: 12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: var(--font); font-size: 16px; line-height: 1.65;
+      overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column;
+    }
+    a { color: var(--electron); }
+    .wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 16px; }
+
+    /* Sticky mini-nav */
+    .toc {
+      position: sticky; top: 0; z-index: 10; background: rgba(15, 20, 32, .95);
+      border-bottom: 1px solid var(--border); backdrop-filter: blur(6px);
+    }
+    .toc ul { display: flex; gap: 4px; list-style: none; margin: 0 auto; padding: 8px 16px; max-width: var(--max); overflow-x: auto; scrollbar-width: none; }
+    .toc ul::-webkit-scrollbar { display: none; }
+    .toc a {
+      display: block; white-space: nowrap; text-decoration: none; color: var(--muted);
+      font-size: 0.85rem; font-weight: 500; padding: 6px 10px; border-radius: 999px;
+    }
+    .toc a:hover { color: var(--text); background: var(--panel); }
+    .toc a.active { color: var(--bg); background: var(--electron); }
+
+    main { flex: 1; padding: 24px 0 48px; }
+    .crumbs { font-size: 0.875rem; color: var(--muted); margin: 0 0 16px; }
+    .crumbs a { color: var(--muted); }
+    .crumbs a:hover { color: var(--electron); }
+    .eyebrow { font-family: var(--mono); font-size: 0.8rem; color: var(--electron); letter-spacing: .04em; margin: 0; }
+    h1 { font-size: clamp(1.5rem, 6vw, 2.2rem); line-height: 1.2; margin: 4px 0 6px; }
+    .subtitle { color: var(--muted); margin: 0 0 8px; }
+    section { scroll-margin-top: 64px; padding-top: 28px; }
+    h2 { font-size: clamp(1.3rem, 5vw, 1.6rem); line-height: 1.25; margin: 0 0 14px; }
+    h3 { font-size: 1.05rem; margin: 0 0 8px; }
+    .prose { max-width: 36em; font-size: 17px; line-height: 1.7; }
+    .prose p, .prose ul { margin: 0 0 14px; }
+    .prose ul { padding-left: 20px; }
+    .prose li { margin: 4px 0; }
+    .prose strong { color: #fff; }
+    .eq { font-family: var(--mono); color: var(--energy); background: #141b2b; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; display: block; overflow-wrap: anywhere; margin: 0 0 14px; font-size: 15px; }
+    .t-e { color: var(--electron); font-weight: 600; }
+    .t-h { color: var(--hole); font-weight: 600; }
+    .t-d { color: var(--donor); font-weight: 600; }
+    .t-a { color: var(--acceptor); font-weight: 600; }
+    hr.sep { border: 0; border-top: 1px solid var(--border); margin: 40px 0 0; }
+    .rm-note { font-size: 0.78rem; color: var(--muted); margin: 0 0 8px; }
+
+    /* Buttons & controls */
+    .btn {
+      font: inherit; font-size: 0.88rem; font-weight: 600; color: var(--text);
+      background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+      padding: 7px 12px; cursor: pointer; min-height: 38px;
+    }
+    .btn:hover:not(:disabled) { background: var(--panel-hover); border-color: var(--electron); }
+    .btn:focus-visible, input:focus-visible { outline: 2px solid var(--electron); outline-offset: 2px; }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
+    .btn[aria-pressed="true"] { background: rgba(255,213,79,.14); border-color: var(--energy); color: var(--energy); }
+    .seg { display: inline-flex; gap: 6px; flex-wrap: wrap; }
+
+    figure.anim {
+      margin: 18px 0 0; background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 12px; min-width: 0;
+    }
+    .ctrls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-bottom: 12px; }
+    .slider { flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; }
+    .slider label { display: flex; justify-content: space-between; gap: 8px; font-size: 0.8rem; color: var(--muted); }
+    .slider output { font-family: var(--mono); color: var(--energy); white-space: nowrap; }
+    input[type="range"] { width: 100%; accent-color: var(--energy); margin: 4px 0 0; }
+    canvas { display: block; width: 100%; border-radius: 8px; background: #141b2b; }
+    .narrow { max-width: 640px; margin: 0 auto; }
+    .exag { font-size: 0.75rem; color: var(--muted); margin: 10px 0 0; }
+    .exag b { color: var(--energy); font-weight: 600; }
+    #cv7 { touch-action: pan-y; cursor: ew-resize; }
+
+    .counters { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 0; }
+    .ctr {
+      flex: 1 1 110px; background: #141b2b; border: 1px solid var(--border); border-radius: 8px;
+      padding: 6px 10px; font-size: 0.78rem; color: var(--muted); min-width: 0;
+    }
+    .ctr b { display: block; font-family: var(--mono); font-size: 1.05rem; font-weight: 500; white-space: nowrap; color: var(--text); overflow: hidden; text-overflow: ellipsis; }
+    .ctr.n b { color: var(--electron); }
+    .ctr.p b { color: var(--hole); }
+    .ctr.ok b { color: var(--success); }
+    .ctr.en b { color: var(--energy); }
+
+    .tally {
+      margin: 10px 0 0; padding: 8px 12px; background: #141b2b; border: 1px solid var(--border); border-radius: 8px;
+      font-family: var(--mono); font-size: 0.85rem; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px;
+    }
+    .tally .d { color: var(--donor); } .tally .a { color: var(--acceptor); }
+    .tally .e { color: var(--electron); } .tally .h { color: var(--hole); }
+    .tally .ok { color: var(--success); }
+    .result { margin: 8px 0 0; font-weight: 600; font-size: 0.95rem; }
+    .result span { font-family: var(--mono); font-weight: 500; color: var(--muted); font-size: .85rem; }
+
+    .legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 0.8rem; color: var(--muted); margin: 8px 0 0; padding: 0; list-style: none; }
+    .legend li { display: inline-flex; align-items: center; gap: 6px; }
+    .sw { display: inline-block; width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
+    .sw.e { background: var(--electron); }
+    .sw.h { border: 2px solid var(--hole); background: rgba(255,138,101,.2); }
+    .sw.si { background: var(--si); }
+    .sw.d { background: var(--donor); }
+    .sw.a { background: var(--acceptor); }
+    .sw.y { background: var(--energy); }
+    .ionsw { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; font-size: 11px; font-weight: 700; line-height: 1; flex-shrink: 0; }
+    .ionsw.d { border: 1.5px solid var(--donor); color: var(--donor); }
+    .ionsw.a { border: 1.5px solid var(--acceptor); color: var(--acceptor); }
+
+    .keypoints {
+      margin-top: 16px; padding: 14px 16px; border-radius: var(--radius);
+      background: rgba(129,199,132,.07); border: 1px solid rgba(129,199,132,.35);
+    }
+    .keypoints h3 { color: var(--success); font-size: 0.95rem; text-transform: uppercase; letter-spacing: .05em; }
+    .keypoints ul { margin: 0; padding-left: 20px; }
+    .keypoints li { margin: 4px 0; }
+
+    .sumhead { margin: 28px 0 10px; font-size: 1.15rem; }
+    .table-box { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 12px; overflow-x: auto; }
+    .vt { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    .vt th, .vt td { text-align: left; padding: 7px 6px; border-top: 1px solid var(--border); vertical-align: top; }
+    .vt thead th { color: var(--muted); font-weight: 600; border-top: 0; }
+    .vt thead th.n-col { color: var(--electron); }
+    .vt thead th.p-col { color: var(--hole); }
+    .vt tbody th { color: var(--muted); font-weight: 500; width: 30%; }
+    @media (max-width: 480px) { .vt { font-size: .8rem; } .vt th, .vt td { padding: 6px 4px; } }
+    .formulas { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    @media (min-width: 640px) { .formulas { grid-template-columns: 1fr 1fr; } }
+    .fcard { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; min-width: 0; }
+    .fcard .f { font-family: var(--mono); font-size: 1rem; color: var(--energy); overflow-wrap: anywhere; }
+    .fcard p { margin: 6px 0 0; font-size: 0.85rem; color: var(--muted); }
+
+    .pager { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 48px; }
+    .pager a {
+      display: block; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 12px 14px; text-decoration: none; color: var(--text); min-width: 0;
+    }
+    .pager a:hover { border-color: var(--electron); }
+    .pager small { display: block; color: var(--muted); font-size: 0.75rem; }
+    .pager .next { text-align: right; }
+
+    .site-footer { border-top: 1px solid var(--border); color: var(--muted); font-size: 0.875rem; }
+    .site-footer .wrap { padding-top: 20px; padding-bottom: 20px; }
+  </style>
+</head>
+<body>
+
+  <nav class="toc" aria-label="Sections">
+    <ul>
+      <li><a href="#s0">Why dope?</a></li>
+      <li><a href="#s1">N-type</a></li>
+      <li><a href="#s2">N-type bands</a></li>
+      <li><a href="#s3">P-type</a></li>
+      <li><a href="#s4">P-type bands</a></li>
+      <li><a href="#s5">Concentrations</a></li>
+      <li><a href="#s6">Neutrality</a></li>
+      <li><a href="#s7">Temperature</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="wrap">
+      <header>
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="../../index.html">Home</a> / <a href="../index.html">Unit 1</a> / 1.4
+        </nav>
+        <p class="eyebrow">TOPIC 1.4</p>
+        <h1>Extrinsic Semiconductors: N-type and P-type Doping</h1>
+        <p class="subtitle">How a tiny amount of impurity turns silicon into a useful conductor of electrons or holes</p>
+        <p class="rm-note" id="rmNote" hidden>Your device asks for reduced motion, so every animation starts paused. Press Play on any animation to run it. Sliders and buttons still update the picture.</p>
+      </header>
+
+      <!-- ================= SECTION 0 ================= -->
+      <section id="s0" aria-labelledby="h0">
+        <h2 id="h0">Why do we dope a semiconductor?</h2>
+        <div class="prose">
+          <p>Pure (<strong>intrinsic</strong>) silicon has very few free carriers. At room temperature it has only about <strong>1 × 10¹⁰ free electrons per cm³</strong>, among about <strong>5 × 10²² silicon atoms per cm³</strong>. That is roughly one free electron for every 5 trillion atoms. Its conductivity is therefore very low, and it changes strongly with temperature. This makes pure silicon unsuitable for most electronic devices.</p>
+          <p><strong>Doping</strong> is the process of adding a small, carefully controlled amount of a selected impurity element to the silicon crystal. The impurity atoms take the place of some silicon atoms in the crystal. Even one impurity atom for every million silicon atoms (about <strong>5 × 10¹⁶ atoms per cm³</strong>) increases the number of free carriers by <strong>millions of times</strong>.</p>
+          <p>A semiconductor whose carriers come mainly from added impurities is called an <strong>extrinsic</strong> semiconductor. Depending on the impurity used, we get two types: <strong>N-type</strong>, which has extra free <span class="t-e">electrons</span>, and <strong>P-type</strong>, which has extra <span class="t-h">holes</span>.</p>
+        </div>
+
+        <figure class="anim" id="anim0">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="slider">
+              <label for="d0"><span>Doping level</span><output id="d0o" for="d0">pure</output></label>
+              <input type="range" id="d0" min="0" max="5" step="1" value="0" aria-describedby="d0o">
+            </div>
+          </div>
+          <canvas id="cv0" class="narrow" style="aspect-ratio:420/320" role="img" aria-label="A silicon bar between two metal contacts, wired to a battery and an ammeter. A zoomed window shows the crystal lattice. As the doping level rises, green impurity atoms and free electrons appear, the ammeter reading rises by many orders of magnitude, and a log bar shows free electrons per cubic centimetre rising from 10 to the 10 up to about 5 times 10 to the 18."></canvas>
+          <ul class="legend">
+            <li><span class="sw si"></span>Si atom</li>
+            <li><span class="ionsw d">+</span>donor ion (P)</li>
+            <li><span class="sw e"></span>free electron</li>
+          </ul>
+          <p class="exag"><b>Not to scale:</b> the lattice window shows only a few impurity atoms; the real ratio is on the slider. Current for 1 V across a 1 cm × 0.1 mm × 0.1 mm bar; values for Si at 300 K.</p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: why dope">
+          <h3>Key points</h3>
+          <ul>
+            <li>Pure Si has only about 10¹⁰ free electrons per cm³ at room temperature.</li>
+            <li><strong>Doping</strong> adds a small, controlled amount of a chosen impurity.</li>
+            <li>1 impurity per million Si atoms raises the carrier count millions of times.</li>
+            <li>Extrinsic silicon is <strong>N-type</strong> (extra electrons) or <strong>P-type</strong> (extra holes).</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 1 ================= -->
+      <section id="s1" aria-labelledby="h1s">
+        <h2 id="h1s">N-type semiconductor: donor atoms</h2>
+        <div class="prose">
+          <p>To make N-type silicon, we add atoms from <strong>group V</strong> of the periodic table, such as <span class="t-d">phosphorus (P)</span>, arsenic (As) or antimony (Sb). These are called <strong>pentavalent</strong> atoms because each has <strong>five valence electrons</strong>.</p>
+          <p>A phosphorus atom sits in the place of a silicon atom. Four of its five valence electrons form covalent bonds with the four neighbouring silicon atoms, exactly as a silicon atom would. The <strong>fifth electron</strong> has no bond to join. It is held to the phosphorus atom only by a weak attraction, so very little energy is needed to set it free: about <strong>0.045 eV</strong> for phosphorus, 0.054 eV for arsenic and 0.039 eV for antimony. Compare this with the <strong>1.12 eV</strong> needed to break a silicon bond. At room temperature, the available thermal energy is enough to free almost every one of these extra electrons.</p>
+          <p>Because the impurity atom gives away (donates) an electron, it is called a <strong>donor</strong>. After giving away its electron, the phosphorus atom has one more proton than electrons, so it becomes a <strong>positive ion</strong>. This ion is fixed in the crystal and cannot move, so it does not carry current.</p>
+          <p>Freeing a donor electron does not create a hole, because no bond is broken. A few electron-hole pairs are still created by heat, just as in pure silicon. As a result, free electrons far outnumber holes. In N-type material, <span class="t-e">electrons</span> are the <strong>majority carriers</strong> and <span class="t-h">holes</span> are the <strong>minority carriers</strong>. The letter N stands for negative, the charge of the majority carriers. The material as a whole remains electrically neutral.</p>
+        </div>
+
+        <figure class="anim" id="anim1">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <button class="btn" type="button" id="add1">Add phosphorus</button>
+            <button class="btn" type="button" id="more1" disabled>Add more donors</button>
+            <div class="slider">
+              <label for="t1"><span>Temperature</span><output id="t1o" for="t1">0 K</output></label>
+              <input type="range" id="t1" min="0" max="400" step="5" value="0">
+            </div>
+          </div>
+          <canvas id="cv1" class="narrow" style="aspect-ratio:420/345" role="img" aria-label="A flat grid of silicon atoms, each bond drawn as a pair of electrons. Adding phosphorus replaces one silicon atom with a green P atom whose fifth electron circles it loosely. Above about 50 K the fifth electron breaks away and wanders through the crystal, and the P atom becomes a fixed positive donor ion. No bond is broken and no hole appears."></canvas>
+          <ul class="legend">
+            <li><span class="sw si"></span>Si atom</li>
+            <li><span class="sw d"></span>P atom</li>
+            <li><span class="ionsw d">+</span>donor ion</li>
+            <li><span class="sw e"></span>electron</li>
+            <li><span class="sw h"></span>hole</li>
+          </ul>
+          <div class="counters" aria-live="polite">
+            <div class="ctr n">Free electrons (majority)<b id="ce1">0</b></div>
+            <div class="ctr p">Holes (minority)<b id="ch1">0</b></div>
+          </div>
+          <p class="exag"><b>Not to scale:</b> heat-generated electron-hole pairs are shown far more often than in real silicon.</p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: donor atoms">
+          <h3>Key points</h3>
+          <ul>
+            <li><strong>Donors</strong> are group V atoms (P, As, Sb) with five valence electrons.</li>
+            <li>The 5th electron is freed by only about 0.045 eV (P), against 1.12 eV to break a Si bond.</li>
+            <li>The donor becomes a fixed <strong>positive ion</strong>; no hole is created.</li>
+            <li>N-type: electrons are the majority, holes the minority; the crystal stays neutral.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 2 ================= -->
+      <section id="s2" aria-labelledby="h2s">
+        <h2 id="h2s">N-type on the energy band diagram</h2>
+        <div class="prose">
+          <p>On the energy band diagram, each donor atom adds an allowed energy level, called the <strong>donor level (E<sub>D</sub>)</strong>, inside the forbidden gap. It lies very close to the bottom of the conduction band: for phosphorus, <strong>E<sub>c</sub> − E<sub>D</sub> is about 0.045 eV</strong>.</p>
+          <p>At absolute zero, the extra electrons sit in these donor levels. As the temperature rises, they easily jump the small distance into the conduction band, where they are free to move. The donor levels they leave behind represent the fixed positive donor ions.</p>
+          <p>At room temperature almost all donors are ionised, so the conduction band contains about as many electrons as there are donor atoms, plus the much smaller number created by breaking bonds. Because the conduction band is now much more populated, the <strong>Fermi level moves up</strong>, closer to the conduction band. This shift is explained in topic 1.5.</p>
+        </div>
+
+        <figure class="anim" id="anim2">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="slider">
+              <label for="t2"><span>Temperature</span><output id="t2o" for="t2">0 K</output></label>
+              <input type="range" id="t2" min="0" max="400" step="5" value="0">
+            </div>
+          </div>
+          <canvas id="cv2" class="narrow" style="aspect-ratio:420/300" role="img" aria-label="Energy band diagram of N-type silicon. A row of donor levels sits just below the conduction band edge. At 0 K each donor level holds an electron. As temperature rises, electrons jump into the conduction band and the emptied levels show fixed positive ions. A dashed Fermi level line stays well above the intrinsic level in the middle of the gap."></canvas>
+          <ul class="legend">
+            <li><span class="sw e"></span>electron</li>
+            <li><span class="ionsw d">+</span>ionised donor</li>
+            <li><span class="sw h"></span>hole</li>
+            <li><span class="sw y"></span><span>E<sub>F</sub> (dashed)</span></li>
+          </ul>
+          <p class="exag"><b>Not to scale:</b> the 0.045 eV gap below E<sub>c</sub> is drawn much larger than it really is, and heat-generated pairs are shown far more often. N<sub>D</sub> = 10¹⁶ cm⁻³; values for Si.</p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: N-type band diagram">
+          <h3>Key points</h3>
+          <ul>
+            <li>The donor level E<sub>D</sub> lies just below E<sub>c</sub> (E<sub>c</sub> − E<sub>D</sub> ≈ 0.045 eV for P).</li>
+            <li>At 0 K the extra electrons sit in E<sub>D</sub>; heat lifts them into the conduction band.</li>
+            <li>At 300 K nearly all donors are ionised, so n ≈ number of donors.</li>
+            <li>E<sub>F</sub> lies closer to E<sub>c</sub> than in pure silicon.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 3 ================= -->
+      <section id="s3" aria-labelledby="h3s">
+        <h2 id="h3s">P-type semiconductor: acceptor atoms</h2>
+        <div class="prose">
+          <p>To make P-type silicon, we add atoms from <strong>group III</strong>, such as <span class="t-a">boron (B)</span>, aluminium (Al), gallium (Ga) or indium (In). These are <strong>trivalent</strong> atoms: each has only <strong>three valence electrons</strong>.</p>
+          <p>A boron atom in place of a silicon atom can complete only three of the four covalent bonds with its neighbours. One bond is left with a missing electron. An electron from a nearby silicon bond can move into this vacancy with very little energy, about <strong>0.045 eV</strong> for boron. When it does, the boron atom has gained an extra electron and becomes a fixed <strong>negative ion</strong>, while the vacancy has moved to the neighbouring bond. That vacancy is a <span class="t-h">hole</span>, and it is free to move through the crystal as explained in topic 1.3.</p>
+          <p>Because the impurity atom accepts an electron, it is called an <strong>acceptor</strong>. Each acceptor produces one hole without producing a free electron. Holes therefore far outnumber free electrons. In P-type material, <span class="t-h">holes</span> are the <strong>majority carriers</strong> and <span class="t-e">electrons</span> are the <strong>minority carriers</strong>. The letter P stands for positive, the effective charge of the majority carriers. Again, the material as a whole remains electrically neutral.</p>
+        </div>
+
+        <figure class="anim" id="anim3">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <button class="btn" type="button" id="add3">Add boron</button>
+            <button class="btn" type="button" id="more3" disabled>Add more acceptors</button>
+            <div class="slider">
+              <label for="t3"><span>Temperature</span><output id="t3o" for="t3">0 K</output></label>
+              <input type="range" id="t3" min="0" max="400" step="5" value="0">
+            </div>
+          </div>
+          <canvas id="cv3" class="narrow" style="aspect-ratio:420/345" role="img" aria-label="A flat grid of silicon atoms. Adding boron replaces one silicon atom with a pink B atom that completes only three bonds; the fourth bond has one electron and an empty slot. When warmed, an electron from a neighbouring silicon bond jumps into the empty slot, the B atom becomes a fixed negative acceptor ion, and an orange hole appears in the neighbour's bond and hops away from bond to bond."></canvas>
+          <ul class="legend">
+            <li><span class="sw si"></span>Si atom</li>
+            <li><span class="sw a"></span>B atom</li>
+            <li><span class="ionsw a">−</span>acceptor ion</li>
+            <li><span class="sw e"></span>electron</li>
+            <li><span class="sw h"></span>hole</li>
+          </ul>
+          <div class="counters" aria-live="polite">
+            <div class="ctr p">Holes (majority)<b id="ch3">0</b></div>
+            <div class="ctr n">Free electrons (minority)<b id="ce3">0</b></div>
+          </div>
+          <p class="exag"><b>Not to scale:</b> heat-generated electron-hole pairs are shown far more often than in real silicon.</p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: acceptor atoms">
+          <h3>Key points</h3>
+          <ul>
+            <li><strong>Acceptors</strong> are group III atoms (B, Al, Ga, In) with three valence electrons.</li>
+            <li>A neighbouring electron fills the incomplete bond with only about 0.045 eV (B).</li>
+            <li>The acceptor becomes a fixed <strong>negative ion</strong> and leaves a mobile hole behind.</li>
+            <li>P-type: holes are the majority, electrons the minority; the crystal stays neutral.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 4 ================= -->
+      <section id="s4" aria-labelledby="h4s">
+        <h2 id="h4s">P-type on the energy band diagram</h2>
+        <div class="prose">
+          <p>Each acceptor adds an allowed energy level, the <strong>acceptor level (E<sub>A</sub>)</strong>, inside the gap just above the top of the valence band. For boron, <strong>E<sub>A</sub> − E<sub>v</sub> is about 0.045 eV</strong>.</p>
+          <p>At absolute zero these acceptor levels are empty. As temperature rises, electrons from the valence band easily jump up into them. Each electron that does so leaves behind a <span class="t-h">hole</span> in the valence band, and the filled acceptor level represents a fixed negative acceptor ion.</p>
+          <p>At room temperature almost all acceptors are ionised, so the valence band contains about as many holes as there are acceptor atoms. The <strong>Fermi level moves down</strong>, closer to the valence band.</p>
+        </div>
+
+        <figure class="anim" id="anim4">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="slider">
+              <label for="t4"><span>Temperature</span><output id="t4o" for="t4">0 K</output></label>
+              <input type="range" id="t4" min="0" max="400" step="5" value="0">
+            </div>
+          </div>
+          <canvas id="cv4" class="narrow" style="aspect-ratio:420/300" role="img" aria-label="Energy band diagram of P-type silicon. A row of empty acceptor levels sits just above the valence band edge. As temperature rises, electrons from the valence band jump up into them, each filled level shows a fixed negative ion, and orange holes are left in the valence band. A dashed Fermi level line stays well below the intrinsic level in the middle of the gap."></canvas>
+          <ul class="legend">
+            <li><span class="sw e"></span>electron</li>
+            <li><span class="ionsw a">−</span>ionised acceptor</li>
+            <li><span class="sw h"></span>hole</li>
+            <li><span class="sw y"></span><span>E<sub>F</sub> (dashed)</span></li>
+          </ul>
+          <p class="exag"><b>Not to scale:</b> the 0.045 eV gap above E<sub>v</sub> is drawn much larger than it really is, and heat-generated pairs are shown far more often. N<sub>A</sub> = 10¹⁶ cm⁻³; values for Si.</p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: P-type band diagram">
+          <h3>Key points</h3>
+          <ul>
+            <li>The acceptor level E<sub>A</sub> lies just above E<sub>v</sub> (E<sub>A</sub> − E<sub>v</sub> ≈ 0.045 eV for B).</li>
+            <li>Valence electrons jump up into E<sub>A</sub>, leaving holes in the valence band.</li>
+            <li>At 300 K nearly all acceptors are ionised, so p ≈ number of acceptors.</li>
+            <li>E<sub>F</sub> lies closer to E<sub>v</sub> than in pure silicon.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 5 ================= -->
+      <section id="s5" aria-labelledby="h5s">
+        <h2 id="h5s">Majority and minority carrier concentrations</h2>
+        <div class="prose">
+          <p>At room temperature we can assume every dopant atom is ionised. For N-type silicon with donor concentration N<sub>D</sub>, the electron concentration is therefore <strong>n ≈ N<sub>D</sub></strong>.</p>
+          <p>The hole concentration does not stay at the intrinsic value n<sub>i</sub>. Because there are now so many electrons, holes meet electrons and recombine much more often, and the hole concentration falls. In equilibrium, <strong>n × p = n<sub>i</sub>²</strong> (the <strong>mass action law</strong>, topic 1.8), so <strong>p = n<sub>i</sub>² / N<sub>D</sub></strong>.</p>
+          <p>Example, silicon at 300 K with n<sub>i</sub> = 1 × 10¹⁰ cm⁻³ and N<sub>D</sub> = 1 × 10¹⁶ cm⁻³: n ≈ 1 × 10¹⁶ cm⁻³ and p = (10¹⁰)² / 10¹⁶ = 1 × 10⁴ cm⁻³. Electrons outnumber holes by a factor of <strong>10¹²</strong>.</p>
+          <p>For P-type silicon with acceptor concentration N<sub>A</sub>: <strong>p ≈ N<sub>A</sub></strong> and <strong>n = n<sub>i</sub>² / N<sub>A</sub></strong>.</p>
+          <p>Since majority carriers dominate, conductivity is approximately <strong>σ ≈ q·N<sub>D</sub>·μ<sub>n</sub></strong> for N-type and <strong>σ ≈ q·N<sub>A</sub>·μ<sub>p</sub></strong> for P-type. For the example above (μ<sub>n</sub> ≈ 1350 cm²/V·s), σ ≈ 2.2 S/cm and the resistivity ρ ≈ 0.46 Ω·cm, roughly 500,000 times lower than pure silicon.</p>
+        </div>
+
+        <figure class="anim" id="anim5">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="seg" role="group" aria-label="Type">
+              <button class="btn" type="button" id="ty5n" aria-pressed="true">N-type</button>
+              <button class="btn" type="button" id="ty5p" aria-pressed="false">P-type</button>
+            </div>
+            <div class="slider">
+              <label for="d5"><span id="d5l">Donor concentration N<sub>D</sub></span><output id="d5o" for="d5">1.0×10¹⁶ cm⁻³</output></label>
+              <input type="range" id="d5" min="14" max="18" step="0.05" value="16">
+            </div>
+          </div>
+          <canvas id="cv5" class="narrow" style="aspect-ratio:420/280" role="img" aria-label="Two bars on a log scale from 10 to the 0 up to 10 to the 18 per cubic centimetre, one for electrons and one for holes, with a dashed line at the intrinsic value 10 to the 10. Raising the doping lifts the majority bar and lowers the minority bar by the same amount, so their product stays 10 to the 20."></canvas>
+          <div class="counters" aria-live="polite">
+            <div class="ctr n" id="maj5c">Majority (n)<b id="maj5">1.0×10¹⁶</b></div>
+            <div class="ctr p" id="min5c">Minority (p)<b id="min5">1.0×10⁴</b></div>
+            <div class="ctr en">n × p (cm⁻⁶)<b id="np5">1.0×10²⁰</b></div>
+            <div class="ctr ok">Resistivity ρ<b id="r5">0.46 Ω·cm</b></div>
+          </div>
+          <p class="exag">Values for Si at 300 K: n<sub>i</sub> = 10¹⁰ cm⁻³, μ<sub>n</sub> = 1350, μ<sub>p</sub> = 480 cm²/V·s.</p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: carrier concentrations">
+          <h3>Key points</h3>
+          <ul>
+            <li>N-type: n ≈ N<sub>D</sub>, p = n<sub>i</sub>²/N<sub>D</sub>. P-type: p ≈ N<sub>A</sub>, n = n<sub>i</sub>²/N<sub>A</sub>.</li>
+            <li>n × p = n<sub>i</sub>² = 10²⁰ cm⁻⁶ for Si at 300 K, whatever the doping.</li>
+            <li>More majority carriers means fewer minority carriers.</li>
+            <li>σ ≈ q·N<sub>D</sub>·μ<sub>n</sub> or q·N<sub>A</sub>·μ<sub>p</sub>; N<sub>D</sub> = 10¹⁶ cm⁻³ gives ρ ≈ 0.46 Ω·cm.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 6 ================= -->
+      <section id="s6" aria-labelledby="h6s">
+        <h2 id="h6s">Charge neutrality and compensation</h2>
+        <div class="prose">
+          <p>Doping does not give the crystal a net charge. Every donor atom is neutral before it gives up its electron; afterwards, the free electron and the positive ion together still add up to zero. The same is true for each acceptor and its hole. This gives the <strong>charge neutrality equation</strong> (all dopants ionised):</p>
+          <span class="eq">n + N<sub>A</sub> = p + N<sub>D</sub></span>
+          <p>If a crystal contains both donors and acceptors, the electrons released by donors fill the vacancies at acceptor atoms first, and the two partly cancel. This is called <strong>compensation</strong>. Only the difference produces free carriers:</p>
+          <ul>
+            <li>If N<sub>D</sub> &gt; N<sub>A</sub>, the material is <strong>N-type</strong> with <strong>n ≈ N<sub>D</sub> − N<sub>A</sub></strong>.</li>
+            <li>If N<sub>A</sub> &gt; N<sub>D</sub>, the material is <strong>P-type</strong> with <strong>p ≈ N<sub>A</sub> − N<sub>D</sub></strong>.</li>
+          </ul>
+          <p>Compensation is used in chip fabrication: a P-type region can be formed inside an N-type wafer by adding more acceptors than the donors already present.</p>
+        </div>
+
+        <figure class="anim" id="anim6">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="slider">
+              <label for="nd6"><span>Donors (P)</span><output id="nd6o" for="nd6">4</output></label>
+              <input type="range" id="nd6" min="0" max="10" step="1" value="4">
+            </div>
+            <div class="slider">
+              <label for="na6"><span>Acceptors (B)</span><output id="na6o" for="na6">2</output></label>
+              <input type="range" id="na6" min="0" max="10" step="1" value="2">
+            </div>
+          </div>
+          <canvas id="cv6" class="narrow" style="aspect-ratio:420/300" role="img" aria-label="A silicon lattice containing green phosphorus donors and pink boron acceptors. Each donor's extra electron first travels to fill a vacancy at an acceptor, making both into fixed ions. Only the leftover donors release free electrons, or the leftover acceptors create holes."></canvas>
+          <ul class="legend">
+            <li><span class="sw d"></span>P atom</li>
+            <li><span class="sw a"></span>B atom</li>
+            <li><span class="ionsw d">+</span>/<span class="ionsw a">−</span>fixed ions</li>
+            <li><span class="sw e"></span>electron</li>
+            <li><span class="sw h"></span>hole</li>
+          </ul>
+          <div class="tally" id="tally6" aria-live="polite"></div>
+          <p class="result" id="res6"></p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: neutrality and compensation">
+          <h3>Key points</h3>
+          <ul>
+            <li>Doping adds carriers, not net charge: n + N<sub>A</sub> = p + N<sub>D</sub>.</li>
+            <li>Donors and acceptors cancel each other first (<strong>compensation</strong>).</li>
+            <li>N<sub>D</sub> &gt; N<sub>A</sub>: N-type, n ≈ N<sub>D</sub> − N<sub>A</sub>. N<sub>A</sub> &gt; N<sub>D</sub>: P-type, p ≈ N<sub>A</sub> − N<sub>D</sub>.</li>
+            <li>Chip makers use it to form P regions inside N-type wafers.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 7 ================= -->
+      <section id="s7" aria-labelledby="h7s">
+        <h2 id="h7s">Effect of temperature, and summary</h2>
+        <div class="prose">
+          <p>The relation n ≈ N<sub>D</sub> holds only over a certain temperature range. Consider silicon with N<sub>D</sub> = 1 × 10¹⁵ cm⁻³:</p>
+          <ul>
+            <li><strong>Freeze-out region</strong> (very low temperature, below about 100 K): there is not enough thermal energy to free all the donor electrons, so n is less than N<sub>D</sub>.</li>
+            <li><strong>Extrinsic region</strong> (about 100 K to about 500 K): practically all donors are ionised, and electrons created by breaking bonds are still far fewer than N<sub>D</sub>. Here n ≈ N<sub>D</sub> and stays almost constant. Devices are designed to operate in this range.</li>
+            <li><strong>Intrinsic region</strong> (high temperature): the number of electron-hole pairs created by heat (n<sub>i</sub>) becomes comparable to, and then larger than, N<sub>D</sub>. The material starts behaving like pure silicon again, and the doping no longer controls the carrier concentration. Heavier doping pushes this region to higher temperatures.</li>
+          </ul>
+        </div>
+
+        <figure class="anim" id="anim7">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Play sweep</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="seg" role="group" aria-label="Donor concentration">
+              <button class="btn" type="button" data-nd="14" aria-pressed="false">10¹⁴</button>
+              <button class="btn" type="button" data-nd="15" aria-pressed="true">10¹⁵</button>
+              <button class="btn" type="button" data-nd="16" aria-pressed="false">10¹⁶ cm⁻³</button>
+            </div>
+            <div class="slider">
+              <label for="t7"><span>Temperature</span><output id="t7o" for="t7">300 K</output></label>
+              <input type="range" id="t7" min="0" max="700" step="1" value="300">
+            </div>
+          </div>
+          <canvas id="cv7" class="narrow" style="aspect-ratio:420/300" role="img" aria-label="Log plot of electron concentration n against temperature from 0 to 700 K for silicon with a chosen donor concentration. n rises from near zero in the freeze-out region, stays flat at N_D in the extrinsic region, and rises steeply in the intrinsic region where it follows the dashed n_i curve. A draggable marker reads out the values."></canvas>
+          <div class="counters" aria-live="polite">
+            <div class="ctr en">T<b id="T7">300 K</b></div>
+            <div class="ctr n">n (cm⁻³)<b id="n7">—</b></div>
+            <div class="ctr en">n<sub>i</sub> (cm⁻³)<b id="ni7">—</b></div>
+            <div class="ctr ok">Region<b id="rg7">—</b></div>
+          </div>
+          <p class="exag">Drag on the plot to move the marker. Values for Si (E<sub>D</sub> 0.045 eV below E<sub>c</sub>).</p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: temperature">
+          <h3>Key points</h3>
+          <ul>
+            <li><strong>Freeze-out</strong> (below about 100 K): n &lt; N<sub>D</sub>.</li>
+            <li><strong>Extrinsic</strong> (about 100–500 K): n ≈ N<sub>D</sub>, almost constant; devices work here.</li>
+            <li><strong>Intrinsic</strong> (high T): n<sub>i</sub> reaches and passes N<sub>D</sub>; doping loses control.</li>
+            <li>Heavier doping pushes the intrinsic region to higher temperatures.</li>
+          </ul>
+        </aside>
+
+        <h3 class="sumhead">Summary: N-type vs P-type</h3>
+        <div class="table-box">
+          <table class="vt">
+            <thead><tr><th scope="col"></th><th scope="col" class="n-col">N-type</th><th scope="col" class="p-col">P-type</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Dopant group</th><td>Group V (pentavalent)</td><td>Group III (trivalent)</td></tr>
+              <tr><th scope="row">Example elements</th><td>P, As, Sb</td><td>B, Al, Ga, In</td></tr>
+              <tr><th scope="row">Impurity name</th><td>Donor</td><td>Acceptor</td></tr>
+              <tr><th scope="row">Charge of fixed ion</th><td>Positive</td><td>Negative</td></tr>
+              <tr><th scope="row">Impurity energy level</th><td>E<sub>D</sub>, just below E<sub>c</sub> (≈ 0.045 eV for P)</td><td>E<sub>A</sub>, just above E<sub>v</sub> (≈ 0.045 eV for B)</td></tr>
+              <tr><th scope="row">Majority carrier</th><td>Electrons</td><td>Holes</td></tr>
+              <tr><th scope="row">Minority carrier</th><td>Holes</td><td>Electrons</td></tr>
+              <tr><th scope="row">Carrier formulas</th><td>n ≈ N<sub>D</sub>, p = n<sub>i</sub>²/N<sub>D</sub></td><td>p ≈ N<sub>A</sub>, n = n<sub>i</sub>²/N<sub>A</sub></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="sumhead">Key formulas</h3>
+        <div class="formulas">
+          <div class="fcard"><div class="f">n ≈ N<sub>D</sub>,&nbsp; p = n<sub>i</sub>²/N<sub>D</sub></div><p>N-type, all donors ionised.</p></div>
+          <div class="fcard"><div class="f">p ≈ N<sub>A</sub>,&nbsp; n = n<sub>i</sub>²/N<sub>A</sub></div><p>P-type, all acceptors ionised.</p></div>
+          <div class="fcard"><div class="f">n + N<sub>A</sub> = p + N<sub>D</sub></div><p>Charge neutrality.</p></div>
+          <div class="fcard"><div class="f">σ ≈ q·N<sub>D</sub>·μ<sub>n</sub> &nbsp;(N-type)<br>σ ≈ q·N<sub>A</sub>·μ<sub>p</sub> &nbsp;(P-type)</div><p>Conductivity from the majority carriers; ρ = 1/σ.</p></div>
+        </div>
+      </section>
+
+      <nav class="pager" aria-label="Topic navigation">
+        <a href="../1-3-intrinsic-semiconductors/index.html"><small>← Previous</small>1.3 Intrinsic Semiconductors</a>
+        <a class="next" href="../1-5-fermi-level/index.html"><small>Next →</small>1.5 The Fermi Level</a>
+      </nav>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">© 2026 Naveen Bokka</div>
+  </footer>
+
+<script>
+(function () {
+  'use strict';
+
+  /* =========================================================
+     Constants (Si, 300 K)
+     ========================================================= */
+  const KB = 8.617e-5, Q = 1.602e-19, NI300 = 1e10, UN = 1350, UP = 480;
+  const EG = 1.12, ED = 0.045, EA = 0.045;            // ED, EA: ionisation energies (eV)
+  const NC0 = 2.8e19, NV0 = 1.04e19;
+  // Scale Nc, Nv so that ni(300 K) = 1e10 exactly (matches topic 1.3 and n·p = 1e20).
+  const CAL = NI300 / (Math.sqrt(NC0 * NV0) * Math.exp(-EG / (2 * KB * 300)));
+  const Nc = T => CAL * NC0 * Math.pow(T / 300, 1.5);
+  const Nv = T => CAL * NV0 * Math.pow(T / 300, 1.5);
+  const niT = T => T <= 0 ? 0 : Math.sqrt(Nc(T) * Nv(T)) * Math.exp(-EG / (2 * KB * T));
+  // Full charge-neutrality solution n + NA⁻ = p + ND⁺ with incomplete ionisation (g = 2 donors, 4 acceptors).
+  // Energies measured from Ev = 0.
+  function solve(T, Nd, Na) {
+    T = Math.max(T, 4);
+    const kT = KB * T, nc = Nc(T), nv = Nv(T);
+    const parts = EF => {
+      const n = nc * Math.exp((EF - EG) / kT), p = nv * Math.exp(-EF / kT);
+      const ndp = Nd / (1 + 2 * Math.exp((EF - (EG - ED)) / kT));
+      const nam = Na / (1 + 4 * Math.exp((EA - EF) / kT));
+      return { n, p, ndp, nam };
+    };
+    let lo = -0.3, hi = EG + 0.3;
+    for (let k = 0; k < 90; k++) {
+      const m = (lo + hi) / 2, s = parts(m);
+      if (s.n + s.nam - s.p - s.ndp > 0) hi = m; else lo = m;
+    }
+    const EF = (lo + hi) / 2, s = parts(EF);
+    return { EF, n: s.n, p: s.p, fD: Nd ? s.ndp / Nd : 0, fA: Na ? s.nam / Na : 0 };
+  }
+
+  const C = {
+    text: '#e6e9ef', muted: '#9aa4b8', e: '#4fc3f7', h: '#ff8a65', en: '#ffd54f', ok: '#81c784',
+    si: '#b39ddb', siDark: '#2a2342', d: '#66bb6a', dDark: '#1b3320', a: '#f06292', aDark: '#3a1828',
+    bond: '#3a4766', line: '#33405e', grid: '#25304a', metal: '#7d8aa3', vb: '#3949ab', cb: '#00838f'
+  };
+  const FONT = 'Inter, system-ui, sans-serif', MONO = '"JetBrains Mono", ui-monospace, monospace';
+  const RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const TAU = Math.PI * 2, rnd = Math.random;
+  const $ = id => document.getElementById(id);
+  if (RM) $('rmNote').hidden = false;
+
+  const SUP = { '-': '⁻', '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹' };
+  const sup = n => String(n).split('').map(ch => SUP[ch] || ch).join('');
+  function fmtX(x, d) {
+    if (!(x > 0)) return '0';
+    d = d == null ? 1 : d;
+    let e = Math.floor(Math.log10(x));
+    if (e >= -1 && e <= 3) return String(Number(x.toPrecision(d + 1)));
+    let ms = (x / Math.pow(10, e)).toFixed(d);
+    if (parseFloat(ms) >= 10) { e++; ms = (1).toFixed(d); }
+    return ms + '×10' + sup(e);
+  }
+  function fmtA(I) {
+    if (I <= 0) return '0 A';
+    const u = [[1, 'A'], [1e-3, 'mA'], [1e-6, 'µA'], [1e-9, 'nA'], [1e-12, 'pA']];
+    for (const [f, s] of u) if (I >= f || f === 1e-12) { const v = I / f; return (v >= 100 ? v.toFixed(0) : v >= 10 ? v.toFixed(1) : v.toFixed(2)) + ' ' + s; }
+  }
+  const ease = t => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const pick = a => a[(rnd() * a.length) | 0];
+  const randVel = sp => { const a = rnd() * TAU; return [Math.cos(a) * sp, Math.sin(a) * sp]; };
+  // Heat-generated pair rate (per second, on screen): shape of exp(−Eg/2kT), compressed so it stays visible.
+  const pairRate = T => T < 150 ? 0 : 0.1 * Math.pow(Math.exp(-EG / (2 * KB) * (1 / T - 1 / 300)), 0.12);
+
+  /* =========================================================
+     Canvas helpers
+     ========================================================= */
+  let FS = 1;
+  function Cv(id, W, H) { this.el = $(id); this.W = W; this.H = H; this.ctx = this.el.getContext('2d'); }
+  Cv.prototype.begin = function () {
+    const w = this.el.clientWidth; if (!w) return null;
+    const dpr = window.devicePixelRatio || 1;
+    const pw = Math.round(w * dpr), ph = Math.round(w * dpr * this.H / this.W);
+    if (this.el.width !== pw || this.el.height !== ph) { this.el.width = pw; this.el.height = ph; }
+    const c = this.ctx, s = pw / this.W;
+    FS = Math.min(1.6, Math.max(1, 1.15 * this.W / w));   // keep labels readable on small screens
+    c.setTransform(s, 0, 0, s, 0, 0); c.clearRect(0, 0, this.W, this.H);
+    c.textBaseline = 'middle'; c.textAlign = 'left'; c.globalAlpha = 1;
+    return c;
+  };
+  // Watermark: drawn inside the canvas, bottom-right, ~13 px on screen at any size.
+  Cv.prototype.wm = function (c) {
+    const s = 13 * this.W / this.el.clientWidth;
+    c.save(); c.globalAlpha = 1; c.font = '500 ' + s.toFixed(1) + 'px ' + FONT; c.fillStyle = 'rgba(255,255,255,.35)';
+    c.textAlign = 'right'; c.textBaseline = 'bottom'; c.fillText('© Naveen Bokka', this.W - 6, this.H - 4); c.restore();
+  };
+  function circ(c, x, y, r, fill, stroke, lw) {
+    c.beginPath(); c.arc(x, y, Math.max(0, r), 0, TAU);
+    if (fill) { c.fillStyle = fill; c.fill(); }
+    if (stroke) { c.strokeStyle = stroke; c.lineWidth = lw || 1.5; c.stroke(); }
+  }
+  function txt(c, s, x, y, col, size, weight, align, font) {
+    c.font = (weight || 500) + ' ' + ((size || 11) * FS).toFixed(1) + 'px ' + (font || FONT);
+    c.fillStyle = col || C.text; c.textAlign = align || 'left'; c.fillText(s, x, y);
+    return c.measureText(s).width;
+  }
+  function tag(c, s, x, y, col, align, size) {
+    c.font = '600 ' + ((size || 10) * FS).toFixed(1) + 'px ' + FONT;
+    const w = c.measureText(s).width + 8, hh = (size || 10) * 0.8 * FS;
+    const x0 = align === 'right' ? x - w : align === 'center' ? x - w / 2 : x;
+    c.fillStyle = 'rgba(15,20,32,.88)'; c.fillRect(x0, y - hh, w, 2 * hh);
+    c.fillStyle = col || C.text; c.textAlign = 'left'; c.fillText(s, x0 + 4, y + 0.5);
+    return w;
+  }
+  function line(c, x0, y0, x1, y1, col, lw, dash) {
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []);
+    c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke(); c.setLineDash([]);
+  }
+  function arrowHead(c, x, y, ang, col, sz) {
+    sz = sz || 6; c.fillStyle = col; c.beginPath();
+    c.moveTo(x, y);
+    c.lineTo(x - sz * Math.cos(ang - 0.45), y - sz * Math.sin(ang - 0.45));
+    c.lineTo(x - sz * Math.cos(ang + 0.45), y - sz * Math.sin(ang + 0.45));
+    c.closePath(); c.fill();
+  }
+  function arrow(c, x0, y0, x1, y1, col, lw, sz) {
+    const a = Math.atan2(y1 - y0, x1 - x0), s = sz || 7;
+    line(c, x0, y0, x1 - Math.cos(a) * s * 0.8, y1 - Math.sin(a) * s * 0.8, col, lw || 2);
+    arrowHead(c, x1, y1, a, col, s);
+  }
+  function elec(c, x, y, r, glow) {
+    if (glow) circ(c, x, y, r * 2, 'rgba(79,195,247,.18)');
+    circ(c, x, y, r, C.e);
+  }
+  function holeRing(c, x, y, r, alpha) {
+    c.globalAlpha = alpha == null ? 1 : alpha;
+    circ(c, x, y, r || 4.6, 'rgba(255,138,101,.22)', C.h, 2);
+    c.globalAlpha = 1;
+  }
+  // Fixed ion: circled + (donor) or circled − (acceptor)
+  function ionMark(c, x, y, rr, sign) {
+    const col = sign === '+' ? C.d : C.a;
+    circ(c, x, y, rr, '#0f1420', col, 1.6);
+    line(c, x - rr * 0.55, y, x + rr * 0.55, y, col, 1.8);
+    if (sign === '+') line(c, x, y - rr * 0.55, x, y + rr * 0.55, col, 1.8);
+  }
+  function fxPos(f) {
+    const p = ease(clamp(f.t, 0, 1));
+    let x = lerp(f.x0, f.x1, p), y = lerp(f.y0, f.y1, p);
+    if (f.arc) {
+      const len = Math.hypot(f.x1 - f.x0, f.y1 - f.y0) || 1;
+      const off = Math.sin(Math.PI * p) * f.arc;
+      x += -(f.y1 - f.y0) / len * off; y += (f.x1 - f.x0) / len * off;
+    }
+    return [x, y];
+  }
+
+  /* =========================================================
+     2D bond lattice engine (used in sections 0, 1, 3, 6)
+     Each bond has two electron "slots". Holes live in empty slots.
+     ========================================================= */
+  function Lattice(cfg) {
+    Object.assign(this, { r: 14, stub: 0.62, so: 6, dots: true, speed: 38 }, cfg);
+    const L = this;
+    L.orbR = L.r * 1.75;
+    L.atoms = []; L.bonds = []; L.slots = []; L.holes = []; L.frees = []; L.fx = []; L.pairs = [];
+    for (let j = 0; j < L.rows; j++) for (let i = 0; i < L.cols; i++)
+      L.atoms.push({ i, j, x: L.x0 + i * L.sp, y: L.y0 + j * L.sp, type: 'Si', ion: false, bonds: [], orb: null, busy: false, Tth: 50, age: 0, delay: 0 });
+    const add = (a, b, x2, y2) => {
+      const len = Math.hypot(x2 - a.x, y2 - a.y), dx = (x2 - a.x) / len, dy = (y2 - a.y) / len;
+      const md = b ? len / 2 : Math.min(L.sp / 2, len - L.so - 4);
+      const bd = { a, b, x2, y2, slots: [] };
+      [-1, 1].forEach(s => {
+        const sl = { x: a.x + dx * (md + s * L.so), y: a.y + dy * (md + s * L.so), e: true, vac: false, busy: false, hole: null, bond: bd };
+        bd.slots.push(sl); L.slots.push(sl);
+      });
+      L.bonds.push(bd); a.bonds.push(bd); if (b) b.bonds.push(bd);
+    };
+    L.atoms.forEach(a => {
+      [[1, 0], [0, 1], [-1, 0], [0, -1]].forEach(([di, dj]) => {
+        const b = L.at(a.i + di, a.j + dj);
+        if (b) { if (di > 0 || dj > 0) add(a, b, b.x, b.y); }
+        else add(a, null, a.x + di * L.sp * L.stub, a.y + dj * L.sp * L.stub);
+      });
+    });
+  }
+  const LP = Lattice.prototype;
+  LP.at = function (i, j) { return (i < 0 || j < 0 || i >= this.cols || j >= this.rows) ? null : this.atoms[j * this.cols + i]; };
+  LP.other = (bd, a) => bd.a === a ? bd.b : bd.a;
+  LP.okBond = bd => bd.a.type !== 'B' && !(bd.b && bd.b.type === 'B');
+  LP.canPlace = function (a) {
+    if (a.type !== 'Si') return false;
+    const nbOk = [[1, 0], [-1, 0], [0, 1], [0, -1]].every(([di, dj]) => { const b = this.at(a.i + di, a.j + dj); return !b || b.type === 'Si'; });
+    return nbOk && a.bonds.every(bd => bd.slots.every(s => s.e && !s.busy));
+  };
+  LP.orbPos = function (a, ph) { return [a.x + Math.cos(ph) * this.orbR, a.y + Math.sin(ph) * this.orbR]; };
+  LP.newFree = function (x, y) { const v = randVel(this.speed); const e = { x, y, vx: v[0], vy: v[1], turn: 0.4 + rnd() }; this.frees.push(e); return e; };
+  LP.newHole = function (slot) { const h = { slot, t: 0.5 + rnd() * 0.6, busy: false, fx: null, dead: false }; slot.hole = h; this.holes.push(h); return h; };
+  LP.removeHole = function (h) { const k = this.holes.indexOf(h); if (k >= 0) this.holes.splice(k, 1); if (h.slot.hole === h) h.slot.hole = null; h.dead = true; };
+  LP.removeFree = function (e) { const k = this.frees.indexOf(e); if (k >= 0) this.frees.splice(k, 1); };
+  LP.addFx = function (x0, y0, x1, y1, dur, arc, free, done, arrowOn) { const f = { x0, y0, x1, y1, t: 0, dur, arc, free, done, arrow: arrowOn }; this.fx.push(f); return f; };
+  LP.nFree = function () { return this.frees.length + this.fx.filter(f => f.free).length; };
+  LP.nearestFree = function (x, y) { let best = null, bd = 1e9; this.frees.forEach(e => { const d = Math.hypot(e.x - x, e.y - y); if (d < bd) { bd = d; best = e; } }); return best; };
+  LP.nearestHole = function (x, y) { let best = null, bd = 1e9; this.holes.forEach(h => { if (h.busy || h.fx) return; const d = Math.hypot(h.slot.x - x, h.slot.y - y); if (d < bd) { bd = d; best = h; } }); return best; };
+
+  LP.addDonor = function (a, Tth, delay) { a.type = 'P'; a.ion = false; a.orb = { ph: rnd() * TAU }; a.Tth = Tth; a.age = 0; a.delay = delay || 0; };
+  LP.addAcceptor = function (a, Tth, delay) {
+    a.type = 'B'; a.ion = false; a.Tth = Tth; a.age = 0; a.delay = delay || 0;
+    // Incomplete bond: prefer right, then down, left, up, with a Si atom on the other end.
+    const pref = [[1, 0], [0, 1], [-1, 0], [0, -1]];
+    let bd = null;
+    for (const [di, dj] of pref) {
+      const o = this.at(a.i + di, a.j + dj);
+      if (o && o.type === 'Si') { bd = a.bonds.find(b => this.other(b, a) === o); break; }
+    }
+    if (!bd) bd = a.bonds[0];
+    const sl = bd.a === a ? bd.slots[0] : bd.slots[1];   // the slot on the boron side
+    sl.e = false; sl.vac = true; a.vacSlot = sl;
+  };
+  LP.ionizeDonor = function (a) {
+    const [x, y] = this.orbPos(a, a.orb ? a.orb.ph : 0);
+    a.orb = null; a.ion = true; a.age = 0;
+    this.newFree(x, y);
+  };
+  LP.captureDonor = function (a) {
+    if (this.frees.length <= this.holes.length) return;      // keep an electron for every hole
+    const e = this.nearestFree(a.x, a.y); if (!e) return;
+    this.removeFree(e); a.busy = true;
+    const [x, y] = this.orbPos(a, 0);
+    this.addFx(e.x, e.y, x, y, 0.7, 12, true, () => { a.ion = false; a.busy = false; a.orb = { ph: 0 }; a.age = 0; a.delay = 0.3; });
+  };
+  LP.ionizeAcceptor = function (a) {
+    const vs = a.vacSlot, nb = this.other(vs.bond, a);
+    if (!nb) return false;
+    const cand = [];
+    nb.bonds.forEach(b2 => { if (b2 === vs.bond || !this.okBond(b2)) return; b2.slots.forEach(s => { if (s.e && !s.busy && !s.vac) cand.push(s); }); });
+    if (!cand.length) return false;
+    const src = pick(cand);
+    src.e = false; src.busy = true; vs.busy = true; a.busy = true;
+    this.addFx(src.x, src.y, vs.x, vs.y, 0.8, 10, false, () => {
+      vs.e = true; vs.vac = false; vs.busy = false; src.busy = false; a.ion = true; a.busy = false; a.age = 0;
+      this.newHole(src);
+    }, true);
+    return true;
+  };
+  LP.captureAcceptor = function (a) {
+    if (this.holes.length <= this.frees.length) return;      // keep a hole for every free electron
+    const vs = a.vacSlot, h = this.nearestHole(vs.x, vs.y); if (!h) return;
+    vs.e = false; vs.busy = true; h.busy = true; a.busy = true;
+    this.addFx(vs.x, vs.y, h.slot.x, h.slot.y, 0.7, 10, false, () => {
+      h.slot.e = true; this.removeHole(h); vs.vac = true; vs.busy = false; a.ion = false; a.busy = false; a.age = 0; a.delay = 0.3;
+    });
+  };
+  LP.hop = function (h) {
+    const bd = h.slot.bond, cand = [];
+    [bd.a, bd.b].forEach(at => {
+      if (!at || at.type === 'B') return;
+      at.bonds.forEach(b2 => { if (b2 === bd || !this.okBond(b2)) return; b2.slots.forEach(s => { if (s.e && !s.busy && !s.vac) cand.push(s); }); });
+    });
+    h.t = 0.45 + rnd() * 0.7;
+    if (!cand.length) return;
+    const s = pick(cand), from = h.slot;
+    s.e = false; s.busy = true; from.busy = true;
+    h.from = from; h.to = s;
+    h.fx = this.addFx(s.x, s.y, from.x, from.y, 0.32, 0, false, () => {
+      from.e = true; from.busy = false; from.hole = null; s.busy = false; s.hole = h; h.slot = s; h.fx = null;
+    });
+  };
+  LP.genPair = function () {
+    const ok = a => !a || a.type === 'Si';
+    const cand = this.slots.filter(s => s.e && !s.busy && !s.vac && ok(s.bond.a) && ok(s.bond.b));
+    if (!cand.length) return;
+    const s = pick(cand); s.e = false;
+    const h = this.newHole(s), e = this.newFree(s.x, s.y);
+    this.pairs.push({ e, h, life: 3 + rnd() * 2.5 });
+  };
+  LP.recombine = function (e, h) {
+    this.removeFree(e); h.busy = true;
+    this.addFx(e.x, e.y, h.slot.x, h.slot.y, 0.6, 10, true, () => { h.slot.e = true; this.removeHole(h); });
+  };
+  // Dopant ionisation driven by temperature (sections 1 and 3)
+  LP.stepDopants = function (T, dt) {
+    this.atoms.forEach(a => {
+      if (a.type === 'Si' || a.busy) return;
+      a.age += dt;
+      if (!a.ion && T > a.Tth && a.age > a.delay && rnd() < dt * 2.5) { if (a.type === 'P') this.ionizeDonor(a); else this.ionizeAcceptor(a); }
+      else if (a.ion && T < a.Tth - 6 && rnd() < dt * 2.5) { if (a.type === 'P') this.captureDonor(a); else this.captureAcceptor(a); }
+    });
+  };
+  LP.step = function (dt) {
+    const L = this, [bx0, by0, bx1, by1] = L.bounds;
+    L.atoms.forEach(a => { if (a.orb) a.orb.ph += dt * 2.4; });
+    L.frees.forEach(e => {
+      e.turn -= dt;
+      if (e.turn <= 0) { const v = randVel(L.speed); e.vx = v[0]; e.vy = v[1]; e.turn = 0.5 + rnd() * 1.2; }
+      e.x += e.vx * dt; e.y += e.vy * dt;
+      if (e.x < bx0) { e.x = bx0; e.vx = Math.abs(e.vx); } if (e.x > bx1) { e.x = bx1; e.vx = -Math.abs(e.vx); }
+      if (e.y < by0) { e.y = by0; e.vy = Math.abs(e.vy); } if (e.y > by1) { e.y = by1; e.vy = -Math.abs(e.vy); }
+    });
+    for (let k = L.fx.length - 1; k >= 0; k--) {
+      const f = L.fx[k]; f.t += dt / f.dur;
+      if (f.t >= 1) { L.fx.splice(k, 1); if (f.done) f.done(); }
+    }
+    L.holes.slice().forEach(h => { if (h.busy || h.fx) return; h.t -= dt; if (h.t <= 0) L.hop(h); });
+    for (let k = L.pairs.length - 1; k >= 0; k--) {
+      const p = L.pairs[k]; p.life -= dt; if (p.life > 0) continue;
+      if (!L.holes.length || !L.frees.length) { if (!L.holes.length || L.nFree() === 0) L.pairs.splice(k, 1); else p.life = 0.3; continue; }
+      let e = null, h = null;
+      if (L.frees.length >= L.holes.length) {
+        h = (!p.h.dead && !p.h.busy && !p.h.fx) ? p.h : L.holes.find(x => !x.busy && !x.fx);
+        if (h) e = L.nearestFree(h.slot.x, h.slot.y);
+      } else {
+        e = L.frees.indexOf(p.e) >= 0 ? p.e : L.frees[0];
+        if (e) h = L.nearestHole(e.x, e.y);
+      }
+      if (e && h) { L.pairs.splice(k, 1); L.recombine(e, h); } else p.life = 0.3;
+    }
+  };
+  LP.draw = function (c) {
+    const L = this, r = L.r;
+    L.bonds.forEach(bd => {
+      const x1 = bd.a.x, y1 = bd.a.y, x2 = bd.x2, y2 = bd.y2;
+      if (!L.dots) { line(c, x1, y1, x2, y2, C.bond, 2); return; }
+      const len = Math.hypot(x2 - x1, y2 - y1), px = -(y2 - y1) / len * 2.2, py = (x2 - x1) / len * 2.2;
+      line(c, x1 + px, y1 + py, x2 + px, y2 + py, C.bond, 1.2);
+      line(c, x1 - px, y1 - py, x2 - px, y2 - py, C.bond, 1.2);
+    });
+    if (L.dots) L.slots.forEach(s => {
+      if (s.e) elec(c, s.x, s.y, L.r > 12 ? 3.2 : 2.8, false);
+      else if (s.vac) { c.setLineDash([2, 2]); circ(c, s.x, s.y, 3.6, null, C.text, 1.2); c.setLineDash([]); }
+    });
+    L.holes.forEach(h => {
+      if (h.fx) { const p = ease(clamp(h.fx.t, 0, 1)); holeRing(c, h.from.x, h.from.y, 4.6, 1 - p); holeRing(c, h.to.x, h.to.y, 4.6, p); }
+      else holeRing(c, h.slot.x, h.slot.y, 4.6, 1);
+    });
+    L.atoms.forEach(a => {
+      const col = a.type === 'P' ? C.d : a.type === 'B' ? C.a : C.si;
+      const dk = a.type === 'P' ? C.dDark : a.type === 'B' ? C.aDark : C.siDark;
+      circ(c, a.x, a.y, r, dk, col, a.type === 'Si' ? 1.4 : 2.2);
+      if (a.type !== 'Si' || L.dots) txt(c, a.type, a.x, a.y + 0.5, col, Math.max(8, r * 0.6), 700, 'center');
+      if (a.ion) ionMark(c, a.x + r * 0.8, a.y - r * 0.8, Math.max(5, r * 0.42), a.type === 'P' ? '+' : '−');
+    });
+    L.atoms.forEach(a => {
+      if (!a.orb) return;
+      c.globalAlpha = 0.35; c.setLineDash([3, 4]); circ(c, a.x, a.y, L.orbR, null, C.d, 1); c.setLineDash([]); c.globalAlpha = 1;
+      const [x, y] = L.orbPos(a, a.orb.ph); elec(c, x, y, 3.6, true);
+    });
+    L.frees.forEach(e => elec(c, e.x, e.y, 3.6, true));
+    L.fx.forEach(f => {
+      if (f.arrow) { c.globalAlpha = 0.85; arrow(c, f.x0, f.y0, f.x1, f.y1, C.e, 1.6, 6); c.globalAlpha = 1; }
+      const [x, y] = fxPos(f); elec(c, x, y, 3.4, true);
+    });
+  };
+
+  /* =========================================================
+     Animation framework: own Play/Pause/Reset, runs only while visible
+     ========================================================= */
+  const anims = [];
+  function Anim(rootId, o) {
+    this.root = $(rootId); this.o = o; this.playing = !RM && !o.startPaused; this.visible = true; this.dirty = true;
+    this.pb = this.root.querySelector('[data-act="play"]');
+    this.playLabel = o.playLabel || 'Play';
+    this.pb.addEventListener('click', () => this.setPlaying(!this.playing));
+    this.root.querySelector('[data-act="reset"]').addEventListener('click', () => { o.reset(); this.settle(); this.dirty = true; });
+    this.sync(); anims.push(this);
+    if ('IntersectionObserver' in window) {
+      this.visible = false;
+      new IntersectionObserver(es => es.forEach(e => { this.visible = e.isIntersecting; if (this.visible) this.dirty = true; }))
+        .observe(this.root);
+    }
+  }
+  Anim.prototype.setPlaying = function (p) { this.playing = p; this.sync(); this.dirty = true; };
+  Anim.prototype.sync = function () { this.pb.textContent = this.playing ? 'Pause' : this.playLabel; };
+  // When paused, jump the simulation forward so controls still show their effect.
+  Anim.prototype.settle = function () {
+    if (!this.playing && this.o.settle) for (let k = 0; k < this.o.settle; k++) this.o.step(0.05);
+    this.dirty = true;
+  };
+
+  /* =========================================================
+     SECTION 0: doping level → lattice window, ammeter, log bar
+     ========================================================= */
+  (function () {
+    const W = 420, H = 320, cv = new Cv('cv0', W, H);
+    const RATIO = [0, 1e-8, 1e-7, 1e-6, 1e-5, 1e-4];
+    const LAB = ['pure', '1 per 10⁸ Si atoms', '1 per 10⁷ Si atoms', '1 per 10⁶ Si atoms', '1 per 10⁵ Si atoms', '1 per 10⁴ Si atoms'];
+    const SHOW = [0, 1, 2, 3, 5, 7], DRIFT = [0, 3, 5, 8, 12, 16];
+    const SPOTS = [[2, 1], [4, 2], [0, 2], [5, 0], [3, 3], [1, 0], [5, 3]];
+    const WIN = [14, 10, 262, 160], BAR = [56, 196, 272, 226];
+    const LB = { x: 362, w: 18, y0: 262, y1: 30, lo: 9, hi: 19 };
+    let lev = 0, L, drift = [], disp = 10, A;
+    const nOf = l => { const N = 5e22 * RATIO[l]; return N / 2 + Math.sqrt(N * N / 4 + NI300 * NI300); };
+    function build() {
+      L = new Lattice({ cols: 6, rows: 4, x0: 43, y0: 28, sp: 38, r: 9, dots: false, speed: 30, bounds: [20, 16, 256, 154] });
+      for (let k = 0; k < SHOW[lev]; k++) { const a = L.at(SPOTS[k][0], SPOTS[k][1]); L.addDonor(a, 0, 0); L.ionizeDonor(a); }
+      drift = [];
+      for (let k = 0; k < DRIFT[lev]; k++) drift.push({ x: BAR[0] + rnd() * (BAR[2] - BAR[0]), y: BAR[1] + 5 + rnd() * (BAR[3] - BAR[1] - 10) });
+      $('d0o').textContent = LAB[lev];
+    }
+    const yLB = lg => LB.y0 - (lg - LB.lo) / (LB.hi - LB.lo) * (LB.y0 - LB.y1);
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      // lattice window
+      c.save(); c.beginPath(); c.rect(WIN[0], WIN[1], WIN[2] - WIN[0], WIN[3] - WIN[1]); c.clip();
+      L.draw(c); c.restore();
+      c.strokeStyle = C.line; c.lineWidth = 1.5; c.strokeRect(WIN[0], WIN[1], WIN[2] - WIN[0], WIN[3] - WIN[1]);
+      // zoom lines to a small square on the bar
+      const sq = [150, BAR[1] + 3, 166, BAR[3] - 3];
+      line(c, WIN[0], WIN[3], sq[0], sq[1], C.line, 1, [3, 3]);
+      line(c, WIN[2], WIN[3], sq[2], sq[1], C.line, 1, [3, 3]);
+      // bar
+      const g = lev / 5;
+      c.fillStyle = 'rgb(' + Math.round(lerp(92, 60, g)) + ',' + Math.round(lerp(98, 112, g)) + ',' + Math.round(lerp(118, 84, g)) + ')';
+      c.fillRect(BAR[0], BAR[1], BAR[2] - BAR[0], BAR[3] - BAR[1]);
+      c.strokeStyle = C.line; c.lineWidth = 1; c.strokeRect(sq[0], sq[1], sq[2] - sq[0], sq[3] - sq[1]);
+      drift.forEach(d => circ(c, d.x, d.y, 2.6, C.e));
+      txt(c, 'Si', BAR[0] + 8, (BAR[1] + BAR[3]) / 2, C.text, 10, 700);
+      // contacts
+      c.fillStyle = C.metal; c.fillRect(BAR[0] - 14, BAR[1] - 6, 14, BAR[3] - BAR[1] + 12); c.fillRect(BAR[2], BAR[1] - 6, 14, BAR[3] - BAR[1] + 12);
+      // circuit
+      const yw = 284, xl = BAR[0] - 7, xr = BAR[2] + 7;
+      line(c, xl, BAR[3] + 6, xl, yw, C.metal, 2); line(c, xl, yw, 94, yw, C.metal, 2);
+      line(c, 106, yw, 185, yw, C.metal, 2); line(c, 215, yw, xr, yw, C.metal, 2); line(c, xr, yw, xr, BAR[3] + 6, C.metal, 2);
+      line(c, 94, yw - 12, 94, yw + 12, C.text, 2.5); line(c, 106, yw - 6, 106, yw + 6, C.text, 4);
+      txt(c, '+', 88, yw - 18, C.text, 11, 700, 'center'); txt(c, '−', 110, yw - 16, C.text, 11, 700, 'center');
+      circ(c, 200, yw, 15, '#141b2b', C.en, 2); txt(c, 'A', 200, yw + 0.5, C.en, 12, 700, 'center');
+      // current
+      const n = Math.pow(10, disp), p = NI300 * NI300 / n;
+      const I = Q * (n * UN + p * UP) * 1e-4;          // σ·(A/L)·V with A/L = 1e-4 cm, V = 1 V
+      txt(c, fmtA(I), 200, yw + 25, C.en, 12, 600, 'center', MONO);
+      // log bar
+      txt(c, 'n (cm⁻³)', LB.x + LB.w / 2, 14, C.muted, 9, 600, 'center');
+      c.fillStyle = '#1a2132'; c.fillRect(LB.x, LB.y1, LB.w, LB.y0 - LB.y1);
+      c.fillStyle = C.e; c.fillRect(LB.x, yLB(disp), LB.w, LB.y0 - yLB(disp));
+      c.strokeStyle = C.line; c.lineWidth = 1; c.strokeRect(LB.x, LB.y1, LB.w, LB.y0 - LB.y1);
+      [10, 12, 14, 16, 18].forEach(e => { const y = yLB(e); line(c, LB.x - 4, y, LB.x, y, C.muted, 1); txt(c, '10' + sup(e), LB.x - 6, y, C.muted, 9, 500, 'right'); });
+      tag(c, fmtX(n), LB.x - 3, yLB(disp), C.e, 'right', 9);
+      cv.wm(c);
+    }
+    A = new Anim('anim0', {
+      settle: 60,
+      step(dt) {
+        L.step(dt);
+        drift.forEach(d => { d.x -= 28 * dt; if (d.x < BAR[0]) d.x += BAR[2] - BAR[0]; });
+        disp += (Math.log10(nOf(lev)) - disp) * Math.min(1, dt * 2.5);
+      },
+      draw,
+      reset() { lev = 0; $('d0').value = 0; build(); }
+    });
+    $('d0').addEventListener('input', e => { lev = +e.target.value; build(); A.settle(); });
+    build(); disp = 10;
+  })();
+
+  /* =========================================================
+     SECTIONS 1 & 3: donor / acceptor in the bond lattice
+     ========================================================= */
+  function dopeSection(id, kind) {
+    const W = 420, H = 345, cv = new Cv('cv' + id, W, H), N = kind === 'n';
+    let L, T = 0, A;
+    const mk = () => new Lattice({ cols: 6, rows: 5, x0: 60, y0: 45, sp: 60, r: 15, bounds: [18, 14, 402, 316] });
+    const nDop = () => L.atoms.filter(a => a.type !== 'Si').length;
+    function btns() { const n = nDop(); $('add' + id).disabled = n > 0; $('more' + id).disabled = n === 0 || n >= 7; }
+    function setT(v) { T = v; $('t' + id + 'o').textContent = Math.round(v) + ' K'; }
+    function place(a, Tth, delay) { if (N) L.addDonor(a, Tth, delay); else L.addAcceptor(a, Tth, delay); }
+    function reset() { L = mk(); setT(0); $('t' + id).value = 0; btns(); }
+    $('add' + id).addEventListener('click', () => { place(L.at(2, 2), 50, 1.2); btns(); A.settle(); });
+    $('more' + id).addEventListener('click', () => {
+      for (let k = 0; k < 3; k++) {
+        const cand = L.atoms.filter(a => L.canPlace(a));
+        if (!cand.length || nDop() >= 7) break;
+        place(pick(cand), 38 + rnd() * 30, 0.3 + rnd() * 0.9);
+      }
+      btns(); A.settle();
+    });
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      L.draw(c);
+      const first = L.at(2, 2);
+      if (first.type !== 'Si' && first.ion) tag(c, N ? 'donor ion' : 'acceptor ion', first.x + 30, first.y + 30, N ? C.d : C.a, 'center', 9);
+      cv.wm(c);
+      $('ce' + id).textContent = L.nFree();
+      $('ch' + id).textContent = L.holes.length;
+    }
+    A = new Anim('anim' + id, {
+      settle: 80,
+      step(dt) {
+        L.stepDopants(T, dt);
+        if (L.pairs.length < 2 && rnd() < pairRate(T) * dt) L.genPair();
+        L.step(dt);
+      },
+      draw, reset
+    });
+    $('t' + id).addEventListener('input', e => { setT(+e.target.value); A.settle(); });
+    reset();
+  }
+  dopeSection(1, 'n');
+  dopeSection(3, 'p');
+
+  /* =========================================================
+     SECTIONS 2 & 4: band diagrams with donor / acceptor levels
+     ========================================================= */
+  function bandSection(id, kind) {
+    const W = 420, H = 300, cv = new Cv('cv' + id, W, H), N = kind === 'n';
+    const yEc = 80, yEv = 220, ST = 34, MID = yEv - yEc - 2 * ST;
+    // Energy (eV above Ev) → y. The 0.045 eV strips next to each band edge are stretched (not to scale).
+    const yE = E => {
+      if (E >= EG - ED) return yEc + (EG - E) / ED * ST;
+      if (E <= EA) return yEv - E / EA * ST;
+      return yEc + ST + (EG - ED - E) / (EG - ED - EA) * MID;
+    };
+    const DOP = 1e16, NL = 8, RANK = [3, 6, 0, 5, 2, 7, 1, 4];
+    const lx = k => 150 + k * 26, yL = N ? yE(EG - ED) : yE(EA);
+    const CB = [40, 26, 362, 74], VB = [40, 226, 362, 270];
+    const cache = {};
+    const sol = T => { const k = Math.round(T); return cache[k] || (cache[k] = solve(k, N ? DOP : 0, N ? 0 : DOP)); };
+    let T, lev, es, hs, fx, pairs, cool, EFd, A;
+    const inBox = (b, x) => ({ x: clamp(x == null ? b[0] + rnd() * (b[2] - b[0]) : x, b[0], b[2]), y: b[1] + rnd() * (b[3] - b[1]) });
+    function carrier(b, x) { const p = inBox(b, x), v = randVel(34); return { x: p.x, y: p.y, vx: v[0], vy: v[1], turn: 0.5 + rnd(), busy: false, dead: false, box: b }; }
+    function move(p, dt) {
+      if (p.busy) return;
+      p.turn -= dt; if (p.turn <= 0) { const v = randVel(34); p.vx = v[0]; p.vy = v[1]; p.turn = 0.6 + rnd() * 1.2; }
+      p.x += p.vx * dt; p.y += p.vy * dt; const b = p.box;
+      if (p.x < b[0]) { p.x = b[0]; p.vx = Math.abs(p.vx); } if (p.x > b[2]) { p.x = b[2]; p.vx = -Math.abs(p.vx); }
+      if (p.y < b[1]) { p.y = b[1]; p.vy = Math.abs(p.vy); } if (p.y > b[3]) { p.y = b[3]; p.vy = -Math.abs(p.vy); }
+    }
+    const rm = (arr, o) => { const k = arr.indexOf(o); if (k >= 0) arr.splice(k, 1); o.dead = true; };
+    const nearest = (arr, x, y) => { let b = null, bd = 1e9; arr.forEach(o => { if (o.busy) return; const d = Math.hypot(o.x - x, o.y - y); if (d < bd) { bd = d; b = o; } }); return b; };
+    const addFx = (x0, y0, x1, y1, dur, done) => fx.push({ x0, y0, x1, y1, t: 0, dur, arc: 0, done });
+    function setT(v) { T = v; $('t' + id + 'o').textContent = Math.round(v) + ' K'; }
+    function reset() {
+      setT(0); $('t' + id).value = 0;
+      lev = []; for (let k = 0; k < NL; k++) lev.push({ x: lx(k), occ: N, show: N, busy: false, rank: RANK[k] });
+      es = []; hs = []; fx = []; pairs = []; cool = 0; EFd = sol(0).EF;
+    }
+    const ionised = () => lev.filter(l => N ? !l.occ : l.occ).length;
+    function transition(tgt) {
+      const ic = ionised();
+      if (ic < tgt) {                         // ionise one more dopant
+        const cands = lev.filter(l => !l.busy && (N ? l.occ : !l.occ)).sort((a, b) => a.rank - b.rank);
+        const l = cands[0]; if (!l) return;
+        l.busy = true;
+        if (N) {
+          l.occ = false; l.show = false;
+          const p = inBox(CB, l.x + (rnd() - 0.5) * 60);
+          addFx(l.x, yL, p.x, p.y, 0.7, () => { l.busy = false; es.push(carrier(CB, p.x)); });
+        } else {
+          l.occ = true;
+          const h = carrier(VB, l.x + (rnd() - 0.5) * 60); hs.push(h);
+          addFx(h.x, h.y, l.x, yL, 0.7, () => { l.busy = false; l.show = true; });
+        }
+      } else if (ic > tgt) {                  // re-capture one
+        const cands = lev.filter(l => !l.busy && (N ? !l.occ : l.occ)).sort((a, b) => b.rank - a.rank);
+        const l = cands[0]; if (!l) return;
+        if (N) {
+          if (es.length <= hs.length) return;
+          const e = nearest(es, l.x, yL); if (!e) return;
+          rm(es, e); l.busy = true; l.occ = true;
+          addFx(e.x, e.y, l.x, yL, 0.7, () => { l.busy = false; l.show = true; });
+        } else {
+          if (hs.length <= es.length) return;
+          const h = nearest(hs, l.x, yL); if (!h) return;
+          h.busy = true; l.busy = true; l.occ = false; l.show = false;
+          addFx(l.x, yL, h.x, h.y, 0.7, () => { l.busy = false; rm(hs, h); });
+        }
+      }
+    }
+    function step(dt) {
+      const s = sol(T), tgt = Math.round(NL * (N ? s.fD : s.fA));
+      EFd += (s.EF - EFd) * Math.min(1, dt * 3);
+      cool -= dt;
+      if (cool <= 0) { transition(tgt); cool = 0.22; }
+      if (pairs.length < 2 && rnd() < pairRate(T) * dt) {      // occasional heat-generated pair
+        const h = carrier(VB); hs.push(h);
+        const pr = { h, e: null, life: 3.5 + rnd() * 2 };
+        const p = inBox(CB, h.x + (rnd() - 0.5) * 40);
+        addFx(h.x, VB[1], p.x, p.y, 0.8, () => { const e = carrier(CB, p.x); e.y = p.y; es.push(e); pr.e = e; });
+        pairs.push(pr);
+      }
+      for (let k = pairs.length - 1; k >= 0; k--) {
+        const pr = pairs[k]; pr.life -= dt;
+        if (pr.life > 0 || !pr.e) continue;
+        let e = null, h = null;
+        if (es.length >= hs.length) { h = (!pr.h.dead && !pr.h.busy) ? pr.h : hs.find(x => !x.busy); if (h) e = nearest(es, h.x, h.y); }
+        else { e = (!pr.e.dead && !pr.e.busy) ? pr.e : es.find(x => !x.busy); if (e) h = nearest(hs, e.x, e.y); }
+        if (e && h) {
+          pairs.splice(k, 1); rm(es, e); h.busy = true;
+          addFx(e.x, e.y, h.x, h.y, 0.7, () => rm(hs, h));
+        } else if (!es.length || !hs.length) pairs.splice(k, 1);
+        else pr.life = 0.3;
+      }
+      es.forEach(p => move(p, dt)); hs.forEach(p => move(p, dt));
+      for (let k = fx.length - 1; k >= 0; k--) { const f = fx[k]; f.t += dt / f.dur; if (f.t >= 1) { fx.splice(k, 1); f.done(); } }
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      // bands
+      c.fillStyle = 'rgba(0,131,143,.30)'; c.fillRect(30, 18, 342, yEc - 18);
+      c.fillStyle = 'rgba(57,73,171,.38)'; c.fillRect(30, yEv, 342, 58);
+      line(c, 30, yEc, 372, yEc, C.cb, 2.5); line(c, 30, yEv, 372, yEv, '#5c6bc0', 2.5);
+      txt(c, 'conduction band', 36, 30, '#80cbc4', 9, 600);
+      txt(c, 'valence band', 36, 268, '#9fa8da', 9, 600);
+      txt(c, 'Ec', 6, yEc, C.text, 11, 700); txt(c, 'Ev', 6, yEv, C.text, 11, 700);
+      txt(c, N ? 'ED' : 'EA', 6, yL, N ? C.d : C.a, 11, 700);
+      // 0.045 eV bracket
+      const b0 = N ? yEc : yL, b1 = N ? yL : yEv, bx = 46;
+      line(c, bx, b0 + 1, bx, b1 - 1, C.muted, 1); line(c, bx - 3, b0 + 1, bx + 3, b0 + 1, C.muted, 1); line(c, bx - 3, b1 - 1, bx + 3, b1 - 1, C.muted, 1);
+      // Eg arrow
+      const ax = 402;
+      arrow(c, ax, (yEc + yEv) / 2, ax, yEc + 2, C.en, 1.4, 6); arrow(c, ax, (yEc + yEv) / 2, ax, yEv - 2, C.en, 1.4, 6);
+      c.save(); c.translate(ax + 9, (yEc + yEv) / 2); c.rotate(-Math.PI / 2); txt(c, 'Eg = 1.12 eV', 0, 0, C.en, 9.5, 600, 'center'); c.restore();
+      // Ei and EF
+      const yi = yE(EG / 2), yF = yE(EFd);
+      line(c, 30, yi, 372, yi, C.muted, 1.2, [2, 4]);
+      line(c, 30, yF, 372, yF, C.en, 1.8, [7, 4]);
+      txt(c, 'EF', 376, yF, C.en, 11, 700);
+      let yiLab = yi; const gap = 15 * FS;
+      if (Math.abs(yF - yi) < gap) yiLab = yF < yi ? yF + gap : yF - gap;
+      txt(c, 'Ei', 376, yiLab, C.muted, 11, 700);
+      tag(c, '0.045 eV', bx + 3, (b0 + b1) / 2, C.muted, 'left', 9);
+      // dopant levels
+      lev.forEach(l => {
+        line(c, l.x - 10, yL, l.x + 10, yL, N ? C.d : C.a, 2.2, [4, 3]);
+        if (N) { if (l.show) elec(c, l.x, yL, 3.8, true); else ionMark(c, l.x, yL, 6.5, '+'); }
+        else if (l.show) ionMark(c, l.x, yL, 6.5, '−');
+      });
+      hs.forEach(h => holeRing(c, h.x, h.y, 4.8, 1));
+      es.forEach(e => elec(c, e.x, e.y, 3.8, true));
+      fx.forEach(f => { const [x, y] = fxPos(f); elec(c, x, y, 3.8, true); });
+      cv.wm(c);
+    }
+    A = new Anim('anim' + id, { settle: 80, step, draw, reset });
+    $('t' + id).addEventListener('input', e => { setT(+e.target.value); A.settle(); });
+    reset();
+  }
+  bandSection(2, 'n');
+  bandSection(4, 'p');
+
+  /* =========================================================
+     SECTION 5: majority / minority bars
+     ========================================================= */
+  (function () {
+    const W = 420, H = 280, cv = new Cv('cv5', W, H);
+    const Y0 = 236, Y1 = 34, yL = l => Y0 - l / 18 * (Y0 - Y1);
+    const BN = [160, 210], BP = [258, 308];
+    let type = 'n', lg = 16, dn = 16, dp = 4, dots = [], A;
+    const tgt = () => type === 'n' ? { n: lg, p: 20 - lg } : { n: 20 - lg, p: lg };
+    for (let k = 0; k < 30; k++) dots.push({ which: k % 2, u: rnd(), v: rnd(), sp: 0.04 + rnd() * 0.05 });
+    function readouts() {
+      const t = tgt(), n = Math.pow(10, t.n), p = Math.pow(10, t.p);
+      const rho = 1 / (Q * (n * UN + p * UP));
+      const N = type === 'n';
+      $('d5l').innerHTML = N ? 'Donor concentration N<sub>D</sub>' : 'Acceptor concentration N<sub>A</sub>';
+      $('d5o').textContent = fmtX(Math.pow(10, lg)) + ' cm⁻³';
+      $('maj5c').firstChild.textContent = N ? 'Majority n ≈ ND (cm⁻³)' : 'Majority p ≈ NA (cm⁻³)';
+      $('min5c').firstChild.textContent = N ? 'Minority p = ni²/ND (cm⁻³)' : 'Minority n = ni²/NA (cm⁻³)';
+      $('maj5c').className = 'ctr ' + (N ? 'n' : 'p'); $('min5c').className = 'ctr ' + (N ? 'p' : 'n');
+      $('maj5').textContent = fmtX(N ? n : p);
+      $('min5').textContent = fmtX(N ? p : n);
+      $('np5').textContent = fmtX(n * p);
+      $('r5').textContent = fmtX(rho, 1) + ' Ω·cm';
+      $('ty5n').setAttribute('aria-pressed', N); $('ty5p').setAttribute('aria-pressed', !N);
+    }
+    function bar(c, b, val, col, fill, lab) {
+      c.fillStyle = '#1a2132'; c.fillRect(b[0], Y1, b[1] - b[0], Y0 - Y1);
+      c.fillStyle = fill; c.fillRect(b[0], yL(val), b[1] - b[0], Y0 - yL(val));
+      line(c, b[0], yL(val), b[1], yL(val), col, 2.5);
+      c.strokeStyle = C.line; c.lineWidth = 1; c.strokeRect(b[0], Y1, b[1] - b[0], Y0 - Y1);
+      tag(c, fmtX(Math.pow(10, val)), (b[0] + b[1]) / 2, yL(val) - 11, col, 'center', 9);
+      txt(c, lab, (b[0] + b[1]) / 2, Y0 + 14, col, 12, 700, 'center');
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      for (let e = 0; e <= 18; e += 3) {
+        const y = yL(e); line(c, 120, y, 330, y, C.grid, 1);
+        txt(c, '10' + sup(e), 112, y, C.muted, 9.5, 500, 'right');
+      }
+      txt(c, 'cm⁻³', 112, 12, C.muted, 9, 600, 'right');
+      bar(c, BN, dn, C.e, 'rgba(79,195,247,.30)', 'n');
+      bar(c, BP, dp, C.h, 'rgba(255,138,101,.30)', 'p');
+      dots.forEach(d => {
+        const b = d.which ? BP : BN, top = yL(d.which ? dp : dn);
+        if (Y0 - top < 8) return;
+        const x = b[0] + 5 + d.u * (b[1] - b[0] - 10), y = Y0 - 4 - d.v * (Y0 - top - 8);
+        if (d.which) holeRing(c, x, y, 3.2, 0.8); else circ(c, x, y, 2.6, C.e);
+      });
+      const yi = yL(10);
+      line(c, 130, yi, 336, yi, C.en, 1.5, [6, 4]);
+      txt(c, 'ni', 340, yi, C.en, 11, 700);
+      cv.wm(c);
+    }
+    A = new Anim('anim5', {
+      settle: 60,
+      step(dt) {
+        const t = tgt(), k = Math.min(1, dt * 4);
+        dn += (t.n - dn) * k; dp += (t.p - dp) * k;
+        dots.forEach(d => { d.v += d.sp * dt; if (d.v > 1) { d.v = 0; d.u = rnd(); } });
+      },
+      draw,
+      reset() { type = 'n'; lg = 16; $('d5').value = 16; readouts(); }
+    });
+    $('d5').addEventListener('input', e => { lg = +e.target.value; readouts(); A.settle(); });
+    $('ty5n').addEventListener('click', () => { type = 'n'; readouts(); A.settle(); });
+    $('ty5p').addEventListener('click', () => { type = 'p'; readouts(); A.settle(); });
+    readouts();
+  })();
+
+  /* =========================================================
+     SECTION 6: compensation
+     ========================================================= */
+  (function () {
+    const W = 420, H = 300, cv = new Cv('cv6', W, H);
+    const cfg = { cols: 9, rows: 6, x0: 42, y0: 36, sp: 42, r: 11, so: 5, speed: 34, bounds: [12, 8, 408, 272] };
+    // Fixed placement order: shuffled checkerboard cells, so no two dopants are direct neighbours.
+    const POS = (() => {
+      const a = []; for (let j = 0; j < 6; j++) for (let i = 0; i < 9; i++) if ((i + j) % 2 === 0) a.push([i, j]);
+      let s = 12345; const r = () => (s = (s * 16807) % 2147483647) / 2147483647;
+      for (let k = a.length - 1; k > 0; k--) { const m = Math.floor(r() * (k + 1)); const t = a[k]; a[k] = a[m]; a[m] = t; }
+      return a;
+    })();
+    let L, nd = 4, na = 2, t = 0, plan = [], cool = 0, A, lastTally = '';
+    function build() {
+      L = new Lattice(cfg); t = 0; plan = []; cool = 0;
+      const D = [], Acc = [];
+      for (let k = 0; k < nd; k++) { const a = L.at(POS[2 * k][0], POS[2 * k][1]); L.addDonor(a, 0, 0); D.push(a); }
+      for (let k = 0; k < na; k++) { const a = L.at(POS[2 * k + 1][0], POS[2 * k + 1][1]); L.addAcceptor(a, 0, 0); Acc.push(a); }
+      const left = Acc.slice();
+      D.forEach(d => {
+        if (!left.length) return;
+        let bi = 0, bd = 1e9;
+        left.forEach((a, i) => { const dd = Math.hypot(a.x - d.x, a.y - d.y); if (dd < bd) { bd = dd; bi = i; } });
+        plan.push({ d, a: left.splice(bi, 1)[0], started: false, done: false });
+      });
+      $('nd6o').textContent = nd; $('na6o').textContent = na;
+      const r = $('res6');
+      if (nd > na) r.innerHTML = '<b style="color:var(--electron)">N-type</b> <span>n ≈ N<sub>D</sub> − N<sub>A</sub> = ' + nd + ' − ' + na + ' = ' + (nd - na) + '</span>';
+      else if (na > nd) r.innerHTML = '<b style="color:var(--hole)">P-type</b> <span>p ≈ N<sub>A</sub> − N<sub>D</sub> = ' + na + ' − ' + nd + ' = ' + (na - nd) + '</span>';
+      else if (nd === 0) r.innerHTML = '<b style="color:var(--si)">No dopants</b> <span>pure silicon</span>';
+      else r.innerHTML = '<b style="color:var(--energy)">Fully compensated</b> <span>N<sub>D</sub> = N<sub>A</sub>: no free carriers from doping</span>';
+    }
+    function transfer(p) {
+      const d = p.d, a = p.a, vs = a.vacSlot;
+      const [x, y] = L.orbPos(d, d.orb.ph);
+      d.orb = null; d.ion = true; vs.busy = true; a.busy = true;
+      L.addFx(x, y, vs.x, vs.y, 1.3, 28, true, () => { vs.e = true; vs.vac = false; vs.busy = false; a.ion = true; a.busy = false; p.done = true; });
+    }
+    function step(dt) {
+      t += dt; L.step(dt);
+      plan.forEach((p, k) => { if (!p.started && t >= 0.9 + k * 0.35) { p.started = true; transfer(p); } });
+      const endPlan = 0.9 + plan.length * 0.35 + 1.5;
+      if (t >= endPlan && plan.every(p => p.done)) {
+        cool -= dt;
+        if (cool <= 0) {
+          const d = L.atoms.find(a => a.type === 'P' && !a.ion && !a.busy);
+          const b = L.atoms.find(a => a.type === 'B' && !a.ion && !a.busy);
+          if (d) L.ionizeDonor(d); else if (b) L.ionizeAcceptor(b);
+          cool = 0.3;
+        }
+      }
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      L.draw(c); cv.wm(c);
+      const pl = L.atoms.filter(a => a.type === 'P' && a.ion).length, mi = L.atoms.filter(a => a.type === 'B' && a.ion).length;
+      const ho = L.holes.length, fe = L.nFree(), okk = pl + ho === mi + fe;
+      const s = '<span class="d">(+ ions) ' + pl + '</span> + <span class="h">(holes) ' + ho + '</span> = <span class="a">(− ions) ' + mi + '</span> + <span class="e">(free e⁻) ' + fe + '</span> ' +
+        (okk ? '<span class="ok">✓ balanced</span>' : '');
+      if (s !== lastTally) { $('tally6').innerHTML = s; lastTally = s; }
+    }
+    A = new Anim('anim6', { settle: 140, step, draw, reset: build });
+    $('nd6').addEventListener('input', e => { nd = +e.target.value; build(); A.settle(); });
+    $('na6').addEventListener('input', e => { na = +e.target.value; build(); A.settle(); });
+    build(); A.settle();
+  })();
+
+  /* =========================================================
+     SECTION 7: n vs T with freeze-out / extrinsic / intrinsic regions
+     ========================================================= */
+  (function () {
+    const W = 420, H = 300, cv = new Cv('cv7', W, H);
+    const PL = 58, PR = 404, PT = 42, PB = 246, T0 = 0, T1 = 700;
+    const xT = T => PL + (T - T0) / (T1 - T0) * (PR - PL);
+    const Tx = x => clamp(T0 + (x - PL) / (PR - PL) * (T1 - T0), T0, T1);
+    const yN = n => PB - (Math.log10(n) - 10) / 7 * (PB - PT);
+    let lg = 15, T = 300, dir = 1, A;
+    const data = {};
+    function curves(l) {
+      if (data[l]) return data[l];
+      const Nd = Math.pow(10, l), pts = [];
+      let tf = null, ti = null;
+      for (let t = 4; t <= 700; t += 2) {
+        const n = solve(t, Nd, 0).n, ni = niT(t);
+        pts.push({ t, n, ni });
+        if (tf === null && n >= 0.9 * Nd) tf = t;
+        if (ti === null && n >= 1.1 * Nd) ti = t;
+      }
+      return (data[l] = { Nd, pts, tf: tf || 0, ti: ti || 700 });
+    }
+    const at = (d, t) => { const k = clamp(Math.round((t - 4) / 2), 0, d.pts.length - 1); return d.pts[k]; };
+    function region(d, t) { return t < d.tf ? 'Freeze-out' : t < d.ti ? 'Extrinsic' : 'Intrinsic'; }
+    function setT(v) {
+      T = clamp(v, T0, T1); $('t7').value = Math.round(T); $('t7o').textContent = Math.round(T) + ' K';
+      const d = curves(lg);
+      const n = T < 4 ? 0 : solve(T, d.Nd, 0).n, ni = niT(T);
+      $('T7').textContent = Math.round(T) + ' K';
+      $('n7').textContent = n < 1 ? '≈ 0' : fmtX(n);
+      $('ni7').textContent = ni < 1 ? '≈ 0' : fmtX(ni);
+      $('rg7').textContent = region(d, T);
+      A && (A.dirty = true);
+    }
+    // Region names sit in a strip above the plot; narrow regions are anchored to the plot edge.
+    function regionLabel(c, x0, x1, s, col) {
+      c.font = '600 ' + (9.5 * FS).toFixed(1) + 'px ' + FONT;
+      const w = c.measureText(s).width;
+      let x = (x0 + x1) / 2 - w / 2;
+      x = clamp(x, PL, PR - w);
+      txt(c, s, x, PT - 9, col, 9.5, 600, 'left');
+      line(c, x0 + 1, PT - 2, x1 - 1, PT - 2, col, 2);
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const d = curves(lg);
+      const xf = xT(d.tf), xi = xT(d.ti);
+      c.fillStyle = 'rgba(79,195,247,.07)'; c.fillRect(PL, PT, xf - PL, PB - PT);
+      c.fillStyle = 'rgba(129,199,132,.08)'; c.fillRect(xf, PT, xi - xf, PB - PT);
+      c.fillStyle = 'rgba(255,138,101,.09)'; c.fillRect(xi, PT, PR - xi, PB - PT);
+      for (let e = 10; e <= 17; e++) { const y = yN(Math.pow(10, e)); line(c, PL, y, PR, y, C.grid, 1); txt(c, '10' + sup(e), PL - 5, y, C.muted, 9.5, 500, 'right'); }
+      for (let t = 0; t <= 700; t += 100) { const x = xT(t); line(c, x, PT, x, PB, C.grid, 1); txt(c, String(t), x, PB + 11, C.muted, 9, 500, t === 0 ? 'left' : t === 700 ? 'right' : 'center', MONO); }
+      c.strokeStyle = C.line; c.lineWidth = 1; c.strokeRect(PL, PT, PR - PL, PB - PT);
+      regionLabel(c, PL, xf, 'freeze-out', C.e);
+      regionLabel(c, xf, xi, 'extrinsic', C.ok);
+      regionLabel(c, xi, PR, 'intrinsic', C.h);
+      c.save(); c.beginPath(); c.rect(PL, PT, PR - PL, PB - PT); c.clip();
+      // ND line
+      const yd = yN(d.Nd);
+      line(c, PL, yd, PR, yd, C.d, 1.2, [2, 3]);
+      // ni curve (dashed)
+      c.strokeStyle = C.en; c.lineWidth = 1.8; c.setLineDash([6, 4]); c.beginPath();
+      let started = false;
+      d.pts.forEach(p => { if (p.ni < 1e9) return; const x = xT(p.t), y = yN(p.ni); if (!started) { c.moveTo(x, y); started = true; } else c.lineTo(x, y); });
+      c.stroke(); c.setLineDash([]);
+      // n curve
+      c.strokeStyle = C.e; c.lineWidth = 2.6; c.beginPath(); started = false;
+      d.pts.forEach(p => { if (p.n < 1e9) return; const x = xT(p.t), y = yN(p.n); if (!started) { c.moveTo(x, y); started = true; } else c.lineTo(x, y); });
+      c.stroke();
+      c.restore();
+      tag(c, 'ND', xT(430), yd + 11, C.d, 'center', 9);
+      const pni = at(d, 640); if (pni.ni > 1e10 && pni.ni < 1e17) tag(c, 'ni', xT(640) + 6, yN(pni.ni) + 12, C.en, 'left', 9);
+      tag(c, 'n', xT(250), yd - 11, C.e, 'center', 9);
+      txt(c, 'n (cm⁻³)', 4, 10, C.muted, 9, 600);
+      txt(c, 'T (K)', PR, PB + 26, C.muted, 9, 600, 'right');
+      // marker
+      const x = xT(T);
+      line(c, x, PT, x, PB, C.en, 1.6);
+      if (T >= 4) {
+        const n = solve(T, d.Nd, 0).n, ni = niT(T);
+        if (n >= 1e10) circ(c, x, yN(Math.min(n, 1e17)), 4.5, C.e, '#141b2b', 1.5);
+        if (ni >= 1e10 && ni <= 1e17) circ(c, x, yN(ni), 4, C.en, '#141b2b', 1.5);
+      }
+      c.fillStyle = C.en; c.beginPath(); c.moveTo(x - 6, PB + 1); c.lineTo(x + 6, PB + 1); c.lineTo(x, PB - 7); c.closePath(); c.fill();
+      tag(c, Math.round(T) + ' K', clamp(x, PL + 24, PR - 60), PB + 28, C.en, 'center', 9);
+      cv.wm(c);
+    }
+    A = new Anim('anim7', {
+      startPaused: true, playLabel: 'Play sweep',
+      step(dt) { let v = T + dir * 70 * dt; if (v >= T1) { v = T1; dir = -1; } if (v <= T0) { v = T0; dir = 1; } setT(v); },
+      draw,
+      reset() { dir = 1; A.setPlaying(false); setT(300); }
+    });
+    document.querySelectorAll('#anim7 [data-nd]').forEach(b => b.addEventListener('click', () => {
+      lg = +b.dataset.nd;
+      document.querySelectorAll('#anim7 [data-nd]').forEach(o => o.setAttribute('aria-pressed', o === b));
+      setT(T);
+    }));
+    $('t7').addEventListener('input', e => { A.setPlaying(false); setT(+e.target.value); });
+    let drag = false;
+    const fromEv = ev => { const r = cv.el.getBoundingClientRect(); return Tx((ev.clientX - r.left) * W / r.width); };
+    cv.el.addEventListener('pointerdown', ev => { drag = true; A.setPlaying(false); try { cv.el.setPointerCapture(ev.pointerId); } catch (e) {} setT(fromEv(ev)); });
+    cv.el.addEventListener('pointermove', ev => { if (drag) setT(fromEv(ev)); });
+    cv.el.addEventListener('pointerup', () => { drag = false; });
+    cv.el.addEventListener('pointercancel', () => { drag = false; });
+    setT(300);
+  })();
+
+  /* =========================================================
+     Mini-nav highlight + main loop
+     ========================================================= */
+  (function () {
+    const links = Array.from(document.querySelectorAll('.toc a'));
+    const secs = links.map(l => document.querySelector(l.getAttribute('href')));
+    function upd() {
+      let cur = 0;
+      secs.forEach((s, i) => { if (s.getBoundingClientRect().top < 120) cur = i; });
+      links.forEach((l, i) => l.classList.toggle('active', i === cur));
+    }
+    window.addEventListener('scroll', upd, { passive: true }); upd();
+  })();
+
+  let last = performance.now();
+  function frame(ts) {
+    const dt = Math.min(0.05, Math.max(0, (ts - last) / 1000)); last = ts;
+    anims.forEach(a => {
+      if (!a.visible) return;
+      if (a.playing) { a.o.step(dt); a.o.draw(); }
+      else if (a.dirty) a.o.draw();
+      a.dirty = false;
+    });
+    requestAnimationFrame(frame);
+  }
+  function onResize() { anims.forEach(a => { a.dirty = true; }); }
+  window.addEventListener('resize', onResize);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(onResize);
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
