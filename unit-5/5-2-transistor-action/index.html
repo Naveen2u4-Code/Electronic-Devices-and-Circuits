@@ -59,8 +59,7 @@
     section { scroll-margin-top: 64px; padding-top: 28px; }
     h2 { font-size: clamp(1.3rem, 5vw, 1.6rem); line-height: 1.25; margin: 0 0 14px; }
     h3 { font-size: 1.05rem; margin: 0 0 8px; }
-    /* Explanation text: 17px / 1.7, at most ~70 characters per line */
-    .prose { font-size: 17px; line-height: 1.7; max-width: 34em; }
+    .prose { font-size: 17px; line-height: 1.7; }
     .prose p, .prose ul, .prose ol { margin: 0 0 14px; }
     .prose ul, .prose ol { padding-left: 22px; }
     .prose li { margin: 4px 0; }
@@ -157,8 +156,10 @@
     .pager .next { text-align: right; }
     .site-foot { border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; text-align: center; padding: 18px 16px; }
 
-    /* Justified paragraphs at every width; hyphenation keeps word gaps small on phones. */
-    .prose p, .prose li, .keypoints li, .exag { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+    /* Justified paragraphs on desktop; phones stay left-aligned to avoid wide word gaps. */
+    @media (min-width: 768px) {
+      .prose p, .prose li, .intro, .keypoints li, .exag { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+    }
       /* Topic 5.2 */
     .grp { display: inline-flex; align-items: center; gap: 6px; }
     .glabel { font-size: 0.8rem; font-weight: 700; color: var(--muted); margin-left: 4px; }
