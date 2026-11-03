@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>1.8 Mass Action Law</title>
+  <meta name="description" content="Mobility, conductivity and the Hall effect explained step by step: what sets mobility, lattice and impurity scattering, Matthiessen's rule, conductivity and resistivity, the Hall voltage and its sign, Hall coefficient and Hall mobility. An interactive lesson.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <style>
+    :root {
+      --bg: #0f1420;
+      --panel: #1a2132;
+      --panel-hover: #212a3f;
+      --border: #2a3448;
+      --text: #e6e9ef;
+      --muted: #9aa4b8;
+      --electron: #4fc3f7;
+      --hole: #ff8a65;
+      --energy: #ffd54f;
+      --success: #81c784;
+      --donor: #66bb6a;
+      --acceptor: #f06292;
+      --vb: #3949ab;
+      --cb: #00838f;
+      --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+      --max: 960px;
+      --radius: 12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: var(--font); font-size: 16px; line-height: 1.65;
+      overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column;
+    }
+    a { color: var(--electron); }
+    .wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 16px; }
+
+    /* Sticky mini-nav */
+    .toc {
+      position: sticky; top: 0; z-index: 10; background: rgba(15, 20, 32, .95);
+      border-bottom: 1px solid var(--border); backdrop-filter: blur(6px);
+    }
+    .toc ul { display: flex; gap: 4px; list-style: none; margin: 0 auto; padding: 8px 16px; max-width: var(--max); overflow-x: auto; scrollbar-width: none; }
+    .toc ul::-webkit-scrollbar { display: none; }
+    .toc a {
+      display: block; white-space: nowrap; text-decoration: none; color: var(--muted);
+      font-size: 0.85rem; font-weight: 500; padding: 6px 10px; border-radius: 999px;
+    }
+    .toc a:hover { color: var(--text); background: var(--panel); }
+    .toc a.active { color: var(--bg); background: var(--electron); }
+
+    main { flex: 1; padding: 24px 0 48px; }
+    .crumbs { font-size: 0.875rem; color: var(--muted); margin: 0 0 16px; }
+    .crumbs a { color: var(--muted); }
+    .crumbs a:hover { color: var(--electron); }
+    .eyebrow { font-family: var(--mono); font-size: 0.8rem; color: var(--electron); letter-spacing: .04em; margin: 0; }
+    h1 { font-size: clamp(1.5rem, 6vw, 2.2rem); line-height: 1.2; margin: 4px 0 6px; }
+    .subtitle { color: var(--muted); margin: 0 0 8px; }
+    section { scroll-margin-top: 64px; padding-top: 28px; }
+    h2 { font-size: clamp(1.3rem, 5vw, 1.6rem); line-height: 1.25; margin: 0 0 14px; }
+    h3 { font-size: 1.05rem; margin: 0 0 8px; }
+    .prose { font-size: 17px; line-height: 1.7; }
+    .prose p, .prose ul { margin: 0 0 14px; }
+    .prose ul { padding-left: 20px; }
+    .prose li { margin: 4px 0; }
+    .prose strong { color: #fff; }
+    .eq { font-family: var(--mono); color: var(--energy); background: #141b2b; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; display: block; overflow-wrap: anywhere; margin: 0 0 14px; font-size: 15px; }
+    .t-e { color: var(--electron); font-weight: 600; }
+    .t-h { color: var(--hole); font-weight: 600; }
+    .t-f { color: var(--energy); font-weight: 600; }
+    hr.sep { border: 0; border-top: 1px solid var(--border); margin: 40px 0 0; }
+    .rm-note { font-size: 0.78rem; color: var(--muted); margin: 0 0 8px; }
+
+    /* Buttons & controls */
+    .btn {
+      font: inherit; font-size: 0.88rem; font-weight: 600; color: var(--text);
+      background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+      padding: 7px 12px; cursor: pointer; min-height: 38px;
+    }
+    .btn:hover:not(:disabled) { background: var(--panel-hover); border-color: var(--electron); }
+    .btn:focus-visible, input:focus-visible { outline: 2px solid var(--electron); outline-offset: 2px; }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
+    .btn[aria-pressed="true"] { background: rgba(255,213,79,.14); border-color: var(--energy); color: var(--energy); }
+
+    figure.anim {
+      margin: 18px 0 0; background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 12px; min-width: 0;
+    }
+    .ctrls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-bottom: 12px; }
+    .slider { flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; }
+    .slider label { display: flex; justify-content: space-between; gap: 8px; font-size: 0.8rem; color: var(--muted); }
+    .slider output { font-family: var(--mono); color: var(--energy); white-space: nowrap; }
+    input[type="range"] { width: 100%; accent-color: var(--energy); margin: 4px 0 0; }
+    canvas { display: block; width: 100%; border-radius: 8px; background: #141b2b; }
+    canvas.drag { touch-action: none; cursor: ns-resize; }
+    .narrow { max-width: 640px; margin: 0 auto; }
+    .exag { font-size: 0.75rem; color: var(--muted); margin: 10px 0 0; }
+    .exag b { color: var(--energy); font-weight: 600; }
+
+    .counters { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 0; }
+    .ctr {
+      flex: 1 1 120px; background: #141b2b; border: 1px solid var(--border); border-radius: 8px;
+      padding: 6px 10px; font-size: 0.78rem; color: var(--muted); min-width: 0;
+    }
+    .ctr b { display: block; font-family: var(--mono); font-size: 1.02rem; font-weight: 500; white-space: nowrap; color: var(--text); overflow: hidden; text-overflow: ellipsis; }
+    .ctr.n b { color: var(--electron); }
+    .ctr.p b { color: var(--hole); }
+    .ctr.ok b { color: var(--success); }
+    .ctr.en b { color: var(--energy); }
+
+    .legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 0.8rem; color: var(--muted); margin: 8px 0 0; padding: 0; list-style: none; }
+    .legend li { display: inline-flex; align-items: center; gap: 6px; }
+    .sw { display: inline-block; width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
+    .sw.e { background: var(--electron); }
+    .sw.h { border: 2px solid var(--hole); background: rgba(255,138,101,.2); }
+    .ln { display: inline-block; width: 18px; height: 0; border-top: 2px solid var(--energy); flex-shrink: 0; }
+    .ln.ei { border-top: 2px dashed var(--muted); }
+    .ln.bz { border-top: 2px dashed var(--success); }
+    .ln.fe { border-top-color: var(--electron); }
+    .ionsw { display: inline-flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; font-size: 11px; font-weight: 700; line-height: 1; flex-shrink: 0; }
+    .ionsw.d { border: 1.5px solid var(--donor); color: var(--donor); }
+    .ionsw.a { border: 1.5px solid var(--acceptor); color: var(--acceptor); }
+
+    .keypoints {
+      margin-top: 16px; padding: 14px 16px; border-radius: var(--radius);
+      background: rgba(129,199,132,.07); border: 1px solid rgba(129,199,132,.35);
+    }
+    .keypoints h3 { color: var(--success); font-size: 0.95rem; text-transform: uppercase; letter-spacing: .05em; }
+    .keypoints ul { margin: 0; padding-left: 20px; }
+    .keypoints li { margin: 4px 0; }
+
+    .sumhead { margin: 28px 0 10px; font-size: 1.15rem; }
+    .table-box { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 12px; overflow-x: auto; }
+    .vt { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    .vt th, .vt td { text-align: left; padding: 7px 6px; border-top: 1px solid var(--border); vertical-align: top; }
+    .vt thead th { color: var(--muted); font-weight: 600; border-top: 0; }
+    .vt tbody th { font-weight: 600; width: 20%; }
+    .vt .f { font-family: var(--mono); color: var(--energy); font-size: .82rem; }
+    @media (max-width: 480px) { .vt { font-size: .8rem; } .vt th, .vt td { padding: 6px 4px; } .vt .f { font-size: .74rem; } }
+    .formulas { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    @media (min-width: 640px) { .formulas { grid-template-columns: 1fr 1fr; } }
+    .fcard { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; min-width: 0; }
+    .fcard .f { font-family: var(--mono); font-size: 1rem; color: var(--energy); overflow-wrap: anywhere; }
+    .fcard p { margin: 6px 0 0; font-size: 0.85rem; color: var(--muted); }
+
+    .pager { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 48px; }
+    .pager a {
+      display: block; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 12px 14px; text-decoration: none; color: var(--text); min-width: 0;
+    }
+    .pager a:hover { border-color: var(--electron); }
+    .pager small { display: block; color: var(--muted); font-size: 0.75rem; }
+    .pager .next { text-align: right; }
+
+    /* Maths (KaTeX). The plain-text version inside each element stays as a fallback. */
+    .eq[data-tex], .f[data-tex] { font-family: var(--font); }
+    .eq[data-tex], .f[data-tex] { text-align: center; }
+    .eq .katex-display, .f .katex-display { margin: 0; text-align: center; overflow-x: auto; overflow-y: hidden; padding: 6px 0; }
+    .eq .katex-display > .katex, .f .katex-display > .katex { text-align: center; }
+    .eq .katex, .f .katex { font-size: 1.3em; }
+    td.f .katex { font-size: 1.15em; }
+    .m .katex { font-size: 1.12em; }
+    td.f .katex { white-space: nowrap; }
+    @media (max-width: 480px) { td.f .katex { font-size: 1em; } }
+    /* Justified paragraphs on desktop; phones stay left-aligned to avoid wide word gaps. */
+    @media (min-width: 768px) {
+      .prose p, .prose li, .intro, .keypoints li, .exag { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+    }
+    /* Topic 1.8 */
+    .duo { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    @media (min-width: 640px) { .duo { grid-template-columns: 1fr 1fr; } }
+    .sw.ring { background: transparent; border: 2px solid #ffd54f; }
+    .sw.ring.r { border-color: #ef5350; }
+    .ln.gn { border-top-color: #ffd54f; } .ln.rc { border-top-color: #ef5350; }
+    .ln.fl { border-top: 2px solid #fff; } .ln.ho { border-top-color: var(--hole); }
+    .ln.ni { border-top: 2px dashed var(--muted); }
+    .ctr.gn b { color: #ffd54f; } .ctr.rc b { color: #ef5350; }
+    .num { display: inline-flex; align-items: center; gap: 6px; font-size: .85rem; color: var(--muted); }
+    .num input { font: inherit; font-family: var(--mono); color: var(--text); background: #141b2b; border: 1px solid var(--border); border-radius: 8px; padding: 6px 8px; width: 110px; min-height: 36px; }
+    .hint { font-size: .78rem; color: var(--muted); flex-basis: 100%; }
+    .hint.bad { color: #ef5350; }
+    .pager .soon { display: block; background: var(--panel); border: 1px dashed var(--border); border-radius: var(--radius); padding: 12px 14px; color: var(--muted); text-align: right; min-width: 0; }
+    @media (max-width: 480px) { .eq.long .katex, .f.long .katex { font-size: 0.98em; } }
+    .pager .soon small { display: block; font-size: 0.75rem; }
+  </style>
+</head>
+<body>
+
+  <nav class="toc" aria-label="Sections">
+    <ul>
+      <li><a href="#s0">The question</a></li>
+      <li><a href="#s1">Generation &amp; recombination</a></li>
+      <li><a href="#s2">Mass action law</a></li>
+      <li><a href="#s3">Why holes drop</a></li>
+      <li><a href="#s4">Exact solution</a></li>
+      <li><a href="#s5">Worked examples</a></li>
+      <li><a href="#s6">Temperature &amp; summary</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="wrap">
+      <header>
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="../../index.html">Home</a> / <a href="../index.html">Unit 1</a> / 1.8
+        </nav>
+        <p class="eyebrow">TOPIC 1.8</p>
+        <h1>Mass Action Law and Carrier Concentration</h1>
+        <p class="subtitle">Why adding donors makes holes disappear, and how to calculate both carrier concentrations in any sample</p>
+        <p class="rm-note" id="rmNote" hidden>Your device asks for reduced motion, so every animation starts paused. Press Play on any animation to run it. Sliders and buttons still update the picture.</p>
+      </header>
+
+      <!-- ================= SECTION 0 ================= -->
+      <section id="s0" aria-labelledby="h0">
+        <h2 id="h0">The question</h2>
+        <div class="prose">
+          <p>In topic 1.4 we doped silicon with donors at <span class="m" data-tex="N_D = 10^{16}">N<sub>D</sub> = 10<sup>16</sup></span> cm⁻³. Almost every donor gives up an electron, so the electron concentration becomes <span class="m" data-tex="n \approx 10^{16}">n ≈ 10<sup>16</sup></span> cm⁻³. We also said something surprising: the hole concentration becomes only about <span class="m" data-tex="p \approx 10^{4}">p ≈ 10<sup>4</sup></span> cm⁻³.</p>
+          <p>Pure (intrinsic) silicon at 300 K has <span class="m" data-tex="n = p = n_i \approx 10^{10}">n = p = n<sub>i</sub> ≈ 10<sup>10</sup></span> cm⁻³. So adding donors did not just add electrons. It also <strong>removed</strong> holes: about a million times fewer than before.</p>
+          <p>That is strange, because a donor atom has nothing to do with holes. It gives away an electron; it does not capture holes. So <strong>why do the holes decrease when we add donors?</strong></p>
+          <p>The answer is a simple and powerful rule called the <strong>mass action law</strong>. It lets us calculate the <strong>minority carrier</strong> concentration (holes in N-type, electrons in P-type) in any doped semiconductor. Minority carriers are tiny in number, but they control how diodes and transistors work, so we need to know them accurately.</p>
+        </div>
+
+        <figure class="anim" id="anim0">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="duo">
+            <div>
+              <canvas id="cv0a" style="aspect-ratio:300/210" role="img" aria-label="Intrinsic silicon: a box with equal small numbers of blue electrons and orange holes moving randomly."></canvas>
+              <div class="counters">
+                <div class="ctr n">Electrons <span class="m" data-tex="n">n</span><b>10¹⁰ cm⁻³</b></div>
+                <div class="ctr p">Holes <span class="m" data-tex="p">p</span><b>10¹⁰ cm⁻³</b></div>
+              </div>
+            </div>
+            <div>
+              <canvas id="cv0b" style="aspect-ratio:300/210" role="img" aria-label="N-type silicon: a box with many blue electrons, green donor ions, and only two orange holes."></canvas>
+              <div class="counters">
+                <div class="ctr n">Electrons <span class="m" data-tex="n">n</span><b>10¹⁶ cm⁻³</b></div>
+                <div class="ctr p">Holes <span class="m" data-tex="p">p</span><b>10⁴ cm⁻³</b></div>
+              </div>
+            </div>
+          </div>
+          <ul class="legend">
+            <li><span class="sw e"></span><span>electron</span></li>
+            <li><span class="sw h"></span><span>hole</span></li>
+            <li><span class="ionsw d">+</span><span>donor ion</span></li>
+          </ul>
+          <p class="exag"><b>Not to scale:</b> the dots only show which carrier is more common. In the real N-type sample there are 10¹² electrons for every hole. Values for Si at 300 K.</p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: the question">
+          <h3>Key points</h3>
+          <ul>
+            <li>Intrinsic Si at 300 K: <span class="m" data-tex="n = p = n_i \approx 10^{10}">n = p = n<sub>i</sub> ≈ 10<sup>10</sup></span> cm⁻³.</li>
+            <li>N-type with <span class="m" data-tex="N_D = 10^{16}">N<sub>D</sub> = 10<sup>16</sup></span>: <span class="m" data-tex="n \approx 10^{16}">n ≈ 10<sup>16</sup></span> but <span class="m" data-tex="p \approx 10^{4}">p ≈ 10<sup>4</sup></span> cm⁻³.</li>
+            <li>Donors do not remove holes directly, yet holes fall a million times.</li>
+            <li>The mass action law explains this and gives the minority carrier concentration.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 1 ================= -->
+      <section id="s1" aria-labelledby="h1s">
+        <h2 id="h1s">Generation and recombination balance</h2>
+        <div class="prose">
+          <p>Inside every semiconductor two opposite processes are always running.</p>
+          <p><strong>1. Generation.</strong> Heat makes the lattice vibrate, and now and then a vibration breaks a covalent bond. This frees an electron and leaves a hole behind: an <strong>electron–hole pair</strong> is created. The generation rate <span class="m" data-tex="G">G</span> (pairs per cm³ per second) depends only on the material and its temperature. It does <strong>not</strong> depend on how many carriers are already there: a bond breaks whether or not other free carriers are nearby.</p>
+          <p><strong>2. Recombination.</strong> A free electron meets a hole and falls back into the bond. Both carriers disappear. For a meeting you need an electron <em>and</em> a hole, so the recombination rate is proportional to both concentrations:</p>
+          <span class="eq" data-tex="R = r\,n\,p">R = r n p</span>
+          <p>where <span class="m" data-tex="r">r</span> is a constant for the material. Double the electrons and each hole meets an electron twice as often; double both and recombination is four times faster.</p>
+          <p><strong>Equilibrium.</strong> Start with no free carriers. Generation adds pairs, recombination is slow at first, so the numbers grow. As they grow, recombination speeds up, until it removes pairs exactly as fast as they are created. This steady state is <strong>thermal equilibrium</strong>:</p>
+          <span class="eq" data-tex="G = r\,n\,p \quad\Rightarrow\quad n\,p = \frac{G}{r}">G = r n p ⇒ n p = G/r</span>
+          <p>Both <span class="m" data-tex="G">G</span> and <span class="m" data-tex="r">r</span> depend only on the material and the temperature, so the product <span class="m" data-tex="np">np</span> is fixed by temperature alone. Doping does not change it.</p>
+          <p>We can find its value from intrinsic material, where <span class="m" data-tex="n = p = n_i">n = p = n<sub>i</sub></span>. Then <span class="m" data-tex="np = n_i^2">np = n<sub>i</sub><sup>2</sup></span>. Since the product is the same for every sample of that material at that temperature,</p>
+          <span class="eq" data-tex="n\,p = n_i^2">n p = n<sub>i</sub><sup>2</sup></span>
+          <p>in <strong>any</strong> equilibrium sample, intrinsic or doped.</p>
+        </div>
+
+        <figure class="anim" id="anim1">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="slider">
+              <label for="t1"><span>Temperature</span><output id="t1o" for="t1">300 K</output></label>
+              <input type="range" id="t1" min="250" max="350" step="5" value="300">
+            </div>
+          </div>
+          <canvas id="cv1" class="narrow" style="aspect-ratio:420/250" role="img" aria-label="A box that starts empty. Electron-hole pairs appear with yellow flashes at a steady rate set by temperature. When an electron and a hole come close they vanish with a red flash. The numbers grow until recombination keeps pace with generation."></canvas>
+          <ul class="legend">
+            <li><span class="sw e"></span><span>electron</span></li>
+            <li><span class="sw h"></span><span>hole</span></li>
+            <li><span class="sw ring g"></span><span>generation</span></li>
+            <li><span class="sw ring r"></span><span>recombination</span></li>
+          </ul>
+          <div class="counters" aria-live="polite">
+            <div class="ctr n"><span class="m" data-tex="n">n</span> (dots)<b id="c1a">0</b></div>
+            <div class="ctr p"><span class="m" data-tex="p">p</span> (dots)<b id="c1b">0</b></div>
+            <div class="ctr gn">Generation <span class="m" data-tex="G">G</span> (/s)<b id="c1c">–</b></div>
+            <div class="ctr rc">Recombination <span class="m" data-tex="R">R</span> (/s)<b id="c1d">–</b></div>
+            <div class="ctr"><span class="m" data-tex="n \cdot p">n · p</span><b id="c1e">0</b></div>
+          </div>
+          <canvas id="cv1g" class="narrow" style="aspect-ratio:420/250;margin-top:10px" role="img" aria-label="Time graph. Top panel: the generation rate stays steady while the recombination rate rises from zero until it matches. Bottom panel: the product n times p rises and then levels off."></canvas>
+          <ul class="legend">
+            <li><span class="ln gn"></span><span><span class="m" data-tex="G">G</span></span></li>
+            <li><span class="ln rc"></span><span><span class="m" data-tex="R">R</span></span></li>
+            <li><span class="ln fl"></span><span><span class="m" data-tex="n \cdot p">n · p</span></span></li>
+          </ul>
+          <p class="exag"><b>Greatly simplified:</b> a few dozen dots stand for about 10¹⁰ carriers per cm³, and everything is slowed enormously. On screen, generation doubles for every 25 K; the real rate grows far faster. Rates are averaged over the last 4 s. A new pair cannot recombine with each other for a moment, so they can separate.</p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: generation and recombination">
+          <h3>Key points</h3>
+          <ul>
+            <li>Generation rate <span class="m" data-tex="G">G</span> depends only on material and temperature.</li>
+            <li>Recombination rate <span class="m" data-tex="R = r\,n\,p">R = r n p</span> needs both an electron and a hole.</li>
+            <li>Equilibrium: <span class="m" data-tex="G = R">G = R</span>, so <span class="m" data-tex="np = G/r">np = G/r</span>, fixed by temperature.</li>
+            <li>Intrinsic material shows the constant is <span class="m" data-tex="n_i^2">n<sub>i</sub><sup>2</sup></span>: <span class="m" data-tex="np = n_i^2">np = n<sub>i</sub><sup>2</sup></span> in any equilibrium sample.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 2 ================= -->
+      <section id="s2" aria-labelledby="h2s">
+        <h2 id="h2s">The mass action law</h2>
+        <div class="prose">
+          <p><strong>Statement.</strong> In a semiconductor in thermal equilibrium, the product of the electron and hole concentrations is a constant at a given temperature:</p>
+          <span class="eq" data-tex="n_0\,p_0 = n_i^2">n<sub>0</sub> p<sub>0</sub> = n<sub>i</sub><sup>2</sup></span>
+          <p>The subscript 0 means "in equilibrium". It does not matter whether the sample is intrinsic, N-type or P-type: if one concentration goes up, the other must go down by the same factor.</p>
+          <p><strong>A second way to see it.</strong> In topic 1.5 we wrote the carrier concentrations using the Fermi level <span class="m" data-tex="E_F">E<sub>F</sub></span>:</p>
+          <span class="eq" data-tex="n = N_c\,e^{-(E_c - E_F)/kT} \qquad p = N_v\,e^{-(E_F - E_v)/kT}">n = N<sub>c</sub> e<sup>-(E<sub>c</sub> − E<sub>F</sub>)/kT</sup> p = N<sub>v</sub> e<sup>-(E<sub>F</sub> − E<sub>v</sub>)/kT</sup></span>
+          <p>Multiply them. The exponents add, and <span class="m" data-tex="E_F">E<sub>F</sub></span> cancels out:</p>
+          <span class="eq" data-tex="n\,p = N_c N_v\,e^{-(E_c - E_v)/kT} = N_c N_v\,e^{-E_g/kT} = n_i^2">n p = N<sub>c</sub> N<sub>v</sub> e<sup>-(E<sub>c</sub> − E<sub>v</sub>)/kT</sup> = N<sub>c</sub> N<sub>v</sub> e<sup>-E<sub>g</sub>/kT</sup> = n<sub>i</sub><sup>2</sup></span>
+          <p>The result depends only on the material (<span class="m" data-tex="N_c">N<sub>c</sub></span>, <span class="m" data-tex="N_v">N<sub>v</sub></span>, <span class="m" data-tex="E_g">E<sub>g</sub></span>) and the temperature. Moving <span class="m" data-tex="E_F">E<sub>F</sub></span> up by <span class="m" data-tex="kT">kT</span> multiplies <span class="m" data-tex="n">n</span> by <span class="m" data-tex="e">e</span> and divides <span class="m" data-tex="p">p</span> by <span class="m" data-tex="e">e</span>: the product never changes.</p>
+          <p>For Si at 300 K, <span class="m" data-tex="n_i \approx 10^{10}">n<sub>i</sub> ≈ 10<sup>10</sup></span> cm⁻³, so <span class="m" data-tex="np = 10^{20}">np = 10<sup>20</sup></span> cm⁻⁶.</p>
+          <p><strong>Conditions.</strong> The law holds only</p>
+          <ul>
+            <li>in <strong>thermal equilibrium</strong>: no light shining on the sample and no current being injected into it, and</li>
+            <li>for <strong>non-degenerate</strong> doping, where <span class="m" data-tex="E_F">E<sub>F</sub></span> stays a few <span class="m" data-tex="kT">kT</span> away from the band edges: below roughly <span class="m" data-tex="10^{18}">10<sup>18</sup></span> to <span class="m" data-tex="10^{19}">10<sup>19</sup></span> cm⁻³ in Si.</li>
+          </ul>
+        </div>
+
+        <figure class="anim" id="anim2">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="slider">
+              <label for="f2"><span><span class="m" data-tex="E_F - E_i">E<sub>F</sub> − E<sub>i</sub></span> (or drag the line)</span><output id="f2o" for="f2">0.00 eV</output></label>
+              <input type="range" id="f2" min="-0.46" max="0.46" step="0.01" value="0">
+            </div>
+          </div>
+          <canvas id="cv2" class="narrow" style="aspect-ratio:420/320;touch-action:none" role="img" aria-label="Left: a band diagram with the conduction band edge, the valence band edge, the dashed intrinsic level and a yellow Fermi level that can be dragged up and down. Right: log-scale bars for n, p and n times p. Raising the Fermi level makes the n bar taller and the p bar shorter by the same number of decades; the n times p bar always stays at 10 to the 20."></canvas>
+          <div class="counters" aria-live="polite">
+            <div class="ctr n"><span class="m" data-tex="n">n</span> (cm⁻³)<b id="c2a">–</b></div>
+            <div class="ctr p"><span class="m" data-tex="p">p</span> (cm⁻³)<b id="c2b">–</b></div>
+            <div class="ctr ok"><span class="m" data-tex="n \cdot p">n · p</span> (cm⁻⁶)<b id="c2c">–</b></div>
+            <div class="ctr en"><span class="m" data-tex="E_F - E_i">E<sub>F</sub> − E<sub>i</sub></span><b id="c2d">–</b></div>
+          </div>
+          <p class="exag">Uses <span class="m" data-tex="n = n_i e^{(E_F - E_i)/kT}">n = n<sub>i</sub> e<sup>(E<sub>F</sub> − E<sub>i</sub>)/kT</sup></span> and <span class="m" data-tex="p = n_i e^{-(E_F - E_i)/kT}">p = n<sub>i</sub> e<sup>-(E<sub>F</sub> − E<sub>i</sub>)/kT</sup></span> with <span class="m" data-tex="n_i = 10^{10}">n<sub>i</sub> = 10<sup>10</sup></span> cm⁻³ and <span class="m" data-tex="kT = 25.9">kT = 25.9</span> meV. Values for Si at 300 K. <span class="m" data-tex="E_i">E<sub>i</sub></span> is drawn at mid-gap (it is really about 0.01 eV below).</p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: mass action law">
+          <h3>Key points</h3>
+          <ul>
+            <li>Mass action law: <span class="m" data-tex="n_0 p_0 = n_i^2">n<sub>0</sub> p<sub>0</sub> = n<sub>i</sub><sup>2</sup></span> in thermal equilibrium.</li>
+            <li>From the Fermi-level formulas, <span class="m" data-tex="E_F">E<sub>F</sub></span> cancels: <span class="m" data-tex="np = N_c N_v e^{-E_g/kT}">np = N<sub>c</sub> N<sub>v</sub> e<sup>-E<sub>g</sub>/kT</sup></span>.</li>
+            <li>Si at 300 K: <span class="m" data-tex="np = 10^{20}">np = 10<sup>20</sup></span> cm⁻⁶.</li>
+            <li>Valid only in equilibrium and for non-degenerate doping.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 3 ================= -->
+      <section id="s3" aria-labelledby="h3s">
+        <h2 id="h3s">Why adding donors reduces holes</h2>
+        <div class="prose">
+          <p>Now we can answer the question from the start.</p>
+          <p>Adding donors adds a large number of electrons. The temperature has not changed, so <strong>generation carries on at exactly the same rate</strong> as before: the same number of new pairs per second.</p>
+          <p>But each hole now finds itself surrounded by far more electrons. Recombination needs an electron and a hole, and its rate is <span class="m" data-tex="r\,n\,p">r n p</span>. With <span class="m" data-tex="n">n</span> suddenly much larger, holes are caught by electrons much more often. <strong>Recombination now outpaces generation</strong>, and the hole population falls.</p>
+          <p>As <span class="m" data-tex="p">p</span> falls, recombination slows down again. The fall stops when recombination once more equals generation. At the new balance there are many electrons and very few holes, and the product is back where it started: <span class="m" data-tex="np = n_i^2">np = n<sub>i</sub><sup>2</sup></span>.</p>
+          <p>Some electrons are lost too (one for every hole that recombines), but the donors supplied so many that <span class="m" data-tex="n">n</span> hardly notices. For holes the loss is everything.</p>
+          <p>The same happens in reverse with <strong>acceptors</strong>: they add many holes, electrons are caught by holes more often, and <span class="m" data-tex="n">n</span> drops until <span class="m" data-tex="np = n_i^2">np = n<sub>i</sub><sup>2</sup></span> again.</p>
+        </div>
+
+        <figure class="anim" id="anim3">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <button class="btn" type="button" id="ad3">Add donors</button>
+            <button class="btn" type="button" id="aa3">Add acceptors</button>
+          </div>
+          <canvas id="cv3" class="narrow" style="aspect-ratio:420/250" role="img" aria-label="A box in intrinsic equilibrium with equal numbers of electrons and holes. Adding donors places green donor ions that release electrons; red recombination flashes become frequent and the hole count falls. Adding acceptors places pink acceptor ions that release holes and does the reverse."></canvas>
+          <ul class="legend">
+            <li><span class="sw e"></span><span>electron</span></li>
+            <li><span class="sw h"></span><span>hole</span></li>
+            <li><span class="ionsw d">+</span><span>donor ion</span></li>
+            <li><span class="ionsw a">−</span><span>acceptor ion</span></li>
+            <li><span class="sw ring g"></span><span>generation</span></li>
+            <li><span class="sw ring r"></span><span>recombination</span></li>
+          </ul>
+          <div class="counters" aria-live="polite">
+            <div class="ctr n"><span class="m" data-tex="n">n</span> (dots)<b id="c3a">–</b></div>
+            <div class="ctr p"><span class="m" data-tex="p">p</span> (dots)<b id="c3b">–</b></div>
+            <div class="ctr"><span class="m" data-tex="n \cdot p">n · p</span> (1 s average)<b id="c3c">–</b></div>
+          </div>
+          <canvas id="cv3g" class="narrow" style="aspect-ratio:420/240;margin-top:10px" role="img" aria-label="Log-scale time graph of n and p. After donors are added, n jumps up, p falls, and the n times p line jumps up briefly before settling back to its equilibrium value, marked n i squared."></canvas>
+          <ul class="legend">
+            <li><span class="ln fe"></span><span><span class="m" data-tex="n">n</span></span></li>
+            <li><span class="ln ho"></span><span><span class="m" data-tex="p">p</span></span></li>
+            <li><span class="ln fl"></span><span><span class="m" data-tex="n \cdot p">n · p</span></span></li>
+            <li><span class="ln ni"></span><span>equilibrium <span class="m" data-tex="n \cdot p">n · p</span> (stands for <span class="m" data-tex="n_i^2">n<sub>i</sub><sup>2</sup></span>)</span></li>
+          </ul>
+          <p class="exag"><b>Greatly simplified:</b> each dot stands for a huge number of carriers, and the doping on screen is only a few times the intrinsic level (real doping is about a million times <span class="m" data-tex="n_i">n<sub>i</sub></span>). With so few dots the counts are noisy, so <span class="m" data-tex="n \cdot p">n · p</span> is averaged over 1 s. The box starts already in intrinsic equilibrium; the generation rate is fixed.</p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: why holes drop">
+          <h3>Key points</h3>
+          <ul>
+            <li>Donors add electrons; generation continues at the same rate.</li>
+            <li>More electrons → holes recombine faster → <span class="m" data-tex="p">p</span> falls.</li>
+            <li>New balance: many electrons, few holes, <span class="m" data-tex="np = n_i^2">np = n<sub>i</sub><sup>2</sup></span> again.</li>
+            <li>Acceptors do the reverse: <span class="m" data-tex="n">n</span> falls.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 4 ================= -->
+      <section id="s4" aria-labelledby="h4s">
+        <h2 id="h4s">Charge neutrality and the exact solution</h2>
+        <div class="prose">
+          <p>The mass action law gives one equation for two unknowns, <span class="m" data-tex="n">n</span> and <span class="m" data-tex="p">p</span>. We need a second equation, and it comes from <strong>charge neutrality</strong>: a piece of semiconductor in equilibrium has no net charge. The positive charges are holes and ionised donors (<span class="m" data-tex="N_D^+">N<sub>D</sub>^+</span>); the negative charges are electrons and ionised acceptors (<span class="m" data-tex="N_A^-">N<sub>A</sub>^-</span>). With all dopants ionised:</p>
+          <span class="eq" data-tex="p + N_D = n + N_A">p + N<sub>D</sub> = n + N<sub>A</sub></span>
+          <p>Put <span class="m" data-tex="p = n_i^2/n">p = n<sub>i</sub><sup>2</sup>/n</span> into this and multiply by <span class="m" data-tex="n">n</span>. We get a quadratic equation, <span class="m" data-tex="n^2 - (N_D - N_A)\,n - n_i^2 = 0">n<sup>2</sup> − (N<sub>D</sub> − N<sub>A</sub>) n − n<sub>i</sub><sup>2</sup> = 0</span>. Its positive root, for a net <strong>N-type</strong> sample (<span class="m" data-tex="N_D &gt; N_A">N<sub>D</sub> > N<sub>A</sub></span>), is</p>
+          <span class="eq long" data-tex="n = \frac{N_D - N_A}{2} + \sqrt{\left(\frac{N_D - N_A}{2}\right)^2 + n_i^2}, \qquad p = \frac{n_i^2}{n}">n = N<sub>D</sub> − N<sub>A</sub>/2 + sqrtleft(N<sub>D</sub> − N<sub>A</sub>/2right)<sup>2</sup> + n<sub>i</sub><sup>2</sup>, p = n<sub>i</sub><sup>2</sup>/n</span>
+          <p>For a net <strong>P-type</strong> sample (<span class="m" data-tex="N_A &gt; N_D">N<sub>A</sub> > N<sub>D</sub></span>), the same steps give</p>
+          <span class="eq long" data-tex="p = \frac{N_A - N_D}{2} + \sqrt{\left(\frac{N_A - N_D}{2}\right)^2 + n_i^2}, \qquad n = \frac{n_i^2}{p}">p = N<sub>A</sub> − N<sub>D</sub>/2 + sqrtleft(N<sub>A</sub> − N<sub>D</sub>/2right)<sup>2</sup> + n<sub>i</sub><sup>2</sup>, n = n<sub>i</sub><sup>2</sup>/p</span>
+          <p><strong>The usual approximation.</strong> In most real samples the net doping is far larger than <span class="m" data-tex="n_i">n<sub>i</sub></span> (for example <span class="m" data-tex="10^{16}">10<sup>16</sup></span> against <span class="m" data-tex="10^{10}">10<sup>10</sup></span>). Then the square root is almost exactly <span class="m" data-tex="(N_D - N_A)/2">(N<sub>D</sub> − N<sub>A</sub>)/2</span>, and</p>
+          <span class="eq" data-tex="n \approx N_D - N_A \ \ \text{(N-type)}, \qquad p \approx N_A - N_D \ \ \text{(P-type)}">n ≈ N<sub>D</sub> − N<sub>A</sub> (N-type), p ≈ N<sub>A</sub> − N<sub>D</sub> (P-type)</span>
+          <p>with the minority carrier from <span class="m" data-tex="n_i^2">n<sub>i</sub><sup>2</sup></span> divided by the majority. Note that donors and acceptors cancel each other: a sample containing both is called <strong>compensated</strong>, and only the difference counts.</p>
+          <p>Check the intrinsic case: with <span class="m" data-tex="N_D = N_A = 0">N<sub>D</sub> = N<sub>A</sub> = 0</span>, the exact formulas give <span class="m" data-tex="n = p = n_i">n = p = n<sub>i</sub></span>, as they should. The approximation fails when the net doping is close to <span class="m" data-tex="n_i">n<sub>i</sub></span> or smaller, for example at high temperature, where <span class="m" data-tex="n_i">n<sub>i</sub></span> is large. Try it below.</p>
+        </div>
+
+        <figure class="anim" id="anim4">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="ctrls">
+            <div class="slider">
+              <label for="nd4"><span>Donors <span class="m" data-tex="N_D">N<sub>D</sub></span></span><output id="nd4o" for="nd4">10¹⁶ cm⁻³</output></label>
+              <input type="range" id="nd4" min="9.9" max="18" step="0.1" value="16">
+            </div>
+            <div class="slider">
+              <label for="na4"><span>Acceptors <span class="m" data-tex="N_A">N<sub>A</sub></span></span><output id="na4o" for="na4">0</output></label>
+              <input type="range" id="na4" min="9.9" max="18" step="0.1" value="9.9">
+            </div>
+            <div class="slider">
+              <label for="t4"><span>Temperature</span><output id="t4o" for="t4">300 K</output></label>
+              <input type="range" id="t4" min="250" max="700" step="5" value="300">
+            </div>
+          </div>
+          <canvas id="cv4" class="narrow" style="aspect-ratio:420/230" role="img" aria-label="Charge balance: two bars of equal length. The top bar is the positive charge, holes plus donor ions; the bottom bar is the negative charge, electrons plus acceptor ions. A label shows whether the sample is N-type, P-type, intrinsic or compensated."></canvas>
+          <div class="counters" aria-live="polite">
+            <div class="ctr"><span class="m" data-tex="n_i">n<sub>i</sub></span> (cm⁻³)<b id="c4a">–</b></div>
+            <div class="ctr n">Exact <span class="m" data-tex="n">n</span><b id="c4b">–</b></div>
+            <div class="ctr p">Exact <span class="m" data-tex="p">p</span><b id="c4c">–</b></div>
+            <div class="ctr n">Approx. <span class="m" data-tex="n">n</span><b id="c4d">–</b></div>
+            <div class="ctr p">Approx. <span class="m" data-tex="p">p</span><b id="c4e">–</b></div>
+            <div class="ctr en">Approx. error<b id="c4f">–</b></div>
+          </div>
+          <p class="exag">The first notch of each doping slider is 0. Silicon, all dopants ionised; <span class="m" data-tex="n_i">n<sub>i</sub></span> = 10¹⁰ cm⁻³ at 300 K and rising with temperature as <span class="m" data-tex="T^{3/2}e^{-E_g/2kT}">T<sup>3/2</sup>e<sup>-E<sub>g</sub>/2kT</sup></span>. The approximation is <span class="m" data-tex="n \approx N_D - N_A">n ≈ N<sub>D</sub> − N<sub>A</sub></span> or <span class="m" data-tex="p \approx N_A - N_D">p ≈ N<sub>A</sub> − N<sub>D</sub></span> (<span class="m" data-tex="n = p = n_i">n = p = n<sub>i</sub></span> if they are equal); the error is the larger of the two percentage errors.</p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: exact solution">
+          <h3>Key points</h3>
+          <ul>
+            <li>Charge neutrality: <span class="m" data-tex="p + N_D = n + N_A">p + N<sub>D</sub> = n + N<sub>A</sub></span>.</li>
+            <li>With <span class="m" data-tex="np = n_i^2">np = n<sub>i</sub><sup>2</sup></span> this gives a quadratic; take the positive root.</li>
+            <li>If <span class="m" data-tex="\lvert N_D - N_A\rvert \gg n_i">| N<sub>D</sub> − N<sub>A</sub>| gg n<sub>i</sub></span>: <span class="m" data-tex="n \approx N_D - N_A">n ≈ N<sub>D</sub> − N<sub>A</sub></span> (N) or <span class="m" data-tex="p \approx N_A - N_D">p ≈ N<sub>A</sub> − N<sub>D</sub></span> (P).</li>
+            <li>The minority carrier is always <span class="m" data-tex="n_i^2">n<sub>i</sub><sup>2</sup></span> divided by the majority.</li>
+            <li>Compensated samples: only the difference <span class="m" data-tex="N_D - N_A">N<sub>D</sub> − N<sub>A</sub></span> matters.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 5 ================= -->
+      <section id="s5" aria-labelledby="h5s">
+        <h2 id="h5s">Worked examples</h2>
+        <div class="prose">
+          <p>All three examples are for Si at 300 K, with <span class="m" data-tex="n_i = 10^{10}">n<sub>i</sub> = 10<sup>10</sup></span> cm⁻³, so <span class="m" data-tex="n_i^2 = 10^{20}">n<sub>i</sub><sup>2</sup> = 10<sup>20</sup></span> cm⁻⁶. In each case the net doping is millions of times <span class="m" data-tex="n_i">n<sub>i</sub></span>, so the simple approximation is excellent.</p>
+          <h3>Example 1: N-type, <span class="m" data-tex="N_D = 10^{16}">N<sub>D</sub> = 10<sup>16</sup></span> cm⁻³</h3>
+          <p>Majority carriers: every donor gives one electron, so</p>
+          <span class="eq" data-tex="n \approx N_D = 10^{16}\ \text{cm}^{-3}">n ≈ N<sub>D</sub> = 10<sup>16</sup> cm<sup>-3</sup></span>
+          <p>Minority carriers, from the mass action law:</p>
+          <span class="eq" data-tex="p = \frac{n_i^2}{n} = \frac{10^{20}}{10^{16}} = 10^{4}\ \text{cm}^{-3}">p = n<sub>i</sub><sup>2</sup>/n = frac10<sup>20</sup>10<sup>16</sup> = 10<sup>4</sup> cm<sup>-3</sup></span>
+          <h3>Example 2: P-type, <span class="m" data-tex="N_A = 10^{17}">N<sub>A</sub> = 10<sup>17</sup></span> cm⁻³</h3>
+          <span class="eq" data-tex="p \approx N_A = 10^{17}\ \text{cm}^{-3}">p ≈ N<sub>A</sub> = 10<sup>17</sup> cm<sup>-3</sup></span>
+          <span class="eq" data-tex="n = \frac{n_i^2}{p} = \frac{10^{20}}{10^{17}} = 10^{3}\ \text{cm}^{-3}">n = n<sub>i</sub><sup>2</sup>/p = frac10<sup>20</sup>10<sup>17</sup> = 10<sup>3</sup> cm<sup>-3</sup></span>
+          <h3>Example 3: compensated, <span class="m" data-tex="N_D = 5\times10^{16}">N<sub>D</sub> = 5×10<sup>16</sup></span>, <span class="m" data-tex="N_A = 2\times10^{16}">N<sub>A</sub> = 2×10<sup>16</sup></span> cm⁻³</h3>
+          <p>There are more donors than acceptors, so the sample is N-type. Each acceptor cancels one donor:</p>
+          <span class="eq" data-tex="n \approx N_D - N_A = 5\times10^{16} - 2\times10^{16} = 3\times10^{16}\ \text{cm}^{-3}">n ≈ N<sub>D</sub> − N<sub>A</sub> = 5×10<sup>16</sup> − 2×10<sup>16</sup> = 3×10<sup>16</sup> cm<sup>-3</sup></span>
+          <span class="eq" data-tex="p = \frac{n_i^2}{n} = \frac{10^{20}}{3\times10^{16}} \approx 3.3\times10^{3}\ \text{cm}^{-3}">p = n<sub>i</sub><sup>2</sup>/n = frac10<sup>20</sup>3×10<sup>16</sup> ≈ 3.3×10<sup>3</sup> cm<sup>-3</sup></span>
+          <p>Pick an example below, or choose "Your own" and type your own doping, to see the carrier concentrations and where the Fermi level sits. The Fermi level position comes from <span class="m" data-tex="E_F - E_i = kT\ln(n/n_i)">E<sub>F</sub> − E<sub>i</sub> = kTln(n/n<sub>i</sub>)</span> (topic 1.5).</p>
+        </div>
+
+        <figure class="anim" id="anim5">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <span class="seg" role="group" aria-label="Example">
+              <button class="btn" type="button" data-ex="1" aria-pressed="true">1</button>
+              <button class="btn" type="button" data-ex="2" aria-pressed="false">2</button>
+              <button class="btn" type="button" data-ex="3" aria-pressed="false">3</button>
+              <button class="btn" type="button" data-ex="own" aria-pressed="false">Your own</button>
+            </span>
+          </div>
+          <div class="ctrls own" id="own5" hidden>
+            <label class="num"><span class="m" data-tex="N_D">N<sub>D</sub></span> (cm⁻³) <input type="text" id="nd5" inputmode="decimal" value="1e15" aria-label="Donor concentration in per cubic centimetre"></label>
+            <label class="num"><span class="m" data-tex="N_A">N<sub>A</sub></span> (cm⁻³) <input type="text" id="na5" inputmode="decimal" value="0" aria-label="Acceptor concentration in per cubic centimetre"></label>
+            <span class="hint" id="msg5">Type numbers like 5e16 or 0 (up to 1e18).</span>
+          </div>
+          <canvas id="cv5" class="narrow" style="aspect-ratio:420/300" role="img" aria-label="Left: band diagram with the Fermi level drawn at its correct position for the chosen example. Right: log-scale bars for n and p, with a dashed line at the intrinsic level n i."></canvas>
+          <div class="counters" aria-live="polite">
+            <div class="ctr">Type<b id="c5a">–</b></div>
+            <div class="ctr n"><span class="m" data-tex="n">n</span> (cm⁻³)<b id="c5b">–</b></div>
+            <div class="ctr p"><span class="m" data-tex="p">p</span> (cm⁻³)<b id="c5c">–</b></div>
+            <div class="ctr en"><span class="m" data-tex="E_F - E_i">E<sub>F</sub> − E<sub>i</sub></span><b id="c5d">–</b></div>
+          </div>
+          <p class="exag">Exact formulas from Section 4, values for Si at 300 K. <span class="m" data-tex="E_i">E<sub>i</sub></span> is drawn at mid-gap.</p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: worked examples">
+          <h3>Key points</h3>
+          <ul>
+            <li>Step 1: majority ≈ net doping (<span class="m" data-tex="N_D - N_A">N<sub>D</sub> − N<sub>A</sub></span> or <span class="m" data-tex="N_A - N_D">N<sub>A</sub> − N<sub>D</sub></span>).</li>
+            <li>Step 2: minority = <span class="m" data-tex="n_i^2">n<sub>i</sub><sup>2</sup></span> / majority.</li>
+            <li><span class="m" data-tex="N_D = 10^{16}">N<sub>D</sub> = 10<sup>16</sup></span> → <span class="m" data-tex="p = 10^{4}">p = 10<sup>4</sup></span>; <span class="m" data-tex="N_A = 10^{17}">N<sub>A</sub> = 10<sup>17</sup></span> → <span class="m" data-tex="n = 10^{3}">n = 10<sup>3</sup></span> cm⁻³.</li>
+            <li>The further the Fermi level is from <span class="m" data-tex="E_i">E<sub>i</sub></span>, the more lopsided <span class="m" data-tex="n">n</span> and <span class="m" data-tex="p">p</span> become.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 6 ================= -->
+      <section id="s6" aria-labelledby="h6s">
+        <h2 id="h6s">Temperature effect and summary</h2>
+        <div class="prose">
+          <p>The intrinsic concentration <span class="m" data-tex="n_i">n<sub>i</sub></span> rises very quickly with temperature, roughly as <span class="m" data-tex="e^{-E_g/2kT}">e<sup>-E<sub>g</sub>/2kT</sup></span>. In Si near room temperature it grows by about 10 times for every 30 K. The product <span class="m" data-tex="n_i^2">n<sub>i</sub><sup>2</sup></span> rises even faster: about 100 times for the same step.</p>
+          <p>Now take a sample with fixed donor doping <span class="m" data-tex="N_D">N<sub>D</sub></span>. Over a wide range of temperature the <strong>majority</strong> carrier stays almost constant at <span class="m" data-tex="n \approx N_D">n ≈ N<sub>D</sub></span>. But the <strong>minority</strong> carrier</p>
+          <span class="eq" data-tex="p = \frac{n_i^2}{N_D}">p = n<sub>i</sub><sup>2</sup>/N<sub>D</sub></span>
+          <p>follows <span class="m" data-tex="n_i^2">n<sub>i</sub><sup>2</sup></span> and rises very rapidly. This is why the reverse leakage current of a diode, which is carried by minority carriers, grows so strongly with temperature (topic 2.6).</p>
+          <p>At high enough temperature <span class="m" data-tex="n_i">n<sub>i</sub></span> approaches <span class="m" data-tex="N_D">N<sub>D</sub></span>. The thermally generated pairs now outnumber the electrons from the donors, the minority carriers catch up with the majority, and the sample behaves like <strong>intrinsic</strong> material. The more heavily a sample is doped, the higher the temperature it can reach before this happens. Devices stop working properly in this range, which is one reason why silicon devices have a maximum operating temperature.</p>
+        </div>
+
+        <figure class="anim" id="anim6">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <span class="seg" role="group" aria-label="Donor doping">
+              <button class="btn" type="button" data-nd="14" aria-pressed="false"><span class="m" data-tex="N_D = 10^{14}">N<sub>D</sub> = 10<sup>14</sup></span></button>
+              <button class="btn" type="button" data-nd="15" aria-pressed="true"><span class="m" data-tex="10^{15}">10<sup>15</sup></span></button>
+              <button class="btn" type="button" data-nd="16" aria-pressed="false"><span class="m" data-tex="10^{16}">10<sup>16</sup></span></button>
+            </span>
+            <div class="slider">
+              <label for="t6"><span>Temperature (or drag on the graph)</span><output id="t6o" for="t6">300 K</output></label>
+              <input type="range" id="t6" min="250" max="700" step="1" value="300">
+            </div>
+          </div>
+          <canvas id="cv6" class="narrow" style="aspect-ratio:420/320;touch-action:pan-y" role="img" aria-label="Log-scale graph of n, p and the dashed intrinsic concentration against temperature from 250 to 700 kelvin for silicon. n stays flat at the donor level, p rises steeply, and both merge with n i at high temperature. Markers show where p reaches 10 percent of n and where n i equals N D. A vertical temperature marker can be dragged."></canvas>
+          <ul class="legend">
+            <li><span class="ln fe"></span><span><span class="m" data-tex="n">n</span></span></li>
+            <li><span class="ln ho"></span><span><span class="m" data-tex="p">p</span></span></li>
+            <li><span class="ln ni"></span><span><span class="m" data-tex="n_i">n<sub>i</sub></span></span></li>
+          </ul>
+          <div class="counters" aria-live="polite">
+            <div class="ctr n"><span class="m" data-tex="n">n</span> (cm⁻³)<b id="c6a">–</b></div>
+            <div class="ctr p"><span class="m" data-tex="p">p</span> (cm⁻³)<b id="c6b">–</b></div>
+            <div class="ctr"><span class="m" data-tex="n_i">n<sub>i</sub></span> (cm⁻³)<b id="c6c">–</b></div>
+          </div>
+          <p class="exag">Silicon, all donors ionised (freeze-out at low temperature is not shown); <span class="m" data-tex="n_i">n<sub>i</sub></span> = 10¹⁰ cm⁻³ at 300 K, scaled with <span class="m" data-tex="T^{3/2}e^{-E_g(T)/2kT}">T<sup>3/2</sup>e<sup>-E<sub>g</sub>(T)/2kT</sup></span>. While playing, the marker sweeps through the temperature range; dragging it pauses the sweep.</p>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: temperature">
+          <h3>Key points</h3>
+          <ul>
+            <li><span class="m" data-tex="n_i">n<sub>i</sub></span> rises steeply with temperature; <span class="m" data-tex="n_i^2">n<sub>i</sub><sup>2</sup></span> even faster.</li>
+            <li>Majority stays ≈ <span class="m" data-tex="N_D">N<sub>D</sub></span>; minority <span class="m" data-tex="p = n_i^2/N_D">p = n<sub>i</sub><sup>2</sup>/N<sub>D</sub></span> rises rapidly → diode leakage grows with heat.</li>
+            <li>When <span class="m" data-tex="n_i">n<sub>i</sub></span> approaches <span class="m" data-tex="N_D">N<sub>D</sub></span> the sample becomes intrinsic.</li>
+          </ul>
+        </aside>
+
+        <h3 class="sumhead">Summary: key formulas</h3>
+        <div class="formulas">
+          <div class="fcard"><div class="f" data-tex="n\,p = n_i^2">n p = n<sub>i</sub><sup>2</sup></div><p>Mass action law. Si at 300 K: <span class="m" data-tex="n_i^2 = 10^{20}">n<sub>i</sub><sup>2</sup> = 10<sup>20</sup></span> cm⁻⁶.</p></div>
+          <div class="fcard"><div class="f" data-tex="p + N_D = n + N_A">p + N<sub>D</sub> = n + N<sub>A</sub></div><p>Charge neutrality, all dopants ionised.</p></div>
+          <div class="fcard"><div class="f" data-tex="n \approx N_D - N_A, \quad p = \frac{n_i^2}{n}">n ≈ N<sub>D</sub> − N<sub>A</sub>, p = n<sub>i</sub><sup>2</sup>/n</div><p>N-type, when <span class="m" data-tex="N_D - N_A \gg n_i">N<sub>D</sub> − N<sub>A</sub> gg n<sub>i</sub></span>.</p></div>
+          <div class="fcard"><div class="f" data-tex="p \approx N_A - N_D, \quad n = \frac{n_i^2}{p}">p ≈ N<sub>A</sub> − N<sub>D</sub>, n = n<sub>i</sub><sup>2</sup>/p</div><p>P-type, when <span class="m" data-tex="N_A - N_D \gg n_i">N<sub>A</sub> − N<sub>D</sub> gg n<sub>i</sub></span>.</p></div>
+          <div class="fcard"><div class="f long" data-tex="n = \frac{N_D - N_A}{2} + \sqrt{\left(\frac{N_D - N_A}{2}\right)^2 + n_i^2}">n = N<sub>D</sub> − N<sub>A</sub>/2 + sqrtleft(N<sub>D</sub> − N<sub>A</sub>/2right)<sup>2</sup> + n<sub>i</sub><sup>2</sup></div><p>Exact solution, net N-type (swap <span class="m" data-tex="n \leftrightarrow p">n leftrightarrow p</span> and <span class="m" data-tex="N_D \leftrightarrow N_A">N<sub>D</sub> leftrightarrow N<sub>A</sub></span> for P-type).</p></div>
+          <div class="fcard"><div class="f" data-tex="\text{Equilibrium, non-degenerate}">Equilibrium, non-degenerate</div><p>Conditions: no light or injected current; doping below about <span class="m" data-tex="10^{18}">10<sup>18</sup></span>–<span class="m" data-tex="10^{19}">10<sup>19</sup></span> cm⁻³ in Si.</p></div>
+        </div>
+      </section>
+
+      <nav class="pager" aria-label="Topic navigation">
+        <a href="../1-7-mobility-conductivity-hall-effect/index.html"><small>← Previous</small>1.7 Mobility, Conductivity &amp; the Hall Effect</a>
+        <span class="next soon"><small>Next →</small>Unit 2 coming soon</span>
+      </nav>
+    </div>
+  </main>
+
+<script>
+(function () {
+  'use strict';
+
+  const C = {
+    text: '#e6e9ef', muted: '#9aa4b8', e: '#4fc3f7', h: '#ff8a65', en: '#ffd54f', ok: '#81c784', cur: '#81c784',
+    mag: '#ce93d8', lat: '#b39ddb', ion: '#f06292', metal: '#7d8aa3', line: '#33405e', grid: '#25304a'
+  };
+  const FONT = 'Inter, system-ui, sans-serif', MONO = '"JetBrains Mono", ui-monospace, monospace';
+  const RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const TAU = Math.PI * 2, rnd = Math.random;
+  const $ = id => document.getElementById(id);
+  if (RM) $('rmNote').hidden = false;
+
+  const SUP = { '-': '⁻', '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹' };
+  const sup = n => String(n).split('').map(ch => SUP[ch] || ch).join('');
+  function fmtX(x, d) {
+    if (!(x > 0)) return '0';
+    d = d == null ? 1 : d;
+    let e = Math.floor(Math.log10(x));
+    let ms = (x / Math.pow(10, e)).toFixed(d);
+    if (parseFloat(ms) >= 10) { e++; ms = (1).toFixed(d); }
+    return ms + '×10' + sup(e);
+  }
+  // 3 significant figures, switching to ×10ⁿ outside 0.01 … 99 999
+  function fmtG(x) {
+    const a = Math.abs(x);
+    if (a === 0) return '0';
+    if (a >= 1e5 || a < 0.01) return (x < 0 ? '−' : '') + fmtX(a, 2);
+    const s = a >= 100 ? a.toFixed(0) : a.toPrecision(3);
+    return (x < 0 ? '−' : '') + s;
+  }
+  function fmtUnit(v, unit, prefixes) {     // engineering prefix, 3 significant figures
+    const a = Math.abs(v); let k = 0;
+    const P = prefixes || [['G', 1e9], ['M', 1e6], ['k', 1e3], ['', 1], ['m', 1e-3], ['µ', 1e-6], ['n', 1e-9]];
+    for (; k < P.length - 1; k++) if (a >= P[k][1]) break;
+    const m = a / P[k][1];
+    return (v < 0 ? '−' : '') + (m >= 100 ? m.toFixed(0) : m.toPrecision(3)) + ' ' + P[k][0] + unit;
+  }
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const lerp = (a, b, t) => a + (b - a) * t;
+
+  /* ---------- shared silicon model (Sections 2, 3, 5) ---------- */
+  const QE = 1.602e-19;
+  const MOB = { n: [1400, 3.5e20], p: [490, 2.16e20] };          // [lattice μ at 300 K, impurity constant]
+  const muL = (k, T) => MOB[k][0] * Math.pow(T / 300, -1.5);
+  const muI = (k, T, N) => N > 0 ? MOB[k][1] / N * Math.pow(T / 300, 1.5) : Infinity;
+  const muT = (k, T, N) => 1 / (1 / muL(k, T) + 1 / muI(k, T, N));
+  const Eg = T => 1.17 - 4.73e-4 * T * T / (T + 636);
+  const KB = 8.617e-5;
+  const niOf = T => 1e10 * Math.pow(T / 300, 1.5) * Math.exp(-Eg(T) / (2 * KB * T) + Eg(300) / (2 * KB * 300));
+
+  /* =========================================================
+     Canvas helpers
+     ========================================================= */
+  let FS = 1;
+  function Cv(id, W, H) { this.el = $(id); this.W = W; this.H = H; this.ctx = this.el.getContext('2d'); }
+  Cv.prototype.begin = function () {
+    const w = this.el.clientWidth; if (!w) return null;
+    const dpr = window.devicePixelRatio || 1;
+    const pw = Math.round(w * dpr), ph = Math.round(w * dpr * this.H / this.W);
+    if (this.el.width !== pw || this.el.height !== ph) { this.el.width = pw; this.el.height = ph; }
+    const c = this.ctx, s = pw / this.W;
+    FS = Math.min(1.6, Math.max(1, 1.15 * this.W / w));
+    c.setTransform(s, 0, 0, s, 0, 0); c.clearRect(0, 0, this.W, this.H);
+    c.textBaseline = 'middle'; c.textAlign = 'left'; c.globalAlpha = 1; c.setLineDash([]);
+    return c;
+  };
+  // Watermark: drawn inside the canvas, bottom-right, ~22 px on screen at any size.
+  Cv.prototype.wm = function (c) {
+    const s = 22 * this.W / this.el.clientWidth;
+    c.save(); c.globalAlpha = 1; c.font = '600 ' + s.toFixed(1) + 'px ' + FONT; c.fillStyle = 'rgba(255,255,255,.35)';
+    c.textAlign = 'right'; c.textBaseline = 'bottom'; c.fillText('@NaveenBokka', this.W - 10, this.H - 8); c.restore();
+  };
+  // Pointer position in canvas units
+  Cv.prototype.pt = function (e) {
+    const r = this.el.getBoundingClientRect();
+    return { x: (e.clientX - r.left) * this.W / r.width, y: (e.clientY - r.top) * this.H / r.height };
+  };
+  function circ(c, x, y, r, fill, stroke, lw) {
+    c.beginPath(); c.arc(x, y, Math.max(0, r), 0, TAU);
+    if (fill) { c.fillStyle = fill; c.fill(); }
+    if (stroke) { c.strokeStyle = stroke; c.lineWidth = lw || 1.5; c.stroke(); }
+  }
+  function txt(c, s, x, y, col, size, weight, align, font) {
+    c.font = (weight || 500) + ' ' + ((size || 11) * FS).toFixed(1) + 'px ' + (font || FONT);
+    c.fillStyle = col || C.text; c.textAlign = align || 'left'; c.fillText(s, x, y);
+    return c.measureText(s).width;
+  }
+  function tag(c, s, x, y, col, align, size) {
+    c.font = '600 ' + ((size || 10) * FS).toFixed(1) + 'px ' + FONT;
+    const w = c.measureText(s).width + 8, hh = (size || 10) * 0.8 * FS;
+    const x0 = align === 'right' ? x - w : align === 'center' ? x - w / 2 : x;
+    c.fillStyle = 'rgba(15,20,32,.88)'; c.fillRect(x0, y - hh, w, 2 * hh);
+    c.fillStyle = col || C.text; c.textAlign = 'left'; c.fillText(s, x0 + 4, y + 0.5);
+    return w;
+  }
+  // Label with a subscript, e.g. sub(c, 'V', 'H', …)
+  function sub(c, a, b, x, y, col, size, align) {
+    c.font = '600 ' + ((size || 11) * FS).toFixed(1) + 'px ' + FONT;
+    const wa = c.measureText(a).width;
+    c.font = '600 ' + ((size || 11) * 0.72 * FS).toFixed(1) + 'px ' + FONT;
+    const wb = c.measureText(b).width, w = wa + wb;
+    let x0 = align === 'right' ? x - w : align === 'center' ? x - w / 2 : x;
+    c.fillStyle = col; c.textAlign = 'left';
+    c.font = '600 ' + ((size || 11) * FS).toFixed(1) + 'px ' + FONT; c.fillText(a, x0, y);
+    c.font = '600 ' + ((size || 11) * 0.72 * FS).toFixed(1) + 'px ' + FONT; c.fillText(b, x0 + wa, y + (size || 11) * 0.3 * FS);
+    return w;
+  }
+  function line(c, x0, y0, x1, y1, col, lw, dash) {
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []);
+    c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke(); c.setLineDash([]);
+  }
+  // Arrow from (x0,y0) to (x1,y1)
+  function arrow(c, x0, y0, x1, y1, col, lw, head) {
+    const dx = x1 - x0, dy = y1 - y0, L = Math.hypot(dx, dy); if (L < 2) return;
+    const ux = dx / L, uy = dy / L, hs = Math.min(head || 8, L * 0.8);
+    line(c, x0, y0, x1 - ux * hs * 0.7, y1 - uy * hs * 0.7, col, lw || 2.5);
+    c.fillStyle = col; c.beginPath(); c.moveTo(x1, y1);
+    c.lineTo(x1 - ux * hs - uy * hs * 0.55, y1 - uy * hs + ux * hs * 0.55);
+    c.lineTo(x1 - ux * hs + uy * hs * 0.55, y1 - uy * hs - ux * hs * 0.55); c.closePath(); c.fill();
+  }
+  function elec(c, x, y, r) { circ(c, x, y, (r || 3.6) * 1.9, 'rgba(79,195,247,.15)'); circ(c, x, y, r || 3.6, C.e); }
+  function holeRing(c, x, y, r) { circ(c, x, y, r || 4.2, 'rgba(255,138,101,.22)', C.h, 2); }
+  function ionMark(c, x, y, rr, col, plus) {
+    circ(c, x, y, rr, '#0f1420', col, 1.4);
+    line(c, x - rr * 0.55, y, x + rr * 0.55, y, col, 1.5);
+    if (plus) line(c, x, y - rr * 0.55, x, y + rr * 0.55, col, 1.5);
+  }
+  function poly(c, pts, fill, stroke, lw) {
+    c.beginPath(); c.moveTo(pts[0][0], pts[0][1]); for (let k = 1; k < pts.length; k++) c.lineTo(pts[k][0], pts[k][1]); c.closePath();
+    if (fill) { c.fillStyle = fill; c.fill(); }
+    if (stroke) { c.strokeStyle = stroke; c.lineWidth = lw || 1.2; c.stroke(); }
+  }
+  function segSel(root, attr, val) {
+    root.querySelectorAll('[data-' + attr + ']').forEach(b => b.setAttribute('aria-pressed', String(b.dataset[attr] === val)));
+  }
+
+  /* =========================================================
+     Animation framework: own Play/Pause/Reset, runs only while visible
+     ========================================================= */
+  const anims = [];
+  function Anim(rootId, o) {
+    this.root = $(rootId); this.o = o; this.playing = !RM; this.visible = true; this.dirty = true;
+    this.pb = this.root.querySelector('[data-act="play"]');
+    this.pb.addEventListener('click', () => this.setPlaying(!this.playing));
+    this.root.querySelector('[data-act="reset"]').addEventListener('click', () => { o.reset(); this.setPlaying(!RM); });
+    o.reset(); this.sync(); anims.push(this);
+    if ('IntersectionObserver' in window) {
+      this.visible = false;
+      new IntersectionObserver(es => es.forEach(e => { this.visible = e.isIntersecting; if (this.visible) this.dirty = true; }))
+        .observe(this.root);
+    }
+  }
+  Anim.prototype.setPlaying = function (p) { this.playing = p; this.sync(); this.dirty = true; };
+  Anim.prototype.sync = function () { this.pb.textContent = this.playing ? 'Pause' : 'Play'; };
+
+  Object.assign(C, { gen: '#ffd54f', rec: '#ef5350', d: '#66bb6a', a: '#f06292', vb: '#3949ab', cb: '#00838f' });
+  const KT300 = 0.025852, NI300 = 1e10;
+  const lg = Math.log10;
+  // exact equilibrium concentrations (all dopants ionised)
+  function solve(ND, NA, ni) {
+    const h = (ND - NA) / 2, s = Math.sqrt(h * h + ni * ni);
+    if (h >= 0) { const n = h + s; return { n, p: ni * ni / n }; }
+    const p = -h + s; return { n: ni * ni / p, p };
+  }
+  function ionD(c, x, y, r) { circ(c, x, y, r, '#0f1420', C.d, 1.4); line(c, x - r * .55, y, x + r * .55, y, C.d, 1.5); line(c, x, y - r * .55, x, y + r * .55, C.d, 1.5); }
+  function ionA(c, x, y, r) { circ(c, x, y, r, '#0f1420', C.a, 1.4); line(c, x - r * .55, y, x + r * .55, y, C.a, 1.5); }
+  function boxFrame(c, b) {
+    c.fillStyle = 'rgba(255,255,255,.025)'; c.fillRect(b.x0, b.y0, b.x1 - b.x0, b.y1 - b.y0);
+    c.strokeStyle = C.line; c.lineWidth = 1.2; c.strokeRect(b.x0, b.y0, b.x1 - b.x0, b.y1 - b.y0);
+  }
+  // log-scale vertical bar
+  function logBar(c, x, w, y0, y1, d0, d1, val, col, label, valTxt) {
+    const Y = d => y0 - (d - d0) / (d1 - d0) * (y0 - y1);
+    const v = clamp(val, d0, d1);
+    c.fillStyle = 'rgba(255,255,255,.04)'; c.fillRect(x, y1, w, y0 - y1);
+    c.fillStyle = col; c.globalAlpha = 0.85; c.fillRect(x, Y(v), w, y0 - Y(v)); c.globalAlpha = 1;
+    txt(c, label, x + w / 2, y0 + 13, col, 12, 700, 'center');
+    if (valTxt) txt(c, valTxt, x + w / 2, Y(v) - 9, col, 9.5, 600, 'center', MONO);
+    return Y;
+  }
+  function decTicks(c, x, y0, y1, d0, d1, step) {
+    for (let d = d0; d <= d1; d += step) {
+      const y = y0 - (d - d0) / (d1 - d0) * (y0 - y1);
+      line(c, x - 3, y, x, y, C.muted, 1); txt(c, '10' + sup(d), x - 5, y, C.muted, 8.5, 500, 'right');
+    }
+  }
+  // Band diagram: returns y of an energy (eV, relative to Ei)
+  function bands(c, x0, x1, yc, yv, efRel, opts) {
+    const o = opts || {}, Ei = (yc + yv) / 2, s = (yv - yc) / 1.12;
+    c.fillStyle = 'rgba(0,131,143,.35)'; c.fillRect(x0, yc - 34, x1 - x0, 34);
+    c.fillStyle = 'rgba(57,73,171,.45)'; c.fillRect(x0, yv, x1 - x0, 34);
+    line(c, x0, yc, x1, yc, C.cb, 2.5); line(c, x0, yv, x1, yv, C.vb, 2.5);
+    sub(c, 'E', 'c', x0 + 4, yc - 10, '#4dd0e1', 11); sub(c, 'E', 'v', x0 + 4, yv + 12, '#9fa8da', 11);
+    line(c, x0, Ei, x1, Ei, C.muted, 1.2, [5, 4]); sub(c, 'E', 'i', x1 - 4, Ei - 10, C.muted, 10, 'right');
+    const yf = Ei - efRel * s;
+    line(c, x0, yf, x1, yf, C.en, o.drag ? 3 : 2.5);
+    sub(c, 'E', 'F', x1 - 4, yf + (efRel >= 0 ? 11 : -10), C.en, 11, 'right');
+    return { Ei, s, yf };
+  }
+
+  /* ---------- particle pool: thermal motion, generation, recombination ---------- */
+  function Pool(box, o) {
+    Object.assign(this, { box, rc: 9, v: 85, tau: 0.35, imm: 0.4, win: 4 }, o || {});
+    this.e = []; this.h = []; this.ions = []; this.fl = []; this.gT = []; this.rT = []; this.t = 0; this.acc = 0;
+  }
+  Pool.prototype.mk = function (x, y, ang, age) {
+    const a = ang == null ? rnd() * TAU : ang;
+    return { x, y, vx: Math.cos(a) * this.v, vy: Math.sin(a) * this.v, tl: -this.tau * Math.log(1 - rnd()), age: age == null ? 9 : age };
+  };
+  Pool.prototype.rp = function () { const b = this.box; return [lerp(b.x0 + 6, b.x1 - 6, rnd()), lerp(b.y0 + 6, b.y1 - 6, rnd())]; };
+  Pool.prototype.gen = function (quiet) {
+    const [x, y] = this.rp(), a = rnd() * TAU;
+    this.e.push(this.mk(x, y, a, 0)); this.h.push(this.mk(x, y, a + Math.PI, 0));
+    if (!quiet) { this.fl.push({ x, y, t: 0, k: 0 }); this.gT.push(this.t); }
+  };
+  Pool.prototype.step = function (dt, G, quiet) {
+    this.t += dt;
+    this.acc += G * dt;
+    while (this.acc >= 1) { this.acc -= 1; this.gen(quiet); }
+    const b = this.box;
+    const mv = q => {
+      q.tl -= dt; q.age += dt;
+      if (q.tl <= 0) { const a = rnd() * TAU; q.vx = Math.cos(a) * this.v; q.vy = Math.sin(a) * this.v; q.tl = -this.tau * Math.log(1 - rnd()); }
+      q.x += q.vx * dt; q.y += q.vy * dt;
+      if (q.x < b.x0 + 4) { q.x = 2 * (b.x0 + 4) - q.x; q.vx = Math.abs(q.vx); }
+      if (q.x > b.x1 - 4) { q.x = 2 * (b.x1 - 4) - q.x; q.vx = -Math.abs(q.vx); }
+      if (q.y < b.y0 + 4) { q.y = 2 * (b.y0 + 4) - q.y; q.vy = Math.abs(q.vy); }
+      if (q.y > b.y1 - 4) { q.y = 2 * (b.y1 - 4) - q.y; q.vy = -Math.abs(q.vy); }
+    };
+    this.e.forEach(mv); this.h.forEach(mv);
+    const r2 = this.rc * this.rc;
+    for (const e of this.e) {
+      if (e.dead || e.age < this.imm) continue;
+      for (const h of this.h) {
+        if (h.dead || h.age < this.imm) continue;
+        const dx = e.x - h.x, dy = e.y - h.y;
+        if (dx * dx + dy * dy < r2) {
+          e.dead = h.dead = true;
+          if (!quiet) { this.fl.push({ x: (e.x + h.x) / 2, y: (e.y + h.y) / 2, t: 0, k: 1 }); this.rT.push(this.t); }
+          break;
+        }
+      }
+    }
+    this.e = this.e.filter(q => !q.dead); this.h = this.h.filter(q => !q.dead);
+    this.fl.forEach(f => { f.t += dt; }); this.fl = this.fl.filter(f => f.t < 0.5);
+    const tw = this.t - this.win;
+    while (this.gT.length && this.gT[0] < tw) this.gT.shift();
+    while (this.rT.length && this.rT[0] < tw) this.rT.shift();
+  };
+  Pool.prototype.rates = function () { const w = Math.min(this.win, Math.max(this.t, 0.5)); return [this.gT.length / w, this.rT.length / w]; };
+  Pool.prototype.draw = function (c) {
+    this.ions.forEach(i => i.k ? ionA(c, i.x, i.y, 6) : ionD(c, i.x, i.y, 6));
+    this.fl.forEach(f => { const a = 1 - f.t / 0.5; c.globalAlpha = a; circ(c, f.x, f.y, 4 + 14 * f.t / 0.5, null, f.k ? C.rec : C.gen, 2.4); c.globalAlpha = 1; });
+    this.h.forEach(q => holeRing(c, q.x, q.y, 3.8));
+    this.e.forEach(q => elec(c, q.x, q.y, 3.4));
+  };
+
+  /* =========================================================
+     SECTION 0: intrinsic vs N-type boxes
+     ========================================================= */
+  (function () {
+    const W = 300, H = 210, A0 = new Cv('cv0a', W, H), B0 = new Cv('cv0b', W, H), box = { x0: 12, x1: 288, y0: 34, y1: 172 };
+    let pa, pb;
+    const A = new Anim('anim0', {
+      reset() {
+        pa = new Pool(box, { v: 60 }); pb = new Pool(box, { v: 60 });
+        for (let k = 0; k < 7; k++) { const [x, y] = pa.rp(); pa.e.push(pa.mk(x, y)); const [u, v] = pa.rp(); pa.h.push(pa.mk(u, v)); }
+        for (let k = 0; k < 34; k++) { const [x, y] = pb.rp(); pb.ions.push({ x, y, k: 0 }); const [u, v] = pb.rp(); pb.e.push(pb.mk(u, v)); }
+        for (let k = 0; k < 2; k++) { const [x, y] = pb.rp(); pb.h.push(pb.mk(x, y)); }
+        pa.rc = pb.rc = 0;             // no recombination in this preview
+      },
+      step(dt) { pa.step(dt, 0, true); pb.step(dt, 0, true); },
+      draw() {
+        [[A0, pa, 'Intrinsic Si'], [B0, pb, 'N-type Si']].forEach(([cv, p, t]) => {
+          const c = cv.begin(); if (!c) return;
+          tag(c, t, 12, 18, C.text, 'left', 12);
+          boxFrame(c, box); p.draw(c); cv.wm(c);
+        });
+      }
+    });
+  })();
+
+  /* =========================================================
+     SECTION 1: generation / recombination approach to equilibrium
+     ========================================================= */
+  (function () {
+    const W = 420, H = 250, cv = new Cv('cv1', W, H), gv = new Cv('cv1g', 420, 250), box = { x0: 10, x1: 410, y0: 10, y1: 214 };
+    const sl = $('t1');
+    let T = 300, pool, hist, tS;
+    const Gof = T => 10 * Math.pow(2, (T - 300) / 25);
+    function upd() { $('t1o').textContent = T + ' K'; }
+    const A = new Anim('anim1', {
+      reset() { pool = new Pool(box); hist = []; tS = 0; upd(); },
+      step(dt) {
+        pool.step(dt, Gof(T));
+        tS += dt;
+        const [g, r] = pool.rates(), n = pool.e.length, p = pool.h.length;
+        if (tS >= 0.25) { tS = 0; hist.push({ t: pool.t, g, r, np: n * p }); if (hist.length > 160) hist.shift(); }
+        $('c1a').textContent = n; $('c1b').textContent = p; $('c1c').textContent = g.toFixed(1); $('c1d').textContent = r.toFixed(1); $('c1e').textContent = n * p;
+      },
+      draw() {
+        const c = cv.begin(); if (!c) return;
+        boxFrame(c, box); pool.draw(c); cv.wm(c);
+        // time graph
+        const g = gv.begin(); if (!g) return;
+        const x0 = 46, x1 = 408, p1 = [16, 104], p2 = [130, 214];
+        const t1 = Math.max(40, pool.t), t0 = t1 - 40, X = t => x0 + (t - t0) / 40 * (x1 - x0);
+        const rmax = Math.max(10, ...hist.map(h => Math.max(h.g, h.r))) * 1.15;
+        const nmax = Math.max(100, ...hist.map(h => h.np)) * 1.15;
+        [p1, p2].forEach(([a, b]) => { g.strokeStyle = C.line; g.lineWidth = 1.2; g.strokeRect(x0, a, x1 - x0, b - a); });
+        txt(g, 'rate (/s)', x0 + 4, p1[0] + 9, C.muted, 9, 500); txt(g, 'n·p', x0 + 4, p2[0] + 9, C.muted, 9, 500);
+        txt(g, '0', x0 - 5, p1[1], C.muted, 8.5, 500, 'right'); txt(g, rmax.toFixed(0), x0 - 5, p1[0] + 4, C.muted, 8.5, 500, 'right');
+        txt(g, '0', x0 - 5, p2[1], C.muted, 8.5, 500, 'right'); txt(g, nmax.toFixed(0), x0 - 5, p2[0] + 4, C.muted, 8.5, 500, 'right');
+        txt(g, 'time →', x0, p2[1] + 13, C.muted, 9, 500);
+        const plot = (key, max, [a, b], col, lw) => {
+          g.strokeStyle = col; g.lineWidth = lw; g.beginPath(); let st = false;
+          hist.forEach(h => { if (h.t < t0) return; const y = b - (h[key] / max) * (b - a); st ? g.lineTo(X(h.t), y) : g.moveTo(X(h.t), y); st = true; });
+          g.stroke();
+        };
+        plot('g', rmax, p1, C.gen, 2); plot('r', rmax, p1, C.rec, 2); plot('np', nmax, p2, '#ffffff', 2);
+        const last = hist[hist.length - 1];
+        if (last) { sub(g, 'G', '', X(last.t) - 4, p1[1] - (last.g / rmax) * (p1[1] - p1[0]) - 10, C.gen, 11, 'right'); }
+        gv.wm(g);
+      }
+    });
+    sl.addEventListener('input', () => { T = +sl.value; upd(); A.dirty = true; });
+  })();
+
+  /* =========================================================
+     SECTION 2: draggable Fermi level and log bars
+     ========================================================= */
+  (function () {
+    const W = 420, H = 320, cv = new Cv('cv2', W, H), sl = $('f2');
+    const BX0 = 14, BX1 = 196, YC = 56, YV = 236;
+    const D0 = 0, D1 = 20, BY0 = 250, BY1 = 50;
+    let ef = 0, shown = 0, drag = false;
+    const nOf = x => NI300 * Math.exp(x / KT300), pOf = x => NI300 * Math.exp(-x / KT300);
+    function upd() {
+      $('f2o').textContent = (ef >= 0 ? '+' : '−') + Math.abs(ef).toFixed(2) + ' eV';
+      $('c2a').textContent = fmtX(nOf(ef), 1); $('c2b').textContent = fmtX(pOf(ef), 1);
+      $('c2c').textContent = fmtX(nOf(ef) * pOf(ef), 1); $('c2d').textContent = (ef >= 0 ? '+' : '−') + Math.abs(ef).toFixed(2) + ' eV';
+    }
+    const A = new Anim('anim2', {
+      reset() { ef = 0; shown = 0; sl.value = 0; upd(); },
+      step(dt) { shown += (ef - shown) * Math.min(1, dt * 10); },
+      draw() {
+        const c = cv.begin(); if (!c) return;
+        if (!A || !A.playing) shown = ef;
+        bands(c, BX0, BX1, YC, YV, shown, { drag });
+        txt(c, '↕', BX0 + (BX1 - BX0) * 0.45, (YC + YV) / 2 - shown * (YV - YC) / 1.12, C.en, 12, 700, 'center');
+        decTicks(c, 252, BY0, BY1, D0, D1, 5);
+        const n = nOf(shown), p = pOf(shown);
+        logBar(c, 262, 36, BY0, BY1, D0, D1, lg(n), C.e, 'n', '10' + sup(Math.round(lg(n))));
+        logBar(c, 312, 36, BY0, BY1, D0, D1, lg(p), C.h, 'p', '10' + sup(Math.round(lg(p))));
+        logBar(c, 378, 30, BY0, BY1, D0, D1, lg(n * p), C.ok, 'n·p', '10²⁰');
+        const yni = BY0 - (10 - D0) / (D1 - D0) * (BY0 - BY1);
+        line(c, 258, yni, 350, yni, C.muted, 1.2, [4, 3]); sub(c, 'n', 'i', 352, yni, C.muted, 10);
+        cv.wm(c);
+      }
+    });
+    function setEf(v) { ef = clamp(Math.round(v * 100) / 100, -0.46, 0.46); sl.value = ef; upd(); A.dirty = true; }
+    sl.addEventListener('input', () => setEf(+sl.value));
+    const el = cv.el;
+    const efAt = p => ((YC + YV) / 2 - p.y) / ((YV - YC) / 1.12);
+    el.addEventListener('pointerdown', e => {
+      const p = cv.pt(e); if (p.x > BX1 + 20) return;
+      drag = true; el.setPointerCapture(e.pointerId); setEf(efAt(p)); e.preventDefault();
+    });
+    el.addEventListener('pointermove', e => { const p = cv.pt(e); if (drag) setEf(efAt(p)); else el.style.cursor = p.x <= BX1 + 20 ? 'ns-resize' : 'default'; });
+    const end = () => { if (drag) { drag = false; A.dirty = true; } };
+    el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end);
+  })();
+
+  /* =========================================================
+     SECTION 3: adding donors / acceptors to an equilibrium box
+     ========================================================= */
+  (function () {
+    const W = 420, H = 250, cv = new Cv('cv3', W, H), gv = new Cv('cv3g', 420, 240), box = { x0: 10, x1: 410, y0: 10, y1: 214 };
+    const G = 12, ADD = 60, MAXI = 180;
+    let pool, hist, tS, npAvg, npEq, smp;
+    function warm() { for (let k = 0; k < 600; k++) pool.step(0.05, G, true); pool.t = 0; pool.gT = []; pool.rT = []; }
+    function btns() { $('ad3').disabled = $('aa3').disabled = pool.ions.length >= MAXI; }
+    const A = new Anim('anim3', {
+      reset() {
+        pool = new Pool(box); warm();
+        // equilibrium n·p measured over a long quiet run
+        let s = 0; for (let k = 0; k < 600; k++) { pool.step(0.05, G, true); s += pool.e.length * pool.h.length; } npEq = s / 600;
+        pool.t = 0; hist = []; tS = 0; smp = []; npAvg = pool.e.length * pool.h.length; btns();
+      },
+      step(dt) {
+        pool.step(dt, G);
+        const n = pool.e.length, p = pool.h.length;
+        smp.push([pool.t, n * p]); while (smp.length && smp[0][0] < pool.t - 1) smp.shift();
+        npAvg = smp.reduce((a, s) => a + s[1], 0) / smp.length;
+        tS += dt; if (tS >= 0.2) { tS = 0; hist.push({ t: pool.t, n, p, np: npAvg }); if (hist.length > 250) hist.shift(); }
+        $('c3a').textContent = n; $('c3b').textContent = p; $('c3c').textContent = Math.round(npAvg);
+      },
+      draw() {
+        const c = cv.begin(); if (!c) return;
+        boxFrame(c, box); pool.draw(c); cv.wm(c);
+        const g = gv.begin(); if (!g) return;
+        const x0 = 44, x1 = 408, y0 = 206, y1 = 14, D0 = 0, D1 = 4;
+        const t1 = Math.max(40, pool.t), t0 = t1 - 40, X = t => x0 + (t - t0) / 40 * (x1 - x0);
+        const Y = v => y0 - (lg(Math.max(v, 1)) - D0) / (D1 - D0) * (y0 - y1);
+        g.strokeStyle = C.line; g.lineWidth = 1.2; g.strokeRect(x0, y1, x1 - x0, y0 - y1);
+        for (let d = 0; d <= 4; d++) { const y = Y(Math.pow(10, d)); line(g, x0, y, x1, y, C.grid, 1); txt(g, d === 0 ? '1' : '10' + sup(d), x0 - 5, y, C.muted, 8.5, 500, 'right'); }
+        txt(g, 'time →', x0, y0 + 13, C.muted, 9, 500);
+        txt(g, 'dots', x0 + 4, y1 + 9, C.muted, 9, 500);
+        line(g, x0, Y(npEq), x1, Y(npEq), C.muted, 1.4, [5, 4]);
+        txt(g, 'nᵢ²', x0 + 4, Y(npEq) - 9, C.muted, 10, 600);
+        const plot = (key, col, lw) => {
+          g.strokeStyle = col; g.lineWidth = lw; g.beginPath(); let st = false;
+          hist.forEach(h => { if (h.t < t0) return; st ? g.lineTo(X(h.t), Y(h[key])) : g.moveTo(X(h.t), Y(h[key])); st = true; });
+          g.stroke();
+        };
+        plot('np', '#ffffff', 2); plot('n', C.e, 2.2); plot('p', C.h, 2.2);
+        const L = hist[hist.length - 1];
+        if (L) { txt(g, 'n', X(L.t) - 2, Y(L.n) - 9, C.e, 11, 700, 'right'); txt(g, 'p', X(L.t) - 2, Y(L.p) + 10, C.h, 11, 700, 'right'); }
+        gv.wm(g);
+      }
+    });
+    function add(k) {
+      for (let i = 0; i < ADD && pool.ions.length < MAXI; i++) {
+        const [x, y] = pool.rp(); pool.ions.push({ x, y, k });
+        (k ? pool.h : pool.e).push(pool.mk(x, y));
+      }
+      btns(); A.dirty = true;
+    }
+    $('ad3').addEventListener('click', () => add(0));
+    $('aa3').addEventListener('click', () => add(1));
+  })();
+
+  /* =========================================================
+     SECTION 4: exact vs approximate calculator + charge balance
+     ========================================================= */
+  (function () {
+    const W = 420, H = 230, cv = new Cv('cv4', W, H);
+    const sD = $('nd4'), sA = $('na4'), sT = $('t4');
+    let res, shown = null;
+    const dop = s => +s.value < 10 ? 0 : Math.pow(10, +s.value);
+    const dTxt = v => v ? fmtX(v, 1) + ' cm⁻³' : '0';
+    function calc() {
+      const ND = dop(sD), NA = dop(sA), T = +sT.value, ni = niOf(T), ex = solve(ND, NA, ni), net = ND - NA;
+      let ap;
+      if (net > 0) ap = { n: net, p: ni * ni / net }; else if (net < 0) ap = { p: -net, n: ni * ni / -net }; else ap = { n: ni, p: ni };
+      const err = Math.max(Math.abs(ap.n / ex.n - 1), Math.abs(ap.p / ex.p - 1)) * 100;
+      let type = ex.n / ex.p > 2 ? 'N-type' : ex.p / ex.n > 2 ? 'P-type' : 'intrinsic (n ≈ p)';
+      if (ND > 0 && NA > 0) type = 'compensated ' + type;
+      else if (!ND && !NA) type = 'intrinsic';
+      res = { ND, NA, T, ni, ex, ap, err, type };
+    }
+    function upd() {
+      calc(); const r = res;
+      $('nd4o').textContent = dTxt(r.ND); $('na4o').textContent = dTxt(r.NA); $('t4o').textContent = r.T + ' K';
+      $('c4a').textContent = fmtX(r.ni, 2); $('c4b').textContent = fmtX(r.ex.n, 3); $('c4c').textContent = fmtX(r.ex.p, 3);
+      $('c4d').textContent = fmtX(r.ap.n, 3); $('c4e').textContent = fmtX(r.ap.p, 3);
+      $('c4f').textContent = r.err < 0.01 ? '< 0.01 %' : r.err < 10 ? r.err.toFixed(2) + ' %' : r.err < 1e4 ? r.err.toFixed(0) + ' %' : fmtX(r.err, 1) + ' %';
+    }
+    const A = new Anim('anim4', {
+      reset() { sD.value = 16; sA.value = 9.9; sT.value = 300; upd(); shown = null; },
+      step(dt) {
+        const r = res, tot = r.ex.p + r.ND, tgt = [r.ex.p / tot, r.ND / tot, r.ex.n / tot, r.NA / tot];
+        if (!shown) shown = tgt.slice();
+        shown = shown.map((v, i) => v + (tgt[i] - v) * Math.min(1, dt * 6));
+      },
+      draw() {
+        const c = cv.begin(); if (!c) return;
+        const r = res, tot = r.ex.p + r.ND;
+        const f = (A && A.playing && shown) ? shown : [r.ex.p / tot, r.ND / tot, r.ex.n / tot, r.NA / tot];
+        const x0 = 70, x1 = 404, L = x1 - x0;
+        tag(c, r.type, W / 2, 20, r.type.indexOf('N-type') >= 0 ? C.e : r.type.indexOf('P-type') >= 0 ? C.h : C.text, 'center', 13);
+        const row = (y, segs, label) => {
+          txt(c, label, x0 - 8, y + 16, C.text, 12, 700, 'right');
+          let x = x0;
+          segs.forEach(([fr, col, lab]) => {
+            const w = fr * L; if (w <= 0) return;
+            c.fillStyle = col; c.globalAlpha = 0.8; c.fillRect(x, y, w, 32); c.globalAlpha = 1;
+            if (w > 26) txt(c, lab, x + w / 2, y + 16, '#0f1420', 11, 700, 'center');
+            x += w;
+          });
+          c.strokeStyle = C.line; c.lineWidth = 1.2; c.strokeRect(x0, y, L, 32);
+        };
+        row(52, [[f[0], C.h, 'p'], [f[1], C.d, 'ND']], '+');
+        row(112, [[f[2], C.e, 'n'], [f[3], C.a, 'NA']], '−');
+        txt(c, 'p + ND', x0, 98, C.muted, 9.5, 500); txt(c, 'n + NA', x0, 158, C.muted, 9.5, 500);
+        txt(c, '= ' + fmtX(r.ex.p + r.ND, 3) + ' cm⁻³', x1, 98, C.muted, 9.5, 500, 'right');
+        txt(c, '= ' + fmtX(r.ex.n + r.NA, 3) + ' cm⁻³', x1, 158, C.muted, 9.5, 500, 'right');
+        txt(c, 'equal: neutral', x0, 184, C.ok, 10, 600);
+        cv.wm(c);
+      }
+    });
+    [sD, sA, sT].forEach(s => s.addEventListener('input', () => { upd(); A.dirty = true; }));
+  })();
+
+  /* =========================================================
+     SECTION 5: worked examples
+     ========================================================= */
+  (function () {
+    const W = 420, H = 300, cv = new Cv('cv5', W, H), root = $('anim5');
+    const EX = { 1: [1e16, 0], 2: [0, 1e17], 3: [5e16, 2e16] };
+    const BX0 = 14, BX1 = 196, YC = 50, YV = 230, D0 = 0, D1 = 20, BY0 = 244, BY1 = 44;
+    let ex = '1', own = [1e15, 0], res, sh = null;
+    function parse(s) { const v = Number(String(s).trim().replace(/×10\^?/, 'e').replace(/x10\^?/i, 'e')); return isFinite(v) && v >= 0 ? v : NaN; }
+    function calc() {
+      const [ND, NA] = ex === 'own' ? own : EX[ex], r = solve(ND, NA, NI300);
+      res = { ND, NA, n: r.n, p: r.p, ef: KT300 * Math.log(r.n / NI300) };
+    }
+    function upd() {
+      calc(); const r = res;
+      root.querySelectorAll('[data-ex]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.ex === ex)));
+      $('own5').hidden = ex !== 'own';
+      $('c5a').textContent = r.n / r.p > 2 ? (r.ND && r.NA ? 'N (compensated)' : 'N-type') : r.p / r.n > 2 ? (r.ND && r.NA ? 'P (compensated)' : 'P-type') : 'intrinsic';
+      $('c5b').textContent = fmtX(r.n, 2); $('c5c').textContent = fmtX(r.p, 2);
+      $('c5d').textContent = (r.ef >= 0 ? '+' : '−') + Math.abs(r.ef).toFixed(3) + ' eV';
+    }
+    const A = new Anim('anim5', {
+      reset() { sh = null; upd(); },
+      step(dt) {
+        const tgt = [res.ef, lg(res.n), lg(res.p)];
+        if (!sh) sh = tgt.slice();
+        sh = sh.map((v, i) => v + (tgt[i] - v) * Math.min(1, dt * 5));
+      },
+      draw() {
+        const c = cv.begin(); if (!c) return;
+        const s = (A && A.playing && sh) ? sh : [res.ef, lg(res.n), lg(res.p)];
+        bands(c, BX0, BX1, YC, YV, s[0]);
+        decTicks(c, 262, BY0, BY1, D0, D1, 5);
+        logBar(c, 280, 46, BY0, BY1, D0, D1, s[1], C.e, 'n', fmtX(res.n, 1));
+        logBar(c, 350, 46, BY0, BY1, D0, D1, s[2], C.h, 'p', fmtX(res.p, 1));
+        const yni = BY0 - (10 - D0) / (D1 - D0) * (BY0 - BY1);
+        line(c, 270, yni, 404, yni, C.muted, 1.3, [4, 3]); sub(c, 'n', 'i', 404, yni - 9, C.muted, 10, 'right');
+        cv.wm(c);
+      }
+    });
+    root.querySelectorAll('[data-ex]').forEach(b => b.addEventListener('click', () => { ex = b.dataset.ex; upd(); A.dirty = true; }));
+    function readOwn() {
+      const a = parse($('nd5').value), b = parse($('na5').value);
+      if (isNaN(a) || isNaN(b) || a > 1e18 || b > 1e18) { $('msg5').textContent = 'Please enter numbers from 0 to 1e18, like 5e16.'; $('msg5').classList.add('bad'); return; }
+      $('msg5').textContent = 'Type numbers like 5e16 or 0 (up to 1e18).'; $('msg5').classList.remove('bad');
+      own = [a, b]; upd(); A.dirty = true;
+    }
+    $('nd5').addEventListener('input', readOwn); $('na5').addEventListener('input', readOwn);
+  })();
+
+  /* =========================================================
+     SECTION 6: n, p, ni versus temperature
+     ========================================================= */
+  (function () {
+    const W = 420, H = 320, cv = new Cv('cv6', W, H), root = $('anim6'), sl = $('t6');
+    const x0 = 50, x1 = 404, y0 = 250, y1 = 16, T0 = 250, T1 = 700, D0 = 0, D1 = 18;
+    const X = T => x0 + (T - T0) / (T1 - T0) * (x1 - x0), Tof = x => T0 + (x - x0) / (x1 - x0) * (T1 - T0);
+    const Y = v => y0 - (clamp(lg(v), D0 - 1, D1 + 1) - D0) / (D1 - D0) * (y0 - y1);
+    let nd = 15, T = 300, dir = 1, drag = false;
+    const ND = () => Math.pow(10, nd);
+    function bisect(f, a, b) { for (let k = 0; k < 60; k++) { const m = (a + b) / 2; (f(a) > 0) === (f(m) > 0) ? a = m : b = m; } return (a + b) / 2; }
+    function upd() {
+      const ni = niOf(T), r = solve(ND(), 0, ni);
+      $('t6o').textContent = Math.round(T) + ' K';
+      $('c6a').textContent = fmtX(r.n, 2); $('c6b').textContent = fmtX(r.p, 2); $('c6c').textContent = fmtX(ni, 2);
+      root.querySelectorAll('[data-nd]').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.nd === nd)));
+    }
+    const A = new Anim('anim6', {
+      reset() { T = 300; dir = 1; sl.value = 300; upd(); },
+      step(dt) {
+        if (drag) return;
+        T += dir * 40 * dt; if (T > T1) { T = T1; dir = -1; } if (T < T0) { T = T0; dir = 1; }
+        sl.value = Math.round(T); upd();
+      },
+      draw() {
+        const c = cv.begin(); if (!c) return;
+        for (let d = 0; d <= 18; d += 3) { line(c, x0, Y(Math.pow(10, d)), x1, Y(Math.pow(10, d)), C.grid, 1); txt(c, '10' + sup(d), x0 - 5, Y(Math.pow(10, d)), C.muted, 8.5, 500, 'right'); }
+        for (let t = 300; t <= 700; t += 100) { line(c, X(t), y1, X(t), y0, C.grid, 1); txt(c, String(t), X(t), y0 + 12, C.muted, 9, 500, 'center'); }
+        txt(c, '250', X(250), y0 + 12, C.muted, 9, 500, 'center');
+        c.strokeStyle = C.line; c.lineWidth = 1.2; c.strokeRect(x0, y1, x1 - x0, y0 - y1);
+        txt(c, 'T (K)', x0, y0 + 28, C.muted, 10, 500); txt(c, 'cm⁻³', x0 + 4, y1 + 9, C.muted, 9, 500);
+        c.save(); c.beginPath(); c.rect(x0, y1, x1 - x0, y0 - y1); c.clip();
+        const curve = (f, col, lw, dash) => { c.strokeStyle = col; c.lineWidth = lw; c.setLineDash(dash || []); c.beginPath(); for (let k = 0; k <= 200; k++) { const t = T0 + (T1 - T0) * k / 200, y = Y(f(t)); k ? c.lineTo(X(t), y) : c.moveTo(X(t), y); } c.stroke(); c.setLineDash([]); };
+        curve(t => niOf(t), C.muted, 1.6, [5, 4]);
+        curve(t => solve(ND(), 0, niOf(t)).n, C.e, 2.6);
+        curve(t => solve(ND(), 0, niOf(t)).p, C.h, 2.6);
+        // markers: p = 10 % of n, and ni = ND
+        const T10 = bisect(t => { const r = solve(ND(), 0, niOf(t)); return r.p / r.n - 0.1; }, T0, T1);
+        const Ti = bisect(t => niOf(t) - ND(), T0, T1);
+        [[T10, 'p = 0.1 n'], [Ti, 'nᵢ = N_D']].forEach(([t, lab], k) => {
+          if (t <= T0 + 1 || t >= T1 - 1) return;
+          line(c, X(t), y1, X(t), y0, k ? C.ok : C.en, 1.4, [3, 3]);
+          tag(c, lab.replace('N_D', 'ND'), X(t) + (k ? 4 : -4), y1 + 12 + k * 20, k ? C.ok : C.en, k ? 'left' : 'right', 9.5);
+        });
+        // temperature marker
+        line(c, X(T), y1, X(T), y0, '#fff', 1.8);
+        const r = solve(ND(), 0, niOf(T));
+        circ(c, X(T), Y(r.n), 5, C.e, '#0f1420', 1.5); circ(c, X(T), Y(r.p), 5, C.h, '#0f1420', 1.5); circ(c, X(T), Y(niOf(T)), 4, C.muted);
+        c.restore();
+        txt(c, 'n', x1 - 4, Y(solve(ND(), 0, niOf(T1)).n) + 12, C.e, 12, 700, 'right');
+        { const tp = 330, yp = Y(solve(ND(), 0, niOf(tp)).p); if (yp < y0 - 8 && yp > y1 + 10) txt(c, 'p', X(tp) + 6, yp + 10, C.h, 12, 700); }
+        { const tn = 280, yn = Y(niOf(tn)); if (yn < y0 - 8) sub(c, 'n', 'i', X(tn), yn - 10, C.muted, 11); }
+        circ(c, X(T), y0, 7, drag ? C.en : '#0f1420', '#fff', 1.6);
+        cv.wm(c);
+      }
+    });
+    root.querySelectorAll('[data-nd]').forEach(b => b.addEventListener('click', () => { nd = +b.dataset.nd; upd(); A.dirty = true; }));
+    sl.addEventListener('input', () => { T = +sl.value; upd(); A.dirty = true; });
+    const el = cv.el;
+    el.addEventListener('pointerdown', e => {
+      const p = cv.pt(e); if (p.x < x0 - 10 || p.x > x1 + 10) return;
+      drag = true; el.setPointerCapture(e.pointerId); T = clamp(Tof(p.x), T0, T1); sl.value = Math.round(T); upd(); A.dirty = true;
+      if (A.playing) A.setPlaying(false);
+    });
+    el.addEventListener('pointermove', e => { const p = cv.pt(e); if (!drag) { el.style.cursor = p.x >= x0 && p.x <= x1 ? 'ew-resize' : 'default'; return; } T = clamp(Tof(p.x), T0, T1); sl.value = Math.round(T); upd(); A.dirty = true; });
+    const end = () => { if (drag) { drag = false; A.dirty = true; } };
+    el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end);
+    sl.addEventListener('pointerdown', () => { if (A.playing) A.setPlaying(false); });
+  })();
+
+  /* ---------- sticky mini-nav highlight ---------- */
+  (function () {
+    const links = Array.from(document.querySelectorAll('.toc a'));
+    const secs = links.map(l => document.querySelector(l.getAttribute('href')));
+    function upd() {
+      let cur = 0;
+      secs.forEach((s, i) => { if (s.getBoundingClientRect().top < 120) cur = i; });
+      links.forEach((l, i) => l.classList.toggle('active', i === cur));
+    }
+    window.addEventListener('scroll', upd, { passive: true }); upd();
+  })();
+
+  let last = performance.now();
+  function frame(ts) {
+    const dt = Math.min(0.05, Math.max(0, (ts - last) / 1000)); last = ts;
+    anims.forEach(a => {
+      if (!a.visible) return;
+      if (a.playing) { a.o.step(dt); a.o.draw(); }
+      else if (a.dirty) a.o.draw();
+      a.dirty = false;
+    });
+    requestAnimationFrame(frame);
+  }
+  function onResize() { anims.forEach(a => { a.dirty = true; }); }
+  window.addEventListener('resize', onResize);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(onResize);
+  requestAnimationFrame(frame);
+})();
+</script>
+<script>
+  // Typeset [data-tex] elements as maths once KaTeX has loaded; pages call mathify(el) after changing text.
+  window.mathify = function (root) {
+    if (!window.katex) return;
+    (root || document).querySelectorAll('[data-tex]').forEach(function (el) {
+      var block = (el.classList.contains('eq') || el.classList.contains('f')) && el.tagName !== 'TD';
+      try { katex.render(el.getAttribute('data-tex'), el, { displayMode: block, throwOnError: false }); } catch (e) {}
+    });
+  };
+  document.addEventListener('DOMContentLoaded', function () { window.mathify(); });
+</script>
+</body>
+</html>
