@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>5.5 Common Emitter Configuration</title>
+  <meta name="description" content="The common emitter configuration of a BJT explained step by step: the CE circuit, input and output characteristics with the saturation, active and cutoff regions, measuring β, and the properties and uses of CE stages. An interactive lesson.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1420;
+      --panel: #1a2132;
+      --panel-hover: #212a3f;
+      --border: #2a3448;
+      --text: #e6e9ef;
+      --muted: #9aa4b8;
+      --electron: #4fc3f7;
+      --hole: #ff8a65;
+      --energy: #ffd54f;
+      --success: #81c784;
+      --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+      --max: 960px;
+      --radius: 12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: var(--font); font-size: 16px; line-height: 1.65;
+      overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column;
+    }
+    a { color: var(--electron); }
+    .wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 16px; }
+
+    /* Sticky mini-nav */
+    .toc {
+      position: sticky; top: 0; z-index: 10; background: rgba(15, 20, 32, .95);
+      border-bottom: 1px solid var(--border); backdrop-filter: blur(6px);
+    }
+    .toc ul { display: flex; gap: 4px; list-style: none; margin: 0 auto; padding: 8px 16px; max-width: var(--max); overflow-x: auto; scrollbar-width: none; }
+    .toc ul::-webkit-scrollbar { display: none; }
+    .toc a {
+      display: block; white-space: nowrap; text-decoration: none; color: var(--muted);
+      font-size: 0.85rem; font-weight: 500; padding: 6px 10px; border-radius: 999px;
+    }
+    .toc a:hover { color: var(--text); background: var(--panel); }
+    .toc a.active { color: var(--bg); background: var(--electron); }
+
+    main { flex: 1; padding: 24px 0 48px; }
+    .crumbs { font-size: 0.875rem; color: var(--muted); margin: 0 0 16px; }
+    .crumbs a { color: var(--muted); }
+    .crumbs a:hover { color: var(--electron); }
+    .eyebrow { font-family: var(--mono); font-size: 0.8rem; color: var(--electron); letter-spacing: .04em; margin: 0; }
+    h1 { font-size: clamp(1.5rem, 6vw, 2.2rem); line-height: 1.2; margin: 4px 0 6px; }
+    .subtitle { color: var(--muted); margin: 0 0 8px; }
+    section { scroll-margin-top: 64px; padding-top: 28px; }
+    h2 { font-size: clamp(1.3rem, 5vw, 1.6rem); line-height: 1.25; margin: 0 0 14px; }
+    h3 { font-size: 1.05rem; margin: 0 0 8px; }
+    .prose { font-size: 17px; line-height: 1.7; }
+    .prose p, .prose ul, .prose ol { margin: 0 0 14px; }
+    .prose ul, .prose ol { padding-left: 22px; }
+    .prose li { margin: 4px 0; }
+    .prose strong { color: #fff; }
+    hr.sep { border: 0; border-top: 1px solid var(--border); margin: 40px 0 0; }
+    .rm-note { font-size: 0.78rem; color: var(--muted); margin: 0 0 8px; }
+
+    /* Buttons & controls */
+    .btn {
+      font: inherit; font-size: 0.88rem; font-weight: 600; color: var(--text);
+      background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+      padding: 7px 12px; cursor: pointer; min-height: 38px;
+    }
+    .btn:hover:not(:disabled) { background: var(--panel-hover); border-color: var(--electron); }
+    .btn:focus-visible, input:focus-visible, canvas:focus-visible { outline: 2px solid var(--electron); outline-offset: 2px; }
+    .btn[aria-pressed="true"] { background: rgba(255,213,79,.14); border-color: var(--energy); color: var(--energy); }
+    .seg { display: inline-flex; gap: 0; }
+    .seg .btn { border-radius: 0; }
+    .seg .btn:first-child { border-radius: 8px 0 0 8px; }
+    .seg .btn:last-child { border-radius: 0 8px 8px 0; }
+    .seg .btn + .btn { margin-left: -1px; }
+    .glabel { font-size: 0.8rem; font-weight: 700; color: var(--muted); }
+
+    figure.anim {
+      margin: 18px 0 0; background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 12px; min-width: 0;
+    }
+    .ctrls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-bottom: 12px; }
+    .slider { flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; }
+    .slider label { display: flex; justify-content: space-between; gap: 8px; font-size: 0.8rem; color: var(--muted); }
+    .slider output { font-family: var(--mono); color: var(--energy); white-space: nowrap; }
+    input[type="range"] { width: 100%; accent-color: var(--energy); margin: 4px 0 0; }
+    canvas { display: block; width: 100%; border-radius: 8px; background: #141b2b; }
+    canvas.drag { touch-action: none; cursor: grab; }
+    canvas[hidden] { display: none; }
+    .narrow { max-width: 760px; margin: 0 auto; }
+    .inset { margin-top: 10px; }
+
+    .counters { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px auto 0; }
+    .ctr {
+      flex: 1 1 90px; background: #141b2b; border: 1px solid var(--border); border-radius: 8px;
+      padding: 6px 10px; font-size: 0.78rem; color: var(--muted); min-width: 0;
+    }
+    .ctr b { display: block; font-family: var(--mono); font-size: 1.02rem; font-weight: 500; white-space: nowrap; color: var(--text); overflow: hidden; text-overflow: ellipsis; }
+    .ctr.ok b { color: var(--success); } .ctr.v b { color: var(--energy); }
+
+    /* Junction and region badges */
+    .badges { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 10px auto 0; }
+    .bdg { font-size: 0.82rem; font-weight: 700; border-radius: 999px; padding: 4px 12px; border: 1.5px solid; white-space: nowrap; }
+    .bdg.fwd { color: #81c784; border-color: #81c784; background: rgba(129,199,132,.1); }
+    .bdg.rev { color: #ce93d8; border-color: #ce93d8; background: rgba(206,147,216,.1); }
+    .bdg.off { color: #b0bec5; border-color: #78909c; background: rgba(120,144,156,.12); }
+    .bdg.r-active { color: #66bb6a; border-color: #66bb6a; background: rgba(27,94,32,.35); }
+    .bdg.r-saturation { color: #ef5350; border-color: #ef5350; background: rgba(183,28,28,.3); }
+    .bdg.r-cutoff { color: #bdbdbd; border-color: #9e9e9e; background: rgba(66,66,66,.5); }
+
+    /* Section 5: comparison table + thumbnails */
+    .sumgrid { display: grid; grid-template-columns: 1fr; gap: 12px; align-items: start; }
+    @media (min-width: 720px) { .sumgrid { grid-template-columns: 3fr 2fr; } }
+    .thumbs { display: grid; grid-template-columns: 1fr; gap: 10px; min-width: 0; }
+    @media (min-width: 480px) and (max-width: 719px) { .thumbs { grid-template-columns: 1fr 1fr; } }
+    .ptitle { margin: 0 0 6px; font-size: 0.85rem; font-weight: 700; color: var(--muted); text-align: center; }
+    .vt { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 0.92rem; background: #141b2b; border: 1px solid var(--border); border-radius: 8px; }
+    .vt th, .vt td { text-align: left; padding: 9px 10px; border-top: 1px solid var(--border); vertical-align: top; overflow-wrap: anywhere; }
+    .vt thead th { border-top: 0; color: var(--text); font-weight: 700; }
+    .vt thead th.cb { color: #4dd0e1; } .vt thead th.ce { color: #ffb74d; }
+    .vt tbody th { font-weight: 600; color: var(--muted); width: 32%; }
+    .vt td.hl { color: #fff; }
+    @media (max-width: 480px) { .vt { font-size: .82rem; } .vt th, .vt td { padding: 7px 5px; } }
+
+    .keypoints {
+      margin-top: 16px; padding: 14px 16px; border-radius: var(--radius);
+      background: rgba(129,199,132,.07); border: 1px solid rgba(129,199,132,.35);
+    }
+    .keypoints h3 { color: var(--success); font-size: 0.95rem; text-transform: uppercase; letter-spacing: .05em; }
+    .keypoints ul { margin: 0; padding-left: 20px; }
+    .keypoints li { margin: 4px 0; }
+
+    .pager { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 48px; }
+    .pager a {
+      display: block; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 12px 14px; text-decoration: none; color: var(--text); min-width: 0;
+    }
+    .pager a:hover { border-color: var(--electron); }
+    .pager small { display: block; color: var(--muted); font-size: 0.75rem; }
+    .pager .next { text-align: right; }
+    .site-foot { border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; text-align: center; padding: 18px 16px; }
+
+    /* Justified paragraphs on desktop; phones stay left-aligned to avoid wide word gaps. */
+    @media (min-width: 768px) {
+      .prose p, .prose li, .keypoints li { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="toc" aria-label="Sections">
+    <ul>
+      <li><a href="#s0">CE circuit</a></li>
+      <li><a href="#s1">Input characteristics</a></li>
+      <li><a href="#s2">Output characteristics</a></li>
+      <li><a href="#s3">Measuring β</a></li>
+      <li><a href="#s4">Properties &amp; uses</a></li>
+      <li><a href="#s5">Summary</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="wrap">
+      <header>
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="../../index.html">Home</a> / <a href="../index.html">Unit 5</a> / 5.5
+        </nav>
+        <p class="eyebrow">TOPIC 5.5</p>
+        <h1>Common Emitter Configuration and Characteristics</h1>
+        <p class="subtitle">The emitter is shared, the base is the input and the collector is the output</p>
+        <p class="rm-note" id="rmNote" hidden>Your device asks for reduced motion, so every animation starts paused. Press Play on any animation to run it. Sliders, buttons and dragging still update the picture.</p>
+      </header>
+
+      <!-- ================= SECTION 0 ================= -->
+      <section id="s0" aria-labelledby="h0">
+        <h2 id="h0">The common emitter circuit</h2>
+        <div class="prose">
+          <p>In the <strong>common emitter (CE)</strong> configuration, the <strong>emitter is shared</strong> by the input and the output and is usually connected to ground. The <strong>input</strong> signal is applied between the base and the emitter, and the <strong>output</strong> is taken between the collector and the emitter.</p>
+          <p>For an NPN transistor in active mode, a supply <strong>V<sub>BB</sub></strong> with a base resistor <strong>R<sub>B</sub></strong> drives a small base current I<sub>B</sub> into the base, <strong>forward biasing the base-emitter junction</strong> (V<sub>BE</sub> ≈ 0.7 V). A supply <strong>V<sub>CC</sub></strong> with a collector resistor <strong>R<sub>C</sub></strong> makes the collector positive, keeping the <strong>collector-base junction reverse biased</strong>.</p>
+          <p>The input current is <strong>I<sub>B</sub></strong> and the output current is <strong>I<sub>C</sub></strong>. Since <strong>I<sub>C</sub> = β·I<sub>B</sub></strong>, the CE configuration has a <strong>LARGE current gain</strong>. It also gives a large <strong>voltage gain</strong>, so its <strong>power gain is the highest</strong> of the three configurations. This is why common emitter is the most widely used configuration for amplifiers.</p>
+          <p>One special feature: the output voltage is <strong>180° out of phase</strong> with the input. When the input rises, I<sub>C</sub> rises, the drop across R<sub>C</sub> increases, and the collector voltage falls.</p>
+        </div>
+
+        <figure class="anim" id="anim0">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <button class="btn" type="button" id="phase0" aria-pressed="false">Show phase</button>
+            <div class="slider">
+              <label for="vbb0"><span>V<sub>BB</sub></span><output id="vbb0o" for="vbb0">2.0 V</output></label>
+              <input type="range" id="vbb0" min="0" max="5" step="0.05" value="2">
+            </div>
+            <div class="slider">
+              <label for="vcc0"><span>V<sub>CC</sub></span><output id="vcc0o" for="vcc0">10.0 V</output></label>
+              <input type="range" id="vcc0" min="0" max="15" step="0.25" value="10">
+            </div>
+          </div>
+          <canvas id="cv0" class="narrow" style="aspect-ratio:600/348" role="img" aria-label="Common emitter NPN circuit: VBB and a 47 kilohm RB drive the base through an ammeter for IB; VCC and a 1 kilohm RC feed the collector through an ammeter for IC; voltmeters read VBE and VCE; the emitter goes to the grounded common rail. Green dots show current, moving at a speed set by the current, and the IC arrow is much thicker than the IB arrow."></canvas>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr v">V<sub>BE</sub><b id="c0vbe">0.68 V</b></div>
+            <div class="ctr v">V<sub>CE</sub><b id="c0vce">7.0 V</b></div>
+            <div class="ctr ok">I<sub>B</sub><b id="c0ib">28 µA</b></div>
+            <div class="ctr ok">I<sub>C</sub><b id="c0ic">2.98 mA</b></div>
+            <div class="ctr">I<sub>C</sub>/I<sub>B</sub><b id="c0b">106</b></div>
+            <div class="ctr">Region<b id="c0reg">active</b></div>
+          </div>
+          <canvas id="cv0s" class="narrow inset" style="aspect-ratio:600/210" hidden role="img" aria-label="Two-channel scope: the input VBB carries a small sine wave and the output VCE moves the opposite way, 180 degrees out of phase."></canvas>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: the CE circuit">
+          <h3>Key points</h3>
+          <ul>
+            <li>Emitter common (grounded); input between base and emitter, output between collector and emitter.</li>
+            <li>V<sub>BB</sub> and R<sub>B</sub> forward bias the base-emitter junction; V<sub>CC</sub> and R<sub>C</sub> reverse bias the collector-base junction.</li>
+            <li>I<sub>C</sub> = β·I<sub>B</sub>: large current gain, large voltage gain, highest power gain.</li>
+            <li>The output is 180° out of phase with the input.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 1 ================= -->
+      <section id="s1" aria-labelledby="h1s">
+        <h2 id="h1s">Input characteristics</h2>
+        <div class="prose">
+          <p>The <strong>INPUT CHARACTERISTIC</strong> of the CE configuration is a graph of base current <strong>I<sub>B</sub></strong> against base-emitter voltage <strong>V<sub>BE</sub></strong>, measured at a constant collector-emitter voltage V<sub>CE</sub>.</p>
+          <p>Like the CB input curve, it has the shape of a <strong>forward-biased diode characteristic</strong>: very little current below the <strong>cut-in voltage</strong> of about 0.5 V, then a steep rise around 0.6 to 0.7 V for silicon. The current is in <strong>microamperes</strong> rather than milliamperes, because only the small base current is plotted.</p>
+          <p>When V<sub>CE</sub> is raised from 0 to about 1 V, the curve <strong>shifts to the RIGHT</strong>: a slightly larger V<sub>BE</sub> is needed for the same I<sub>B</sub>. The reason is that a larger V<sub>CE</sub> widens the collector depletion region, which narrows the effective base width. A narrower base means less recombination, so less base current is needed. Above about 1 V, further increases in V<sub>CE</sub> have little extra effect, so the curves for higher V<sub>CE</sub> almost overlap.</p>
+          <p>The <strong>INPUT RESISTANCE r<sub>i</sub> = ΔV<sub>BE</sub> / ΔI<sub>B</sub></strong> at constant V<sub>CE</sub>. Because I<sub>B</sub> is much smaller than I<sub>E</sub>, the CE input resistance is much higher than in CB, typically <strong>around a kilohm</strong>.</p>
+        </div>
+
+        <figure class="anim" id="anim1">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <span class="glabel">Point on V<sub>CE</sub> =</span>
+            <div class="seg" role="group" aria-label="Curve for the draggable point">
+              <button class="btn" type="button" data-vce="0" aria-pressed="false">0 V</button>
+              <button class="btn" type="button" data-vce="1" aria-pressed="true">1 V</button>
+              <button class="btn" type="button" data-vce="2" aria-pressed="false">10 V</button>
+            </div>
+          </div>
+          <canvas id="cv1" class="narrow drag" tabindex="0" style="aspect-ratio:640/456" role="img" aria-label="Graph of IB from 0 to 100 microamps against VBE from 0 to 0.9 volts for VCE of 0, 1 and 10 volts. The curves stay near zero below about 0.5 volts and then rise steeply; the VCE = 0 curve sits to the left, and the 1 volt and 10 volt curves lie on top of each other. A draggable point shows the tangent and the input resistance. Use the up and down arrow keys to move the point."></canvas>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr v">V<sub>BE</sub><b id="c1vbe">0.700 V</b></div>
+            <div class="ctr ok">I<sub>B</sub><b id="c1ib">20 µA</b></div>
+            <div class="ctr">r<sub>i</sub> = ΔV<sub>BE</sub>/ΔI<sub>B</sub><b id="c1ri">1.3 kΩ</b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: input characteristics">
+          <h3>Key points</h3>
+          <ul>
+            <li>Input characteristic: I<sub>B</sub> against V<sub>BE</sub>, with V<sub>CE</sub> held constant.</li>
+            <li>Diode-like: cut-in about 0.5 V, steep rise at 0.6 to 0.7 V; current in µA.</li>
+            <li>Raising V<sub>CE</sub> from 0 to about 1 V shifts the curve right; beyond 1 V the curves almost overlap.</li>
+            <li>r<sub>i</sub> = ΔV<sub>BE</sub>/ΔI<sub>B</sub>, around a kilohm, much higher than in CB.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 2 ================= -->
+      <section id="s2" aria-labelledby="h2s">
+        <h2 id="h2s">Output characteristics</h2>
+        <div class="prose">
+          <p>The <strong>OUTPUT CHARACTERISTIC</strong> of the CE configuration is a graph of collector current <strong>I<sub>C</sub></strong> against collector-emitter voltage <strong>V<sub>CE</sub></strong>, drawn for several constant values of base current I<sub>B</sub> (for example 0, 20, 40, 60, 80 and 100 µA). It has three regions:</p>
+          <p><strong>SATURATION REGION:</strong> at very low V<sub>CE</sub>, below about 0.2 to 0.3 V. Here <strong>both junctions are forward biased</strong>. I<sub>C</sub> rises steeply with V<sub>CE</sub> and is <strong>LESS than β·I<sub>B</sub></strong>, because the collector cannot collect all the carriers the base current could support. The voltage across a saturated transistor is <strong>V<sub>CE(sat)</sub> ≈ 0.2 V</strong>.</p>
+          <p><strong>ACTIVE REGION:</strong> V<sub>CE</sub> above saturation. Here <strong>I<sub>C</sub> ≈ β·I<sub>B</sub></strong>, and each curve is nearly flat, rising slowly with V<sub>CE</sub> because of the <strong>Early effect</strong> (topic 5.10). The curves are spaced roughly equally for equal steps of I<sub>B</sub>. This is the region used for <strong>amplification</strong>.</p>
+          <p><strong>CUTOFF REGION:</strong> when I<sub>B</sub> = 0, only the small leakage current <strong>I<sub>CEO</sub> = (1 + β)·I<sub>CBO</sub></strong> flows. The region below the I<sub>B</sub> = 0 curve is cutoff. The transistor acts as an <strong>open switch</strong>.</p>
+          <p>At high V<sub>CE</sub> the collector junction breaks down. In CE the breakdown voltage <strong>BV<sub>CEO</sub></strong> is lower than the CB value BV<sub>CBO</sub> (topic 5.11).</p>
+          <p>The <strong>OUTPUT RESISTANCE r<sub>o</sub> = ΔV<sub>CE</sub> / ΔI<sub>C</sub></strong> (at constant I<sub>B</sub>) is the inverse slope of a curve in the active region. It is <strong>lower than in CB</strong>, because the CE output curves slope more.</p>
+        </div>
+
+        <figure class="anim" id="anim2">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <canvas id="cv2" class="narrow drag" tabindex="0" style="aspect-ratio:640/456" role="img" aria-label="Graph of IC from 0 to 12 milliamps against VCE from 0 to 15 volts for IB of 0 to 100 microamps in steps of 20. A thin saturation region near VCE = 0 is shaded red, the active region green and the cutoff strip grey. Drag the operating point, or use the arrow keys: left and right change VCE, up and down change IB."></canvas>
+          <div class="badges narrow" aria-live="polite">
+            <span class="bdg fwd" id="b2ebj">EBJ forward</span>
+            <span class="bdg rev" id="b2cbj">CBJ reverse</span>
+            <span class="bdg r-active" id="b2reg">active</span>
+          </div>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr ok">I<sub>B</sub><b id="c2ib">60 µA</b></div>
+            <div class="ctr ok">I<sub>C</sub><b id="c2ic">6.4 mA</b></div>
+            <div class="ctr v">V<sub>CE</sub><b id="c2vce">8.0 V</b></div>
+            <div class="ctr v">V<sub>BE</sub><b id="c2vbe">0.70 V</b></div>
+            <div class="ctr">I<sub>C</sub>/I<sub>B</sub><b id="c2b">107</b></div>
+            <div class="ctr">r<sub>o</sub><b id="c2ro">17 kΩ</b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: output characteristics">
+          <h3>Key points</h3>
+          <ul>
+            <li>Output characteristic: I<sub>C</sub> against V<sub>CE</sub>, for constant values of I<sub>B</sub>.</li>
+            <li>Saturation: V<sub>CE</sub> below about 0.2 to 0.3 V, both junctions forward, I<sub>C</sub> &lt; β·I<sub>B</sub>.</li>
+            <li>Active: I<sub>C</sub> ≈ β·I<sub>B</sub>, curves nearly flat with an Early-effect slope; used for amplification.</li>
+            <li>Cutoff: I<sub>B</sub> = 0, only I<sub>CEO</sub> = (1 + β)·I<sub>CBO</sub> flows; r<sub>o</sub> is lower than in CB.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 3 ================= -->
+      <section id="s3" aria-labelledby="h3s">
+        <h2 id="h3s">Measuring β from the characteristics</h2>
+        <div class="prose">
+          <p>The output characteristics let us measure the current gain:</p>
+          <ul>
+            <li><strong>DC current gain:</strong> β<sub>dc</sub> = h<sub>FE</sub> = I<sub>C</sub> / I<sub>B</sub> at a chosen operating point.</li>
+            <li><strong>AC (small-signal) current gain:</strong> β<sub>ac</sub> = h<sub>fe</sub> = ΔI<sub>C</sub> / ΔI<sub>B</sub>, measured between two neighbouring curves at the same V<sub>CE</sub>.</li>
+          </ul>
+          <p>In practice <strong>β is not a fixed number</strong>. It changes with <strong>collector current</strong> (it is lower at very small and very large currents), with <strong>temperature</strong> (it increases as temperature rises), and from <strong>one transistor to another</strong> of the same type. Datasheets therefore give a minimum and maximum value. Good circuit design does not depend on an exact β (Unit 6).</p>
+        </div>
+
+        <figure class="anim" id="anim3">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <canvas id="cv3" class="narrow drag" tabindex="0" style="aspect-ratio:640/456" role="img" aria-label="Output characteristics with a draggable vertical line at a chosen VCE. Tap two IB curves to mark delta IB and delta IC and read beta ac and beta dc. Keyboard: left and right move the line, up and down move the pair of curves."></canvas>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr v">V<sub>CE</sub><b id="c3vce">8.0 V</b></div>
+            <div class="ctr ok">ΔI<sub>B</sub><b id="c3dib">20 µA</b></div>
+            <div class="ctr ok">ΔI<sub>C</sub><b id="c3dic">2.1 mA</b></div>
+            <div class="ctr">β<sub>ac</sub> = ΔI<sub>C</sub>/ΔI<sub>B</sub><b id="c3bac">107</b></div>
+            <div class="ctr">β<sub>dc</sub> (upper)<b id="c3bdc">107</b></div>
+          </div>
+          <canvas id="cv3i" class="narrow inset" style="aspect-ratio:640/230" role="img" aria-label="Inset of beta against collector current on a log scale, typical shape: beta rises at low current, is flat in the middle and falls at high current; a second curve for a higher temperature lies above it."></canvas>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: measuring beta">
+          <h3>Key points</h3>
+          <ul>
+            <li>β<sub>dc</sub> = h<sub>FE</sub> = I<sub>C</sub>/I<sub>B</sub> at one operating point.</li>
+            <li>β<sub>ac</sub> = h<sub>fe</sub> = ΔI<sub>C</sub>/ΔI<sub>B</sub> between neighbouring curves at the same V<sub>CE</sub>.</li>
+            <li>β falls at very low and very high I<sub>C</sub>, rises with temperature and varies between devices.</li>
+            <li>Datasheets give a minimum and maximum β; good designs do not rely on an exact value.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 4 ================= -->
+      <section id="s4" aria-labelledby="h4s">
+        <h2 id="h4s">Properties and uses of the CE configuration</h2>
+        <div class="prose">
+          <p>Common emitter properties:</p>
+          <ul>
+            <li><strong>Current gain:</strong> β, large (typically 50-400).</li>
+            <li><strong>Voltage gain:</strong> high.</li>
+            <li><strong>Power gain:</strong> the highest of the three configurations.</li>
+            <li><strong>Input resistance:</strong> medium (around a kilohm).</li>
+            <li><strong>Output resistance:</strong> medium to high (tens of kilohms).</li>
+            <li><strong>Phase:</strong> output inverted by 180°.</li>
+          </ul>
+          <p><strong>Uses:</strong> general-purpose <strong>voltage amplifiers</strong> in audio and signal circuits, and <strong>electronic switches</strong> (driving LEDs, relays and logic).</p>
+        </div>
+
+        <figure class="anim" id="anim4">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="slider">
+              <label for="amp4"><span>Input amplitude v<sub>in</sub> (peak)</span><output id="amp4o" for="amp4">40 mV</output></label>
+              <input type="range" id="amp4" min="0" max="300" step="5" value="40">
+            </div>
+          </div>
+          <canvas id="cv4" class="narrow" style="aspect-ratio:640/510" role="img" aria-label="A common emitter amplifier: a small sine vin in series with VBB drives the base through RB, the collector feeds RC from VCC, and vout is taken at the collector. A two-channel scope shows vin small and vout large and inverted. Large inputs make vout clip flat at the top (cutoff) and the bottom (saturation)."></canvas>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr v">v<sub>in</sub> peak<b id="c4vin">40 mV</b></div>
+            <div class="ctr v">v<sub>out</sub> +peak<b id="c4vp">1.6 V</b></div>
+            <div class="ctr v">v<sub>out</sub> −peak<b id="c4vn">−1.6 V</b></div>
+            <div class="ctr">gain v<sub>out</sub>/v<sub>in</sub><b id="c4av">−39</b></div>
+            <div class="ctr">Clipping<b id="c4clip">none</b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: properties and uses">
+          <h3>Key points</h3>
+          <ul>
+            <li>Large current gain β (typically 50-400), high voltage gain, highest power gain.</li>
+            <li>Medium input resistance (about 1 kΩ), medium to high output resistance (tens of kΩ).</li>
+            <li>Output inverted by 180°; too large an input clips at cutoff (top) and saturation (bottom).</li>
+            <li>Uses: voltage amplifiers in audio and signal circuits, and switches for LEDs, relays and logic.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 5 ================= -->
+      <section id="s5" aria-labelledby="h5s">
+        <h2 id="h5s">Summary</h2>
+        <div class="prose">
+          <p>In common emitter, the input is at the <strong>base</strong> and the output at the <strong>collector</strong>, with the emitter common. The input characteristic is a <strong>diode-like curve in microamperes</strong>; the output characteristics show <strong>saturation</strong>, <strong>active</strong> (I<sub>C</sub> ≈ β·I<sub>B</sub>) and <strong>cutoff</strong> regions. CE gives large current, voltage and power gain with a <strong>180° phase inversion</strong>, which makes it the most widely used configuration.</p>
+        </div>
+
+        <figure class="anim" id="anim5">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="sumgrid">
+            <table class="vt">
+              <thead>
+                <tr><th scope="col"></th><th scope="col" class="cb">CB</th><th scope="col" class="ce">CE</th></tr>
+              </thead>
+              <tbody>
+                <tr><th scope="row">Input current</th><td>I<sub>E</sub></td><td class="hl">I<sub>B</sub></td></tr>
+                <tr><th scope="row">Output current</th><td>I<sub>C</sub></td><td class="hl">I<sub>C</sub></td></tr>
+                <tr><th scope="row">Current gain</th><td>α, just below 1</td><td class="hl">β, large (50-400)</td></tr>
+                <tr><th scope="row">Voltage gain</th><td>High</td><td class="hl">High</td></tr>
+                <tr><th scope="row">Input resistance</th><td>Very low (tens of Ω)</td><td class="hl">Medium (about 1 kΩ)</td></tr>
+                <tr><th scope="row">Output resistance</th><td>Very high (hundreds of kΩ to MΩ)</td><td class="hl">Medium to high (tens of kΩ)</td></tr>
+                <tr><th scope="row">Phase</th><td>In phase</td><td class="hl">Inverted, 180°</td></tr>
+              </tbody>
+            </table>
+            <div class="thumbs">
+              <div>
+                <p class="ptitle">CB output characteristics</p>
+                <canvas id="cv5a" style="aspect-ratio:320/210" role="img" aria-label="Thumbnail of the CB output characteristics: very flat IC curves against VCB for IE of 1 to 5 milliamps, with a dot moving along one curve."></canvas>
+              </div>
+              <div>
+                <p class="ptitle">CE output characteristics</p>
+                <canvas id="cv5b" style="aspect-ratio:320/210" role="img" aria-label="Thumbnail of the CE output characteristics: IC curves against VCE for IB of 20 to 100 microamps, sloping more than the CB curves, with a dot moving along one curve."></canvas>
+              </div>
+            </div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: summary">
+          <h3>Key points</h3>
+          <ul>
+            <li>CE: input at the base, output at the collector, emitter common.</li>
+            <li>Input curve is diode-like in µA; output curves show saturation, active (I<sub>C</sub> ≈ β·I<sub>B</sub>) and cutoff.</li>
+            <li>Large current, voltage and power gain with a 180° phase inversion: the most widely used configuration.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <nav class="pager" aria-label="Topic navigation">
+        <a href="../5-4-common-base/index.html"><small>← Previous</small>5.4 Common Base Configuration</a>
+        <a class="next" href="../5-6-common-collector/index.html"><small>Next →</small>5.6 Common Collector Configuration</a>
+      </nav>
+    </div>
+  </main>
+
+  <footer class="site-foot">© 2026 Naveen Bokka</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  const C = {
+    text: '#e6e9ef', muted: '#9aa4b8', e: '#4fc3f7', h: '#ff8a65', v: '#ffd54f', cur: '#81c784', wire: '#cfd8dc',
+    grid: 'rgba(255,255,255,.07)', IN: '#4dd0e1',
+    act: 'rgba(27,94,32,.25)', sat: 'rgba(183,28,28,.25)', cut: 'rgba(66,66,66,.4)',
+    tAct: '#66bb6a', tSat: '#ef5350', tCut: '#d0d0d0'
+  };
+  const FONT = 'Inter, system-ui, sans-serif';
+  const MONO = '"JetBrains Mono", Consolas, monospace';
+  const RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const TAU = Math.PI * 2;
+  const $ = id => document.getElementById(id);
+  if (RM) $('rmNote').hidden = false;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+  /* =========================================================
+     Device model: NPN silicon, 300 K. Ebers-Moll transport model
+     (IS = 1e-14 A, βF = 100, βR = 1, VT = 25.9 mV) with the Early
+     effect (VA = 100 V) applied to the forward collector current.
+     ========================================================= */
+  const IS = 1e-14, BF = 100, BR = 1, VT = 0.0259, VA = 100;
+  const CUTIN = 0.5;   // junction counted as "forward" (conducting) above the cut-in voltage
+  const xp = v => Math.exp(Math.min(v / VT, 90)) - 1;
+  // Terminal currents (A) from VBE and VCB (VBC = −VCB).
+  function em(vbe, vcb) {
+    const icc = IS * xp(vbe), iec = IS * xp(-vcb), ea = 1 + vcb / VA;
+    const ic = icc * ea - iec * (1 + 1 / BR), ib = icc / BF + iec / BR;
+    return { ic: ic, ib: ib, ie: ic + ib, icc: icc, iec: iec, ea: ea };
+  }
+  // Common emitter view: VBE and VCE in.
+  const emCE = (vbe, vce) => em(vbe, vce - vbe);
+  // VBE that gives base current ib (A) at a given VCE (IB rises monotonically with VBE).
+  function vbeForIB(ib, vce) {
+    let a = -0.3, b = 1.2;
+    for (let k = 0; k < 56; k++) { const m = (a + b) / 2; if (emCE(m, vce).ib < ib) a = m; else b = m; }
+    return (a + b) / 2;
+  }
+  // Operating point for a forced IB (A) and VCE (V)
+  function ceIB(ib, vce) {
+    const vbe = vbeForIB(ib, vce), r = emCE(vbe, vce);
+    r.vbe = vbe; r.vce = vce; r.vbc = vbe - vce; return r;
+  }
+  // Region and junction states from the model
+  function states(r, ibZero) {
+    const ebj = r.vbe >= CUTIN ? 'fwd' : 'off';
+    const cbj = r.vbc >= CUTIN ? 'fwd' : r.vbc < 0 ? 'rev' : 'off';
+    const reg = ibZero ? 'cutoff' : cbj === 'fwd' ? 'saturation' : ebj === 'off' ? 'cutoff' : 'active';
+    return { ebj: ebj, cbj: cbj, reg: reg };
+  }
+  // CE circuit: VBB–RB into the base, VCC–RC into the collector, emitter grounded.
+  function solveCE(VBB, RB, VCC, RC) {
+    function vceFor(vbe) {
+      let a = -0.3, b = VCC + 1;
+      for (let k = 0; k < 48; k++) { const m = (a + b) / 2; if (VCC - m - emCE(vbe, m).ic * RC > 0) a = m; else b = m; }
+      return (a + b) / 2;
+    }
+    let a = -0.3, b = 1.0;
+    for (let k = 0; k < 48; k++) { const m = (a + b) / 2, y = vceFor(m); if (VBB - m - emCE(m, y).ib * RB > 0) a = m; else b = m; }
+    const vbe = (a + b) / 2, vce = vceFor(vbe), r = emCE(vbe, vce);
+    r.vbe = vbe; r.vce = vce; r.vbc = vbe - vce; return r;
+  }
+  // Common base view (for the summary thumbnail): IE forced, closed form.
+  function emIE(ie, vcb) {
+    const iec = IS * xp(-vcb), ea = 1 + vcb / VA, icc = (ie + iec) / (ea + 1 / BF);
+    return { ic: icc * ea - iec * (1 + 1 / BR) };
+  }
+
+  function fmtA(a) {
+    const s = a < 0 ? '−' : ''; a = Math.abs(a);
+    if (a < 1e-15) return '0 A';
+    const P = [['mA', 1e-3], ['µA', 1e-6], ['nA', 1e-9], ['pA', 1e-12], ['fA', 1e-15]];
+    let k = 0; for (; k < P.length - 1; k++) if (a >= P[k][1]) break;
+    const m = a / P[k][1];
+    return s + (m >= 100 ? m.toFixed(0) : m >= 10 ? m.toFixed(1) : m.toFixed(2)) + ' ' + P[k][0];
+  }
+  const fmtV = (v, d) => { const t = Math.abs(v).toFixed(d == null ? 2 : d); return (v < 0 && +t !== 0 ? '−' : '') + t + ' V'; };
+  function fmtR(r) {
+    if (!isFinite(r) || r > 1e10) return '> 10 GΩ';
+    if (r >= 1e6) return (r / 1e6).toFixed(r >= 1e7 ? 0 : 1) + ' MΩ';
+    if (r >= 1e3) return (r / 1e3).toFixed(r >= 1e4 ? 0 : 1) + ' kΩ';
+    return r.toFixed(r >= 100 ? 0 : 1) + ' Ω';
+  }
+  const REGCOL = { active: C.tAct, saturation: C.tSat, cutoff: C.tCut };
+
+  /* ---------- Canvas helpers ---------- */
+  let FS = 1;
+  function Cv(id, W, H, cap) { this.el = $(id); this.W = W; this.H = H; this.cap = cap || 1.6; this.ctx = this.el.getContext('2d'); }
+  Cv.prototype.begin = function () {
+    const w = this.el.clientWidth; if (!w) return null;
+    const dpr = window.devicePixelRatio || 1;
+    const pw = Math.round(w * dpr), ph = Math.round(w * dpr * this.H / this.W);
+    if (this.el.width !== pw || this.el.height !== ph) { this.el.width = pw; this.el.height = ph; }
+    const c = this.ctx, s = pw / this.W;
+    FS = Math.min(this.cap, Math.max(1, 1.15 * this.W / w));
+    c.setTransform(s, 0, 0, s, 0, 0); c.clearRect(0, 0, this.W, this.H);
+    c.textBaseline = 'middle'; c.textAlign = 'left'; c.globalAlpha = 1; c.setLineDash([]); c.lineCap = 'butt';
+    return c;
+  };
+  // Watermark: drawn inside the canvas, bottom-right, 13 px on screen at any size.
+  Cv.prototype.wm = function (c) {
+    const k = this.W / this.el.clientWidth, s = 13 * k;
+    c.save(); c.setTransform(this.el.width / this.W, 0, 0, this.el.width / this.W, 0, 0);
+    c.globalAlpha = 1; c.font = '500 ' + s.toFixed(1) + 'px ' + FONT; c.fillStyle = 'rgba(255,255,255,.35)';
+    c.textAlign = 'right'; c.textBaseline = 'bottom'; c.fillText('© Naveen Bokka', this.W - 6 * k, this.H - 4 * k); c.restore();
+  };
+  Cv.prototype.pt = function (e) {
+    const r = this.el.getBoundingClientRect();
+    return { x: (e.clientX - r.left) * this.W / r.width, y: (e.clientY - r.top) * this.H / r.height };
+  };
+  function circ(c, x, y, r, fill, stroke, lw) {
+    c.beginPath(); c.arc(x, y, Math.max(0, r), 0, TAU);
+    if (fill) { c.fillStyle = fill; c.fill(); }
+    if (stroke) { c.strokeStyle = stroke; c.lineWidth = lw || 1.5; c.stroke(); }
+  }
+  function txt(c, s, x, y, col, size, weight, align, font) {
+    c.font = (weight || 600) + ' ' + ((size || 12) * FS).toFixed(1) + 'px ' + (font || FONT);
+    c.fillStyle = col || C.text; c.textAlign = align || 'left'; c.fillText(s, x, y);
+  }
+  // Label with subscript and optional trailing text, e.g. subU(c, 'I', 'C', ' (mA)', …)
+  function subU(c, a, b, u, x, y, col, size, align) {
+    const z = (size || 13) * FS;
+    c.font = '700 ' + z.toFixed(1) + 'px ' + FONT; const wa = c.measureText(a).width;
+    c.font = '700 ' + (z * 0.72).toFixed(1) + 'px ' + FONT; const wb = c.measureText(b).width;
+    c.font = '600 ' + z.toFixed(1) + 'px ' + FONT; const wu = u ? c.measureText(u).width : 0;
+    const w = wa + wb + wu, x0 = align === 'right' ? x - w : align === 'center' ? x - w / 2 : x;
+    c.fillStyle = col; c.textAlign = 'left';
+    c.font = '700 ' + z.toFixed(1) + 'px ' + FONT; c.fillText(a, x0, y);
+    c.font = '700 ' + (z * 0.72).toFixed(1) + 'px ' + FONT; c.fillText(b, x0 + wa, y + z * 0.3);
+    if (u) { c.font = '600 ' + z.toFixed(1) + 'px ' + FONT; c.fillText(u, x0 + wa + wb, y); }
+    return w;
+  }
+  function line(c, x0, y0, x1, y1, col, lw, dash) {
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []);
+    c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke(); c.setLineDash([]);
+  }
+  function pline(c, pts, col, lw, dash) {
+    if (pts.length < 2) return;
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []); c.lineJoin = 'round';
+    c.beginPath(); pts.forEach((p, k) => k ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); c.stroke(); c.setLineDash([]);
+  }
+  // Arrow with shaft width lw; head scales with the shaft.
+  function arrow(c, x0, y0, x1, y1, col, lw, head) {
+    const dx = x1 - x0, dy = y1 - y0, L = Math.hypot(dx, dy); if (L < 2) return;
+    const ux = dx / L, uy = dy / L, hs = Math.min(head || 10, L * 0.8), hw = Math.max(hs * 0.55, lw * 0.9);
+    line(c, x0, y0, x1 - ux * hs * 0.9, y1 - uy * hs * 0.9, col, lw || 3);
+    c.fillStyle = col; c.beginPath(); c.moveTo(x1, y1);
+    c.lineTo(x1 - ux * hs - uy * hw, y1 - uy * hs + ux * hw);
+    c.lineTo(x1 - ux * hs + uy * hw, y1 - uy * hs - ux * hw); c.closePath(); c.fill();
+  }
+  function poly(c, pts, fill, stroke, lw) {
+    c.beginPath(); c.moveTo(pts[0][0], pts[0][1]); for (let k = 1; k < pts.length; k++) c.lineTo(pts[k][0], pts[k][1]); c.closePath();
+    if (fill) { c.fillStyle = fill; c.fill(); }
+    if (stroke) { c.strokeStyle = stroke; c.lineWidth = lw || 1.2; c.stroke(); }
+  }
+  function rrect(c, x, y, w, h, r) {
+    c.beginPath();
+    if (c.roundRect) c.roundRect(x, y, w, h, r); else c.rect(x, y, w, h);
+  }
+  function resH(c, x0, x1, y, col) {
+    const n = 6, d = (x1 - x0) / n, pts = [[x0, y]];
+    for (let k = 0; k < n; k++) pts.push([x0 + d * (k + 0.5), y + (k % 2 ? 8 : -8)]);
+    pts.push([x1, y]); pline(c, pts, col || C.wire, 2.5);
+  }
+  function resV(c, x, y0, y1, col) {
+    const n = 6, d = (y1 - y0) / n, pts = [[x, y0]];
+    for (let k = 0; k < n; k++) pts.push([x + (k % 2 ? 8 : -8), y0 + d * (k + 0.5)]);
+    pts.push([x, y1]); pline(c, pts, col || C.wire, 2.5);
+  }
+  function ground(c, x, y) {
+    line(c, x, y, x, y + 8, C.wire, 2.5);
+    line(c, x - 12, y + 8, x + 12, y + 8, C.wire, 2.5); line(c, x - 7, y + 13, x + 7, y + 13, C.wire, 2.5); line(c, x - 3, y + 18, x + 3, y + 18, C.wire, 2.5);
+  }
+  // Battery on a vertical wire, long (+) plate on top. side = −1: label left, +1: label right.
+  function vbat(c, x, y, subs, side, val) {
+    const yL = y - 6, yS = y + 6;
+    c.fillStyle = '#141b2b'; c.fillRect(x - 20, y - 12, 40, 24);
+    line(c, x - 18, yL, x + 18, yL, C.v, 3); line(c, x - 10, yS, x + 10, yS, C.v, 5);
+    const sx = x - side * 26;
+    txt(c, '+', sx, yL - 6, C.v, 14, 700, 'center'); txt(c, '−', sx, yS + 6, C.v, 14, 700, 'center');
+    const lx = x + side * 26, al = side < 0 ? 'right' : 'left';
+    subU(c, 'V', subs, '', lx, val ? y - 9 : y, C.v, 13, al);
+    if (val) txt(c, val, lx, y + 11, C.v, 11, 500, al, MONO);
+  }
+  /* NPN symbol, vertical: (bx, by) = middle of the base bar, base lead to the left, collector up, emitter down.
+     Lead ends: base (bx − 100s, by), collector (bx + 70s, by − 125s), emitter (bx + 70s, by + 125s). */
+  function bjtSym(c, bx, by, s) {
+    const P = (x, y) => [bx + x * s, by + y * s];
+    const L = (a, b, w) => { const A = P(a[0], a[1]), B = P(b[0], b[1]); line(c, A[0], A[1], B[0], B[1], C.wire, (w || 3) * s); };
+    const cc = P(35, 0); circ(c, cc[0], cc[1], 72 * s, '#141b2b', 'rgba(207,216,220,.3)', 1.5);
+    L([-100, 0], [0, 0]); L([0, -50], [0, 50], 6); L([0, -28], [70, -70]); L([70, -70], [70, -125]);
+    L([0, 28], [70, 70]); L([70, 70], [70, 125]);
+    const ll = Math.hypot(70, 42), ux = 70 / ll, uy = 42 / ll, T = P(70 * 0.82, 28 + 42 * 0.82), hs = 17 * s;
+    poly(c, [[T[0], T[1]], [T[0] - ux * hs - uy * hs * 0.6, T[1] - uy * hs + ux * hs * 0.6], [T[0] - ux * hs + uy * hs * 0.6, T[1] - uy * hs - ux * hs * 0.6]], C.wire);
+  }
+  // Plot frame. P = {l, r, t, b, X(v), Y(v)}
+  function axes(c, P, xt, yt, fx, fy) {
+    xt.forEach(v => { const x = P.X(v); line(c, x, P.t, x, P.b, C.grid, 1); txt(c, fx(v), x, P.b + 14, C.muted, 11, 500, 'center'); });
+    yt.forEach(v => { const y = P.Y(v); line(c, P.l, y, P.r, y, C.grid, 1); txt(c, fy(v), P.l - 8, y, C.muted, 11, 500, 'right'); });
+    line(c, P.l, P.b, P.r, P.b, C.muted, 1.5); line(c, P.l, P.t, P.l, P.b, C.muted, 1.5);
+  }
+  function along(pts, d) {
+    for (let k = 1; k < pts.length; k++) {
+      const a = pts[k - 1], b = pts[k], L = Math.hypot(b[0] - a[0], b[1] - a[1]);
+      if (d <= L) return [a[0] + (b[0] - a[0]) * d / L, a[1] + (b[1] - a[1]) * d / L];
+      d -= L;
+    }
+    return null;
+  }
+  const plen = pts => pts.reduce((s, p, k) => k ? s + Math.hypot(p[0] - pts[k - 1][0], p[1] - pts[k - 1][1]) : 0, 0);
+  function flowDots(c, pts, phase, gap, col, r) {
+    const L = plen(pts);
+    for (let d = ((phase % gap) + gap) % gap; d < L; d += gap) { const q = along(pts, d); if (q) circ(c, q[0], q[1], r || 3.2, col); }
+  }
+  function segSel(root, attr, val) {
+    root.querySelectorAll('[data-' + attr + ']').forEach(b => b.setAttribute('aria-pressed', String(b.dataset[attr] === String(val))));
+  }
+  function draggable(cv, onPt, onDown) {
+    let down = false;
+    cv.el.addEventListener('pointerdown', e => { down = true; cv.el.setPointerCapture(e.pointerId); const p = cv.pt(e); if (onDown) onDown(p); onPt(p); e.preventDefault(); });
+    cv.el.addEventListener('pointermove', e => { if (down) onPt(cv.pt(e)); });
+    const up = () => { down = false; };
+    cv.el.addEventListener('pointerup', up); cv.el.addEventListener('pointercancel', up);
+  }
+  function scopeGrid(c, S, nx, ny) {
+    rrect(c, S.l - 6, S.t - 6, S.r - S.l + 12, S.b - S.t + 12, 8); c.fillStyle = '#0b1612'; c.fill();
+    const DX = (S.r - S.l) / nx, DY = (S.b - S.t) / ny;
+    for (let k = 0; k <= nx; k++) line(c, S.l + k * DX, S.t, S.l + k * DX, S.b, k === nx / 2 ? 'rgba(129,199,132,.35)' : 'rgba(129,199,132,.13)', 1);
+    for (let k = 0; k <= ny; k++) line(c, S.l, S.t + k * DY, S.r, S.t + k * DY, k === ny / 2 ? 'rgba(129,199,132,.35)' : 'rgba(129,199,132,.13)', 1);
+    return DY;
+  }
+  function glowLine(c, pts, col) { c.shadowColor = col; c.shadowBlur = 6; pline(c, pts, col, 2.4); c.shadowBlur = 0; }
+  function setBadge(id, kind, text) { const b = $(id); b.textContent = text; b.className = 'bdg ' + kind; }
+  function junctionBadges(p, st) {
+    setBadge(p + 'ebj', st.ebj, 'EBJ ' + (st.ebj === 'fwd' ? 'forward' : 'below cut-in'));
+    setBadge(p + 'cbj', st.cbj, 'CBJ ' + (st.cbj === 'fwd' ? 'forward' : st.cbj === 'rev' ? 'reverse' : 'below cut-in'));
+    setBadge(p + 'reg', 'r-' + st.reg, st.reg);
+  }
+
+  /* ---------- Animation framework: own Play/Pause/Reset, runs only while visible ---------- */
+  const anims = [];
+  function Anim(rootId, o) {
+    this.root = $(rootId); this.o = o; this.playing = !RM; this.visible = true; this.dirty = true;
+    this.pb = this.root.querySelector('[data-act="play"]');
+    this.pb.addEventListener('click', () => { if (!this.playing && o.restart) o.restart(); this.setPlaying(!this.playing); });
+    this.root.querySelector('[data-act="reset"]').addEventListener('click', () => { o.reset(); this.setPlaying(!RM); });
+    o.reset(); this.sync(); anims.push(this);
+    if ('IntersectionObserver' in window) {
+      this.visible = false;
+      new IntersectionObserver(es => es.forEach(e => { this.visible = e.isIntersecting; if (this.visible) this.dirty = true; }))
+        .observe(this.root);
+    }
+  }
+  Anim.prototype.setPlaying = function (p) { this.playing = p; this.sync(); this.dirty = true; };
+  Anim.prototype.sync = function () { this.pb.textContent = this.playing ? 'Pause' : 'Play'; };
+
+  /* =========================================================
+     Shared CE output-characteristic data (sections 2, 3, 5)
+     ========================================================= */
+  const OUT_IB = [0, 20, 40, 60, 80, 100];                      // µA
+  const OUT_COL = ['#9e9e9e', '#4fc3f7', '#aed581', '#ffb74d', '#f06292', '#ba68c8'];
+  const CUT_D = 0.25;                                            // drawn height of the IB = 0 curve (mA), not to scale
+  const OUT_V = (function () { const v = []; for (let x = 0; x < 1; x += 0.01) v.push(x); for (let x = 1; x <= 15.0001; x += 0.25) v.push(x); return v; })();
+  const ICEO = ceIB(0, 15).ic;                                   // model leakage at IB = 0
+  const OUT = OUT_IB.map(ib => OUT_V.map(v => [v, ceIB(ib * 1e-6, v).ic * 1e3]));
+  // display value of a curve point: the IB = 0 curve is scaled up so it can be seen
+  const dispIC = (k, ic) => k === 0 ? Math.max(0, ic * 1e-3 / ICEO) * CUT_D : Math.max(0, ic);
+  // Saturation boundary: the collector junction reaches the cut-in voltage (VBC = 0.5 V)
+  const SATB = (function () {
+    const pts = [];
+    for (let ib = 0; ib <= 140; ib += (ib < 10 ? 1 : 5)) {
+      let vce = 0.2, r;
+      for (let k = 0; k < 6; k++) { r = ceIB(ib * 1e-6, vce); vce = Math.max(0, r.vbe - CUTIN); }
+      r = ceIB(ib * 1e-6, vce); pts.push([vce, Math.max(0, r.ic * 1e3)]);
+    }
+    return pts;
+  })();
+  // Piecewise x axis: 0…1 V takes 22 % of the width (expanded, not to scale), 1…15 V the rest.
+  function ceAxis(P, f) {
+    const xk = P.l + f * (P.r - P.l); P.xk = xk;
+    P.X = v => v <= 1 ? P.l + v * (xk - P.l) : xk + (v - 1) / 14 * (P.r - xk);
+    P.Xi = x => x <= xk ? (x - P.l) / (xk - P.l) : 1 + (x - xk) / (P.r - xk) * 14;
+    P.Y = i => P.b - i / 12 * (P.b - P.t);
+    P.Yi = y => (P.b - y) / (P.b - P.t) * 12;
+  }
+  function outAxes(c, P) {
+    axes(c, P, [0, 0.5, 1, 5, 10, 15], [0, 2, 4, 6, 8, 10, 12], v => String(v), v => String(v));
+    line(c, P.xk, P.t, P.xk, P.b, 'rgba(255,255,255,.28)', 1.2, [4, 4]);
+    subU(c, 'I', 'C', ' (mA)', P.l - 4, P.t - 20, C.text, 13, 'left');
+    subU(c, 'V', 'CE', ' (V)', (P.l + P.r) / 2 + 40, P.b + 40, C.text, 13, 'center');
+    txt(c, '0–1 V not to scale', P.l, P.b + 40, C.muted, 10, 500, 'left');
+  }
+  function outShade(c, P) {
+    const yc = P.Y(CUT_D);
+    c.save(); c.beginPath(); c.rect(P.l, P.t, P.r - P.l, yc - P.t); c.clip();
+    const B = SATB.map(p => [P.X(p[0]), P.Y(p[1])]); B.unshift([P.X(SATB[0][0]), yc + 1]);
+    const top = B[B.length - 1];
+    poly(c, B.concat([[top[0], P.t - 1], [P.r, P.t - 1], [P.r, yc + 1]]), C.act);
+    poly(c, B.concat([[top[0], P.t - 1], [P.l, P.t - 1], [P.l, yc + 1]]), C.sat);
+    c.restore();
+    c.fillStyle = C.cut; c.fillRect(P.l, yc, P.r - P.l, P.b - yc);
+  }
+  // Curve k as canvas points, up to x = xmax
+  function outPts(P, k, xmax) {
+    const pts = [];
+    for (const p of OUT[k]) { const x = P.X(p[0]); if (x > xmax) break; pts.push([x, P.Y(Math.min(12, dispIC(k, p[1])))]); }
+    return pts;
+  }
+  const curveIC = (k, vce) => k === 0 ? ceIB(0, vce).ic * 1e3 : ceIB(OUT_IB[k] * 1e-6, vce).ic * 1e3;
+
+  /* =========================================================
+     0. The CE circuit: VBB, VCC, meters, flow dots, phase scope
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv0', 600, 348), cs = new Cv('cv0s', 600, 210);
+    const sVbb = $('vbb0'), sVcc = $('vcc0'), bPh = $('phase0');
+    const RB = 47e3, RC = 1e3, AMP = 0.25, FQ = 0.5;
+    let st = null, dc = null, phB = 0, phC = 0, t = 0, phase = false, hist = [], A;
+    function readouts(r) {
+      $('c0vbe').textContent = fmtV(r.vbe); $('c0vce').textContent = fmtV(r.vce, r.vce < 1 ? 2 : 1);
+      $('c0ib').textContent = fmtA(Math.max(0, r.ib)); $('c0ic').textContent = fmtA(r.ic);
+      const s = states(r, r.ib < 1e-9);
+      $('c0b').textContent = s.reg === 'cutoff' || r.ic <= 0 ? '—' : (r.ic / r.ib).toFixed(0);
+      $('c0reg').textContent = s.reg; $('c0reg').style.color = REGCOL[s.reg];
+      r.reg = s.reg;
+    }
+    function solveNow() {
+      const VBB = +sVbb.value, VCC = +sVcc.value;
+      const v = phase ? Math.max(0, VBB + AMP * Math.sin(TAU * FQ * t)) : VBB;
+      st = solveCE(v, RB, VCC, RC); st.VBB = v; st.VCC = VCC;
+      readouts(st);
+    }
+    function upd() {
+      const VBB = +sVbb.value, VCC = +sVcc.value;
+      $('vbb0o').textContent = VBB.toFixed(2) + ' V'; $('vcc0o').textContent = VCC.toFixed(1) + ' V';
+      dc = solveCE(VBB, RB, VCC, RC); hist = [];
+      solveNow();
+      if (A) A.dirty = true;
+    }
+    // conventional-current paths
+    const pB = [[386, 300], [50, 300], [50, 180], [298, 180]];
+    const pC = [[386, 300], [570, 300], [570, 60], [386, 60], [386, 96]];
+    const pE = [[386, 262], [386, 300]];
+    function meter(c, x, y, ch) { circ(c, x, y, 16, '#141b2b', C.wire, 2.2); txt(c, ch, x, y + 1, C.wire, 14, 700, 'center'); }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const full = cv.el.clientWidth >= 480;
+      // wires
+      pline(c, [[250, 180], [50, 180], [50, 300], [570, 300], [570, 60], [386, 60], [386, 80]], C.wire, 2.5);
+      line(c, 386, 280, 386, 300, C.wire, 2.5);
+      ground(c, 300, 300);
+      // voltmeter leads (dashed) from base / collector node down to the common emitter rail
+      line(c, 232, 180, 232, 300, 'rgba(255,213,79,.55)', 1.5, [4, 4]);
+      line(c, 462, 60, 462, 300, 'rgba(255,213,79,.55)', 1.5, [4, 4]);
+      [[232, 180], [232, 300], [462, 60], [462, 300]].forEach(p => circ(c, p[0], p[1], 3.5, C.v));
+      // flow dots, speed proportional to current (conventional current)
+      flowDots(c, pB, phB, 22, C.cur, 2.6); flowDots(c, pC, phC, 22, C.cur, 3.2); flowDots(c, pE, phC + phB, 22, C.cur, 3.2);
+      // resistors
+      c.fillStyle = '#141b2b'; c.fillRect(86, 168, 68, 24); c.fillRect(490, 48, 64, 24);
+      resH(c, 90, 150, 180); resH(c, 494, 550, 60);
+      subU(c, 'R', 'B', ' 47 kΩ', 120, 204, C.muted, 11, 'center'); subU(c, 'R', 'C', ' 1 kΩ', 522, 86, C.muted, 11, 'center');
+      // ammeters
+      meter(c, 196, 180, 'A'); meter(c, 425, 60, 'A');
+      subU(c, 'I', 'B', '', 196, 146, C.cur, 13, 'center'); if (full) txt(c, fmtA(Math.max(0, st.ib)), 196, 210, C.cur, 11, 500, 'center', MONO);
+      subU(c, 'I', 'C', '', 425, 92, C.cur, 13, 'center'); if (full) txt(c, fmtA(st.ic), 425, 110, C.cur, 11, 500, 'center', MONO);
+      // voltmeters
+      meter(c, 232, 248, 'V'); meter(c, 462, 150, 'V');
+      subU(c, 'V', 'BE', '', 254, full ? 240 : 248, C.v, 13, 'left'); if (full) txt(c, fmtV(st.vbe), 254, 259, C.v, 11, 500, 'left', MONO);
+      subU(c, 'V', 'CE', '', 484, full ? 142 : 150, C.v, 13, 'left'); if (full) txt(c, fmtV(st.vce, 1), 484, 161, C.v, 11, 500, 'left', MONO);
+      // batteries
+      vbat(c, 50, 240, 'BB', 1, full ? st.VBB.toFixed(2) + ' V' : '');
+      vbat(c, 570, 220, 'CC', -1, full ? st.VCC.toFixed(1) + ' V' : '');
+      // transistor
+      bjtSym(c, 330, 180, 0.8);
+      txt(c, 'B', 270, 166, C.text, 14, 700, 'center'); txt(c, 'C', 370, 98, C.text, 14, 700, 'center'); txt(c, 'E', 370, 266, C.text, 14, 700, 'center');
+      // current arrows: IC drawn ~100× wider than IB in scale, width capped
+      const ib = Math.max(0, st.ib), ic = Math.max(0, st.ic), on = ib > 2e-8;
+      if (on) {
+        const ratio = ic / ib, wB = 1.5, wC = Math.min(16, wB * ratio);
+        arrow(c, 214, 164, 252, 164, C.cur, wB, 8);
+        arrow(c, 530, 30, 466, 30, C.cur, wC, Math.max(12, wC * 1.1));
+        const w1 = subU(c, 'I', 'C', ' : ', 16, 22, C.cur, 12, 'left');
+        subU(c, 'I', 'B', ' = ' + ratio.toFixed(0) + ' : 1', 16 + w1, 22, C.cur, 12, 'left');
+        if (wB * ratio > 16) txt(c, 'width capped, not to scale', 16, 40, C.muted, 10, 500, 'left');
+      }
+      txt(c, st.reg, 16, 330, REGCOL[st.reg], 13, 700, 'left');
+      cv.wm(c);
+    }
+    function drawScope() {
+      const c = cs.begin(); if (!c) return;
+      const S = { l: 40, r: 560, t: 16, b: 176 };
+      const DY = scopeGrid(c, S, 10, 6), yc = (S.t + S.b) / 2;
+      const N = 300, dxs = (S.r - S.l) / (N - 1), k1 = DY / 0.2, k2 = DY / 0.5;   // CH1 0.2 V/div, CH2 0.5 V/div
+      const n = hist.length, a = [], b = [];
+      for (let i = 0; i < n; i++) {
+        const x = S.r - (n - 1 - i) * dxs;
+        a.push([x, clamp(yc - (hist[i][0] - dc.VBBdc) * k1, S.t, S.b)]);
+        b.push([x, clamp(yc - (hist[i][1] - dc.vce) * k2, S.t, S.b)]);
+      }
+      c.save(); c.beginPath(); c.rect(S.l, S.t, S.r - S.l, S.b - S.t); c.clip();
+      glowLine(c, b, C.v); glowLine(c, a, C.IN);
+      c.restore();
+      subU(c, 'V', 'BB', '  in   0.2 V/div', S.l, S.b + 18, C.IN, 11, 'left');
+      subU(c, 'V', 'CE', '  out  0.5 V/div', S.l + 260, S.b + 18, C.v, 11, 'left');
+      cs.wm(c);
+    }
+    const sp = i => 30 * i * 1e3;   // px/s per mA, proportional to current
+    const o = {
+      reset() { phB = phC = 0; t = 0; hist = []; },
+      step(dt) {
+        if (phase) { t += dt; solveNow(); hist.push([st.VBB, st.vce]); if (hist.length > 300) hist.shift(); }
+        phB += Math.min(400, sp(st.ib)) * dt; phC += Math.min(400, sp(st.ic)) * dt;
+      },
+      draw() { draw(); if (phase) drawScope(); }
+    };
+    upd(); dc.VBBdc = +sVbb.value;
+    A = new Anim('anim0', o);
+    const onSl = () => { upd(); dc.VBBdc = +sVbb.value; };
+    sVbb.addEventListener('input', onSl); sVcc.addEventListener('input', onSl);
+    bPh.addEventListener('click', () => {
+      phase = !phase; bPh.setAttribute('aria-pressed', String(phase)); $('cv0s').hidden = !phase;
+      t = 0; hist = []; solveNow(); A.dirty = true;
+      if (phase && !A.playing) A.setPlaying(true);
+    });
+  })();
+
+  /* =========================================================
+     1. Input characteristics: IB vs VBE for VCE = 0, 1, 10 V
+     ========================================================= */
+  const IN_VCE = [0, 1, 10], IN_COL = ['#4dd0e1', '#ffb74d', '#ba68c8'];
+  (function () {
+    const cv = new Cv('cv1', 640, 456, 2), root = $('anim1');
+    const P = { l: 62, r: 620, t: 40, b: 366 };
+    P.X = v => P.l + v / 0.9 * (P.r - P.l); P.Y = i => P.b - i / 100 * (P.b - P.t);
+    const vTop = IN_VCE.map(v => vbeForIB(100e-6, v));
+    const ibAt = (v, i) => emCE(v, IN_VCE[i]).ib * 1e6;   // µA
+    let p = 0, sel = 1, ibSel = 20, A;
+    const ptOf = (ib, i) => { const vbe = vbeForIB(ib * 1e-6, IN_VCE[i]); return { vbe: vbe, x: P.X(vbe), y: P.Y(ib) }; };
+    function curve(c, i, vEnd, col, lw, dash) {
+      const pts = [];
+      for (let v = 0; v <= vEnd + 1e-9; v += 0.003) pts.push([P.X(v), P.Y(clamp(ibAt(v, i), 0, 100))]);
+      pts.push([P.X(vEnd), P.Y(clamp(ibAt(vEnd, i), 0, 100))]);
+      pline(c, pts, col, lw, dash);
+    }
+    const slope = (vbe, i) => (ibAt(vbe + 1e-4, i) - ibAt(vbe - 1e-4, i)) / 2e-4;   // µA/V
+    function upd() {
+      const q = ptOf(ibSel, sel);
+      $('c1vbe').textContent = q.vbe.toFixed(3) + ' V'; $('c1ib').textContent = ibSel.toFixed(0) + ' µA';
+      $('c1ri').textContent = fmtR(1e6 / slope(q.vbe, sel));
+      if (A) A.dirty = true;
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      axes(c, P, [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9], [0, 20, 40, 60, 80, 100], v => v.toFixed(1), v => String(v));
+      subU(c, 'I', 'B', ' (µA)', P.l - 4, P.t - 20, C.text, 13, 'left');
+      subU(c, 'V', 'BE', ' (V)', (P.l + P.r) / 2, P.b + 40, C.text, 13, 'center');
+      line(c, P.X(0.5), P.t, P.X(0.5), P.b, 'rgba(255,255,255,.22)', 1.2, [3, 4]);
+      txt(c, 'cut-in', P.X(0.5) - 6, P.b - 14, C.muted, 11, 600, 'right');
+      curve(c, sel, vTop[sel], IN_COL[sel], 1.5, [4, 5]);   // faint track for the draggable point
+      for (let i = 0; i < 3; i++) {
+        const f = clamp(p - i, 0, 1); if (f <= 0) continue;
+        const vEnd = f * vTop[i];
+        curve(c, i, vEnd, IN_COL[i], i === 2 ? 2.4 : 3.2, i === 2 ? [7, 6] : null);
+        if (f < 1) {
+          const ib = clamp(ibAt(vEnd, i), 0, 100);
+          circ(c, P.X(vEnd), P.Y(ib), 9, 'rgba(255,255,255,.15)'); circ(c, P.X(vEnd), P.Y(ib), 5, IN_COL[i], '#fff', 1.5);
+        }
+      }
+      for (let i = 0; i < 3; i++) {
+        const y = P.t + 10 + 8 * FS + i * 16 * FS;
+        line(c, P.l + 14, y, P.l + 36, y, IN_COL[i], 3, i === 2 ? [6, 4] : null);
+        subU(c, 'V', 'CE', ' = ' + IN_VCE[i] + ' V', P.l + 44, y, IN_COL[i], 12, 'left');
+      }
+      if (p > 2.5) txt(c, '1 V and 10 V overlap', P.l + 14, P.t + 10 + 8 * FS + 48 * FS, C.muted, 11, 600, 'left');
+      // draggable point, tangent and ri
+      const q = ptOf(ibSel, sel), g = slope(q.vbe, sel);
+      const sx = (P.r - P.l) / 0.9, sy = (P.b - P.t) / 100;
+      let dx = 1, dy = -g * sy / sx; const L = Math.hypot(dx, dy); dx /= L; dy /= L;
+      line(c, q.x - dx * 90, q.y - dy * 90, q.x + dx * 90, q.y + dy * 90, C.text, 1.8, [6, 4]);
+      circ(c, q.x, q.y, 12, 'rgba(255,213,79,.2)'); circ(c, q.x, q.y, 6.5, '#fff', C.v, 2.5);
+      const ly = clamp(q.y + 20, P.t + 12, P.b - 30);
+      subU(c, 'r', 'i', ' = ' + fmtR(1e6 / g), q.x + 18, ly, C.v, 13, 'left');
+      cv.wm(c);
+    }
+    const o = {
+      reset() { p = RM ? 3 : 0; },
+      restart() { if (p >= 3) p = 0; },
+      step(dt) { p += dt / 2.2; if (p >= 3) { p = 3; A.setPlaying(false); } },
+      draw: draw
+    };
+    A = new Anim('anim1', o);
+    upd();
+    root.querySelectorAll('[data-vce]').forEach(b => b.addEventListener('click', () => { sel = +b.dataset.vce; segSel(root, 'vce', sel); upd(); }));
+    draggable(cv, pt => {
+      let best = ibSel, bd = 1e9;
+      for (let ib = 2; ib <= 100; ib += 1) { const q = ptOf(ib, sel), d = Math.hypot(q.x - pt.x, q.y - pt.y); if (d < bd) { bd = d; best = ib; } }
+      ibSel = best; upd();
+    });
+    cv.el.addEventListener('keydown', e => {
+      if (e.key === 'ArrowUp' || e.key === 'ArrowRight') ibSel = Math.min(100, ibSel + 2);
+      else if (e.key === 'ArrowDown' || e.key === 'ArrowLeft') ibSel = Math.max(2, ibSel - 2);
+      else return;
+      e.preventDefault(); upd();
+    });
+  })();
+
+  /* =========================================================
+     2. Output characteristics: IC vs VCE for IB = 0…100 µA
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv2', 640, 456, 2);
+    const P = { l: 62, r: 620, t: 40, b: 366 }; ceAxis(P, 0.22);
+    let ib = 60, vce = 8, st = null, sw = 1, A;
+    function upd() {
+      st = ceIB(ib * 1e-6, vce);
+      const s = states(st, ib === 0);
+      junctionBadges('b2', s);
+      $('c2ib').textContent = ib.toFixed(0) + ' µA';
+      $('c2ic').textContent = fmtA(Math.max(0, st.ic));
+      $('c2vce').textContent = fmtV(vce, vce < 1 ? 2 : 1);
+      $('c2vbe').textContent = fmtV(st.vbe);
+      $('c2b').textContent = s.reg === 'cutoff' || st.ic <= 0 ? '—' : (st.ic / st.ib).toFixed(s.reg === 'saturation' ? 1 : 0);
+      if (s.reg === 'active') {
+        const d = 0.25, i1 = ceIB(ib * 1e-6, Math.max(0, vce - d)).ic, i2 = ceIB(ib * 1e-6, vce + d).ic;
+        $('c2ro').textContent = fmtR((vce + d - Math.max(0, vce - d)) / Math.max(1e-15, i2 - i1));
+      } else $('c2ro').textContent = s.reg === 'saturation' ? 'low' : '—';
+      st.reg = s.reg;
+      if (A) A.dirty = true;
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      outShade(c, P); outAxes(c, P);
+      const yc = P.Y(CUT_D);
+      txt(c, 'active', P.xk + (P.r - P.xk) * 0.45, P.Y(11.3), C.tAct, 14, 700, 'center');
+      c.save(); c.translate(P.X(0.06) + 2, P.Y(6)); c.rotate(-Math.PI / 2); txt(c, 'saturation', 0, 0, C.tSat, 12, 700, 'center'); c.restore();
+      txt(c, 'cutoff', P.xk + 8, yc - 9, C.tCut, 11, 700, 'left');
+      const xs = P.l + sw * (P.r - P.l);
+      for (let k = 0; k < OUT_IB.length; k++) {
+        const pts = outPts(P, k, xs);
+        pline(c, pts, OUT_COL[k], k === 0 ? 3 : 2.6);
+        if (sw < 1 && pts.length) { const h = pts[pts.length - 1]; circ(c, h[0], h[1], 4.5, OUT_COL[k], '#fff', 1.2); }
+        else if (k > 0) subU(c, 'I', 'B', ' = ' + OUT_IB[k] + ' µA', P.r - 4, P.Y(OUT[k][OUT[k].length - 1][1]) - 12, OUT_COL[k], 11.5, 'right');
+      }
+      if (sw >= 1) subU(c, 'I', 'B', ' = 0 (ICEO, not to scale)', P.r - 4, yc - 9, C.tCut, 10.5, 'right');
+      if (sw < 1) line(c, xs, P.t, xs, P.b, 'rgba(255,255,255,.5)', 1.2, [3, 3]);
+      // operating point
+      if (OUT_IB.indexOf(ib) < 0 && ib > 0) {
+        const pts = OUT_V.map(v => [P.X(v), P.Y(Math.min(12, Math.max(0, ceIB(ib * 1e-6, v).ic * 1e3)))]);
+        pline(c, pts, 'rgba(255,255,255,.75)', 1.5, [5, 4]);
+      }
+      const x = P.X(vce), y = P.Y(Math.min(12, ib === 0 ? dispIC(0, st.ic * 1e3) : Math.max(0, st.ic * 1e3)));
+      line(c, x, y, x, P.b, 'rgba(255,213,79,.6)', 1.2, [3, 4]); line(c, P.l, y, x, y, 'rgba(255,213,79,.6)', 1.2, [3, 4]);
+      circ(c, x, y, 13, 'rgba(255,213,79,.2)'); circ(c, x, y, 6.5, '#fff', C.v, 2.5);
+      cv.wm(c);
+    }
+    const o = {
+      reset() { sw = RM ? 1 : 0; ib = 60; vce = 8; upd(); },
+      restart() { if (sw >= 1) sw = 0; },
+      step(dt) { sw += dt / 3.5; if (sw >= 1) { sw = 1; A.setPlaying(false); } },
+      draw: draw
+    };
+    upd();
+    A = new Anim('anim2', o);
+    draggable(cv, pt => {
+      let v = clamp(P.Xi(pt.x), 0.02, 15);
+      vce = v < 1 ? Math.round(v * 100) / 100 : Math.round(v * 10) / 10;
+      const icT = P.Yi(pt.y);
+      ib = icT < CUT_D * 1.2 ? 0 : clamp(Math.round(icT / (0.1 * (1 + (vce - 0.7) / VA))), 1, 100);
+      upd();
+    });
+    cv.el.addEventListener('keydown', e => {
+      const dv = vce < 1 ? 0.02 : 0.5;
+      if (e.key === 'ArrowRight') vce = Math.min(15, Math.round((vce + dv) * 100) / 100);
+      else if (e.key === 'ArrowLeft') vce = Math.max(0.02, Math.round((vce - dv) * 100) / 100);
+      else if (e.key === 'ArrowUp') ib = Math.min(100, ib + 2);
+      else if (e.key === 'ArrowDown') ib = Math.max(0, ib - 2);
+      else return;
+      e.preventDefault(); upd();
+    });
+  })();
+
+  /* =========================================================
+     3. Measuring β: vertical VCE line, two selected curves, β vs IC inset
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv3', 640, 456, 2), ci = new Cv('cv3i', 640, 230);
+    const P = { l: 62, r: 620, t: 40, b: 366 }; ceAxis(P, 0.22);
+    let vce = 8, pick = [2, 3], grow = 1, u = 0, dragLine = false, A;
+    function pair() { const a = Math.min(pick[0], pick[1]), b = Math.max(pick[0], pick[1]); return [a, b]; }
+    function upd() {
+      const [a, b] = pair(), ia = curveIC(a, vce), ibb = curveIC(b, vce);
+      const dIB = OUT_IB[b] - OUT_IB[a], dIC = ibb - ia;
+      $('c3vce').textContent = fmtV(vce, vce < 1 ? 2 : 1);
+      $('c3dib').textContent = dIB + ' µA'; $('c3dic').textContent = fmtA(dIC * 1e-3);
+      $('c3bac').textContent = (dIC * 1e3 / dIB).toFixed(0);
+      $('c3bdc').textContent = (ibb * 1e3 / OUT_IB[b]).toFixed(0);
+      if (A) A.dirty = true;
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      outAxes(c, P);
+      const [a, b] = pair();
+      for (let k = 0; k < OUT_IB.length; k++) {
+        const on = k === a || k === b;
+        pline(c, outPts(P, k, P.r + 1), OUT_COL[k], on ? 3.4 : 2, null);
+        if (k > 0) subU(c, 'I', 'B', ' = ' + OUT_IB[k] + ' µA', P.r - 4, P.Y(OUT[k][OUT[k].length - 1][1]) - 12, OUT_COL[k], on ? 12 : 11, 'right');
+      }
+      subU(c, 'I', 'B', ' = 0 (not to scale)', P.r - 4, P.Y(CUT_D) - 9, C.tCut, 10.5, 'right');
+      // vertical VCE line with a grab handle
+      const x = P.X(vce);
+      line(c, x, P.t, x, P.b, C.v, 2, [6, 4]);
+      rrect(c, x - 10, P.t - 6, 20, 14, 4); c.fillStyle = C.v; c.fill();
+      const lab = ' = ' + (vce < 1 ? vce.toFixed(2) : vce.toFixed(1)) + ' V', nearL = x < P.l + 150;
+      subU(c, 'V', 'CE', lab, x + (nearL ? 14 : x > P.r - 140 ? -14 : 14), nearL ? P.t + 14 : P.t - 22, C.v, 12, !nearL && x > P.r - 140 ? 'right' : 'left');
+      // the two marked points, ΔIC bracket and ΔIB label
+      const ya = P.Y(Math.min(12, dispIC(a, curveIC(a, vce)))), yb = P.Y(Math.min(12, dispIC(b, curveIC(b, vce))));
+      line(c, P.l, ya, x, ya, 'rgba(255,255,255,.35)', 1, [3, 4]); line(c, P.l, yb, x, yb, 'rgba(255,255,255,.35)', 1, [3, 4]);
+      const g = 0.5 - 0.5 * Math.cos(Math.PI * grow), ytop = ya + (yb - ya) * g;
+      const bx = x + (x > P.r - 80 ? -26 : 26);
+      if (Math.abs(ya - ytop) > 4) { arrow(c, bx, ya, bx, ytop, C.cur, 2.4, 9); line(c, bx - 6, ya, bx + 6, ya, C.cur, 2.4); }
+      if (grow >= 1) subU(c, 'ΔI', 'C', '', bx + (bx > x ? 8 : -8), (ya + yb) / 2, C.cur, 13, bx > x ? 'left' : 'right');
+      subU(c, 'ΔI', 'B', ' = ' + (OUT_IB[b] - OUT_IB[a]) + ' µA', bx > x ? x - 10 : x + 10, (ya + yb) / 2, C.text, 12, bx > x ? 'right' : 'left');
+      circ(c, x, ya, 6, '#fff', OUT_COL[a], 2.5); circ(c, x, yb, 6, '#fff', OUT_COL[b], 2.5);
+      cv.wm(c);
+    }
+    // Inset: β vs IC, typical shape (illustrative, not from the device model)
+    const Q = { l: 56, r: 620, t: 30, b: 178 };
+    const bShape = (xl, k) => k / (1 + Math.pow(10, -(xl + 1.2) / 0.55)) / (1 + Math.pow(10, (xl - 2.3) / 0.45));
+    const qX = xl => Q.l + (xl + 3) / 6 * (Q.r - Q.l), qY = y => Q.b - y * (Q.b - Q.t);
+    function drawInset() {
+      const c = ci.begin(); if (!c) return;
+      line(c, Q.l, Q.b, Q.r, Q.b, C.muted, 1.4); line(c, Q.l, Q.t, Q.l, Q.b, C.muted, 1.4);
+      for (let d = -3; d <= 3; d++) line(c, qX(d), Q.b, qX(d), Q.b + 5, C.muted, 1.2);
+      txt(c, 'β', Q.l - 14, Q.t + 4, C.text, 15, 700, 'center');
+      subU(c, 'I', 'C', ' (log scale)', (Q.l + Q.r) / 2, Q.b + 22, C.text, 12, 'center');
+      txt(c, 'typical shape', Q.r, Q.t - 12, C.muted, 11, 600, 'right');
+      const p1 = [], p2 = [];
+      for (let xl = -3; xl <= 3.0001; xl += 0.05) { p1.push([qX(xl), qY(bShape(xl, 0.62))]); p2.push([qX(xl), qY(bShape(xl, 0.82))]); }
+      pline(c, p2, '#ff8a65', 2.2, [6, 4]); pline(c, p1, '#ffb74d', 3);
+      txt(c, 'T higher', qX(0.4), qY(0.82) - 12, '#ff8a65', 11.5, 700, 'center');
+      txt(c, 'low', qX(-2.5), qY(0.12) - 14, C.muted, 11, 600, 'center');
+      txt(c, 'flat', qX(0.4), qY(0.62) + 16, C.muted, 11, 600, 'center');
+      txt(c, 'high', qX(2.75), qY(0.12) - 14, C.muted, 11, 600, 'center');
+      const xl = -2.6 + 5.3 * (0.5 - 0.5 * Math.cos(TAU * u / 8));
+      circ(c, qX(xl), qY(bShape(xl, 0.62)), 9, 'rgba(255,213,79,.2)'); circ(c, qX(xl), qY(bShape(xl, 0.62)), 5, '#fff', C.v, 2);
+      ci.wm(c);
+    }
+    const o = {
+      reset() { vce = 8; pick = [2, 3]; grow = RM ? 1 : 0; u = 0; upd(); },
+      step(dt) { grow = Math.min(1, grow + dt / 0.9); u += dt; },
+      draw() { draw(); drawInset(); }
+    };
+    upd();
+    A = new Anim('anim3', o);
+    function selectAt(pt) {
+      const v = clamp(P.Xi(pt.x), 0, 15);
+      let best = 0, bd = 1e9;
+      for (let k = 0; k < OUT_IB.length; k++) { const d = Math.abs(P.Y(Math.min(12, dispIC(k, curveIC(k, v)))) - pt.y); if (d < bd) { bd = d; best = k; } }
+      if (bd > 40) return;
+      if (pick.indexOf(best) >= 0) return;
+      pick = [pick[1], best]; grow = RM ? 1 : 0; upd();
+    }
+    draggable(cv, pt => {
+      if (!dragLine) return;
+      const v = clamp(P.Xi(pt.x), 0.05, 15);
+      vce = v < 1 ? Math.round(v * 100) / 100 : Math.round(v * 10) / 10; upd();
+    }, pt => {
+      dragLine = Math.abs(pt.x - P.X(vce)) < 22;
+      if (!dragLine) selectAt(pt);
+    });
+    cv.el.addEventListener('keydown', e => {
+      const [a, b] = pair(), dv = vce < 1 ? 0.05 : 0.5;
+      if (e.key === 'ArrowRight') vce = Math.min(15, Math.round((vce + dv) * 100) / 100);
+      else if (e.key === 'ArrowLeft') vce = Math.max(0.05, Math.round((vce - dv) * 100) / 100);
+      else if (e.key === 'ArrowUp' && b < OUT_IB.length - 1) { pick = [a + 1, b + 1]; grow = RM ? 1 : 0; }
+      else if (e.key === 'ArrowDown' && a > 0) { pick = [a - 1, b - 1]; grow = RM ? 1 : 0; }
+      else return;
+      e.preventDefault(); upd();
+    });
+  })();
+
+  /* =========================================================
+     4. CE amplifier: small sine in, large inverted sine out, clipping
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv4', 640, 510), sl = $('amp4');
+    const VCC = 10, RC = 1e3, RB = 2e3, VCEQ = 5, NS = 160;
+    // bias: find VBB that puts the quiescent VCE at 5 V
+    const VBBQ = (function () { let a = 0.5, b = 1.2; for (let k = 0; k < 40; k++) { const m = (a + b) / 2; if (solveCE(m, RB, VCC, RC).vce > VCEQ) a = m; else b = m; } return (a + b) / 2; })();
+    const VQ = solveCE(VBBQ, RB, VCC, RC).vce, VSAT = solveCE(VBBQ + 1, RB, VCC, RC).vce;
+    let amp = 0.04, wave = [], t = 0, A;
+    function upd() {
+      amp = +sl.value / 1000; $('amp4o').textContent = (amp * 1e3).toFixed(0) + ' mV';
+      wave = [];
+      for (let k = 0; k < NS; k++) wave.push(solveCE(VBBQ + amp * Math.sin(TAU * k / NS), RB, VCC, RC).vce - VQ);
+      const mx = Math.max.apply(null, wave), mn = Math.min.apply(null, wave);
+      $('c4vin').textContent = (amp * 1e3).toFixed(0) + ' mV';
+      $('c4vp').textContent = fmtV(mx, 2); $('c4vn').textContent = fmtV(mn, 2);
+      $('c4av').textContent = amp > 0 ? '−' + ((mx - mn) / (2 * amp)).toFixed(0) : '—';
+      const cut = mx > VCC - VQ - 0.15, sat = mn < VSAT - VQ + 0.15;
+      $('c4clip').textContent = cut && sat ? 'top and bottom' : cut ? 'top (cutoff)' : sat ? 'bottom (saturation)' : 'none';
+      if (A) A.dirty = true;
+    }
+    const wAt = ph => { const f = ((ph % 1) + 1) % 1 * NS, i = Math.floor(f), r = f - i; return wave[i] * (1 - r) + wave[(i + 1) % NS] * r; };
+    const S = { l: 40, r: 600, t: 232, b: 452 }, yc = (S.t + S.b) / 2;
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const s = Math.sin(TAU * t * 0.5);
+      // circuit strip
+      line(c, 420, 22, 596, 22, C.wire, 2.5); circ(c, 600, 22, 4.5, '#141b2b', C.v, 2);
+      subU(c, '+V', 'CC', ' = 10 V', 592, 40, C.v, 12, 'right');
+      line(c, 420, 22, 420, 30, C.wire, 2.5); resV(c, 420, 30, 72); line(c, 420, 72, 420, 82, C.wire, 2.5);
+      subU(c, 'R', 'C', ' 1 kΩ', 404, 51, C.muted, 12, 'right');
+      line(c, 420, 82, 560, 82, C.wire, 2.5); circ(c, 564, 82, 4.5, '#141b2b', C.v, 2); txt(c, 'vout', 576, 82, C.v, 13, 700, 'left');
+      pline(c, [[343, 138], [250, 138]], C.wire, 2.5); c.fillStyle = '#141b2b'; c.fillRect(184, 126, 70, 24); resH(c, 190, 250, 138);
+      subU(c, 'R', 'B', ' 2 kΩ', 220, 162, C.muted, 12, 'center');
+      pline(c, [[190, 138], [80, 138], [80, 200], [420, 200], [420, 194]], C.wire, 2.5);
+      ground(c, 250, 200);
+      vbat(c, 80, 156, 'BB', -1, '');
+      circ(c, 80, 184, 13, '#141b2b', C.IN, 2.2);
+      const sw = []; for (let k = 0; k <= 14; k++) sw.push([73 + k, 184 - 5 * Math.sin(k / 14 * TAU)]); pline(c, sw, C.IN, 2);
+      txt(c, 'vin', 58, 186, C.IN, 13, 700, 'right');
+      bjtSym(c, 388.5, 138, 0.45);
+      // signal arrows pulse with the signal: base current up means collector voltage down
+      c.globalAlpha = 0.35 + 0.65 * Math.abs(s);
+      arrow(c, 120, 120, 170, 120, C.cur, 2.4, 9); txt(c, s >= 0 ? 'iB ↑' : 'iB ↓', 145, 104, C.cur, 12, 700, 'center');
+      txt(c, s >= 0 ? 'vout ↓' : 'vout ↑', 500, 104, C.v, 12, 700, 'center');
+      c.globalAlpha = 1;
+      // scope
+      const DY = scopeGrid(c, S, 10, 8);
+      const k1 = DY / 0.2, k2 = DY / 2;   // CH1 200 mV/div, CH2 2 V/div
+      c.save(); c.beginPath(); c.rect(S.l, S.t, S.r - S.l, S.b - S.t); c.clip();
+      const yTop = yc - (VCC - VQ) * k2, yBot = yc - (VSAT - VQ) * k2;
+      line(c, S.l, yTop, S.r, yTop, 'rgba(189,189,189,.75)', 1.3, [6, 5]);
+      line(c, S.l, yBot, S.r, yBot, 'rgba(239,83,80,.8)', 1.3, [6, 5]);
+      const pa = [], pb = [];
+      for (let x = S.l; x <= S.r; x += 3) {
+        const ph = (x - S.l) / (S.r - S.l) * 2 - t * 0.5;
+        pa.push([x, yc - amp * Math.sin(TAU * ph) * k1]); pb.push([x, yc - wAt(ph) * k2]);
+      }
+      glowLine(c, pb, C.v); glowLine(c, pa, C.IN);
+      c.restore();
+      txt(c, 'cutoff', S.r - 6, yTop - 9, C.tCut, 11, 700, 'right');
+      txt(c, 'saturation', S.r - 6, yBot + 10, C.tSat, 11, 700, 'right');
+      txt(c, 'CH1  vin   200 mV/div', S.l, S.b + 24, C.IN, 12, 700, 'left', MONO);
+      txt(c, 'CH2  vout  2 V/div', S.l, S.b + 44, C.v, 12, 700, 'left', MONO);
+      cv.wm(c);
+    }
+    const o = { reset() { t = 0; }, step(dt) { t += dt; }, draw: draw };
+    upd();
+    A = new Anim('anim4', o);
+    sl.addEventListener('input', upd);
+  })();
+
+  /* =========================================================
+     5. Summary thumbnails: CB and CE output characteristics
+     ========================================================= */
+  (function () {
+    const ca = new Cv('cv5a', 320, 210), cb = new Cv('cv5b', 320, 210);
+    const PA = { l: 36, r: 306, t: 30, b: 176 };
+    PA.X = v => PA.l + v / 15 * (PA.r - PA.l); PA.Y = i => PA.b - i / 6 * (PA.b - PA.t);
+    const PB = { l: 36, r: 306, t: 30, b: 176 }; ceAxis(PB, 0.22);
+    const CBC = ['#4fc3f7', '#aed581', '#ffb74d', '#f06292', '#ba68c8'];
+    let t = 0;
+    function frame(c, P, a, b, xa, xb) {
+      line(c, P.l, P.b, P.r, P.b, C.muted, 1.4); line(c, P.l, P.t, P.l, P.b, C.muted, 1.4);
+      subU(c, a, b, '', P.l - 2, P.t - 14, C.text, 12, 'left');
+      subU(c, xa, xb, '', (P.l + P.r) / 2, P.b + 16, C.text, 12, 'center');
+    }
+    function draw() {
+      const u = 0.5 - 0.5 * Math.cos(TAU * t / 6);
+      let c = ca.begin();
+      if (c) {
+        frame(c, PA, 'I', 'C', 'V', 'CB');
+        for (let k = 1; k <= 5; k++) {
+          const pts = []; for (let v = 0; v <= 15.001; v += 0.5) pts.push([PA.X(v), PA.Y(emIE(k * 1e-3, v).ic * 1e3)]);
+          pline(c, pts, CBC[k - 1], 2);
+        }
+        const v = u * 15; circ(c, PA.X(v), PA.Y(emIE(3e-3, v).ic * 1e3), 9, 'rgba(255,213,79,.2)'); circ(c, PA.X(v), PA.Y(emIE(3e-3, v).ic * 1e3), 5, '#fff', C.v, 2);
+        txt(c, 'flat', PA.r - 4, PA.Y(5.4) - 10, C.muted, 10.5, 600, 'right');
+        ca.wm(c);
+      }
+      c = cb.begin();
+      if (c) {
+        frame(c, PB, 'I', 'C', 'V', 'CE');
+        for (let k = 1; k < OUT_IB.length; k++) pline(c, outPts(PB, k, PB.r + 1), OUT_COL[k], 2);
+        const v = 0.02 + u * 14.98, ic = ceIB(60e-6, v).ic * 1e3;
+        circ(c, PB.X(v), PB.Y(ic), 9, 'rgba(255,213,79,.2)'); circ(c, PB.X(v), PB.Y(ic), 5, '#fff', C.v, 2);
+        txt(c, 'slopes more', PB.r - 4, PB.Y(11.6) - 8, C.muted, 10.5, 600, 'right');
+        cb.wm(c);
+      }
+    }
+    new Anim('anim5', { reset() { t = RM ? 3 : 0; }, step(dt) { t += dt; }, draw: draw });
+  })();
+
+  /* ---------- sticky mini-nav highlight ---------- */
+  (function () {
+    const links = Array.from(document.querySelectorAll('.toc a'));
+    const secs = links.map(l => document.querySelector(l.getAttribute('href')));
+    function upd() {
+      let cur = 0;
+      secs.forEach((s, i) => { if (s.getBoundingClientRect().top < 120) cur = i; });
+      links.forEach((l, i) => l.classList.toggle('active', i === cur));
+    }
+    window.addEventListener('scroll', upd, { passive: true }); upd();
+  })();
+
+  let last = performance.now();
+  function frame(ts) {
+    const dt = Math.min(0.05, Math.max(0, (ts - last) / 1000)); last = ts;
+    anims.forEach(a => {
+      if (!a.visible) return;
+      if (a.playing) { a.o.step(dt); a.o.draw(); }
+      else if (a.dirty) a.o.draw();
+      a.dirty = false;
+    });
+    requestAnimationFrame(frame);
+  }
+  function onResize() { anims.forEach(a => { a.dirty = true; }); }
+  window.addEventListener('resize', onResize);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(onResize);
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
