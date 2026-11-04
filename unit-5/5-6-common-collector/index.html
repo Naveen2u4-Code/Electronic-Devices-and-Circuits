@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>5.6 Common Collector Configuration</title>
-  <meta name="description" content="The common collector configuration (emitter follower) explained step by step: the CC circuit, how the emitter follows the base, high input and low output resistance, the follower as a buffer, CC characteristics and a comparison of CB, CE and CC. An interactive lesson.">
+  <meta name="description" content="The common collector configuration (emitter follower) explained step by step: the CC circuit, how the emitter follows the base, high input and low output resistance, CC characteristics and a comparison of CB, CE and CC. An interactive lesson.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -155,16 +155,12 @@
   
     /* Topic 5.6 */
     .prose p.eq { text-align: center; font-family: var(--mono); font-size: 16px; background: #141b2b; border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; }
-    .duo { display: grid; grid-template-columns: 1fr; gap: 12px; }
-    @media (min-width: 640px) { .duo { grid-template-columns: 1fr 1fr; } }
-    .duo canvas { max-width: 420px; margin: 0 auto; }
     .trio { display: grid; grid-template-columns: 1fr; gap: 10px; }
     .trio canvas { max-width: 340px; margin: 0 auto; }
     @media (min-width: 720px) { .trio { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
     .tblwrap { margin-top: 14px; }
     .vt thead th.cc { color: #81c784; }
     .vt.cmp tbody th { width: 28%; }
-    .ctr.wide { flex-basis: 150px; }
     .vt.cmp { table-layout: auto; }
     .vt.cmp th, .vt.cmp td { overflow-wrap: normal; }
     @media (max-width: 480px) { .vt.cmp { font-size: .76rem; } .vt.cmp th, .vt.cmp td { padding: 6px 4px; } .vt.cmp tbody th { width: auto; } }
@@ -177,9 +173,8 @@
       <li><a href="#s0">CC circuit</a></li>
       <li><a href="#s1">Emitter follows base</a></li>
       <li><a href="#s2">Input &amp; output resistance</a></li>
-      <li><a href="#s3">Buffer</a></li>
-      <li><a href="#s4">CC characteristics</a></li>
-      <li><a href="#s5">CB, CE and CC</a></li>
+      <li><a href="#s3">CC characteristics</a></li>
+      <li><a href="#s4">CB, CE and CC</a></li>
     </ul>
   </nav>
 
@@ -330,71 +325,18 @@
 
       <!-- ================= SECTION 3 ================= -->
       <section id="s3" aria-labelledby="h3s">
-        <h2 id="h3s">The emitter follower as a buffer</h2>
+        <h2 id="h3s">CC characteristics</h2>
         <div class="prose">
-          <p>A <strong>buffer</strong> connects a source that cannot supply much current to a load that needs current, without losing the signal.</p>
-          <p>Example: a signal source with an internal resistance of 10 kΩ is connected directly to a 100 Ω load (like a small speaker). The voltage divides between the 10 kΩ and the 100 Ω, so only about <strong>1% of the signal</strong> reaches the load.</p>
-          <p>With an emitter follower in between, the source sees the <strong>high input resistance</strong> of the follower, so almost all of its voltage reaches the base. The follower then drives the 100 Ω load from its <strong>low output resistance</strong>, so almost all of that voltage reaches the load.</p>
-          <p>This <strong>IMPEDANCE MATCHING</strong> role is the main use of the common collector stage: output stages of amplifiers, driving cables and speakers, and the pass transistor in simple voltage regulators. Two emitter followers can be cascaded as a <strong>DARLINGTON</strong> pair for an even higher current gain (about β²).</p>
+          <p>The <strong>CC output characteristic</strong> (I<sub>E</sub> against V<sub>CE</sub> for constant I<sub>B</sub>) is <strong>almost identical to the CE output characteristic</strong>, because I<sub>E</sub> = I<sub>C</sub> + I<sub>B</sub> ≈ I<sub>C</sub>. The same <strong>saturation, active and cutoff</strong> regions appear. For this reason the CE characteristics are usually used for CC design as well. The <strong>input characteristic</strong> (I<sub>B</sub> against V<sub>CB</sub>, at constant V<sub>CE</sub>) is different in shape, but it is rarely needed in practice.</p>
         </div>
 
         <figure class="anim" id="anim3">
           <div class="ctrls">
             <button class="btn" type="button" data-act="play">Pause</button>
             <button class="btn" type="button" data-act="reset">Reset</button>
-            <div class="slider">
-              <label for="rs3"><span>Source resistance R<sub>s</sub></span><output id="rs3o" for="rs3">10 kΩ</output></label>
-              <input type="range" id="rs3" min="0" max="100" step="1" value="50">
-            </div>
-            <div class="slider">
-              <label for="rl3"><span>Load resistance R<sub>L</sub></span><output id="rl3o" for="rl3">100 Ω</output></label>
-              <input type="range" id="rl3" min="0" max="150" step="1" value="50">
-            </div>
+            <button class="btn" type="button" id="ic3" aria-pressed="false">Overlay I<sub>C</sub> curves</button>
           </div>
-          <div class="duo">
-            <div>
-              <p class="ptitle">(a) Source drives the load directly</p>
-              <canvas id="cv3a" style="aspect-ratio:320/330" role="img" aria-label="Circuit a: the source with resistance Rs drives the load RL directly. The scope shows the 1 volt source sine in blue and the much smaller load voltage in orange."></canvas>
-            </div>
-            <div>
-              <p class="ptitle">(b) Through an emitter follower</p>
-              <canvas id="cv3b" style="aspect-ratio:320/330" role="img" aria-label="Circuit b: the same source drives the base of an emitter follower, whose emitter drives the load RL. The scope shows the source sine in blue and the load voltage in orange, much larger than in circuit a."></canvas>
-            </div>
-          </div>
-          <div class="counters" aria-live="polite">
-            <div class="ctr v wide">v<sub>L</sub> peak (a)<b id="c3va">9.9 mV</b></div>
-            <div class="ctr v wide">v<sub>L</sub> peak (b)<b id="c3vb">0.50 V</b></div>
-            <div class="ctr">R<sub>in</sub> of follower<b id="c3rin">10.4 kΩ</b></div>
-            <div class="ctr">R<sub>out</sub> of follower<b id="c3rout">102 Ω</b></div>
-          </div>
-        </figure>
-
-        <aside class="keypoints" aria-label="Key points: buffer">
-          <h3>Key points</h3>
-          <ul>
-            <li>A buffer lets a weak (high-resistance) source drive a load that needs current.</li>
-            <li>10 kΩ source straight into 100 Ω: only about 1% of the signal reaches the load.</li>
-            <li>The follower's high R<sub>in</sub> and low R<sub>out</sub> pass far more of the signal to the load.</li>
-            <li>Uses: amplifier output stages, cables and speakers, regulator pass transistors; a Darlington pair gives about β².</li>
-          </ul>
-        </aside>
-      </section>
-      <hr class="sep">
-
-      <!-- ================= SECTION 4 ================= -->
-      <section id="s4" aria-labelledby="h4s">
-        <h2 id="h4s">CC characteristics</h2>
-        <div class="prose">
-          <p>The <strong>CC output characteristic</strong> (I<sub>E</sub> against V<sub>CE</sub> for constant I<sub>B</sub>) is <strong>almost identical to the CE output characteristic</strong>, because I<sub>E</sub> = I<sub>C</sub> + I<sub>B</sub> ≈ I<sub>C</sub>. The same <strong>saturation, active and cutoff</strong> regions appear. For this reason the CE characteristics are usually used for CC design as well. The <strong>input characteristic</strong> (I<sub>B</sub> against V<sub>CB</sub>, at constant V<sub>CE</sub>) is different in shape, but it is rarely needed in practice.</p>
-        </div>
-
-        <figure class="anim" id="anim4">
-          <div class="ctrls">
-            <button class="btn" type="button" data-act="play">Pause</button>
-            <button class="btn" type="button" data-act="reset">Reset</button>
-            <button class="btn" type="button" id="ic4" aria-pressed="false">Overlay I<sub>C</sub> curves</button>
-          </div>
-          <canvas id="cv4" class="narrow" style="aspect-ratio:640/456" role="img" aria-label="Graph of IE from 0 to 10 milliamps against VCE from 0 to 15 volts for IB of 0 to 80 microamps, with saturation, active and cutoff regions shaded. The overlay adds dashed IC curves that sit just below the IE curves; the gap is drawn five times larger than real."></canvas>
+          <canvas id="cv3" class="narrow" style="aspect-ratio:640/456" role="img" aria-label="Graph of IE from 0 to 10 milliamps against VCE from 0 to 15 volts for IB of 0 to 80 microamps, with saturation, active and cutoff regions shaded. The overlay adds dashed IC curves that sit just below the IE curves; the gap is drawn five times larger than real."></canvas>
         </figure>
 
         <aside class="keypoints" aria-label="Key points: CC characteristics">
@@ -409,9 +351,9 @@
       </section>
       <hr class="sep">
 
-      <!-- ================= SECTION 5 ================= -->
-      <section id="s5" aria-labelledby="h5s">
-        <h2 id="h5s">Comparing CB, CE and CC</h2>
+      <!-- ================= SECTION 4 ================= -->
+      <section id="s4" aria-labelledby="h4s">
+        <h2 id="h4s">Comparing CB, CE and CC</h2>
         <div class="prose">
           <p>All three configurations use the same transistor; only the connections differ.</p>
           <ul>
@@ -421,15 +363,15 @@
           </ul>
         </div>
 
-        <figure class="anim" id="anim5">
+        <figure class="anim" id="anim4">
           <div class="ctrls">
             <button class="btn" type="button" data-act="play">Pause</button>
             <button class="btn" type="button" data-act="reset">Reset</button>
           </div>
           <div class="trio">
-            <canvas id="cv5a" style="aspect-ratio:300/400" role="img" aria-label="Common base: emitter input, collector output, base on the shared rail. Mini scope: output larger than input and in phase."></canvas>
-            <canvas id="cv5b" style="aspect-ratio:300/400" role="img" aria-label="Common emitter: base input, collector output, emitter on the shared rail. Mini scope: output larger than input and inverted."></canvas>
-            <canvas id="cv5c" style="aspect-ratio:300/400" role="img" aria-label="Common collector: base input, emitter output, collector on the shared rail. Mini scope: output the same size as the input and in phase."></canvas>
+            <canvas id="cv4a" style="aspect-ratio:300/400" role="img" aria-label="Common base: emitter input, collector output, base on the shared rail. Mini scope: output larger than input and in phase."></canvas>
+            <canvas id="cv4b" style="aspect-ratio:300/400" role="img" aria-label="Common emitter: base input, collector output, emitter on the shared rail. Mini scope: output larger than input and inverted."></canvas>
+            <canvas id="cv4c" style="aspect-ratio:300/400" role="img" aria-label="Common collector: base input, emitter output, collector on the shared rail. Mini scope: output the same size as the input and in phase."></canvas>
           </div>
           <div class="tblwrap">
             <table class="vt cmp">
@@ -951,76 +893,10 @@
   })();
 
   /* =========================================================
-     3. Buffer: source → load directly vs. through a follower
+     3. CC characteristics: IE vs VCE (IC overlay), from the device model
      ========================================================= */
   (function () {
-    const ca = new Cv('cv3a', 320, 350), cb = new Cv('cv3b', 320, 350), sS = $('rs3'), sL = $('rl3');
-    const ICQ = 10e-3, rpi = BF * VT / ICQ, VS = 1;   // follower biased at IC = 10 mA (small-signal view)
-    let RS = 10e3, RL = 100, ga = 0, gb = 0, t = 0, A;
-    function upd() {
-      RS = logR(+sS.value, 1000, 2); RL = logR(+sL.value, 10, 2);
-      $('rs3o').textContent = fmtR(RS); $('rl3o').textContent = fmtR(RL);
-      const rin = rpi + (BF + 1) * RL, rout = (RS + rpi) / (BF + 1);
-      ga = RL / (RS + RL);
-      gb = (rin / (RS + rin)) * ((BF + 1) * RL / rin);
-      const fv = v => v >= 0.1 ? v.toFixed(2) + ' V' : (v * 1e3).toFixed(v >= 0.01 ? 0 : 1) + ' mV';
-      const pct = g => g < 0.001 ? '<0.1%' : (g * 100).toFixed(g < 0.1 ? 1 : 0) + '%';
-      $('c3va').textContent = fv(ga * VS) + ' (' + pct(ga) + ')';
-      $('c3vb').textContent = fv(gb * VS) + ' (' + pct(gb) + ')';
-      $('c3rin').textContent = fmtR(rin); $('c3rout').textContent = fmtR(rout);
-      if (A) A.dirty = true;
-    }
-    const S = { l: 22, r: 298, t: 212, b: 310 };
-    function scope(c, g) {
-      const DY = scopeGrid(c, S, 8, 6), yc = (S.t + S.b) / 2, k = DY / 0.5;   // 0.5 V/div
-      const pi = [], po = [];
-      for (let x = S.l; x <= S.r + 0.1; x += 3) { const s = Math.sin(TAU * ((x - S.l) / (S.r - S.l) * 2 - t * 0.5)); pi.push([x, yc - VS * s * k]); po.push([x, yc - g * VS * s * k]); }
-      c.globalAlpha = 0.6; glowLine(c, pi, C.in); c.globalAlpha = 1; glowLine(c, po, C.out);
-      txt(c, 'vs', S.l + 4, S.t + 9, C.in, 11, 700, 'left'); subU(c, 'v', 'L', '', S.l + 26, S.t + 9, C.out, 11, 'left');
-      txt(c, '0.5 V/div', S.l, S.b + 18, C.muted, 10.5, 600, 'left', MONO);
-    }
-    function srcRs(c, xEnd) {
-      line(c, 30, 90, 30, 124, C.wire, 2.5); source(c, 30, 140); line(c, 30, 156, 30, 190, C.wire, 2.5);
-      line(c, 30, 90, 62, 90, C.wire, 2.5); c.fillStyle = '#141b2b'; c.fillRect(60, 78, 64, 24); resH(c, 64, 120, 90);
-      line(c, 120, 90, xEnd, 90, C.wire, 2.5);
-      subU(c, 'R', 's', ' ' + fmtR(RS), 92, 66, C.muted, 11.5, 'center');
-    }
-    function load(c, x, yTop) {
-      line(c, x, yTop, x, 140, C.wire, 2.5); resV(c, x, 140, 180); line(c, x, 180, x, 190, C.wire, 2.5);
-      subU(c, 'R', 'L', ' ' + fmtR(RL), x - 14, 160, C.muted, 11.5, 'right');
-      circ(c, x, yTop, 4, C.out); subU(c, 'v', 'L', '', x + 10, yTop - 12, C.out, 12, 'left');
-    }
-    function drawA() {
-      const c = ca.begin(); if (!c) return;
-      srcRs(c, 270); load(c, 270, 90);
-      line(c, 30, 190, 270, 190, C.wire, 2.5); ground(c, 150, 190);
-      scope(c, ga); ca.wm(c);
-    }
-    function drawB() {
-      const c = cb.begin(); if (!c) return;
-      srcRs(c, 125);
-      bjtSym(c, 167, 90, 0.42);
-      const xe = 167 + 29.4;
-      line(c, xe, 37.5, xe, 24, C.wire, 2.5); terminal(c, xe, 20); subU(c, '+V', 'CC', '', xe + 10, 16, C.v, 10.5, 'left');
-      line(c, xe, 142.5, xe, 150, C.wire, 2.5); line(c, xe, 150, 270, 150, C.wire, 2.5);
-      // RL from the emitter node to ground
-      line(c, 270, 150, 270, 154, C.wire, 2.5); resV(c, 270, 154, 182); line(c, 270, 182, 270, 190, C.wire, 2.5);
-      subU(c, 'R', 'L', ' ' + fmtR(RL), 258, 170, C.muted, 11.5, 'right');
-      circ(c, 270, 150, 4, C.out); subU(c, 'v', 'L', '', 278, 138, C.out, 12, 'left');
-      line(c, 30, 190, 270, 190, C.wire, 2.5); ground(c, 150, 190);
-      scope(c, gb); cb.wm(c);
-    }
-    const o = { reset() { t = 0; }, step(dt) { t += dt; }, draw() { drawA(); drawB(); } };
-    upd();
-    A = new Anim('anim3', o);
-    sS.addEventListener('input', upd); sL.addEventListener('input', upd);
-  })();
-
-  /* =========================================================
-     4. CC characteristics: IE vs VCE (IC overlay), from the device model
-     ========================================================= */
-  (function () {
-    const cv = new Cv('cv4', 640, 456, 2), bt = $('ic4');
+    const cv = new Cv('cv3', 640, 456, 2), bt = $('ic3');
     const P = { l: 62, r: 620, t: 40, b: 366 }, YM = 10, GAP = 5, CUT_D = 0.25;
     const xk = P.l + 0.22 * (P.r - P.l);
     P.X = v => v <= 1 ? P.l + v * (xk - P.l) : xk + (v - 1) / 14 * (P.r - xk);
@@ -1088,15 +964,15 @@
       step(dt) { sw += dt / 3.5; if (sw >= 1) { sw = 1; A.setPlaying(false); } },
       draw: draw
     };
-    A = new Anim('anim4', o);
+    A = new Anim('anim3', o);
     bt.addEventListener('click', () => { showIC = !showIC; bt.setAttribute('aria-pressed', String(showIC)); A.dirty = true; });
   })();
 
   /* =========================================================
-     5. CB, CE and CC side by side, each with a mini scope
+     4. CB, CE and CC side by side, each with a mini scope
      ========================================================= */
   (function () {
-    const cvs = { CB: new Cv('cv5a', 300, 400), CE: new Cv('cv5b', 300, 400), CC: new Cv('cv5c', 300, 400) };
+    const cvs = { CB: new Cv('cv4a', 300, 400), CE: new Cv('cv4b', 300, 400), CC: new Cv('cv4c', 300, 400) };
     const COM = { CB: 'B', CE: 'E', CC: 'C' }, GAIN = { CB: 2.4, CE: -2.4, CC: 0.97 };
     const RY = 212, XL = 24, XR = 276;
     let ph = 0, t = 0;
@@ -1145,7 +1021,7 @@
       if (kind !== 'CC') txt(c, 'gain not to scale', XR, 236, C.muted, 10, 500, 'right');
       cv.wm(c);
     }
-    new Anim('anim5', {
+    new Anim('anim4', {
       reset() { ph = 0; t = 0; },
       step(dt) { ph += dt * 0.8; t += dt; },
       draw() { drawOne('CB'); drawOne('CE'); drawOne('CC'); }
