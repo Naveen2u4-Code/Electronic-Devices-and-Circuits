@@ -337,6 +337,7 @@
             <button class="btn" type="button" id="ic3" aria-pressed="false">Overlay I<sub>C</sub> curves</button>
           </div>
           <canvas id="cv3" class="narrow" style="aspect-ratio:640/456" role="img" aria-label="Graph of IE from 0 to 10 milliamps against VCE from 0 to 15 volts for IB of 0 to 80 microamps, with saturation, active and cutoff regions shaded. The overlay adds dashed IC curves that sit just below the IE curves; the gap is drawn five times larger than real."></canvas>
+          <canvas id="cv3i" class="narrow inset" style="aspect-ratio:640/380" role="img" aria-label="CC input characteristic: IB from 0 to 100 microamps against VCB from 0 to 7 volts for VCE of 2, 4 and 6 volts. Each curve is high at low VCB and falls steeply to zero as VCB approaches about 0.7 volts below VCE, because VBE = VCE minus VCB shrinks. Higher VCE moves the curve to the right."></canvas>
         </figure>
 
         <aside class="keypoints" aria-label="Key points: CC characteristics">
@@ -958,11 +959,38 @@
       }
       cv.wm(c);
     }
+    // Input characteristic: IB against VCB at constant VCE. VBE = VCE − VCB, so IB falls as VCB rises.
+    const ci = new Cv('cv3i', 640, 380, 2);
+    const Q = { l: 62, r: 620, t: 44, b: 300 }, IVCE = [2, 4, 6], ICOL = ['#4dd0e1', '#ffb74d', '#ba68c8'];
+    Q.X = v => Q.l + v / 7 * (Q.r - Q.l); Q.Y = i => Q.b - i / 100 * (Q.b - Q.t);
+    const INC = IVCE.map(vce => {
+      const out = [];
+      for (let v = 0; v <= vce + 1e-9; v += 0.002) { const ib = emCE(vce - v, vce).ib * 1e6; if (ib <= 100) out.push([v, Math.max(0, ib)]); }
+      for (let v = vce; v <= 7.0001; v += 0.05) out.push([v, Math.max(0, emCE(vce - v, vce).ib * 1e6)]);
+      return out;
+    });
+    function drawIn() {
+      const c = ci.begin(); if (!c) return;
+      axes(c, Q, [0, 1, 2, 3, 4, 5, 6, 7], [0, 20, 40, 60, 80, 100], v => String(v), v => String(v));
+      subU(c, 'I', 'B', ' (µA)', Q.l - 4, Q.t - 22, C.text, 13, 'left');
+      subU(c, 'V', 'CB', ' (V)', (Q.l + Q.r) / 2, Q.b + 48, C.text, 13, 'center');
+      txt(c, 'input characteristic', Q.r, Q.t - 22, C.muted, 11, 600, 'right');
+      const xs = Q.l + sw * (Q.r - Q.l);
+      for (let k = 0; k < IVCE.length; k++) {
+        const pts = []; for (const p of INC[k]) { const x = Q.X(p[0]); if (x > xs) break; pts.push([x, Q.Y(p[1])]); }
+        pline(c, pts, ICOL[k], 2.8);
+        if (sw < 1 && pts.length) { const h = pts[pts.length - 1]; circ(c, h[0], h[1], 4.5, ICOL[k], '#fff', 1.2); }
+        const x0 = Q.X(INC[k][0][0]);
+        if (x0 <= xs) subU(c, 'V', 'CE', ' = ' + IVCE[k] + ' V', x0 + 8, Q.t + 14 + k * 18 * FS, ICOL[k], 12, 'left');
+      }
+      if (sw < 1) line(c, xs, Q.t, xs, Q.b, 'rgba(255,255,255,.5)', 1.2, [3, 3]);
+      ci.wm(c);
+    }
     const o = {
       reset() { sw = RM ? 1 : 0; },
       restart() { if (sw >= 1) sw = 0; },
       step(dt) { sw += dt / 3.5; if (sw >= 1) { sw = 1; A.setPlaying(false); } },
-      draw: draw
+      draw() { draw(); drawIn(); }
     };
     A = new Anim('anim3', o);
     bt.addEventListener('click', () => { showIC = !showIC; bt.setAttribute('aria-pressed', String(showIC)); A.dirty = true; });
