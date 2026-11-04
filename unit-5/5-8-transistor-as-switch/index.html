@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>5.8 Transistor as a Switch</title>
+  <meta name="description" content="The BJT as an electronic switch explained step by step: cutoff as OFF and saturation as ON, designing a saturated switch, flyback diodes for inductive loads, power and switching loss, switching times, and applications such as the inverter and PWM. An interactive lesson.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1420;
+      --panel: #1a2132;
+      --panel-hover: #212a3f;
+      --border: #2a3448;
+      --text: #e6e9ef;
+      --muted: #9aa4b8;
+      --electron: #4fc3f7;
+      --hole: #ff8a65;
+      --energy: #ffd54f;
+      --success: #81c784;
+      --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+      --max: 960px;
+      --radius: 12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: var(--font); font-size: 16px; line-height: 1.65;
+      overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column;
+    }
+    a { color: var(--electron); }
+    .wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 16px; }
+
+    /* Sticky mini-nav */
+    .toc {
+      position: sticky; top: 0; z-index: 10; background: rgba(15, 20, 32, .95);
+      border-bottom: 1px solid var(--border); backdrop-filter: blur(6px);
+    }
+    .toc ul { display: flex; gap: 4px; list-style: none; margin: 0 auto; padding: 8px 16px; max-width: var(--max); overflow-x: auto; scrollbar-width: none; }
+    .toc ul::-webkit-scrollbar { display: none; }
+    .toc a {
+      display: block; white-space: nowrap; text-decoration: none; color: var(--muted);
+      font-size: 0.85rem; font-weight: 500; padding: 6px 10px; border-radius: 999px;
+    }
+    .toc a:hover { color: var(--text); background: var(--panel); }
+    .toc a.active { color: var(--bg); background: var(--electron); }
+
+    main { flex: 1; padding: 24px 0 48px; }
+    .crumbs { font-size: 0.875rem; color: var(--muted); margin: 0 0 16px; }
+    .crumbs a { color: var(--muted); }
+    .crumbs a:hover { color: var(--electron); }
+    .eyebrow { font-family: var(--mono); font-size: 0.8rem; color: var(--electron); letter-spacing: .04em; margin: 0; }
+    h1 { font-size: clamp(1.5rem, 6vw, 2.2rem); line-height: 1.2; margin: 4px 0 6px; }
+    .subtitle { color: var(--muted); margin: 0 0 8px; }
+    section { scroll-margin-top: 64px; padding-top: 28px; }
+    h2 { font-size: clamp(1.3rem, 5vw, 1.6rem); line-height: 1.25; margin: 0 0 14px; }
+    h3 { font-size: 1.05rem; margin: 0 0 8px; }
+    .prose { font-size: 17px; line-height: 1.7; }
+    .prose p, .prose ul, .prose ol { margin: 0 0 14px; }
+    .prose ul, .prose ol { padding-left: 22px; }
+    .prose li { margin: 4px 0; }
+    .prose strong { color: #fff; }
+    hr.sep { border: 0; border-top: 1px solid var(--border); margin: 40px 0 0; }
+    .rm-note { font-size: 0.78rem; color: var(--muted); margin: 0 0 8px; }
+
+    /* Buttons & controls */
+    .btn {
+      font: inherit; font-size: 0.88rem; font-weight: 600; color: var(--text);
+      background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+      padding: 7px 12px; cursor: pointer; min-height: 38px;
+    }
+    .btn:hover:not(:disabled) { background: var(--panel-hover); border-color: var(--electron); }
+    .btn:focus-visible, input:focus-visible, canvas:focus-visible { outline: 2px solid var(--electron); outline-offset: 2px; }
+    .btn[aria-pressed="true"] { background: rgba(255,213,79,.14); border-color: var(--energy); color: var(--energy); }
+    .seg { display: inline-flex; gap: 0; }
+    .seg .btn { border-radius: 0; }
+    .seg .btn:first-child { border-radius: 8px 0 0 8px; }
+    .seg .btn:last-child { border-radius: 0 8px 8px 0; }
+    .seg .btn + .btn { margin-left: -1px; }
+    .glabel { font-size: 0.8rem; font-weight: 700; color: var(--muted); }
+
+    figure.anim {
+      margin: 18px 0 0; background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 12px; min-width: 0;
+    }
+    .ctrls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-bottom: 12px; }
+    .slider { flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; }
+    .slider label { display: flex; justify-content: space-between; gap: 8px; font-size: 0.8rem; color: var(--muted); }
+    .slider output { font-family: var(--mono); color: var(--energy); white-space: nowrap; }
+    input[type="range"] { width: 100%; accent-color: var(--energy); margin: 4px 0 0; }
+    canvas { display: block; width: 100%; border-radius: 8px; background: #141b2b; }
+    canvas.drag { touch-action: none; cursor: grab; }
+    canvas[hidden] { display: none; }
+    .narrow { max-width: 760px; margin: 0 auto; }
+    .inset { margin-top: 10px; }
+
+    .counters { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px auto 0; }
+    .ctr {
+      flex: 1 1 90px; background: #141b2b; border: 1px solid var(--border); border-radius: 8px;
+      padding: 6px 10px; font-size: 0.78rem; color: var(--muted); min-width: 0;
+    }
+    .ctr b { display: block; font-family: var(--mono); font-size: 1.02rem; font-weight: 500; white-space: nowrap; color: var(--text); overflow: hidden; text-overflow: ellipsis; }
+    .ctr.ok b { color: var(--success); } .ctr.v b { color: var(--energy); }
+
+    /* Junction and region badges */
+    .badges { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 10px auto 0; }
+    .bdg { font-size: 0.82rem; font-weight: 700; border-radius: 999px; padding: 4px 12px; border: 1.5px solid; white-space: nowrap; }
+    .bdg.fwd { color: #81c784; border-color: #81c784; background: rgba(129,199,132,.1); }
+    .bdg.rev { color: #ce93d8; border-color: #ce93d8; background: rgba(206,147,216,.1); }
+    .bdg.off { color: #b0bec5; border-color: #78909c; background: rgba(120,144,156,.12); }
+    .bdg.r-active { color: #66bb6a; border-color: #66bb6a; background: rgba(27,94,32,.35); }
+    .bdg.r-saturation { color: #ef5350; border-color: #ef5350; background: rgba(183,28,28,.3); }
+    .bdg.r-cutoff { color: #bdbdbd; border-color: #9e9e9e; background: rgba(66,66,66,.5); }
+
+    /* Section 5: comparison table + thumbnails */
+    .sumgrid { display: grid; grid-template-columns: 1fr; gap: 12px; align-items: start; }
+    @media (min-width: 720px) { .sumgrid { grid-template-columns: 3fr 2fr; } }
+    .thumbs { display: grid; grid-template-columns: 1fr; gap: 10px; min-width: 0; }
+    @media (min-width: 480px) and (max-width: 719px) { .thumbs { grid-template-columns: 1fr 1fr; } }
+    .ptitle { margin: 0 0 6px; font-size: 0.85rem; font-weight: 700; color: var(--muted); text-align: center; }
+    .vt { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 0.92rem; background: #141b2b; border: 1px solid var(--border); border-radius: 8px; }
+    .vt th, .vt td { text-align: left; padding: 9px 10px; border-top: 1px solid var(--border); vertical-align: top; overflow-wrap: anywhere; }
+    .vt thead th { border-top: 0; color: var(--text); font-weight: 700; }
+    .vt thead th.cb { color: #4dd0e1; } .vt thead th.ce { color: #ffb74d; }
+    .vt tbody th { font-weight: 600; color: var(--muted); width: 32%; }
+    .vt td.hl { color: #fff; }
+    @media (max-width: 480px) { .vt { font-size: .82rem; } .vt th, .vt td { padding: 7px 5px; } }
+
+    .keypoints {
+      margin-top: 16px; padding: 14px 16px; border-radius: var(--radius);
+      background: rgba(129,199,132,.07); border: 1px solid rgba(129,199,132,.35);
+    }
+    .keypoints h3 { color: var(--success); font-size: 0.95rem; text-transform: uppercase; letter-spacing: .05em; }
+    .keypoints ul { margin: 0; padding-left: 20px; }
+    .keypoints li { margin: 4px 0; }
+
+    .pager { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 48px; }
+    .pager a {
+      display: block; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 12px 14px; text-decoration: none; color: var(--text); min-width: 0;
+    }
+    .pager a:hover { border-color: var(--electron); }
+    .pager small { display: block; color: var(--muted); font-size: 0.75rem; }
+    .pager .next { text-align: right; }
+    .site-foot { border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; text-align: center; padding: 18px 16px; }
+
+    /* Justified paragraphs on desktop; phones stay left-aligned to avoid wide word gaps. */
+    @media (min-width: 768px) {
+      .prose p, .prose li, .keypoints li { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+    }
+  
+    /* Topic 5.8 */
+    .ctr.warn b { color: #ef5350; }
+    .designer { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 12px; margin: 0 auto 10px; max-width: 760px; }
+    @media (min-width: 640px) { .designer { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    .designer label { display: flex; flex-direction: column; gap: 4px; font-size: .8rem; color: var(--muted); min-width: 0; }
+    .designer input { font: inherit; font-family: var(--mono); font-size: .95rem; color: var(--energy); background: #141b2b; border: 1px solid var(--border); border-radius: 8px; padding: 7px 9px; width: 100%; min-width: 0; }
+    .designer input:focus-visible { outline: 2px solid var(--electron); outline-offset: 1px; }
+    .ctr small { display: block; font-size: .72rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .derr { color: #ef5350; font-size: .9rem; margin: 0 auto 8px; max-width: 760px; }
+    .testrow { max-width: 760px; margin: 12px auto 0; }
+    .satbadge { font-weight: 700; font-size: .95rem; border-radius: 10px; padding: 7px 14px; border: 2px solid; white-space: nowrap; }
+    .satbadge.ok { color: #81c784; border-color: #81c784; background: rgba(129,199,132,.12); }
+    .satbadge.bad { color: #ef5350; border-color: #ef5350; background: rgba(239,83,80,.14); white-space: normal; }
+  </style>
+</head>
+<body>
+
+  <nav class="toc" aria-label="Sections">
+    <ul>
+      <li><a href="#s0">ON and OFF</a></li>
+      <li><a href="#s1">Designing the switch</a></li>
+      <li><a href="#s2">Inductive loads</a></li>
+      <li><a href="#s3">Power</a></li>
+      <li><a href="#s4">Switching times</a></li>
+      <li><a href="#s5">Applications &amp; summary</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="wrap">
+      <header>
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="../../index.html">Home</a> / <a href="../index.html">Unit 5</a> / 5.8
+        </nav>
+        <p class="eyebrow">TOPIC 5.8</p>
+        <h1>Transistor as a Switch</h1>
+        <p class="subtitle">Cutoff is OFF, saturation is ON, and the active region is only crossed on the way</p>
+        <p class="rm-note" id="rmNote" hidden>Your device asks for reduced motion, so every animation starts paused. Press Play on any animation to run it. Sliders, buttons and dragging still update the picture.</p>
+      </header>
+
+      <!-- ================= SECTION 0 ================= -->
+      <section id="s0" aria-labelledby="h0">
+        <h2 id="h0">The idea: ON and OFF</h2>
+        <div class="prose">
+          <p>A switch has two states: <strong>OFF</strong>, where no current flows, and <strong>ON</strong>, where current flows with almost no voltage across the switch. A BJT can do the same job electronically, with no moving parts, millions of times per second.</p>
+          <ul>
+            <li><strong>OFF = CUTOFF:</strong> with the base voltage below about 0.5 V, I<sub>B</sub> ≈ 0 and I<sub>C</sub> ≈ 0. The full supply voltage appears across the transistor (V<sub>CE</sub> ≈ V<sub>CC</sub>), like an <strong>open switch</strong>.</li>
+            <li><strong>ON = SATURATION:</strong> with enough base current, the transistor saturates. I<sub>C</sub> is limited only by the load, and V<sub>CE(sat)</sub> is only about 0.2 V, like a <strong>closed switch</strong>.</li>
+          </ul>
+          <p>A switch circuit <strong>avoids the active region</strong> except for the brief moment of changing state, because in the active region both the voltage and the current are significant and the transistor wastes power as heat.</p>
+        </div>
+
+        <figure class="anim" id="anim0">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <button class="btn" type="button" id="in0" aria-pressed="false">V<sub>IN</sub> = 0 V</button>
+          </div>
+          <canvas id="cv0" class="narrow" style="aspect-ratio:640/350" role="img" aria-label="Switch circuit: VCC = 5 V feeds RC and an LED into the collector, the emitter is grounded and the base is fed through RB from a selector giving VIN = 0 V or 3.3 V. Beside it a mechanical switch opens when the transistor is OFF and closes when it is ON; the LED glows when ON."></canvas>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr v">V<sub>IN</sub><b id="c0vin">0 V</b></div>
+            <div class="ctr ok">I<sub>B</sub><b id="c0ib">0 mA</b></div>
+            <div class="ctr ok">I<sub>C</sub><b id="c0ic">0 mA</b></div>
+            <div class="ctr v">V<sub>CE</sub><b id="c0vce">5.0 V</b></div>
+            <div class="ctr">State<b id="c0st">OFF</b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: ON and OFF">
+          <h3>Key points</h3>
+          <ul>
+            <li>OFF = cutoff: I<sub>B</sub> ≈ 0, I<sub>C</sub> ≈ 0, V<sub>CE</sub> ≈ V<sub>CC</sub> (open switch).</li>
+            <li>ON = saturation: I<sub>C</sub> set by the load, V<sub>CE(sat)</sub> ≈ 0.2 V (closed switch).</li>
+            <li>No moving parts; it can switch millions of times per second.</li>
+            <li>The active region is only crossed while changing state, because it wastes power.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 1 ================= -->
+      <section id="s1" aria-labelledby="h1s">
+        <h2 id="h1s">Designing a saturated switch</h2>
+        <div class="prose">
+          <p>To be sure the transistor is fully ON, we design it to <strong>saturate even for the lowest β</strong> it might have.</p>
+          <ul>
+            <li><strong>Step 1.</strong> Find the ON collector current set by the load: <strong>I<sub>C(sat)</sub> = (V<sub>CC</sub> − V<sub>LOAD</sub> − V<sub>CE(sat)</sub>) / R<sub>C</sub></strong>.</li>
+            <li><strong>Step 2.</strong> Find the minimum base current needed: <strong>I<sub>B(min)</sub> = I<sub>C(sat)</sub> / β<sub>(min)</sub></strong>.</li>
+            <li><strong>Step 3.</strong> Choose a larger base current for safety, usually 2 to 5 times I<sub>B(min)</sub>. This extra drive is called the <strong>OVERDRIVE</strong> factor.</li>
+            <li><strong>Step 4.</strong> Choose the base resistor: <strong>R<sub>B</sub> = (V<sub>IN</sub> − V<sub>BE(sat)</sub>) / I<sub>B</sub></strong>, with V<sub>BE(sat)</sub> ≈ 0.8 V.</li>
+          </ul>
+          <p><strong>Worked example:</strong> drive an LED (forward voltage 2 V, about 20 mA) from V<sub>CC</sub> = 5 V, with the input coming from a 3.3 V logic output, using a transistor with β<sub>(min)</sub> = 100.</p>
+          <ul>
+            <li>R<sub>C</sub> = (5 − 2 − 0.2) / 20 mA = 140 Ω → choose the standard value <strong>150 Ω</strong>, so <strong>I<sub>C(sat)</sub> ≈ 18.7 mA</strong>.</li>
+            <li>I<sub>B(min)</sub> = 18.7 mA / 100 ≈ <strong>0.19 mA</strong>.</li>
+            <li>With an overdrive of 5: <strong>I<sub>B</sub> ≈ 0.93 mA</strong>.</li>
+            <li>R<sub>B</sub> = (3.3 − 0.8) / 0.93 mA ≈ <strong>2.7 kΩ</strong>.</li>
+          </ul>
+        </div>
+
+        <figure class="anim" id="anim1">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="designer">
+            <label><span>V<sub>CC</sub> (V)</span><input type="number" id="d_vcc" value="5" min="1" max="48" step="0.1" inputmode="decimal"></label>
+            <label><span>Load voltage (V)</span><input type="number" id="d_vl" value="2" min="0" max="40" step="0.1" inputmode="decimal"></label>
+            <label><span>Load current (mA)</span><input type="number" id="d_il" value="20" min="0.1" max="1000" step="0.1" inputmode="decimal"></label>
+            <label><span>β<sub>(min)</sub></span><input type="number" id="d_bmin" value="100" min="5" max="1000" step="1" inputmode="numeric"></label>
+            <label><span>Overdrive</span><input type="number" id="d_od" value="5" min="1" max="10" step="0.5" inputmode="decimal"></label>
+            <label><span>V<sub>IN</sub> (V)</span><input type="number" id="d_vin" value="3.3" min="0.9" max="24" step="0.1" inputmode="decimal"></label>
+          </div>
+          <p class="derr" id="d_err" hidden></p>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr">R<sub>C</sub> (E12)<b id="o_rc">150 Ω</b></div>
+            <div class="ctr ok">I<sub>C(sat)</sub><b id="o_ics">18.7 mA</b></div>
+            <div class="ctr ok">I<sub>B(min)</sub><b id="o_ibm">0.19 mA</b></div>
+            <div class="ctr ok">I<sub>B</sub><b id="o_ib">0.93 mA</b></div>
+            <div class="ctr">R<sub>B</sub> (E12)<b id="o_rb">2.7 kΩ</b></div>
+          </div>
+          <canvas id="cv1" class="narrow inset" style="aspect-ratio:640/350" role="img" aria-label="The designed circuit with its RC and RB labels updated, and the LED lit according to the collector current for the tested beta."></canvas>
+          <div class="ctrls testrow">
+            <div class="slider">
+              <label for="b1"><span>Test with actual β</span><output id="b1o" for="b1">100</output></label>
+              <input type="range" id="b1" min="50" max="400" step="1" value="100">
+            </div>
+            <span class="satbadge ok" id="b1badge">SATURATED ✓</span>
+          </div>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr ok">I<sub>B</sub> (with E12 R<sub>B</sub>)<b id="t_ib">0.93 mA</b></div>
+            <div class="ctr">β·I<sub>B</sub><b id="t_bib">93 mA</b></div>
+            <div class="ctr ok">I<sub>C</sub><b id="t_ic">18.7 mA</b></div>
+            <div class="ctr v">V<sub>CE</sub><b id="t_vce">0.2 V</b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: design">
+          <h3>Key points</h3>
+          <ul>
+            <li>I<sub>C(sat)</sub> = (V<sub>CC</sub> − V<sub>LOAD</sub> − V<sub>CE(sat)</sub>)/R<sub>C</sub>, then I<sub>B(min)</sub> = I<sub>C(sat)</sub>/β<sub>(min)</sub>.</li>
+            <li>Give 2 to 5 times I<sub>B(min)</sub> (overdrive) so it saturates even at the lowest β.</li>
+            <li>R<sub>B</sub> = (V<sub>IN</sub> − V<sub>BE(sat)</sub>)/I<sub>B</sub>, with V<sub>BE(sat)</sub> ≈ 0.8 V.</li>
+            <li>LED example: R<sub>C</sub> = 150 Ω, I<sub>C(sat)</sub> ≈ 18.7 mA, I<sub>B</sub> ≈ 0.93 mA, R<sub>B</sub> ≈ 2.7 kΩ.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 2 ================= -->
+      <section id="s2" aria-labelledby="h2s">
+        <h2 id="h2s">Switching inductive loads (relays and motors)</h2>
+        <div class="prose">
+          <p>Relays, solenoids and motors are <strong>coils (inductors)</strong>. An inductor resists sudden changes in current. When the transistor switches OFF, the coil current tries to keep flowing, and the coil produces a large <strong>voltage spike</strong> (V = L·di/dt) at the collector. This spike can exceed the transistor's breakdown voltage and destroy it.</p>
+          <p>The standard protection is a <strong>FLYBACK DIODE</strong> connected across the coil, reverse biased during normal operation (cathode to the positive supply). When the transistor turns off, the diode gives the coil current a safe path to circulate and decay, <strong>clamping the collector voltage</strong> to about one diode drop above V<sub>CC</sub>.</p>
+        </div>
+
+        <figure class="anim" id="anim2">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <button class="btn" type="button" id="in2" aria-pressed="true">Input ON</button>
+            <button class="btn" type="button" id="dio2" aria-pressed="true">Flyback diode: present</button>
+            <button class="btn" type="button" id="auto2" aria-pressed="true">Auto pulse</button>
+          </div>
+          <canvas id="cv2" class="narrow" style="aspect-ratio:640/320" role="img" aria-label="Relay coil from VCC = 12 V to the collector, with a flyback diode across the coil (cathode to VCC) that can be removed. Green dots show the coil current; after turn-off with the diode present they circulate through the diode and fade."></canvas>
+          <canvas id="cv2s" class="narrow inset" style="aspect-ratio:640/330" role="img" aria-label="Scope of VIN and the collector voltage. Without the diode, turn-off makes a tall spike far above 12 volts that exceeds VCEO; with the diode, the collector is clamped near 12.7 volts while the coil current decays."></canvas>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr v">V<sub>C</sub> now<b id="c2vc">0.2 V</b></div>
+            <div class="ctr v">Peak V<sub>C</sub> after turn-off<b id="c2pk">—</b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: inductive loads">
+          <h3>Key points</h3>
+          <ul>
+            <li>A coil resists sudden changes of current: turning it off gives a spike V = L·di/dt.</li>
+            <li>The spike can exceed the transistor's breakdown voltage and destroy it.</li>
+            <li>A flyback diode across the coil (cathode to +V<sub>CC</sub>) lets the current circulate and decay.</li>
+            <li>The collector is clamped to about one diode drop above V<sub>CC</sub> (≈ 12.7 V here).</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 3 ================= -->
+      <section id="s3" aria-labelledby="h3s">
+        <h2 id="h3s">Power in a switch</h2>
+        <div class="prose">
+          <p>The power dissipated in the transistor is <strong>P = V<sub>CE</sub> × I<sub>C</sub></strong>.</p>
+          <ul>
+            <li><strong>OFF:</strong> I<sub>C</sub> ≈ 0, so P ≈ 0.</li>
+            <li><strong>ON:</strong> V<sub>CE</sub> ≈ 0.2 V, so P is small (for 18.7 mA, about 3.7 mW).</li>
+            <li><strong>DURING SWITCHING:</strong> for a short time both V<sub>CE</sub> and I<sub>C</sub> are large, and the power peaks. This <strong>SWITCHING LOSS</strong> grows with how often the switch changes state (frequency) and how slowly it changes.</li>
+          </ul>
+          <p>This is why <strong>fast edges</strong> matter and why switching circuits run cool, while a transistor left in the active region with a large load current can get hot.</p>
+        </div>
+
+        <figure class="anim" id="anim3">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <button class="btn" type="button" id="act3" aria-pressed="false">Leave in active region</button>
+            <div class="slider">
+              <label for="f3"><span>Switching frequency</span><output id="f3o" for="f3">10 kHz</output></label>
+              <input type="range" id="f3" min="0" max="115" step="1" value="50">
+            </div>
+            <div class="slider">
+              <label for="e3"><span>Edge time</span><output id="e3o" for="e3">1.0 µs</output></label>
+              <input type="range" id="e3" min="0" max="100" step="1" value="50">
+            </div>
+          </div>
+          <canvas id="cv3" class="narrow" style="aspect-ratio:640/496" role="img" aria-label="Three aligned traces for a square-wave input: VCE, IC and the power P = VCE times IC. The power is near zero in the flat parts and spikes at each transition, shaded. A transistor icon changes from cool to hot colours with the average power. With Leave in active region on, the power becomes a large constant level."></canvas>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr">Average P<b id="c3p">18 mW</b></div>
+            <div class="ctr">ON-state loss<b id="c3on">9.8 mW</b></div>
+            <div class="ctr">Switching loss<b id="c3sw">7.9 mW</b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: power">
+          <h3>Key points</h3>
+          <ul>
+            <li>P = V<sub>CE</sub> × I<sub>C</sub>: about 0 when OFF, small when ON (≈ 3.7 mW for 18.7 mA).</li>
+            <li>During each transition both are large, so power spikes: switching loss.</li>
+            <li>Switching loss rises with frequency and with slower edges.</li>
+            <li>A transistor left in the active region with a large current gets hot.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 4 ================= -->
+      <section id="s4" aria-labelledby="h4s">
+        <h2 id="h4s">Switching times and speed</h2>
+        <div class="prose">
+          <p>A transistor cannot switch instantly. When a pulse is applied to the base, the collector current changes after some delays:</p>
+          <ul>
+            <li><strong>DELAY TIME t<sub>d</sub>:</strong> from the input step to I<sub>C</sub> reaching 10% of its final value (time to charge the junction capacitances).</li>
+            <li><strong>RISE TIME t<sub>r</sub>:</strong> I<sub>C</sub> rising from 10% to 90%.</li>
+            <li><strong>STORAGE TIME t<sub>s</sub>:</strong> after the input is removed, the time until I<sub>C</sub> falls to 90%. During saturation, extra charge is stored in the base, and it must be removed before the transistor can leave saturation.</li>
+            <li><strong>FALL TIME t<sub>f</sub>:</strong> I<sub>C</sub> falling from 90% to 10%.</li>
+          </ul>
+          <p>Turn-on time <strong>t<sub>on</sub> = t<sub>d</sub> + t<sub>r</sub></strong>. Turn-off time <strong>t<sub>off</sub> = t<sub>s</sub> + t<sub>f</sub></strong>. Storage time is usually the longest, and it gets longer with more overdrive. Ways to reduce it include a <strong>SCHOTTKY CLAMP</strong> (a Schottky diode from base to collector that prevents deep saturation) and a <strong>speed-up capacitor</strong> across R<sub>B</sub>.</p>
+        </div>
+
+        <figure class="anim" id="anim4">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <button class="btn" type="button" id="sch4" aria-pressed="false">Schottky clamp</button>
+            <div class="slider">
+              <label for="od4"><span>Overdrive</span><output id="od4o" for="od4">5.0×</output></label>
+              <input type="range" id="od4" min="1" max="10" step="0.5" value="5">
+            </div>
+          </div>
+          <canvas id="cv4" class="narrow" style="aspect-ratio:640/456" role="img" aria-label="Oscilloscope: the input pulse on top and IC below, with 10 percent and 90 percent dashed lines. Brackets mark the delay time td, rise time tr, storage time ts and fall time tf. More overdrive lengthens ts; the Schottky clamp shrinks ts to near zero."></canvas>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr">t<sub>d</sub><b id="c4td">10 ns</b></div>
+            <div class="ctr">t<sub>r</sub><b id="c4tr">25 ns</b></div>
+            <div class="ctr warn">t<sub>s</sub><b id="c4ts">193 ns</b></div>
+            <div class="ctr">t<sub>f</sub><b id="c4tf">60 ns</b></div>
+            <div class="ctr">t<sub>on</sub><b id="c4ton">35 ns</b></div>
+            <div class="ctr">t<sub>off</sub><b id="c4toff">253 ns</b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: switching times">
+          <h3>Key points</h3>
+          <ul>
+            <li>t<sub>on</sub> = t<sub>d</sub> + t<sub>r</sub>; t<sub>off</sub> = t<sub>s</sub> + t<sub>f</sub>, measured at the 10% and 90% levels of I<sub>C</sub>.</li>
+            <li>Storage time comes from extra charge stored in the base during saturation.</li>
+            <li>t<sub>s</sub> is usually the longest and grows with overdrive.</li>
+            <li>A Schottky clamp or a speed-up capacitor across R<sub>B</sub> reduces t<sub>s</sub>.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 5 ================= -->
+      <section id="s5" aria-labelledby="h5s">
+        <h2 id="h5s">Applications and summary</h2>
+        <div class="prose">
+          <p>Transistor switches are everywhere: driving <strong>LEDs and displays</strong> from microcontrollers, switching <strong>relays and motors</strong>, controlling power with <strong>pulse-width modulation (PWM)</strong>, and in <strong>logic gates</strong>. The simplest logic gate is the <strong>transistor INVERTER (NOT gate)</strong>: a high input saturates the transistor and pulls the output low; a low input cuts it off and the output is pulled high through R<sub>C</sub>.</p>
+          <p><strong>Summary:</strong> OFF = cutoff (I<sub>C</sub> ≈ 0, V<sub>CE</sub> ≈ V<sub>CC</sub>); ON = saturation (V<sub>CE</sub> ≈ 0.2 V). Design for saturation at minimum β with 2-5 times overdrive. Protect inductive loads with a flyback diode. Switching speed is limited mainly by storage time.</p>
+        </div>
+
+        <figure class="anim" id="anim5">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <button class="btn" type="button" id="in5" aria-pressed="false">Input = 0 V</button>
+          </div>
+          <canvas id="cv5" class="narrow" style="aspect-ratio:640/340" role="img" aria-label="Transistor inverter: VCC = 5 V, RC = 1 kilohm, RB = 10 kilohms, input 0 or 5 V, output at the collector. A truth table beside it highlights the active row: input 0 gives output 1, input 1 gives output 0."></canvas>
+          <div class="ctrls testrow">
+            <div class="slider">
+              <label for="d5"><span>PWM duty cycle</span><output id="d5o" for="d5">50%</output></label>
+              <input type="range" id="d5" min="0" max="100" step="1" value="50">
+            </div>
+          </div>
+          <canvas id="cv5p" class="narrow inset" style="aspect-ratio:640/250" role="img" aria-label="PWM demo: a square wave input with the chosen duty cycle switches the transistor and the LED; the LED brightness follows the duty cycle."></canvas>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr v">V<sub>OUT</sub><b id="c5vo">5.0 V</b></div>
+            <div class="ctr">Duty cycle<b id="c5d">50%</b></div>
+            <div class="ctr ok">Average LED current<b id="c5i">9.3 mA</b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: applications and summary">
+          <h3>Key points</h3>
+          <ul>
+            <li>Uses: LEDs and displays, relays and motors, PWM power control, logic gates.</li>
+            <li>Inverter (NOT gate): high in saturates the transistor, output low; low in cuts it off, output high.</li>
+            <li>Design for saturation at minimum β with 2-5 times overdrive; flyback diodes on coils.</li>
+            <li>Switching speed is limited mainly by storage time.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <nav class="pager" aria-label="Topic navigation">
+        <a href="../5-7-regions-of-operation/index.html"><small>← Previous</small>5.7 Regions of Operation</a>
+        <a class="next" href="../5-9-transistor-as-amplifier/index.html"><small>Next →</small>5.9 Transistor as an Amplifier</a>
+      </nav>
+    </div>
+  </main>
+
+  <footer class="site-foot">© 2026 Naveen Bokka</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  const C = {
+    text: '#e6e9ef', muted: '#9aa4b8', e: '#4fc3f7', h: '#ff8a65', v: '#ffd54f', cur: '#81c784', wire: '#cfd8dc',
+    grid: 'rgba(255,255,255,.07)', IN: '#4dd0e1',
+    act: 'rgba(27,94,32,.25)', sat: 'rgba(183,28,28,.25)', cut: 'rgba(66,66,66,.4)',
+    tAct: '#66bb6a', tSat: '#ef5350', tCut: '#d0d0d0'
+  };
+  const FONT = 'Inter, system-ui, sans-serif';
+  const MONO = '"JetBrains Mono", Consolas, monospace';
+  const RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const TAU = Math.PI * 2;
+  const $ = id => document.getElementById(id);
+  if (RM) $('rmNote').hidden = false;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+  /* =========================================================
+     Device model: NPN silicon, 300 K. Ebers-Moll transport model
+     (IS = 1e-14 A, βF = 100, βR = 1, VT = 25.9 mV) with the Early
+     effect (VA = 100 V) applied to the forward collector current.
+     ========================================================= */
+  const IS = 1e-14, BF = 100, BR = 1, VT = 0.0259, VA = 100;
+  const CUTIN = 0.5;   // junction counted as "forward" (conducting) above the cut-in voltage
+  const xp = v => Math.exp(Math.min(v / VT, 90)) - 1;
+  // Terminal currents (A) from VBE and VCB (VBC = −VCB).
+  function em(vbe, vcb) {
+    const icc = IS * xp(vbe), iec = IS * xp(-vcb), ea = 1 + vcb / VA;
+    const ic = icc * ea - iec * (1 + 1 / BR), ib = icc / BF + iec / BR;
+    return { ic: ic, ib: ib, ie: ic + ib, icc: icc, iec: iec, ea: ea };
+  }
+  // Common emitter view: VBE and VCE in.
+  const emCE = (vbe, vce) => em(vbe, vce - vbe);
+  // VBE that gives base current ib (A) at a given VCE (IB rises monotonically with VBE).
+  function vbeForIB(ib, vce) {
+    let a = -0.3, b = 1.2;
+    for (let k = 0; k < 56; k++) { const m = (a + b) / 2; if (emCE(m, vce).ib < ib) a = m; else b = m; }
+    return (a + b) / 2;
+  }
+  // Operating point for a forced IB (A) and VCE (V)
+  function ceIB(ib, vce) {
+    const vbe = vbeForIB(ib, vce), r = emCE(vbe, vce);
+    r.vbe = vbe; r.vce = vce; r.vbc = vbe - vce; return r;
+  }
+  // Region and junction states from the model
+  function states(r, ibZero) {
+    const ebj = r.vbe >= CUTIN ? 'fwd' : 'off';
+    const cbj = r.vbc >= CUTIN ? 'fwd' : r.vbc < 0 ? 'rev' : 'off';
+    const reg = ibZero ? 'cutoff' : cbj === 'fwd' ? 'saturation' : ebj === 'off' ? 'cutoff' : 'active';
+    return { ebj: ebj, cbj: cbj, reg: reg };
+  }
+  // CE circuit: VBB–RB into the base, VCC–RC into the collector, emitter grounded.
+  function solveCE(VBB, RB, VCC, RC) {
+    function vceFor(vbe) {
+      let a = -0.3, b = VCC + 1;
+      for (let k = 0; k < 48; k++) { const m = (a + b) / 2; if (VCC - m - emCE(vbe, m).ic * RC > 0) a = m; else b = m; }
+      return (a + b) / 2;
+    }
+    let a = -0.3, b = 1.0;
+    for (let k = 0; k < 48; k++) { const m = (a + b) / 2, y = vceFor(m); if (VBB - m - emCE(m, y).ib * RB > 0) a = m; else b = m; }
+    const vbe = (a + b) / 2, vce = vceFor(vbe), r = emCE(vbe, vce);
+    r.vbe = vbe; r.vce = vce; r.vbc = vbe - vce; return r;
+  }
+  // Common base view (for the summary thumbnail): IE forced, closed form.
+  function emIE(ie, vcb) {
+    const iec = IS * xp(-vcb), ea = 1 + vcb / VA, icc = (ie + iec) / (ea + 1 / BF);
+    return { ic: icc * ea - iec * (1 + 1 / BR) };
+  }
+
+  function fmtA(a) {
+    const s = a < 0 ? '−' : ''; a = Math.abs(a);
+    if (a < 1e-15) return '0 A';
+    const P = [['mA', 1e-3], ['µA', 1e-6], ['nA', 1e-9], ['pA', 1e-12], ['fA', 1e-15]];
+    let k = 0; for (; k < P.length - 1; k++) if (a >= P[k][1]) break;
+    const m = a / P[k][1];
+    return s + (m >= 100 ? m.toFixed(0) : m >= 10 ? m.toFixed(1) : m.toFixed(2)) + ' ' + P[k][0];
+  }
+  const fmtV = (v, d) => { const t = Math.abs(v).toFixed(d == null ? 2 : d); return (v < 0 && +t !== 0 ? '−' : '') + t + ' V'; };
+  function fmtR(r) {
+    if (!isFinite(r) || r > 1e10) return '> 10 GΩ';
+    if (r >= 1e6) return (r / 1e6).toFixed(r >= 1e7 ? 0 : 1) + ' MΩ';
+    if (r >= 1e3) return (r / 1e3).toFixed(r >= 1e4 ? 0 : 1) + ' kΩ';
+    return r.toFixed(r >= 100 ? 0 : 1) + ' Ω';
+  }
+  const REGCOL = { active: C.tAct, saturation: C.tSat, cutoff: C.tCut };
+
+  /* ---------- Canvas helpers ---------- */
+  let FS = 1;
+  function Cv(id, W, H, cap) { this.el = $(id); this.W = W; this.H = H; this.cap = cap || 1.6; this.ctx = this.el.getContext('2d'); }
+  Cv.prototype.begin = function () {
+    const w = this.el.clientWidth; if (!w) return null;
+    const dpr = window.devicePixelRatio || 1;
+    const pw = Math.round(w * dpr), ph = Math.round(w * dpr * this.H / this.W);
+    if (this.el.width !== pw || this.el.height !== ph) { this.el.width = pw; this.el.height = ph; }
+    const c = this.ctx, s = pw / this.W;
+    FS = Math.min(this.cap, Math.max(1, 1.15 * this.W / w));
+    c.setTransform(s, 0, 0, s, 0, 0); c.clearRect(0, 0, this.W, this.H);
+    c.textBaseline = 'middle'; c.textAlign = 'left'; c.globalAlpha = 1; c.setLineDash([]); c.lineCap = 'butt';
+    return c;
+  };
+  // Watermark: drawn inside the canvas, bottom-right, 13 px on screen at any size.
+  Cv.prototype.wm = function (c) {
+    const k = this.W / this.el.clientWidth, s = 13 * k;
+    c.save(); c.setTransform(this.el.width / this.W, 0, 0, this.el.width / this.W, 0, 0);
+    c.globalAlpha = 1; c.font = '500 ' + s.toFixed(1) + 'px ' + FONT; c.fillStyle = 'rgba(255,255,255,.35)';
+    c.textAlign = 'right'; c.textBaseline = 'bottom'; c.fillText('© Naveen Bokka', this.W - 6 * k, this.H - 4 * k); c.restore();
+  };
+  Cv.prototype.pt = function (e) {
+    const r = this.el.getBoundingClientRect();
+    return { x: (e.clientX - r.left) * this.W / r.width, y: (e.clientY - r.top) * this.H / r.height };
+  };
+  function circ(c, x, y, r, fill, stroke, lw) {
+    c.beginPath(); c.arc(x, y, Math.max(0, r), 0, TAU);
+    if (fill) { c.fillStyle = fill; c.fill(); }
+    if (stroke) { c.strokeStyle = stroke; c.lineWidth = lw || 1.5; c.stroke(); }
+  }
+  function txt(c, s, x, y, col, size, weight, align, font) {
+    c.font = (weight || 600) + ' ' + ((size || 12) * FS).toFixed(1) + 'px ' + (font || FONT);
+    c.fillStyle = col || C.text; c.textAlign = align || 'left'; c.fillText(s, x, y);
+  }
+  // Label with subscript and optional trailing text, e.g. subU(c, 'I', 'C', ' (mA)', …)
+  function subU(c, a, b, u, x, y, col, size, align) {
+    const z = (size || 13) * FS;
+    c.font = '700 ' + z.toFixed(1) + 'px ' + FONT; const wa = c.measureText(a).width;
+    c.font = '700 ' + (z * 0.72).toFixed(1) + 'px ' + FONT; const wb = c.measureText(b).width;
+    c.font = '600 ' + z.toFixed(1) + 'px ' + FONT; const wu = u ? c.measureText(u).width : 0;
+    const w = wa + wb + wu, x0 = align === 'right' ? x - w : align === 'center' ? x - w / 2 : x;
+    c.fillStyle = col; c.textAlign = 'left';
+    c.font = '700 ' + z.toFixed(1) + 'px ' + FONT; c.fillText(a, x0, y);
+    c.font = '700 ' + (z * 0.72).toFixed(1) + 'px ' + FONT; c.fillText(b, x0 + wa, y + z * 0.3);
+    if (u) { c.font = '600 ' + z.toFixed(1) + 'px ' + FONT; c.fillText(u, x0 + wa + wb, y); }
+    return w;
+  }
+  function line(c, x0, y0, x1, y1, col, lw, dash) {
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []);
+    c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke(); c.setLineDash([]);
+  }
+  function pline(c, pts, col, lw, dash) {
+    if (pts.length < 2) return;
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []); c.lineJoin = 'round';
+    c.beginPath(); pts.forEach((p, k) => k ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); c.stroke(); c.setLineDash([]);
+  }
+  // Arrow with shaft width lw; head scales with the shaft.
+  function arrow(c, x0, y0, x1, y1, col, lw, head) {
+    const dx = x1 - x0, dy = y1 - y0, L = Math.hypot(dx, dy); if (L < 2) return;
+    const ux = dx / L, uy = dy / L, hs = Math.min(head || 10, L * 0.8), hw = Math.max(hs * 0.55, lw * 0.9);
+    line(c, x0, y0, x1 - ux * hs * 0.9, y1 - uy * hs * 0.9, col, lw || 3);
+    c.fillStyle = col; c.beginPath(); c.moveTo(x1, y1);
+    c.lineTo(x1 - ux * hs - uy * hw, y1 - uy * hs + ux * hw);
+    c.lineTo(x1 - ux * hs + uy * hw, y1 - uy * hs - ux * hw); c.closePath(); c.fill();
+  }
+  function poly(c, pts, fill, stroke, lw) {
+    c.beginPath(); c.moveTo(pts[0][0], pts[0][1]); for (let k = 1; k < pts.length; k++) c.lineTo(pts[k][0], pts[k][1]); c.closePath();
+    if (fill) { c.fillStyle = fill; c.fill(); }
+    if (stroke) { c.strokeStyle = stroke; c.lineWidth = lw || 1.2; c.stroke(); }
+  }
+  function rrect(c, x, y, w, h, r) {
+    c.beginPath();
+    if (c.roundRect) c.roundRect(x, y, w, h, r); else c.rect(x, y, w, h);
+  }
+  function resH(c, x0, x1, y, col) {
+    const n = 6, d = (x1 - x0) / n, pts = [[x0, y]];
+    for (let k = 0; k < n; k++) pts.push([x0 + d * (k + 0.5), y + (k % 2 ? 8 : -8)]);
+    pts.push([x1, y]); pline(c, pts, col || C.wire, 2.5);
+  }
+  function resV(c, x, y0, y1, col) {
+    const n = 6, d = (y1 - y0) / n, pts = [[x, y0]];
+    for (let k = 0; k < n; k++) pts.push([x + (k % 2 ? 8 : -8), y0 + d * (k + 0.5)]);
+    pts.push([x, y1]); pline(c, pts, col || C.wire, 2.5);
+  }
+  function ground(c, x, y) {
+    line(c, x, y, x, y + 8, C.wire, 2.5);
+    line(c, x - 12, y + 8, x + 12, y + 8, C.wire, 2.5); line(c, x - 7, y + 13, x + 7, y + 13, C.wire, 2.5); line(c, x - 3, y + 18, x + 3, y + 18, C.wire, 2.5);
+  }
+  // Battery on a vertical wire, long (+) plate on top. side = −1: label left, +1: label right.
+  function vbat(c, x, y, subs, side, val) {
+    const yL = y - 6, yS = y + 6;
+    c.fillStyle = '#141b2b'; c.fillRect(x - 20, y - 12, 40, 24);
+    line(c, x - 18, yL, x + 18, yL, C.v, 3); line(c, x - 10, yS, x + 10, yS, C.v, 5);
+    const sx = x - side * 26;
+    txt(c, '+', sx, yL - 6, C.v, 14, 700, 'center'); txt(c, '−', sx, yS + 6, C.v, 14, 700, 'center');
+    const lx = x + side * 26, al = side < 0 ? 'right' : 'left';
+    subU(c, 'V', subs, '', lx, val ? y - 9 : y, C.v, 13, al);
+    if (val) txt(c, val, lx, y + 11, C.v, 11, 500, al, MONO);
+  }
+  /* NPN symbol, vertical: (bx, by) = middle of the base bar, base lead to the left, collector up, emitter down.
+     Lead ends: base (bx − 100s, by), collector (bx + 70s, by − 125s), emitter (bx + 70s, by + 125s). */
+  function bjtSym(c, bx, by, s) {
+    const P = (x, y) => [bx + x * s, by + y * s];
+    const L = (a, b, w) => { const A = P(a[0], a[1]), B = P(b[0], b[1]); line(c, A[0], A[1], B[0], B[1], C.wire, (w || 3) * s); };
+    const cc = P(35, 0); circ(c, cc[0], cc[1], 72 * s, '#141b2b', 'rgba(207,216,220,.3)', 1.5);
+    L([-100, 0], [0, 0]); L([0, -50], [0, 50], 6); L([0, -28], [70, -70]); L([70, -70], [70, -125]);
+    L([0, 28], [70, 70]); L([70, 70], [70, 125]);
+    const ll = Math.hypot(70, 42), ux = 70 / ll, uy = 42 / ll, T = P(70 * 0.82, 28 + 42 * 0.82), hs = 17 * s;
+    poly(c, [[T[0], T[1]], [T[0] - ux * hs - uy * hs * 0.6, T[1] - uy * hs + ux * hs * 0.6], [T[0] - ux * hs + uy * hs * 0.6, T[1] - uy * hs - ux * hs * 0.6]], C.wire);
+  }
+  // Plot frame. P = {l, r, t, b, X(v), Y(v)}
+  function axes(c, P, xt, yt, fx, fy) {
+    xt.forEach(v => { const x = P.X(v); line(c, x, P.t, x, P.b, C.grid, 1); txt(c, fx(v), x, P.b + 14, C.muted, 11, 500, 'center'); });
+    yt.forEach(v => { const y = P.Y(v); line(c, P.l, y, P.r, y, C.grid, 1); txt(c, fy(v), P.l - 8, y, C.muted, 11, 500, 'right'); });
+    line(c, P.l, P.b, P.r, P.b, C.muted, 1.5); line(c, P.l, P.t, P.l, P.b, C.muted, 1.5);
+  }
+  function along(pts, d) {
+    for (let k = 1; k < pts.length; k++) {
+      const a = pts[k - 1], b = pts[k], L = Math.hypot(b[0] - a[0], b[1] - a[1]);
+      if (d <= L) return [a[0] + (b[0] - a[0]) * d / L, a[1] + (b[1] - a[1]) * d / L];
+      d -= L;
+    }
+    return null;
+  }
+  const plen = pts => pts.reduce((s, p, k) => k ? s + Math.hypot(p[0] - pts[k - 1][0], p[1] - pts[k - 1][1]) : 0, 0);
+  function flowDots(c, pts, phase, gap, col, r) {
+    const L = plen(pts);
+    for (let d = ((phase % gap) + gap) % gap; d < L; d += gap) { const q = along(pts, d); if (q) circ(c, q[0], q[1], r || 3.2, col); }
+  }
+  function segSel(root, attr, val) {
+    root.querySelectorAll('[data-' + attr + ']').forEach(b => b.setAttribute('aria-pressed', String(b.dataset[attr] === String(val))));
+  }
+  function draggable(cv, onPt, onDown) {
+    let down = false;
+    cv.el.addEventListener('pointerdown', e => { down = true; cv.el.setPointerCapture(e.pointerId); const p = cv.pt(e); if (onDown) onDown(p); onPt(p); e.preventDefault(); });
+    cv.el.addEventListener('pointermove', e => { if (down) onPt(cv.pt(e)); });
+    const up = () => { down = false; };
+    cv.el.addEventListener('pointerup', up); cv.el.addEventListener('pointercancel', up);
+  }
+  function scopeGrid(c, S, nx, ny) {
+    rrect(c, S.l - 6, S.t - 6, S.r - S.l + 12, S.b - S.t + 12, 8); c.fillStyle = '#0b1612'; c.fill();
+    const DX = (S.r - S.l) / nx, DY = (S.b - S.t) / ny;
+    for (let k = 0; k <= nx; k++) line(c, S.l + k * DX, S.t, S.l + k * DX, S.b, k === nx / 2 ? 'rgba(129,199,132,.35)' : 'rgba(129,199,132,.13)', 1);
+    for (let k = 0; k <= ny; k++) line(c, S.l, S.t + k * DY, S.r, S.t + k * DY, k === ny / 2 ? 'rgba(129,199,132,.35)' : 'rgba(129,199,132,.13)', 1);
+    return DY;
+  }
+  function glowLine(c, pts, col) { c.shadowColor = col; c.shadowBlur = 6; pline(c, pts, col, 2.4); c.shadowBlur = 0; }
+  function setBadge(id, kind, text) { const b = $(id); b.textContent = text; b.className = 'bdg ' + kind; }
+  function junctionBadges(p, st) {
+    setBadge(p + 'ebj', st.ebj, 'EBJ ' + (st.ebj === 'fwd' ? 'forward' : 'below cut-in'));
+    setBadge(p + 'cbj', st.cbj, 'CBJ ' + (st.cbj === 'fwd' ? 'forward' : st.cbj === 'rev' ? 'reverse' : 'below cut-in'));
+    setBadge(p + 'reg', 'r-' + st.reg, st.reg);
+  }
+
+  /* ---------- Animation framework: own Play/Pause/Reset, runs only while visible ---------- */
+  const anims = [];
+  function Anim(rootId, o) {
+    this.root = $(rootId); this.o = o; this.playing = !RM; this.visible = true; this.dirty = true;
+    this.pb = this.root.querySelector('[data-act="play"]');
+    this.pb.addEventListener('click', () => { if (!this.playing && o.restart) o.restart(); this.setPlaying(!this.playing); });
+    this.root.querySelector('[data-act="reset"]').addEventListener('click', () => { o.reset(); this.setPlaying(!RM); });
+    o.reset(); this.sync(); anims.push(this);
+    if ('IntersectionObserver' in window) {
+      this.visible = false;
+      new IntersectionObserver(es => es.forEach(e => { this.visible = e.isIntersecting; if (this.visible) this.dirty = true; }))
+        .observe(this.root);
+    }
+  }
+  Anim.prototype.setPlaying = function (p) { this.playing = p; this.sync(); this.dirty = true; };
+  Anim.prototype.sync = function () { this.pb.textContent = this.playing ? 'Pause' : 'Play'; };
+
+  function terminal(c, x, y, col) { circ(c, x, y, 4.5, '#141b2b', col || C.v, 2); }
+
+  /* ---------- Topic 5.8: switch helpers (simple switch approximations) ---------- */
+  C.in = '#4fc3f7'; C.out = '#ff8a65'; C.pw = '#ce93d8'; C.led = '#ff5252'; C.warn = '#ef5350';
+  const VBES = 0.8, VCES = 0.2;
+  const E12 = [1.0, 1.2, 1.5, 1.8, 2.2, 2.7, 3.3, 3.9, 4.7, 5.6, 6.8, 8.2];
+  function e12(r) {
+    const d = Math.pow(10, Math.floor(Math.log10(r))), cand = E12.map(v => v * d).concat([10 * d]);
+    return cand.reduce((a, b) => Math.abs(Math.log(b / r)) < Math.abs(Math.log(a / r)) ? b : a);
+  }
+  const fmtmA = a => { const m = a * 1e3; return (m >= 100 ? m.toFixed(0) : m >= 10 ? m.toFixed(1) : m.toFixed(2)) + ' mA'; };
+  const lerpCol = (a, b, t) => { const p = h => [1, 3, 5].map(i => parseInt(h.substr(i, 2), 16)); const A = p(a), B = p(b); return 'rgb(' + A.map((v, i) => Math.round(v + (B[i] - v) * t)).join(',') + ')'; };
+  function led(c, x, yT, yB, glow) {
+    const ym = (yT + yB) / 2;
+    if (glow > 0.01) {
+      const g = c.createRadialGradient(x, ym, 2, x, ym, 50);
+      g.addColorStop(0, 'rgba(255,82,82,' + (0.85 * glow).toFixed(3) + ')'); g.addColorStop(1, 'rgba(255,82,82,0)');
+      c.fillStyle = g; c.beginPath(); c.arc(x, ym, 50, 0, TAU); c.fill();
+    }
+    line(c, x, yT, x, ym - 10, C.wire, 2.5); line(c, x, ym + 10, x, yB, C.wire, 2.5);
+    poly(c, [[x - 12, ym - 10], [x + 12, ym - 10], [x, ym + 10]], glow > 0.01 ? lerpCol('#5a2a2a', '#ff5252', Math.min(1, glow)) : '#141b2b', C.wire, 2);
+    line(c, x - 12, ym + 10, x + 12, ym + 10, C.wire, 2.5);
+    const ac = glow > 0.01 ? C.led : C.muted;
+    arrow(c, x + 14, ym - 2, x + 28, ym - 12, ac, 1.6, 6); arrow(c, x + 14, ym + 6, x + 28, ym - 4, ac, 1.6, 6);
+  }
+  // two-way selector: pole at (x, y), contacts above (hi) and below (lo)
+  function selector(c, x, y, hi, labHi, labLo) {
+    const xc = x - 34, yh = y - 30, yl = y + 30;
+    circ(c, xc, yh, 4, '#141b2b', C.v, 2); circ(c, xc, yl, 4, '#141b2b', C.wire, 2); circ(c, x, y, 4, C.wire);
+    txt(c, labHi, xc, yh - 14, C.v, 11, 700, 'center'); line(c, xc, yl + 4, xc, yl + 10, C.wire, 2); ground(c, xc, yl + 10);
+    txt(c, labLo, xc + 18, yl + 14, C.muted, 10.5, 600, 'left');
+    line(c, x, y, xc + 3, hi ? yh + 2 : yl - 2, '#fff', 3);
+  }
+  function mechSwitch(c, x, on) {
+    const yt = 120, yb = 250;
+    txt(c, on ? 'ON' : 'OFF', x, 64, on ? C.cur : C.muted, 20, 700, 'center');
+    line(c, x, 92, x, yt, C.wire, 2.5); line(c, x, yb, x, 280, C.wire, 2.5);
+    circ(c, x, yt, 5, '#141b2b', C.wire, 2); circ(c, x, yb, 5, '#141b2b', C.wire, 2);
+    if (on) line(c, x, yb - 5, x, yt + 5, '#fff', 4); else line(c, x, yb - 5, x + 50, yt + 18, '#fff', 4);
+    txt(c, 'C', x - 16, yt, C.text, 14, 700, 'right'); txt(c, 'E', x - 16, yb, C.text, 14, 700, 'right');
+  }
+  // LED switch circuit used in sections 0 and 1
+  function swCircuit(c, o) {
+    const full = o.full;
+    terminal(c, 300, 22); txt(c, o.vcc, 312, 22, C.v, 13, 700, 'left');
+    line(c, 300, 26, 300, 34, C.wire, 2.5); resV(c, 300, 34, 82); line(c, 300, 82, 300, 96, C.wire, 2.5);
+    subU(c, 'R', 'C', ' ' + o.rc, 284, 58, C.muted, 11.5, 'right');
+    led(c, 300, 96, 160, o.glow); txt(c, 'LED', 284, 128, C.muted, 11.5, 600, 'right');
+    flowDots(c, [[300, 26], [300, 96]], o.pC, 20, C.cur, 3); flowDots(c, [[300, 300], [300, 310]], o.pC, 20, C.cur, 3);
+    bjtSym(c, 258, 235, 0.6);
+    line(c, 300, 310, 300, 312, C.wire, 2.5); ground(c, 300, 312);
+    line(c, 90, 235, 118, 235, C.wire, 2.5); c.fillStyle = '#141b2b'; c.fillRect(114, 223, 68, 24); resH(c, 118, 178, 235); line(c, 178, 235, 198, 235, C.wire, 2.5);
+    flowDots(c, [[92, 235], [196, 235]], o.pB, 20, C.cur, 2.4);
+    subU(c, 'R', 'B', ' ' + o.rb, 148, 260, C.muted, 11.5, 'center');
+    selector(c, 90, 235, o.hi, o.labHi, '0 V'); subU(c, 'V', 'IN', '', 98, 216, C.in, 12, 'left');
+    subU(c, 'I', 'B', '', 150, 205, C.cur, 12, 'center'); if (full) txt(c, o.ibTxt, 150, 190, C.cur, 10.5, 500, 'center', MONO);
+    subU(c, 'I', 'C', '', 314, 170, C.cur, 12, 'left'); if (full) txt(c, o.icTxt, 336, 170, C.cur, 10.5, 500, 'left', MONO);
+    line(c, 352, 160, 352, 310, 'rgba(255,213,79,.55)', 1.5, [4, 4]); line(c, 300, 160, 352, 160, 'rgba(255,213,79,.35)', 1, [2, 3]); line(c, 300, 310, 352, 310, 'rgba(255,213,79,.35)', 1, [2, 3]);
+    subU(c, 'V', 'CE', '', 360, 235, C.v, 12, 'left'); if (full) txt(c, o.vceTxt, 360, 252, C.v, 10.5, 500, 'left', MONO);
+    txt(c, 'B', 212, 220, C.text, 13, 700, 'center'); txt(c, 'C', 286, 172, C.text, 13, 700, 'right'); txt(c, 'E', 286, 300, C.text, 13, 700, 'right');
+  }
+
+  /* =========================================================
+     0. ON and OFF: LED switch beside a mechanical switch
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv0', 640, 350), bt = $('in0');
+    const RC = 150, RB = 2700, VCC = 5, VF = 2;
+    let on = false, pB = 0, pC = 0, ph = 0, A;
+    const st = () => on ? { ib: (3.3 - VBES) / RB, ic: (VCC - VF - VCES) / RC, vce: VCES } : { ib: 0, ic: 0, vce: VCC };
+    function upd() {
+      const s = st();
+      bt.innerHTML = 'V<sub>IN</sub> = ' + (on ? '3.3 V' : '0 V'); bt.setAttribute('aria-pressed', String(on));
+      $('c0vin').textContent = on ? '3.3 V' : '0 V'; $('c0ib').textContent = fmtmA(s.ib); $('c0ic').textContent = fmtmA(s.ic);
+      $('c0vce').textContent = s.vce.toFixed(1) + ' V'; $('c0st').textContent = on ? 'ON' : 'OFF';
+      $('c0st').style.color = on ? C.cur : C.muted;
+      if (A) A.dirty = true;
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const s = st(), full = cv.el.clientWidth >= 480;
+      swCircuit(c, { full: full, vcc: '+5 V', rc: '150 Ω', rb: '2.7 kΩ', glow: on ? 0.75 + 0.25 * Math.sin(ph * 3) * 0.3 : 0, pB: pB, pC: pC, hi: on, labHi: '3.3 V',
+        ibTxt: fmtmA(s.ib), icTxt: fmtmA(s.ic), vceTxt: s.vce.toFixed(1) + ' V' });
+      txt(c, '≡', 445, 190, C.muted, 26, 700, 'center');
+      mechSwitch(c, 545, on);
+      cv.wm(c);
+    }
+    const o = {
+      reset() { on = false; pB = pC = ph = 0; upd(); },
+      step(dt) { ph += dt; const s = st(); pB += Math.min(300, s.ib * 1e3 * 60) * dt; pC += Math.min(300, s.ic * 1e3 * 8) * dt; },
+      draw: draw
+    };
+    upd();
+    A = new Anim('anim0', o);
+    bt.addEventListener('click', () => { on = !on; upd(); });
+  })();
+
+  /* =========================================================
+     1. Designer: E12 resistors, then test with an actual β
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv1', 640, 350), sB = $('b1');
+    const ids = ['d_vcc', 'd_vl', 'd_il', 'd_bmin', 'd_od', 'd_vin'];
+    let D = null, T = null, pB = 0, pC = 0, A;
+    function calc() {
+      const g = id => parseFloat($(id).value);
+      const vcc = g('d_vcc'), vl = g('d_vl'), il = g('d_il') * 1e-3, bmin = g('d_bmin'), od = g('d_od'), vin = g('d_vin');
+      const err = $('d_err');
+      const bad = [vcc, vl, il, bmin, od, vin].some(v => !isFinite(v)) ? 'Please fill in every box with a number.' :
+        vcc - vl - VCES <= 0 ? 'VCC must be more than the load voltage plus 0.2 V.' :
+        vin <= VBES ? 'VIN must be above VBE(sat) = 0.8 V.' : il <= 0 || bmin <= 0 || od < 1 ? 'Load current and β(min) must be positive, and overdrive at least 1.' : '';
+      err.hidden = !bad; err.textContent = bad;
+      if (bad) return;
+      const rcx = (vcc - vl - VCES) / il, rc = e12(rcx), ics = (vcc - vl - VCES) / rc, ibm = ics / bmin, ib = od * ibm, rbx = (vin - VBES) / ib, rb = e12(rbx);
+      D = { vcc: vcc, vl: vl, vin: vin, rc: rc, rb: rb, ics: ics };
+      $('o_rc').innerHTML = fmtR(rc) + '<small>calc ' + fmtR(rcx) + '</small>'; $('o_ics').textContent = fmtmA(ics);
+      $('o_ibm').textContent = fmtmA(ibm); $('o_ib').textContent = fmtmA(ib); $('o_rb').innerHTML = fmtR(rb) + '<small>calc ' + fmtR(rbx) + '</small>';
+      test();
+    }
+    function test() {
+      if (!D) return;
+      const beta = +sB.value; $('b1o').textContent = beta;
+      const ib = (D.vin - VBES) / D.rb, bib = beta * ib, sat = bib >= D.ics;
+      const ic = sat ? D.ics : bib, vce = sat ? VCES : D.vcc - D.vl - ic * D.rc;
+      T = { ib: ib, ic: ic, vce: vce, sat: sat, beta: beta };
+      $('t_ib').textContent = fmtmA(ib); $('t_bib').textContent = fmtmA(bib); $('t_ic').textContent = fmtmA(ic); $('t_vce').textContent = vce.toFixed(2) + ' V';
+      const b = $('b1badge'); b.textContent = sat ? 'SATURATED ✓' : 'NOT SATURATED: VCE = ' + vce.toFixed(2) + ' V'; b.className = 'satbadge ' + (sat ? 'ok' : 'bad');
+      if (A) A.dirty = true;
+    }
+    function draw() {
+      const c = cv.begin(); if (!c || !D || !T) return;
+      const full = cv.el.clientWidth >= 480;
+      swCircuit(c, { full: full, vcc: '+' + D.vcc + ' V', rc: fmtR(D.rc), rb: fmtR(D.rb), glow: Math.min(1, T.ic / D.ics) * 0.9, pB: pB, pC: pC, hi: true, labHi: D.vin + ' V',
+        ibTxt: fmtmA(T.ib), icTxt: fmtmA(T.ic), vceTxt: T.vce.toFixed(2) + ' V' });
+      txt(c, 'β = ' + T.beta, 470, 120, C.text, 15, 700, 'left');
+      txt(c, T.sat ? 'saturated' : 'active', 470, 146, T.sat ? C.cur : C.warn, 14, 700, 'left');
+      cv.wm(c);
+    }
+    const o = {
+      reset() { $('d_vcc').value = 5; $('d_vl').value = 2; $('d_il').value = 20; $('d_bmin').value = 100; $('d_od').value = 5; $('d_vin').value = 3.3; sB.value = 100; pB = pC = 0; calc(); },
+      step(dt) { if (!T) return; pB += Math.min(300, T.ib * 1e3 * 60) * dt; pC += Math.min(300, T.ic * 1e3 * 8) * dt; },
+      draw: draw
+    };
+    calc();
+    A = new Anim('anim1', o);
+    ids.forEach(id => $(id).addEventListener('input', calc));
+    sB.addEventListener('input', test);
+  })();
+
+  /* =========================================================
+     2. Inductive load: relay coil, flyback diode, scope
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv2', 640, 320), cs = new Cv('cv2s', 640, 330);
+    const bIn = $('in2'), bD = $('dio2'), bA = $('auto2');
+    const VCC = 12, TAU_ON = 0.25, TAU_D = 0.4, VMAX = 50, VCEO = 40, WIN = 6;
+    let on = true, diode = true, auto = true, iL = 1, sp = 0, spA = 0, vc = VCES, t = 0, tAuto = 0, hist = [], pk = null, pL = 0, A;
+    function sync() {
+      bIn.textContent = on ? 'Input ON' : 'Input OFF'; bIn.setAttribute('aria-pressed', String(on));
+      bD.textContent = 'Flyback diode: ' + (diode ? 'present' : 'absent'); bD.setAttribute('aria-pressed', String(diode));
+      bA.setAttribute('aria-pressed', String(auto));
+      if (A) A.dirty = true;
+    }
+    function setIn(v) {
+      if (v === on) return;
+      on = v;
+      if (!on) { if (!diode) { spA = 140 * iL; sp = 0; hist.push([t, 0, VCC + spA]); pk = 'far above V' ; } else pk = 'diode'; }
+      sync();
+    }
+    function step(dt) {
+      t += dt;
+      if (auto) { tAuto += dt; if (tAuto >= 1.6) { tAuto = 0; setIn(!on); } }
+      if (on) { iL += (1 - iL) * Math.min(1, dt / TAU_ON); vc = VCES; }
+      else if (diode) { iL -= iL * Math.min(1, dt / TAU_D); vc = VCC + 0.7 * Math.min(1, iL / 0.04); }
+      else { sp += dt; iL *= Math.exp(-dt / 0.02); vc = VCC + spA * Math.exp(-sp / 0.05) * Math.cos(TAU * sp / 0.12); }
+      hist.push([t, on ? 5 : 0, vc]);
+      while (hist.length && hist[0][0] < t - WIN) hist.shift();
+      pL += Math.min(260, 160 * iL) * dt;
+      $('c2vc').textContent = vc > VCEO ? 'above VCEO (spike)' : vc.toFixed(1) + ' V'; $('c2vc').style.color = vc > VCEO ? C.warn : '';
+      $('c2pk').textContent = pk === null ? '—' : pk === 'diode' ? '≈ 12.7 V (clamped)' : 'far above V' + 'CEO';
+      $('c2pk').style.color = pk && pk !== 'diode' ? C.warn : '';
+    }
+    function coil(c, x, y0, y1) {
+      const n = 5, h = (y1 - y0) / n;
+      c.strokeStyle = C.wire; c.lineWidth = 2.5; c.beginPath(); c.moveTo(x, y0);
+      for (let k = 0; k < n; k++) c.arc(x, y0 + h * (k + 0.5), h / 2, -Math.PI / 2, Math.PI / 2, false);
+      c.stroke();
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      // supply rail, coil, diode
+      terminal(c, 230, 30); txt(c, '+12 V', 230, 14, C.v, 12, 700, 'center');
+      line(c, 234, 30, 380, 30, C.wire, 2.5); line(c, 300, 30, 300, 44, C.wire, 2.5); coil(c, 300, 44, 136); line(c, 300, 136, 300, 170, C.wire, 2.5);
+      txt(c, 'relay coil', 280, 90, C.muted, 11.5, 600, 'right');
+      if (diode) {
+        line(c, 380, 30, 380, 70, C.wire, 2.5); line(c, 380, 112, 380, 150, C.wire, 2.5); line(c, 380, 150, 300, 150, C.wire, 2.5);
+        poly(c, [[368, 108], [392, 108], [380, 74]], C.wire); line(c, 366, 72, 394, 72, C.wire, 3);
+        txt(c, 'D', 400, 92, C.text, 13, 700, 'left');
+      } else {
+        c.globalAlpha = 0.25; line(c, 380, 30, 380, 150, C.wire, 2, [4, 4]); line(c, 380, 150, 300, 150, C.wire, 2, [4, 4]); c.globalAlpha = 1;
+        txt(c, 'no diode', 392, 92, C.muted, 11, 600, 'left');
+      }
+      // current: through the transistor while ON, round the diode loop after turn-off
+      if (on) flowDots(c, [[234, 30], [300, 30], [300, 280]], pL, 18, C.cur, 3);
+      else if (diode && iL > 0.03) flowDots(c, [[300, 40], [300, 150], [380, 150], [380, 30], [300, 30], [300, 40]], pL, 18, C.cur, 3);
+      bjtSym(c, 268.5, 226.25, 0.45); ground(c, 300, 284);
+      line(c, 110, 226, 144, 226, C.wire, 2.5); c.fillStyle = '#141b2b'; c.fillRect(140, 214, 64, 24); resH(c, 144, 200, 226); line(c, 200, 226, 223, 226, C.wire, 2.5);
+      subU(c, 'R', 'B', '', 172, 250, C.muted, 11.5, 'center');
+      terminal(c, 106, 226, C.in); subU(c, 'V', 'IN', '', 94, 226, C.in, 12, 'right'); txt(c, on ? 'ON' : 'OFF', 106, 250, on ? C.cur : C.muted, 12, 700, 'center');
+      // collector node and spike flash
+      circ(c, 300, 150, 3.5, C.v);
+      if (!on && !diode && sp < 0.35) { const a = Math.exp(-sp / 0.12); circ(c, 300, 158, 26, 'rgba(239,83,80,' + (0.45 * a).toFixed(3) + ')'); txt(c, 'spike', 318, 172, C.warn, 13, 700, 'left'); }
+      subU(c, 'V', 'C', '', 312, 150, C.v, 12, 'left');
+      cv.wm(c);
+    }
+    function drawScope() {
+      const c = cs.begin(); if (!c) return;
+      const S = { l: 56, r: 620, t: 16, b: 266 }, Y = v => S.b - Math.min(v, VMAX + 4) / VMAX * (S.b - S.t);
+      scopeGrid(c, S, 10, 5);
+      [0, 10, 20, 30, 40, 50].forEach(v => txt(c, v + ' V', S.l - 8, Y(v), C.muted, 10.5, 500, 'right'));
+      c.save(); c.beginPath(); c.rect(S.l, S.t - 2, S.r - S.l, S.b - S.t + 4); c.clip();
+      line(c, S.l, Y(VCEO), S.r, Y(VCEO), 'rgba(239,83,80,.8)', 1.4, [6, 4]); line(c, S.l, Y(VCC), S.r, Y(VCC), 'rgba(255,213,79,.45)', 1.2, [4, 4]);
+      const X = tt => S.r - (t - tt) / WIN * (S.r - S.l);
+      const a = hist.map(h => [X(h[0]), Y(h[1])]), b = hist.map(h => [X(h[0]), Y(h[2])]);
+      glowLine(c, a, C.in); glowLine(c, b, C.out);
+      let over = false; for (const h of hist) if (h[2] > VCEO) { over = true; const x = X(h[0]); circ(c, x, S.t + 4, 3, C.warn); }
+      c.restore();
+      txt(c, 'VCEO', S.r - 4, Y(VCEO) - 9, C.warn, 11, 700, 'right'); txt(c, 'VCC', S.r - 4, Y(VCC) - 9, 'rgba(255,213,79,.8)', 10.5, 700, 'right');
+      if (over) { txt(c, 'exceeds VCEO', S.l + 8, S.t + 14, C.warn, 13, 700, 'left'); txt(c, 'spike not to scale', S.l + 8, S.t + 32, C.muted, 10.5, 500, 'left'); }
+      txt(c, 'CH1  VIN', S.l, S.b + 22, C.in, 12, 700, 'left', MONO); txt(c, 'CH2  VC', S.l, S.b + 42, C.out, 12, 700, 'left', MONO);
+      cs.wm(c);
+    }
+    const o = {
+      reset() { on = true; diode = true; auto = true; iL = 1; sp = 0; vc = VCES; t = 0; tAuto = 0; hist = []; pk = null; sync(); },
+      step: step,
+      draw() { draw(); drawScope(); }
+    };
+    A = new Anim('anim2', o);
+    bIn.addEventListener('click', () => { auto = false; setIn(!on); step(0); A.dirty = true; });
+    bD.addEventListener('click', () => { diode = !diode; sync(); step(0); });
+    bA.addEventListener('click', () => { auto = !auto; tAuto = 0; sync(); });
+  })();
+
+  /* =========================================================
+     3. Power in a switch: VCE, IC, P traces
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv3', 640, 496), sF = $('f3'), sE = $('e3'), bt = $('act3');
+    const VCC = 12, RL = 120, IMAX = (VCC - VCES) / RL;   // resistive load: 12 V, 120 Ω
+    let f = 1e4, te = 1e-6, active = false, t = 0, pav = 0, A;
+    function upd() {
+      f = 1e3 * Math.pow(10, +sF.value / 50); te = 0.1e-6 * Math.pow(100, +sE.value / 100);
+      $('f3o').textContent = f >= 1e4 ? (f / 1e3).toFixed(0) + ' kHz' : (f / 1e3).toFixed(1) + ' kHz';
+      $('e3o').textContent = te >= 1e-6 ? (te * 1e6).toFixed(1) + ' µs' : (te * 1e9).toFixed(0) + ' ns';
+      const pon = 0.5 * VCES * IMAX, psw = f * 2 * VCC * IMAX * te / 6;
+      pav = active ? (VCC / 2) * (VCC / 2 / RL) : pon + psw;
+      const fw = p => p >= 0.1 ? (p * 1e3).toFixed(0) + ' mW' : (p * 1e3).toFixed(1) + ' mW';
+      $('c3p').textContent = fw(pav); $('c3on').textContent = active ? '—' : fw(pon); $('c3sw').textContent = active ? '—' : fw(psw);
+      bt.setAttribute('aria-pressed', String(active));
+      if (A) A.dirty = true;
+    }
+    function x01(p, ef) {   // IC as a fraction of IMAX over one period (ON for the first half)
+      p = ((p % 1) + 1) % 1;
+      if (p < ef) return p / ef; if (p < 0.5) return 1; if (p < 0.5 + ef) return 1 - (p - 0.5) / ef; return 0;
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const L = 70, R = 540, panels = [{ t: 26, b: 128, lab: ['V', 'CE', ' (V)'], col: C.v, max: 12 }, { t: 168, b: 270, lab: ['I', 'C', ' (mA)'], col: C.out, max: 100 }, { t: 310, b: 412, lab: ['P', '', ' (mW)'], col: C.pw, max: 320 }];
+      const efReal = te * f, ef = Math.max(efReal, 0.035);
+      const N = 260, vals = [];
+      for (let k = 0; k <= N; k++) {
+        const p = k / N * 2 - t * 0.25, x = active ? 0.5 : x01(p, ef);
+        const ic = x * (active ? VCC / 2 / RL : IMAX) * (active ? 2 : 1), vce = active ? VCC / 2 : VCC - x * (VCC - VCES);
+        vals.push([L + k / N * (R - L), vce, ic * 1e3, vce * ic * 1e3]);
+      }
+      panels.forEach((P, i) => {
+        line(c, L, P.b, R, P.b, C.muted, 1.3); line(c, L, P.t, L, P.b, C.muted, 1.3);
+        txt(c, String(P.max), L - 6, P.t + 4, C.muted, 10.5, 500, 'right'); txt(c, '0', L - 6, P.b, C.muted, 10.5, 500, 'right');
+        subU(c, P.lab[0], P.lab[1], P.lab[2], L + 6, P.t - 10, P.col, 12, 'left');
+        const Y = v => P.b - Math.min(v, P.max) / P.max * (P.b - P.t);
+        const pts = vals.map(v => [v[0], Y(v[i + 1])]);
+        if (i === 2) { c.beginPath(); c.moveTo(L, P.b); pts.forEach(p => c.lineTo(p[0], p[1])); c.lineTo(R, P.b); c.closePath(); c.fillStyle = 'rgba(206,147,216,.25)'; c.fill(); }
+        glowLine(c, pts, P.col);
+      });
+      if (!active && efReal < 0.035) txt(c, 'edges not to scale', R, 452, C.muted, 10.5, 500, 'right');
+      if (!active) txt(c, 'switching loss', R, 300, C.pw, 11, 600, 'right');
+      // transistor icon: colour follows average power
+      const h = clamp(pav / 0.3, 0, 1), col = h < 0.5 ? lerpCol('#4fc3f7', '#ffd54f', h * 2) : lerpCol('#ffd54f', '#ef5350', (h - 0.5) * 2);
+      const ix = 592, iy = 230;
+      rrect(c, ix - 22, iy - 30, 44, 50, 10); c.fillStyle = col; c.fill();
+      [-12, 0, 12].forEach(d => line(c, ix + d, iy + 20, ix + d, iy + 50, C.wire, 3));
+      if (h > 0.25) for (let k = -1; k <= 1; k++) {
+        const pts = []; for (let s = 0; s <= 12; s++) pts.push([ix + k * 12 + 3 * Math.sin(s / 2 + t * 5 + k), iy - 36 - s * 2.4]);
+        c.globalAlpha = Math.min(1, h); pline(c, pts, '#ef5350', 2); c.globalAlpha = 1;
+      }
+      txt(c, h > 0.6 ? 'hot' : h > 0.25 ? 'warm' : 'cool', ix, iy + 66, col, 12, 700, 'center');
+      cv.wm(c);
+    }
+    const o = { reset() { sF.value = 50; sE.value = 50; active = false; t = 0; upd(); }, step(dt) { t += dt; }, draw: draw };
+    upd();
+    A = new Anim('anim3', o);
+    sF.addEventListener('input', upd); sE.addEventListener('input', upd);
+    bt.addEventListener('click', () => { active = !active; upd(); });
+  })();
+
+  /* =========================================================
+     4. Switching times: td, tr, ts, tf
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv4', 640, 456), sO = $('od4'), bt = $('sch4');
+    const TD = 10, TR = 25, TF = 60, TAUS = 120;   // ns, typical small-signal switching transistor
+    let od = 5, sch = false, ts = 0, sw = 1, A;
+    function upd() {
+      od = +sO.value; $('od4o').textContent = od.toFixed(1) + '×';
+      ts = sch ? 5 : TAUS * Math.log(od);
+      $('c4td').textContent = TD + ' ns'; $('c4tr').textContent = TR + ' ns'; $('c4ts').textContent = ts.toFixed(0) + ' ns';
+      $('c4tf').textContent = TF + ' ns'; $('c4ton').textContent = (TD + TR) + ' ns'; $('c4toff').textContent = (ts + TF).toFixed(0) + ' ns';
+      bt.setAttribute('aria-pressed', String(sch));
+      if (A) A.dirty = true;
+    }
+    const sm = s => s * s * (3 - 2 * s);
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const L = 60, R = 620, tot = 720, X = d => L + d / tot * (R - L);
+      // display time line (times not to scale): pre, td×3, tr×2, plateau, ts, tf, tail
+      const d0 = 40, dTd = TD * 3, dTr = TR * 2, d1 = d0 + dTd + dTr + 200, dTs = ts, dTf = TF;
+      const a10 = d0 + dTd, a90 = a10 + dTr, b90 = d1 + dTs, b10 = b90 + dTf;
+      function ic(d) {
+        if (d < d0) return 0;
+        if (d < a10) return 0.1 * Math.pow((d - d0) / dTd, 2);
+        if (d < a90) return 0.1 + 0.8 * sm((d - a10) / dTr);
+        if (d < d1) return 1 - 0.1 * Math.exp(-(d - a90) / 12);
+        if (d < b90) return 1 - 0.1 * Math.pow((d - d1) / Math.max(dTs, 1e-6), 4);
+        if (d < b10) return 0.9 - 0.8 * sm((d - b90) / dTf);
+        return 0.1 * Math.exp(-(d - b10) / 18);
+      }
+      const ti = { t: 30, b: 110 }, Ti = { t: 150, b: 340 };
+      const yI = v => ti.b - v * (ti.b - ti.t), yC = v => Ti.b - v * (Ti.b - Ti.t);
+      line(c, L, ti.b, R, ti.b, C.muted, 1.2); line(c, L, Ti.b, R, Ti.b, C.muted, 1.2); line(c, L, ti.t - 6, L, ti.b, C.muted, 1.2); line(c, L, Ti.t - 6, L, Ti.b, C.muted, 1.2);
+      subU(c, 'V', 'IN', '', L - 8, (ti.t + ti.b) / 2, C.in, 12, 'right'); subU(c, 'I', 'C', '', L - 8, (Ti.t + Ti.b) / 2, C.out, 12, 'right');
+      [[0.1, '10%'], [0.9, '90%']].forEach(q => { line(c, L, yC(q[0]), R, yC(q[0]), 'rgba(255,255,255,.35)', 1.2, [5, 4]); txt(c, q[1], R - 2, yC(q[0]) - 9, C.muted, 10.5, 600, 'right'); });
+      const xs = L + sw * (R - L), pi = [], pc = [];
+      for (let d = 0; d <= tot; d += 2) { const x = X(d); if (x > xs) break; pi.push([x, yI(d >= d0 && d < d1 ? 1 : 0)]); pc.push([x, yC(ic(d))]); }
+      glowLine(c, pi, C.in); glowLine(c, pc, C.out);
+      if (sw < 1) line(c, xs, ti.t - 6, xs, Ti.b, 'rgba(255,255,255,.4)', 1.2, [3, 3]);
+      // brackets
+      function br(a, b, row, lab) {
+        const y = Ti.b + 26 + row * 30, x0 = X(a), x1 = X(b);
+        line(c, x0, Ti.b + 4, x0, y, 'rgba(255,255,255,.25)', 1, [2, 3]); line(c, x1, Ti.b + 4, x1, y, 'rgba(255,255,255,.25)', 1, [2, 3]);
+        line(c, x0, y, x1, y, C.v, 2); line(c, x0, y - 5, x0, y + 5, C.v, 2); line(c, x1, y - 5, x1, y + 5, C.v, 2);
+        subU(c, 't', lab, '', (x0 + x1) / 2, y - 11, C.v, 12, 'center');
+      }
+      if (sw >= 1) { br(d0, a10, 0, 'd'); br(a10, a90, 1, 'r'); if (dTs > 2) br(d1, b90, 0, 's'); br(b90, b10, 1, 'f'); }
+      txt(c, 'times not to scale', R, 14, C.muted, 10.5, 500, 'right');
+      if (sch) txt(c, 'Schottky clamp', L + 4, 14, C.cur, 11, 700, 'left');
+      cv.wm(c);
+    }
+    const o = {
+      reset() { sO.value = 5; sch = false; sw = RM ? 1 : 0; upd(); },
+      step(dt) { sw += dt / 2.5; if (sw > 1.6) sw = 0; },
+      draw() { const keep = sw; if (sw > 1) sw = 1; draw(); sw = keep; }
+    };
+    upd();
+    A = new Anim('anim4', o);
+    sO.addEventListener('input', upd);
+    bt.addEventListener('click', () => { sch = !sch; upd(); });
+  })();
+
+  /* =========================================================
+     5. Inverter with truth table, and PWM brightness
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv5', 640, 340), cp = new Cv('cv5p', 640, 250), bt = $('in5'), sD = $('d5');
+    const VCC = 5, RC = 1000, RB = 10e3;
+    let hi = false, duty = 0.5, t = 0, pC = 0, A;
+    const vout = () => hi ? VCES : VCC;   // IB = 0.42 mA ≫ IC(sat)/β = 4.8 mA/100: saturated
+    function upd() {
+      bt.textContent = 'Input = ' + (hi ? '5 V' : '0 V'); bt.setAttribute('aria-pressed', String(hi));
+      duty = +sD.value / 100; $('d5o').textContent = Math.round(duty * 100) + '%';
+      $('c5vo').textContent = vout().toFixed(1) + ' V'; $('c5d').textContent = Math.round(duty * 100) + '%';
+      $('c5i').textContent = (duty * 18.7).toFixed(1) + ' mA';
+      if (A) A.dirty = true;
+    }
+    function drawInv() {
+      const c = cv.begin(); if (!c) return;
+      terminal(c, 260, 22); txt(c, '+5 V', 272, 22, C.v, 13, 700, 'left');
+      line(c, 260, 26, 260, 36, C.wire, 2.5); resV(c, 260, 36, 90); line(c, 260, 90, 260, 130, C.wire, 2.5);
+      subU(c, 'R', 'C', ' 1 kΩ', 244, 63, C.muted, 11.5, 'right');
+      line(c, 260, 110, 360, 110, C.wire, 2.5); terminal(c, 364, 110, C.out); circ(c, 260, 110, 3.5, C.wire);
+      subU(c, 'V', 'OUT', '', 372, 96, C.out, 12, 'left'); txt(c, vout().toFixed(1) + ' V', 372, 124, C.out, 12, 700, 'left', MONO);
+      if (hi) flowDots(c, [[260, 26], [260, 280]], pC, 20, C.cur, 3);
+      bjtSym(c, 218, 205, 0.6); ground(c, 260, 280);
+      line(c, 44, 205, 80, 205, C.wire, 2.5); c.fillStyle = '#141b2b'; c.fillRect(76, 193, 68, 24); resH(c, 80, 140, 205); line(c, 140, 205, 158, 205, C.wire, 2.5);
+      subU(c, 'R', 'B', ' 10 kΩ', 110, 230, C.muted, 11.5, 'center');
+      terminal(c, 40, 205, C.in); subU(c, 'V', 'IN', '', 40, 182, C.in, 12, 'center'); txt(c, hi ? '5 V' : '0 V', 40, 230, C.in, 12, 700, 'center', MONO);
+      txt(c, hi ? 'ON' : 'OFF', 300, 205, hi ? C.cur : C.muted, 14, 700, 'left');
+      // truth table
+      const tx = 440, tw = 170, ty = 70, rh = 44;
+      txt(c, 'NOT', tx + tw / 2, ty - 26, C.text, 14, 700, 'center');
+      rrect(c, tx, ty, tw, rh * 3, 8); c.fillStyle = '#141b2b'; c.fill(); c.strokeStyle = 'rgba(255,255,255,.2)'; c.lineWidth = 1; c.stroke();
+      [[0, 'IN', 'OUT']].concat([[1, '0', '1'], [2, '1', '0']]).forEach(r => {
+        const y = ty + r[0] * rh, sel = r[0] && (r[0] === 2) === hi;
+        if (sel) { rrect(c, tx + 3, y + 3, tw - 6, rh - 6, 6); c.fillStyle = 'rgba(255,213,79,.2)'; c.fill(); }
+        txt(c, r[1], tx + tw * 0.27, y + rh / 2, r[0] ? (sel ? '#fff' : C.text) : C.in, r[0] ? 16 : 12, 700, 'center', r[0] ? MONO : FONT);
+        txt(c, r[2], tx + tw * 0.73, y + rh / 2, r[0] ? (sel ? '#fff' : C.text) : C.out, r[0] ? 16 : 12, 700, 'center', r[0] ? MONO : FONT);
+        if (r[0]) line(c, tx, y, tx + tw, y, 'rgba(255,255,255,.15)', 1);
+      });
+      line(c, tx + tw / 2, ty, tx + tw / 2, ty + rh * 3, 'rgba(255,255,255,.15)', 1);
+      cv.wm(c);
+    }
+    function drawPwm() {
+      const c = cp.begin(); if (!c) return;
+      const period = 1, phase = t * 0.5, inst = ((phase % period) + period) % period < duty;
+      led(c, 80, 60, 170, duty);
+      txt(c, 'LED', 80, 196, C.muted, 12, 600, 'center');
+      txt(c, inst ? 'ON' : 'OFF', 132, 116, inst ? C.cur : C.muted, 12, 700, 'left');
+      const S = { l: 200, r: 616, t: 36, b: 186 }, DY = scopeGrid(c, S, 8, 4), Y = v => S.b - 10 - v * (S.b - S.t - 20);
+      const pts = [];
+      for (let x = S.l; x <= S.r; x += 1) {
+        const p = (x - S.l) / (S.r - S.l) * 3 + phase, q = ((p % 1) + 1) % 1;
+        pts.push([x, Y(q < duty ? 1 : 0)]);
+      }
+      c.save(); c.beginPath(); c.rect(S.l, S.t, S.r - S.l, S.b - S.t); c.clip();
+      glowLine(c, pts, C.in);
+      line(c, S.l, Y(duty), S.r, Y(duty), 'rgba(255,82,82,.85)', 1.6, [6, 4]);
+      c.restore();
+      txt(c, 'PWM input', S.l, S.t - 14, C.in, 12, 700, 'left'); txt(c, 'average', S.r, Y(duty) - 10, C.led, 11, 700, 'right');
+      void DY;
+      cp.wm(c);
+    }
+    const o = {
+      reset() { hi = false; sD.value = 50; t = 0; pC = 0; upd(); },
+      step(dt) { t += dt; if (hi) pC += 40 * dt; },
+      draw() { drawInv(); drawPwm(); }
+    };
+    upd();
+    A = new Anim('anim5', o);
+    bt.addEventListener('click', () => { hi = !hi; upd(); });
+    sD.addEventListener('input', upd);
+  })();
+
+  /* ---------- sticky mini-nav highlight ---------- */
+  (function () {
+    const links = Array.from(document.querySelectorAll('.toc a'));
+    const secs = links.map(l => document.querySelector(l.getAttribute('href')));
+    function upd() {
+      let cur = 0;
+      secs.forEach((s, i) => { if (s.getBoundingClientRect().top < 120) cur = i; });
+      links.forEach((l, i) => l.classList.toggle('active', i === cur));
+    }
+    window.addEventListener('scroll', upd, { passive: true }); upd();
+  })();
+
+  let last = performance.now();
+  function frame(ts) {
+    const dt = Math.min(0.05, Math.max(0, (ts - last) / 1000)); last = ts;
+    anims.forEach(a => {
+      if (!a.visible) return;
+      if (a.playing) { a.o.step(dt); a.o.draw(); }
+      else if (a.dirty) a.o.draw();
+      a.dirty = false;
+    });
+    requestAnimationFrame(frame);
+  }
+  function onResize() { anims.forEach(a => { a.dirty = true; }); }
+  window.addEventListener('resize', onResize);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(onResize);
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
