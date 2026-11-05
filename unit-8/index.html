@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>
+    // Slugs of topics that have been built.
+    // Add a slug here once unit-8/<slug>/index.html exists.
+    const builtTopics = [];
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Unit 8: Field-Effect Transistors</title>
+  <meta name="description" content="Unit 8: Field-Effect Transistors.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1420;
+      --panel: #1a2132;
+      --panel-hover: #212a3f;
+      --border: #2a3448;
+      --text: #e6e9ef;
+      --muted: #9aa4b8;
+      --electron: #4fc3f7;
+      --hole: #ff8a65;
+      --energy: #ffd54f;
+      --success: #81c784;
+      --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+      --max: 960px;
+      --radius: 12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    a { color: var(--electron); }
+    code, .mono { font-family: var(--mono); }
+    .wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 16px; }
+
+
+    main { flex: 1; padding: 24px 0 48px; }
+    .crumbs { font-size: 0.875rem; color: var(--muted); margin: 0 0 16px; }
+    .crumbs a { color: var(--muted); }
+    .crumbs a:hover { color: var(--electron); }
+    .eyebrow { font-family: var(--mono); font-size: 0.8rem; color: var(--electron); letter-spacing: .04em; margin: 0; }
+    h1 { font-size: clamp(1.5rem, 6vw, 2.2rem); line-height: 1.2; margin: 4px 0 12px; }
+    .intro { color: var(--muted); margin: 0 0 28px; }
+
+    .topics { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+    .topic {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      color: var(--text);
+      text-decoration: none;
+      transition: background .15s, border-color .15s;
+    }
+    a.topic:hover, a.topic:focus-visible { background: var(--panel-hover); border-color: var(--electron); }
+    a.topic:focus-visible { outline: 2px solid var(--electron); outline-offset: 2px; }
+    .topic .num { font-family: var(--mono); color: var(--electron); font-size: 0.9rem; min-width: 2.6em; flex-shrink: 0; }
+    .topic .title { flex: 1; min-width: 0; font-weight: 500; overflow-wrap: anywhere; }
+    .badge { flex-shrink: 0; font-size: 0.75rem; font-weight: 600; padding: 3px 10px; border-radius: 999px; white-space: nowrap; }
+    .badge.ready { color: var(--bg); background: var(--success); }
+    .badge.soon { color: var(--muted); border: 1px solid var(--border); }
+    .topic.disabled { opacity: .6; }
+    .topic.disabled .num { color: var(--muted); }
+
+    .back { display: inline-block; margin-top: 28px; }
+
+    /* Justified paragraphs on desktop; phones stay left-aligned to avoid wide word gaps. */
+    @media (min-width: 768px) {
+      .prose p, .prose li, .intro, .keypoints li, .exag { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+    }
+  </style>
+</head>
+<body>
+
+  <main>
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Home</a> / Unit 8</nav>
+      <p class="eyebrow">UNIT 08</p>
+      <h1>Field-Effect Transistors</h1>
+      <p class="intro">
+        Transistors controlled by an electric field instead of a base current. This unit
+        covers the JFET and the MOSFET, their characteristics and parameters, how to bias
+        them, their small-signal model and amplifier configurations, and ends with the
+        CMOS inverter that underpins modern digital chips.
+      </p>
+
+      <ol class="topics" id="topic-list"></ol>
+      <noscript><p class="intro">Enable JavaScript to see the topic list.</p></noscript>
+
+      <a class="back" href="../index.html">← All units</a>
+    </div>
+  </main>
+
+  <script>
+    const topics = [
+      { num: "8.1", title: "JFET structure and working",               slug: "8-1-jfet-structure" },
+      { num: "8.2", title: "JFET characteristics and pinch-off",       slug: "8-2-jfet-characteristics" },
+      { num: "8.3", title: "JFET parameters (gm, rd, μ)",              slug: "8-3-jfet-parameters" },
+      { num: "8.4", title: "MOSFET basics: the MOS capacitor",         slug: "8-4-mos-capacitor" },
+      { num: "8.5", title: "Enhancement MOSFET",                       slug: "8-5-enhancement-mosfet" },
+      { num: "8.6", title: "Depletion MOSFET",                         slug: "8-6-depletion-mosfet" },
+      { num: "8.7", title: "MOSFET characteristics and regions",       slug: "8-7-mosfet-characteristics" },
+      { num: "8.8", title: "FET biasing (self bias, voltage divider)", slug: "8-8-fet-biasing" },
+      { num: "8.9", title: "FET small-signal model",                   slug: "8-9-fet-small-signal-model" },
+      { num: "8.10", title: "CS, CD and CG amplifiers",                 slug: "8-10-cs-cd-cg-amplifiers" },
+      { num: "8.11", title: "BJT vs FET comparison",                    slug: "8-11-bjt-vs-fet" },
+      { num: "8.12", title: "CMOS inverter (bridge to VLSI)",           slug: "8-12-cmos-inverter" }
+    ];
+
+    const list = document.getElementById("topic-list");
+    topics.forEach(function (t) {
+      const built = builtTopics.indexOf(t.slug) !== -1;
+      const li = document.createElement("li");
+      const row = document.createElement(built ? "a" : "div");
+      row.className = "topic" + (built ? "" : " disabled");
+      if (built) row.href = t.slug + "/index.html";
+      else row.setAttribute("aria-disabled", "true");
+      row.innerHTML =
+        '<span class="num"></span><span class="title"></span>' +
+        '<span class="badge ' + (built ? 'ready">Watch' : 'soon">Coming soon') + '</span>';
+      row.querySelector(".num").textContent = t.num;
+      row.querySelector(".title").textContent = t.title;
+      li.appendChild(row);
+      list.appendChild(li);
+    });
+  </script>
+</body>
+</html>
