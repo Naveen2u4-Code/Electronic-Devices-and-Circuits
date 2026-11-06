@@ -1435,14 +1435,17 @@
     function draw() {
       const c = cv.begin(); if (!c) return;
       const S = { l: 50, r: 610, t: 16, b: 256 }, DY = scopeGrid(c, S, 10, 8), yc = (S.t + S.b) / 2, q = amp.q;
-      const nice = [1e-3, 2e-3, 5e-3, 1e-2, 2e-2, 5e-2, 0.1], d1 = nice.find(v => A0 / v <= 3) || 0.1, k1 = DY / d1, k2 = DY / 2;
+      // vout fills about 3 divisions; vin is kept to at most 1 division so the output is always the larger trace
+      let pk = 0; cy.forEach(r => { pk = Math.max(pk, Math.abs(r.vc - q.vc)); });
+      const d2 = [0.05, 0.1, 0.2, 0.5, 1, 2, 5].find(v => pk / v <= 3.5) || 5, d1 = [1e-2, 2e-2, 5e-2, 0.1].find(v => A0 / v <= 1) || 0.1;
+      const k1 = DY / d1, k2 = DY / d2;
       c.save(); c.beginPath(); c.rect(S.l, S.t, S.r - S.l, S.b - S.t); c.clip();
       const pi = [], po = [];
       for (let x = S.l; x <= S.r; x += 2) { const vin = A0 * Math.sin(TAU * ((x - S.l) / (S.r - S.l) * 2 - t * 0.5)), r = amp.at(vin); pi.push([x, yc - vin * k1]); po.push([x, yc - (r.vc - q.vc) * k2, r.sat || r.cut]); }
       glowLine(c, pi, C.in); wave(c, po, C.out);
       c.restore();
       txt(c, 'CH1  vin   ' + (d1 >= 1e-2 ? (d1 * 1e3).toFixed(0) : (d1 * 1e3).toFixed(0)) + ' mV/div', S.l, S.b + 22, C.in, 12, 700, 'left', MONO);
-      txt(c, 'CH2  vout  2 V/div', S.l, S.b + 42, C.out, 12, 700, 'left', MONO);
+      txt(c, 'CH2  vout  ' + (d2 < 1 ? (d2 * 1e3).toFixed(0) + ' mV/div' : d2 + ' V/div'), S.l, S.b + 42, C.out, 12, 700, 'left', MONO);
       cv.wm(c);
     }
     const o = { reset() { sA.value = 24; sR.value = 5.6; sL.value = 100; s2.value = 10; t = 0; upd(); }, step(dt) { t += dt; }, draw: draw };
