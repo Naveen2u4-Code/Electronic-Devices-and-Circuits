@@ -411,11 +411,8 @@
             </div>
           </div>
           <canvas id="cv4" class="narrow" style="aspect-ratio:640/360" role="img" aria-label="Scope of the collector voltage of the example amplifier with an ideal, perfectly scaled sine dashed for reference. As the input grows the output becomes asymmetric, then flattens near 0.2 volts above the emitter (saturation) and near 12 volts (cutoff), with clipped parts in red."></canvas>
-          <canvas id="cv4h" class="narrow inset" style="aspect-ratio:640/200" role="img" aria-label="Bar chart of harmonic content of the simulated output: the fundamental at 100 percent and the second and third harmonics as a percentage of it, growing with amplitude."></canvas>
           <div class="counters narrow" aria-live="polite">
             <div class="ctr v">v<sub>in</sub> peak<b id="c4a">2 mV</b></div>
-            <div class="ctr">2nd harmonic<b id="c4h2">1.9%</b></div>
-            <div class="ctr">3rd harmonic<b id="c4h3">0.0%</b></div>
             <div class="ctr">Output<b id="c4st">clean</b></div>
           </div>
         </figure>
@@ -425,7 +422,7 @@
           <ul>
             <li>I<sub>C</sub> grows exponentially with V<sub>BE</sub>, so only tiny inputs are copied faithfully.</li>
             <li>Small-signal operation needs a base signal much smaller than V<sub>T</sub> (a few mV).</li>
-            <li>Larger inputs give unequal half-cycles (distortion) and harmonics.</li>
+            <li>Larger inputs give unequal half-cycles: the output is distorted.</li>
             <li>Very large inputs clip: saturation on one peak, cutoff on the other.</li>
           </ul>
         </aside>
@@ -1332,16 +1329,15 @@
   })();
 
   /* =========================================================
-     4. Distortion and clipping: scope and harmonics
+     4. Distortion and clipping: scope
      ========================================================= */
   (function () {
-    const cv = new Cv('cv4', 640, 360), ch = new Cv('cv4h', 640, 200), sl = $('a4');
+    const cv = new Cv('cv4', 640, 360), sl = $('a4');
     const amp = new Amp(EX, Infinity), q = amp.q;
-    let A0 = 2e-3, t = 0, h = [1, 0, 0], st = 'clean', cy = [], A;
+    let A0 = 2e-3, t = 0, st = 'clean', cy = [], A;
     function upd() {
       A0 = logSl(+sl.value, 1e-3, 100, 100); $('a4o').textContent = fmtmV(A0); $('c4a').textContent = fmtmV(A0);
-      cy = amp.cycle(A0, 256); h = harm(cy, 'vc'); st = status(cy);
-      $('c4h2').textContent = (100 * h[1] / h[0]).toFixed(1) + '%'; $('c4h3').textContent = (100 * h[2] / h[0]).toFixed(1) + '%';
+      cy = amp.cycle(A0, 256); st = status(cy);
       $('c4st').textContent = st; $('c4st').style.color = st === 'clean' ? C.cur : st === 'distorted' ? C.v : C.warn;
       if (A) A.dirty = true;
     }
@@ -1362,18 +1358,6 @@
         if (cy.some(r => r.sat)) txt(c, 'saturation', S.r - 4, Y(q.ve + VSAT) - 10, C.warn, 11.5, 700, 'right');
         subU(c, 'V', 'C', '', S.l, S.b + 22, C.out, 12, 'left'); txt(c, 'ideal', S.l + 34, S.b + 22, 'rgba(255,255,255,.7)', 11.5, 600, 'left');
         cv.wm(c);
-      }
-      const d = ch.begin(); if (d) {
-        const L = 130, R = 560, rows = [['fundamental', 1], ['2nd', h[1] / h[0]], ['3rd', h[2] / h[0]]];
-        rows.forEach((r, i) => {
-          const y = 34 + i * 50, w = (R - L) * Math.min(1, i ? r[1] / 0.25 : 1);
-          txt(d, r[0], L - 10, y, C.muted, 12, 600, 'right');
-          rrect(d, L, y - 11, R - L, 22, 5); d.fillStyle = '#141b2b'; d.fill();
-          if (w > 0.5) { rrect(d, L, y - 11, Math.max(3, w), 22, 5); d.fillStyle = i ? (r[1] > 0.05 ? C.warn : C.v) : C.out; d.fill(); }
-          txt(d, (r[1] * 100).toFixed(1) + '%', R + 8, y, C.text, 12, 700, 'left', MONO);
-        });
-        txt(d, '2nd, 3rd bars: 0–25% scale', L, 182, C.muted, 10.5, 500, 'left');
-        ch.wm(d);
       }
     }
     const o = { reset() { sl.value = 15; t = 0; upd(); }, step(dt) { t += dt; }, draw: draw };
