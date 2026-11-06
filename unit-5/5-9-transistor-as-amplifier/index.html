@@ -214,10 +214,7 @@
               <input type="range" id="a0" min="0" max="100" step="1" value="50">
             </div>
           </div>
-          <div class="duo">
-            <canvas id="cv0a" style="aspect-ratio:600/330" role="img" aria-label="Block diagram: a small input sine enters a transistor block drawn as a valve and a large copy leaves as the output, while yellow arrows carry energy from a battery into the block."></canvas>
-            <canvas id="cv0b" style="aspect-ratio:600/330" role="img" aria-label="Valve analogy: a small hand turns a tap under a water tank; the small turning movement controls a large flow of water from the tank."></canvas>
-          </div>
+          <canvas id="cv0a" class="narrow" style="aspect-ratio:600/330" role="img" aria-label="A small input sine enters the base of an NPN transistor and a large copy leaves from the collector as the output, while yellow arrows carry energy from the DC supply down into the collector. The emitter goes to ground."></canvas>
         </figure>
 
         <aside class="keypoints" aria-label="Key points: amplification">
@@ -870,7 +867,7 @@
      0. What is amplification: block diagram and tap analogy
      ========================================================= */
   (function () {
-    const ca = new Cv('cv0a', 600, 330), cb = new Cv('cv0b', 600, 330), sl = $('a0');
+    const ca = new Cv('cv0a', 600, 330), sl = $('a0');
     let a = 0.5, t = 0, A;
     function upd() { a = +sl.value / 100; $('a0o').textContent = Math.round(a * 100) + '%'; if (A) A.dirty = true; }
     function sineAt(c, x0, x1, y, amp, col, ph) {
@@ -880,46 +877,27 @@
     function drawA() {
       const c = ca.begin(); if (!c) return;
       const ain = 2 + 14 * a, aout = Math.min(100, ain * 5);
-      // battery and energy arrows
-      rrect(c, 262, 18, 76, 38, 6); c.fillStyle = '#141b2b'; c.fill(); c.strokeStyle = C.v; c.lineWidth = 2; c.stroke();
-      line(c, 286, 26, 286, 48, C.v, 3); line(c, 298, 31, 298, 43, C.v, 5); line(c, 310, 26, 310, 48, C.v, 3); line(c, 322, 31, 322, 43, C.v, 5);
-      txt(c, 'supply', 350, 37, C.v, 12, 700, 'left');
-      for (let k = 0; k < 3; k++) { const y = 64 + ((t * 40 + k * 16) % 46); c.globalAlpha = 1 - (y - 64) / 50; arrow(c, 300, y, 300, y + 10, C.v, 3, 8); c.globalAlpha = 1; }
-      // block with valve symbol
-      rrect(c, 222, 120, 156, 110, 12); c.fillStyle = '#141b2b'; c.fill(); c.strokeStyle = C.wire; c.lineWidth = 2; c.stroke();
-      poly(c, [[270, 155], [270, 195], [300, 175]], null, C.wire, 2); poly(c, [[330, 155], [330, 195], [300, 175]], null, C.wire, 2);
-      line(c, 300, 175, 300, 142, C.wire, 2); line(c, 290, 142, 310, 142, C.wire, 3);
-      txt(c, 'transistor', 300, 214, C.muted, 12, 600, 'center');
-      line(c, 172, 175, 222, 175, C.wire, 2.5); line(c, 378, 175, 420, 175, C.wire, 2.5);
+      // DC supply (battery) at the top
+      rrect(c, 262, 14, 76, 38, 6); c.fillStyle = '#141b2b'; c.fill(); c.strokeStyle = C.v; c.lineWidth = 2; c.stroke();
+      line(c, 286, 22, 286, 44, C.v, 3); line(c, 298, 27, 298, 39, C.v, 5); line(c, 310, 22, 310, 44, C.v, 3); line(c, 322, 27, 322, 39, C.v, 5);
+      txt(c, 'DC supply', 350, 33, C.v, 12, 700, 'left');
+      // supply wire down to the collector, with energy arrows flowing along it
+      line(c, 300, 52, 300, 100, C.wire, 2.5);
+      for (let k = 0; k < 3; k++) { const y = 56 + ((t * 40 + k * 14) % 36); c.globalAlpha = 1 - (y - 56) / 40; arrow(c, 316, y, 316, y + 10, C.v, 3, 8); c.globalAlpha = 1; }
+      // NPN transistor: base from the input, collector up to the supply, emitter down to ground
+      bjtSym(c, 258, 175, 0.6);
+      line(c, 172, 175, 198, 175, C.wire, 2.5);
+      line(c, 300, 250, 300, 268, C.wire, 2.5); ground(c, 300, 268);
+      txt(c, 'B', 222, 162, C.muted, 11, 700, 'center'); txt(c, 'C', 312, 118, C.muted, 11, 700, 'left'); txt(c, 'E', 312, 236, C.muted, 11, 700, 'left');
+      txt(c, 'NPN transistor', 336, 214, C.muted, 12, 600, 'left');
+      // output taken from the collector
+      circ(c, 300, 100, 4, C.wire);
+      line(c, 300, 100, 400, 100, C.wire, 2.5); line(c, 400, 100, 400, 175, C.wire, 2.5); line(c, 400, 175, 420, 175, C.wire, 2.5);
       sineAt(c, 20, 168, 175, ain, C.in, t * 0.5); sineAt(c, 424, 590, 175, aout, C.out, t * 0.5);
       txt(c, 'vin', 94, 290, C.in, 14, 700, 'center'); txt(c, 'vout', 507, 290, C.out, 14, 700, 'center');
       ca.wm(c);
     }
-    function drawB() {
-      const c = cb.begin(); if (!c) return;
-      const s = Math.sin(TAU * t * 0.5), flow = 0.5 + 0.45 * a * s, th = -0.3 + 0.35 * a * s;
-      // tank
-      rrect(c, 30, 24, 170, 96, 8); c.fillStyle = '#141b2b'; c.fill(); c.strokeStyle = C.wire; c.lineWidth = 2; c.stroke();
-      c.fillStyle = 'rgba(79,195,247,.45)'; c.fillRect(34, 46, 162, 70);
-      txt(c, 'supply', 115, 36, C.v, 12, 700, 'center');
-      // pipe and tap
-      c.fillStyle = '#2b3550'; c.fillRect(106, 120, 18, 70); circ(c, 115, 200, 16, '#3a4766', C.wire, 2);
-      c.save(); c.translate(115, 200); c.rotate(th); line(c, 0, 0, 52, 0, C.wire, 6); circ(c, 58, 0, 11, '#ffccbc', '#ff8a65', 2); c.restore();
-      txt(c, 'tap', 92, 200, C.muted, 11, 600, 'right');
-      // water stream: width follows the tap
-      const w = 4 + 22 * flow;
-      c.fillStyle = 'rgba(79,195,247,.75)'; c.fillRect(115 - w / 2, 216, w, 84);
-      for (let k = 0; k < 6; k++) { const y = 216 + ((t * 90 + k * 14) % 84); circ(c, 115 + (k % 2 ? w / 4 : -w / 4), y, 2.5, '#e1f5fe'); }
-      // traces: small hand movement in, large flow out
-      const S = { l: 250, r: 590, t: 40, b: 290 };
-      line(c, S.l, (S.t + S.b) / 2, S.r, (S.t + S.b) / 2, 'rgba(255,255,255,.15)', 1);
-      const pa = [], pb = [];
-      for (let x = S.l; x <= S.r; x += 3) { const q = Math.sin(TAU * ((x - S.l) / (S.r - S.l) * 2 - t * 0.5)); pa.push([x, 165 - (2 + 14 * a) * q]); pb.push([x, 165 + 100 * Math.min(1, a * 0.9) * q * 0.9]); }
-      glowLine(c, pa, C.in); glowLine(c, pb, C.out);
-      txt(c, 'hand', S.l, S.t, C.in, 12, 700, 'left'); txt(c, 'flow', S.l + 50, S.t, C.out, 12, 700, 'left');
-      cb.wm(c);
-    }
-    const o = { reset() { sl.value = 50; t = 0; upd(); }, step(dt) { t += dt; }, draw() { drawA(); drawB(); } };
+    const o = { reset() { sl.value = 50; t = 0; upd(); }, step(dt) { t += dt; }, draw() { drawA(); } };
     upd();
     A = new Anim('anim0', o);
     sl.addEventListener('input', upd);
