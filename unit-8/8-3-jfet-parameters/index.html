@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>8.3 JFET Parameters: gm, rd and μ</title>
+  <meta name="description" content="JFET small-signal parameters: transconductance gm, drain resistance rd and amplification factor μ, how they are read from the characteristics, how they relate (μ = gm·rd) and how they change with the Q-point. An interactive lesson.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1420;
+      --panel: #1a2132;
+      --panel-hover: #212a3f;
+      --border: #2a3448;
+      --text: #e6e9ef;
+      --muted: #9aa4b8;
+      --electron: #4fc3f7;
+      --hole: #ff8a65;
+      --energy: #ffd54f;
+      --success: #81c784;
+      --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+      --max: 960px;
+      --radius: 12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: var(--font); font-size: 16px; line-height: 1.65;
+      overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column;
+    }
+    a { color: var(--electron); }
+    .wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 16px; }
+
+    /* Sticky mini-nav */
+    .toc {
+      position: sticky; top: 0; z-index: 10; background: rgba(15, 20, 32, .95);
+      border-bottom: 1px solid var(--border); backdrop-filter: blur(6px);
+    }
+    .toc ul { display: flex; gap: 4px; list-style: none; margin: 0 auto; padding: 8px 16px; max-width: var(--max); overflow-x: auto; scrollbar-width: none; }
+    .toc ul::-webkit-scrollbar { display: none; }
+    .toc a {
+      display: block; white-space: nowrap; text-decoration: none; color: var(--muted);
+      font-size: 0.85rem; font-weight: 500; padding: 6px 10px; border-radius: 999px;
+    }
+    .toc a:hover { color: var(--text); background: var(--panel); }
+    .toc a.active { color: var(--bg); background: var(--electron); }
+
+    main { flex: 1; padding: 24px 0 48px; }
+    .crumbs { font-size: 0.875rem; color: var(--muted); margin: 0 0 16px; }
+    .crumbs a { color: var(--muted); }
+    .crumbs a:hover { color: var(--electron); }
+    .eyebrow { font-family: var(--mono); font-size: 0.8rem; color: var(--electron); letter-spacing: .04em; margin: 0; }
+    h1 { font-size: clamp(1.5rem, 6vw, 2.2rem); line-height: 1.2; margin: 4px 0 6px; }
+    .subtitle { color: var(--muted); margin: 0 0 8px; }
+    section { scroll-margin-top: 64px; padding-top: 28px; }
+    h2 { font-size: clamp(1.3rem, 5vw, 1.6rem); line-height: 1.25; margin: 0 0 14px; }
+    h3 { font-size: 1.05rem; margin: 0 0 8px; }
+    .prose { font-size: 17px; line-height: 1.7; max-width: 70ch; }
+    .prose p, .prose ul, .prose ol { margin: 0 0 14px; }
+    .prose ul, .prose ol { padding-left: 22px; }
+    .prose li { margin: 4px 0; }
+    .prose strong { color: #fff; }
+    .prose p.eq { text-align: center; font-family: var(--mono); font-size: 16px; background: #141b2b; border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; overflow-wrap: anywhere; }
+    hr.sep { border: 0; border-top: 1px solid var(--border); margin: 40px 0 0; }
+    .rm-note { font-size: 0.78rem; color: var(--muted); margin: 0 0 8px; }
+
+    /* Buttons & controls */
+    .btn {
+      font: inherit; font-size: 0.88rem; font-weight: 600; color: var(--text);
+      background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+      padding: 7px 12px; cursor: pointer; min-height: 38px;
+    }
+    .btn:hover:not(:disabled) { background: var(--panel-hover); border-color: var(--electron); }
+    .btn:focus-visible, input:focus-visible, canvas:focus-visible { outline: 2px solid var(--electron); outline-offset: 2px; }
+    .btn[aria-pressed="true"] { background: rgba(255,213,79,.14); border-color: var(--energy); color: var(--energy); }
+    .seg { display: inline-flex; gap: 0; flex-wrap: nowrap; }
+    .seg .btn { border-radius: 0; padding: 7px 10px; }
+    .seg .btn:first-child { border-radius: 8px 0 0 8px; }
+    .seg .btn:last-child { border-radius: 0 8px 8px 0; }
+    .seg .btn + .btn { margin-left: -1px; }
+    .glabel { font-size: 0.8rem; font-weight: 700; color: var(--muted); }
+
+    figure.anim {
+      margin: 18px 0 0; background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 12px; min-width: 0;
+    }
+    .ctrls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-bottom: 12px; }
+    .slider { flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; }
+    .slider label { display: flex; justify-content: space-between; gap: 8px; font-size: 0.8rem; color: var(--muted); }
+    .slider output { font-family: var(--mono); color: var(--energy); white-space: nowrap; }
+    .slider[hidden] { display: none; }
+    input[type="range"] { width: 100%; accent-color: var(--energy); margin: 4px 0 0; }
+    canvas { display: block; width: 100%; border-radius: 8px; background: #141b2b; }
+    canvas.drag { cursor: crosshair; touch-action: none; }
+    .narrow { max-width: 760px; margin-left: auto; margin-right: auto; }
+    .inset { margin-top: 10px; }
+
+    .counters { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px auto 0; }
+    .ctr {
+      flex: 1 1 100px; background: #141b2b; border: 1px solid var(--border); border-radius: 8px;
+      padding: 6px 10px; font-size: 0.78rem; color: var(--muted); min-width: 0;
+    }
+    .ctr b { display: block; font-family: var(--mono); font-size: 1.02rem; font-weight: 500; white-space: nowrap; color: var(--text); overflow: hidden; text-overflow: ellipsis; }
+    .ctr.v b { color: var(--energy); } .ctr.q b { color: var(--hole); } .ctr.cur b { color: var(--success); }
+    .ctr.gm b { color: #4fc3f7; } .ctr.rd b { color: #ffb74d; } .ctr.mu b { color: #81c784; }
+    .ctr.rd.ohm b { color: #4fc3f7; }
+
+    .badges { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 10px auto 0; }
+    .bdg { font-size: 0.82rem; font-weight: 700; border-radius: 999px; padding: 4px 12px; border: 1.5px solid; white-space: normal; }
+    .bdg.r-ohm { color: #4fc3f7; border-color: #4fc3f7; background: rgba(2,119,189,.2); }
+    .bdg.r-sat { color: #66bb6a; border-color: #66bb6a; background: rgba(27,94,32,.35); }
+
+    /* Section 3 check panel */
+    .check { margin: 10px auto 0; background: #141b2b; border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; }
+    .check h3 { color: var(--energy); font-size: .95rem; margin: 0 0 6px; }
+    .check .row { display: flex; justify-content: space-between; gap: 10px; padding: 6px 0; border-top: 1px solid var(--border); font-size: .92rem; }
+    .check .row:first-of-type { border-top: 0; }
+    .check .row span:last-child { font-family: var(--mono); white-space: nowrap; }
+    .check .gm { color: #4fc3f7; } .check .rd { color: #ffb74d; } .check .mu { color: #81c784; }
+    .check .note { margin: 8px 0 0; font-size: .82rem; color: var(--muted); }
+
+    .keypoints {
+      margin-top: 16px; padding: 14px 16px; border-radius: var(--radius);
+      background: rgba(129,199,132,.07); border: 1px solid rgba(129,199,132,.35);
+    }
+    .keypoints h3 { color: var(--success); font-size: 0.95rem; text-transform: uppercase; letter-spacing: .05em; }
+    .keypoints ul { margin: 0; padding-left: 20px; }
+    .keypoints li { margin: 4px 0; }
+
+    .formulas { margin: 14px 0 0; background: #141b2b; border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; }
+    .formulas h3 { color: var(--energy); font-size: .9rem; text-transform: uppercase; letter-spacing: .05em; }
+    .formulas ul { margin: 0; padding-left: 20px; font-family: var(--mono); font-size: .9rem; }
+    .formulas li { margin: 4px 0; overflow-wrap: anywhere; }
+
+    .pager { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 48px; }
+    .pager a {
+      display: block; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 12px 14px; text-decoration: none; color: var(--text); min-width: 0;
+    }
+    .pager a:hover { border-color: var(--electron); }
+    .pager small { display: block; color: var(--muted); font-size: 0.75rem; }
+    .pager .next { text-align: right; }
+    .site-foot { border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; text-align: center; padding: 18px 16px; }
+
+    /* Justified paragraphs on desktop; phones stay left-aligned to avoid wide word gaps. */
+    @media (min-width: 768px) {
+      .prose p, .prose li, .keypoints li { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+      .prose p.eq { text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="toc" aria-label="Sections">
+    <ul>
+      <li><a href="#s0">Why parameters</a></li>
+      <li><a href="#s1">gm</a></li>
+      <li><a href="#s2">rd</a></li>
+      <li><a href="#s3">μ</a></li>
+      <li><a href="#s4">Q-point</a></li>
+      <li><a href="#s5">Summary</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="wrap">
+      <header>
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="../../index.html">Home</a> / <a href="../index.html">Unit 8</a> / 8.3
+        </nav>
+        <p class="eyebrow">TOPIC 8.3</p>
+        <h1>JFET Parameters: g<sub>m</sub>, r<sub>d</sub> and μ</h1>
+        <p class="subtitle">Three slopes at the Q-point that describe how a JFET amplifies</p>
+        <p class="rm-note" id="rmNote" hidden>Your device asks for reduced motion, so every animation starts paused. Press Play on any animation to run it. Sliders, buttons and dragging still update the picture.</p>
+      </header>
+
+      <!-- ================= SECTION 0 ================= -->
+      <section id="s0" aria-labelledby="h0">
+        <h2 id="h0">Why we need small-signal parameters</h2>
+        <div class="prose">
+          <p>In an amplifier, the JFET is biased at a steady operating point (the <strong>Q-POINT</strong>) in the saturation region, and a small AC signal makes V<sub>GS</sub> and V<sub>DS</sub> vary slightly around it. To calculate how much the drain current changes, we do not need the whole curved characteristic. We only need how <strong>STEEP</strong> the characteristics are at the Q-point.</p>
+          <p>Three small-signal parameters describe this:</p>
+          <ul>
+            <li>the <strong>TRANSCONDUCTANCE g<sub>m</sub></strong>: how much I<sub>D</sub> changes when V<sub>GS</sub> changes;</li>
+            <li>the <strong>DRAIN RESISTANCE r<sub>d</sub></strong>: how much I<sub>D</sub> changes when V<sub>DS</sub> changes;</li>
+            <li>the <strong>AMPLIFICATION FACTOR μ</strong>: how they combine.</li>
+          </ul>
+        </div>
+
+        <figure class="anim" id="anim0">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <button class="btn" type="button" id="z0" aria-pressed="false">Zoom</button>
+          </div>
+          <canvas id="cv0" class="narrow" style="aspect-ratio:600/400" role="img" aria-label="Transfer characteristic ID against VGS with a Q-point at VGS = −2 V. A small sine of plus and minus 0.2 V in VGS, drawn below the graph, moves the point along the curve, and the matching ID sine is drawn to the left of the graph. Zoom magnifies the region around Q, where the curve is nearly a straight line."></canvas>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: why parameters">
+          <h3>Key points</h3>
+          <ul>
+            <li>An amplifying JFET sits at a Q-point in the saturation region.</li>
+            <li>A small signal moves V<sub>GS</sub> and V<sub>DS</sub> only slightly around Q.</li>
+            <li>Over such a small swing the curve is nearly straight, so only its slope matters.</li>
+            <li>The slopes are described by g<sub>m</sub>, r<sub>d</sub> and μ.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 1 ================= -->
+      <section id="s1" aria-labelledby="h1s">
+        <h2 id="h1s">Transconductance g<sub>m</sub></h2>
+        <div class="prose">
+          <p>The <strong>TRANSCONDUCTANCE g<sub>m</sub></strong> (also written g<sub>fs</sub> or y<sub>fs</sub> on datasheets) is the change in drain current caused by a small change in gate-source voltage, with V<sub>DS</sub> held constant:</p>
+          <p class="eq">g<sub>m</sub> = ΔI<sub>D</sub> / ΔV<sub>GS</sub>   (V<sub>DS</sub> constant)</p>
+          <p>It is measured in siemens (S), usually millisiemens (mS). On the transfer characteristic, g<sub>m</sub> is the <strong>SLOPE</strong> of the curve at the Q-point. It tells how strongly the gate controls the current, so it is the most important parameter for amplification.</p>
+          <p>Differentiating Shockley's equation gives:</p>
+          <p class="eq">g<sub>m</sub> = g<sub>m0</sub> · (1 − V<sub>GS</sub>/V<sub>P</sub>), where g<sub>m0</sub> = 2·I<sub>DSS</sub> / |V<sub>P</sub>|</p>
+          <p>An equivalent form is g<sub>m</sub> = g<sub>m0</sub> · sqrt(I<sub>D</sub> / I<sub>DSS</sub>).</p>
+          <p><strong>g<sub>m0</sub></strong> is the largest transconductance, at V<sub>GS</sub> = 0. For our JFET, g<sub>m0</sub> = 2 × 10 mA / 4 V = <strong>5 mS</strong>. At V<sub>GS</sub> = −2 V, g<sub>m</sub> = 5 × (1 − 0.5) = <strong>2.5 mS</strong>. At V<sub>GS</sub> = V<sub>P</sub>, g<sub>m</sub> = 0.</p>
+        </div>
+
+        <figure class="anim" id="anim1">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="slider">
+              <label for="a1"><span>Q-point V<sub>GS</sub> (or drag the graph)</span><output id="a1o" for="a1">−2.00 V</output></label>
+              <input type="range" id="a1" min="-4" max="0" step="0.01" value="-2">
+            </div>
+          </div>
+          <canvas id="cv1" class="narrow drag" style="aspect-ratio:600/370" role="img" aria-label="Transfer characteristic with a draggable Q-point and its purple tangent line. A small right-angle triangle under the tangent marks ΔVGS and ΔID."></canvas>
+          <canvas id="cv1b" class="narrow inset" style="aspect-ratio:600/250" role="img" aria-label="gm against VGS: a straight line from 0 at VP = −4 V up to gm0 = 5 mS at VGS = 0, with a dot that follows the Q-point."></canvas>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr v">V<sub>GS</sub><b id="c1g">−2.00 V</b></div>
+            <div class="ctr cur">I<sub>D</sub><b id="c1i">2.50 mA</b></div>
+            <div class="ctr">ΔI<sub>D</sub> for ΔV<sub>GS</sub> = 0.6 V<b id="c1d">1.50 mA</b></div>
+            <div class="ctr gm">g<sub>m</sub> = ΔI<sub>D</sub>/ΔV<sub>GS</sub><b id="c1gm">2.50 mS</b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: transconductance">
+          <h3>Key points</h3>
+          <ul>
+            <li>g<sub>m</sub> = ΔI<sub>D</sub>/ΔV<sub>GS</sub> at constant V<sub>DS</sub>: the slope of the transfer curve.</li>
+            <li>g<sub>m</sub> = g<sub>m0</sub>(1 − V<sub>GS</sub>/V<sub>P</sub>), with g<sub>m0</sub> = 2I<sub>DSS</sub>/|V<sub>P</sub>| = 5 mS here.</li>
+            <li>g<sub>m</sub> falls in a straight line from g<sub>m0</sub> at V<sub>GS</sub> = 0 to zero at V<sub>P</sub>.</li>
+            <li>At V<sub>GS</sub> = −2 V, g<sub>m</sub> = 2.5 mS.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 2 ================= -->
+      <section id="s2" aria-labelledby="h2s">
+        <h2 id="h2s">Drain resistance r<sub>d</sub></h2>
+        <div class="prose">
+          <p>The <strong>DRAIN RESISTANCE r<sub>d</sub></strong> (also called the output resistance; its inverse 1/r<sub>d</sub> is listed on datasheets as g<sub>os</sub> or y<sub>os</sub>) describes how much the drain current changes when V<sub>DS</sub> changes, with V<sub>GS</sub> held constant:</p>
+          <p class="eq">r<sub>d</sub> = ΔV<sub>DS</sub> / ΔI<sub>D</sub>   (V<sub>GS</sub> constant)</p>
+          <p>On the drain characteristics it is the inverse of the <strong>SLOPE</strong> of a curve. In the saturation region the curves are nearly flat, so r<sub>d</sub> is <strong>large</strong>, typically tens of kilohms to megohms. The slight slope comes from channel-length modulation, and r<sub>d</sub> can be estimated as:</p>
+          <p class="eq">r<sub>d</sub> ≈ 1 / (λ·I<sub>D</sub>)</p>
+          <p>For λ = 0.01 V<sup>−1</sup> and I<sub>D</sub> = 2.5 mA, r<sub>d</sub> ≈ <strong>40 kΩ</strong>.</p>
+          <p>In the ohmic region the curves are steep, so r<sub>d</sub> is <strong>small</strong>: there the JFET acts as a low-value resistor.</p>
+        </div>
+
+        <figure class="anim" id="anim2">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <span class="glabel">V<sub>GS</sub></span>
+            <div class="seg" role="group" aria-label="Curve (VGS)">
+              <button class="btn" type="button" data-g="0">0 V</button>
+              <button class="btn" type="button" data-g="-1">−1 V</button>
+              <button class="btn" type="button" data-g="-2">−2 V</button>
+              <button class="btn" type="button" data-g="-3">−3 V</button>
+            </div>
+            <div class="slider">
+              <label for="a2"><span>Q-point V<sub>DS</sub> (or drag the graph)</span><output id="a2o" for="a2">8.0 V</output></label>
+              <input type="range" id="a2" min="0.1" max="15" step="0.1" value="8">
+            </div>
+          </div>
+          <canvas id="cv2" class="narrow drag" style="aspect-ratio:600/400" role="img" aria-label="Drain characteristics for VGS = 0, −1, −2 and −3 V with the pinch-off line dashed. A draggable Q-point has a purple tangent and a triangle marking ΔVDS and ΔID. In saturation the tangent is almost flat; in the ohmic region it is steep."></canvas>
+          <div class="badges narrow" aria-live="polite"><span class="bdg r-sat" id="b2">saturation</span></div>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr v">V<sub>GS</sub>, V<sub>DS</sub><b id="c2v">−2 V, 8.0 V</b></div>
+            <div class="ctr cur">I<sub>D</sub><b id="c2i">2.70 mA</b></div>
+            <div class="ctr rd" id="c2box">r<sub>d</sub> = ΔV<sub>DS</sub>/ΔI<sub>D</sub><b id="c2r">40.0 kΩ</b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: drain resistance">
+          <h3>Key points</h3>
+          <ul>
+            <li>r<sub>d</sub> = ΔV<sub>DS</sub>/ΔI<sub>D</sub> at constant V<sub>GS</sub>: the inverse slope of a drain curve.</li>
+            <li>In saturation the curves are nearly flat, so r<sub>d</sub> is large: r<sub>d</sub> ≈ 1/(λ·I<sub>D</sub>).</li>
+            <li>At I<sub>D</sub> = 2.5 mA and λ = 0.01 V<sup>−1</sup>, r<sub>d</sub> ≈ 40 kΩ.</li>
+            <li>In the ohmic region the curves are steep, so r<sub>d</sub> is small.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 3 ================= -->
+      <section id="s3" aria-labelledby="h3s">
+        <h2 id="h3s">Amplification factor μ</h2>
+        <div class="prose">
+          <p>The <strong>AMPLIFICATION FACTOR μ</strong> compares how effective the gate voltage and the drain voltage are at controlling the current. It is the change in V<sub>DS</sub> needed to cancel the effect of a change in V<sub>GS</sub>, keeping I<sub>D</sub> constant:</p>
+          <p class="eq">μ = − ΔV<sub>DS</sub> / ΔV<sub>GS</sub>   (I<sub>D</sub> constant)</p>
+          <p>The three parameters are related simply:</p>
+          <p class="eq">μ = g<sub>m</sub> · r<sub>d</sub></p>
+          <p>For our example at V<sub>GS</sub> = −2 V: μ = 2.5 mS × 40 kΩ = <strong>100</strong>.</p>
+          <p>μ is the <strong>largest voltage gain</strong> a single JFET can give, reached only when the drain load resistance is much larger than r<sub>d</sub>. With a practical drain resistor R<sub>D</sub>, the gain is g<sub>m</sub>·(R<sub>D</sub> ∥ r<sub>d</sub>), which is smaller than μ.</p>
+        </div>
+
+        <figure class="anim" id="anim3">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="slider">
+              <label for="a3"><span>Gate step ΔV<sub>GS</sub></span><output id="a3o" for="a3">+20 mV</output></label>
+              <input type="range" id="a3" min="5" max="40" step="1" value="20">
+            </div>
+          </div>
+          <canvas id="cv3" class="narrow" style="aspect-ratio:600/400" role="img" aria-label="Zoomed drain characteristics near the Q-point at VGS = −2 V, VDS = 10 V. Raising VGS by ΔVGS lifts the point to a higher curve (green arrow, ΔID); then VDS is lowered along that curve until ID is back at its starting value (amber arrow, ΔVDS)."></canvas>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr v">ΔV<sub>GS</sub><b id="c3g">+20 mV</b></div>
+            <div class="ctr cur">ΔI<sub>D</sub> from the gate<b id="c3i">+0.055 mA</b></div>
+            <div class="ctr rd">ΔV<sub>DS</sub> to cancel it<b id="c3d">−2.17 V</b></div>
+            <div class="ctr mu">μ = |ΔV<sub>DS</sub>/ΔV<sub>GS</sub>|<b id="c3m">108</b></div>
+          </div>
+          <div class="check narrow" aria-live="polite">
+            <h3>Check: μ = g<sub>m</sub> · r<sub>d</sub></h3>
+            <div class="row"><span class="gm">g<sub>m</sub> = ΔI<sub>D</sub>/ΔV<sub>GS</sub></span><span class="gm" id="k3g">2.76 mS</span></div>
+            <div class="row"><span class="rd">r<sub>d</sub> = |ΔV<sub>DS</sub>|/ΔI<sub>D</sub></span><span class="rd" id="k3r">39.2 kΩ</span></div>
+            <div class="row"><span class="mu">g<sub>m</sub> · r<sub>d</sub></span><span class="mu" id="k3p">108</span></div>
+            <div class="row"><span class="mu">μ from the tug of war</span><span class="mu" id="k3m">108</span></div>
+            <p class="note">Here the Q-point is at V<sub>DS</sub> = 10 V, where the factor (1 + λ·V<sub>DS</sub>) = 1.1 raises I<sub>D</sub> and g<sub>m</sub> by about 10 %, so μ comes out near 110 instead of the 100 of the example (which takes λ·V<sub>DS</sub> ≈ 0). A finite gate step also lowers it slightly.</p>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: amplification factor">
+          <h3>Key points</h3>
+          <ul>
+            <li>μ = −ΔV<sub>DS</sub>/ΔV<sub>GS</sub> at constant I<sub>D</sub>: how much more the gate controls I<sub>D</sub> than the drain.</li>
+            <li>μ = g<sub>m</sub>·r<sub>d</sub>; at V<sub>GS</sub> = −2 V, μ = 2.5 mS × 40 kΩ = 100.</li>
+            <li>μ is the largest voltage gain one JFET can give.</li>
+            <li>With a drain resistor the gain is g<sub>m</sub>·(R<sub>D</sub> ∥ r<sub>d</sub>), smaller than μ.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 4 ================= -->
+      <section id="s4" aria-labelledby="h4s">
+        <h2 id="h4s">How the parameters change with the Q-point</h2>
+        <div class="prose">
+          <p>The parameters are not constants; they depend on where the JFET is biased:</p>
+          <ul>
+            <li>g<sub>m</sub> is <strong>largest</strong> near V<sub>GS</sub> = 0 (large I<sub>D</sub>) and falls to zero at V<sub>GS</sub> = V<sub>P</sub>.</li>
+            <li>r<sub>d</sub> ≈ 1/(λ·I<sub>D</sub>) is <strong>LARGER</strong> at small currents.</li>
+            <li>μ = g<sub>m</sub>·r<sub>d</sub> <strong>INCREASES</strong> at lower currents, because r<sub>d</sub> rises faster than g<sub>m</sub> falls (for this model μ is proportional to 1/sqrt(I<sub>D</sub>)).</li>
+          </ul>
+          <p>Designers choose the Q-point as a <strong>compromise</strong>: a larger current gives more g<sub>m</sub> (more gain), but uses more power, and the swing available for the signal must be kept in the saturation region.</p>
+          <p>Datasheets list typical g<sub>m</sub> (often measured at V<sub>GS</sub> = 0, i.e. g<sub>m0</sub>) and output admittance y<sub>os</sub>.</p>
+        </div>
+
+        <figure class="anim" id="anim4">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="slider">
+              <label for="a4"><span>Q-point V<sub>GS</sub></span><output id="a4o" for="a4">−2.00 V</output></label>
+              <input type="range" id="a4" min="-3.9" max="0" step="0.01" value="-2">
+            </div>
+          </div>
+          <canvas id="cv4" class="narrow" style="aspect-ratio:600/636" role="img" aria-label="Three graphs against VGS from −4 to 0 V, stacked: gm rising in a straight line to 5 mS, rd falling from very large values near VP to 10 kilohms at VGS = 0, and μ falling from very large values near VP to 50 at VGS = 0. A vertical marker shows the chosen VGS on all three."></canvas>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr cur">I<sub>D</sub><b id="c4i">2.50 mA</b></div>
+            <div class="ctr gm">g<sub>m</sub><b id="c4g">2.50 mS</b></div>
+            <div class="ctr rd">r<sub>d</sub><b id="c4r">40.0 kΩ</b></div>
+            <div class="ctr mu">μ<b id="c4m">100</b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: Q-point dependence">
+          <h3>Key points</h3>
+          <ul>
+            <li>g<sub>m</sub> is largest at V<sub>GS</sub> = 0 and zero at V<sub>P</sub>.</li>
+            <li>r<sub>d</sub> ≈ 1/(λ·I<sub>D</sub>) grows as the current falls.</li>
+            <li>μ = g<sub>m</sub>·r<sub>d</sub> grows at low current (∝ 1/sqrt(I<sub>D</sub>) in this model).</li>
+            <li>The Q-point is a compromise between gain, power and signal swing.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 5 ================= -->
+      <section id="s5" aria-labelledby="h5s">
+        <h2 id="h5s">Summary</h2>
+        <div class="prose">
+          <p><strong>g<sub>m</sub> = ΔI<sub>D</sub>/ΔV<sub>GS</sub></strong> is the slope of the transfer curve: g<sub>m</sub> = g<sub>m0</sub>(1 − V<sub>GS</sub>/V<sub>P</sub>) with g<sub>m0</sub> = 2I<sub>DSS</sub>/|V<sub>P</sub>|. <strong>r<sub>d</sub> = ΔV<sub>DS</sub>/ΔI<sub>D</sub></strong> is the inverse slope of a drain curve, large in saturation (r<sub>d</sub> ≈ 1/(λI<sub>D</sub>)). <strong>μ = g<sub>m</sub>·r<sub>d</sub></strong> is the maximum voltage gain. All three depend on the Q-point.</p>
+        </div>
+
+        <figure class="anim" id="anim5">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="ctrls">
+            <div class="slider">
+              <label for="a5s"><span>I<sub>DSS</sub></span><output id="a5so" for="a5s">10.0 mA</output></label>
+              <input type="range" id="a5s" min="1" max="20" step="0.5" value="10">
+            </div>
+            <div class="slider">
+              <label for="a5p"><span>V<sub>P</sub></span><output id="a5po" for="a5p">−4.0 V</output></label>
+              <input type="range" id="a5p" min="-8" max="-0.5" step="0.1" value="-4">
+            </div>
+            <div class="slider">
+              <label for="a5l"><span>λ</span><output id="a5lo" for="a5l">0.010 /V</output></label>
+              <input type="range" id="a5l" min="0.001" max="0.05" step="0.001" value="0.01">
+            </div>
+          </div>
+          <div class="ctrls">
+            <span class="glabel">Set the Q-point by</span>
+            <div class="seg" role="group" aria-label="Set the Q-point by">
+              <button class="btn" type="button" data-m="vgs" aria-pressed="true">V<sub>GS</sub></button>
+              <button class="btn" type="button" data-m="id" aria-pressed="false">I<sub>D</sub></button>
+            </div>
+            <div class="slider" id="a5gw">
+              <label for="a5g"><span>V<sub>GS</sub></span><output id="a5go" for="a5g">−2.00 V</output></label>
+              <input type="range" id="a5g" min="-4" max="0" step="0.01" value="-2">
+            </div>
+            <div class="slider" id="a5iw" hidden>
+              <label for="a5i"><span>I<sub>D</sub> (% of I<sub>DSS</sub>)</span><output id="a5io" for="a5i">25 %</output></label>
+              <input type="range" id="a5i" min="1" max="100" step="1" value="25">
+            </div>
+          </div>
+          <canvas id="cv5" class="narrow" style="aspect-ratio:600/362" role="img" aria-label="Mini transfer curve for the chosen IDSS and VP with the Q-point and its tangent, whose slope is gm."></canvas>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr gm">g<sub>m0</sub><b id="c5g0">5.00 mS</b></div>
+            <div class="ctr gm">g<sub>m</sub><b id="c5g">2.50 mS</b></div>
+            <div class="ctr cur">I<sub>D</sub><b id="c5i">2.50 mA</b></div>
+            <div class="ctr rd">r<sub>d</sub><b id="c5r">40.0 kΩ</b></div>
+            <div class="ctr mu">μ<b id="c5m">100</b></div>
+          </div>
+        </figure>
+
+        <div class="formulas" aria-label="Key formulas">
+          <h3>Key formulas</h3>
+          <ul>
+            <li>g<sub>m</sub> = ΔI<sub>D</sub>/ΔV<sub>GS</sub></li>
+            <li>g<sub>m</sub> = g<sub>m0</sub>(1 − V<sub>GS</sub>/V<sub>P</sub>)</li>
+            <li>g<sub>m0</sub> = 2I<sub>DSS</sub>/|V<sub>P</sub>|</li>
+            <li>g<sub>m</sub> = g<sub>m0</sub>·sqrt(I<sub>D</sub>/I<sub>DSS</sub>)</li>
+            <li>r<sub>d</sub> = ΔV<sub>DS</sub>/ΔI<sub>D</sub> ≈ 1/(λI<sub>D</sub>)</li>
+            <li>μ = g<sub>m</sub>·r<sub>d</sub></li>
+          </ul>
+        </div>
+
+        <aside class="keypoints" aria-label="Key points: summary">
+          <h3>Key points</h3>
+          <ul>
+            <li>g<sub>m</sub>: slope of the transfer curve, g<sub>m0</sub>(1 − V<sub>GS</sub>/V<sub>P</sub>).</li>
+            <li>r<sub>d</sub>: inverse slope of a drain curve, large in saturation, ≈ 1/(λI<sub>D</sub>).</li>
+            <li>μ = g<sub>m</sub>·r<sub>d</sub> is the maximum voltage gain.</li>
+            <li>All three depend on the Q-point.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <nav class="pager" aria-label="Topic navigation">
+        <a href="../8-2-jfet-characteristics/index.html"><small>← Previous</small>8.2 JFET Characteristics and Pinch-Off</a>
+        <a class="next" href="../8-4-mos-capacitor/index.html"><small>Next →</small>8.4 MOSFET Basics: the MOS Capacitor</a>
+      </nav>
+    </div>
+  </main>
+
+  <footer class="site-foot">© 2026 Naveen Bokka</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  const C = {
+    text: '#e6e9ef', muted: '#9aa4b8', v: '#ffd54f', cur: '#81c784', wire: '#cfd8dc', tan: '#ce93d8', q: '#ff8a65',
+    gm: '#4fc3f7', rd: '#ffb74d', mu: '#81c784', trc: '#80cbc4', grid: 'rgba(255,255,255,.07)'
+  };
+  const VPAL = { '0': '#f06292', '-1': '#4db6ac', '-2': '#9fa8da', '-3': '#bcaaa4' };
+  const FONT = 'Inter, system-ui, sans-serif';
+  const MONO = '"JetBrains Mono", Consolas, monospace';
+  const RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const TAU = Math.PI * 2;
+  const $ = id => document.getElementById(id);
+  if (RM) $('rmNote').hidden = false;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const lerp = (a, b, u) => a + (b - a) * u;
+  const ease = u => { u = clamp(u, 0, 1); return u * u * (3 - 2 * u); };
+
+  /* =========================================================
+     n-channel JFET: IDSS = 10 mA, VP = −4 V, λ = 0.01 /V.
+       Saturation: ID = IDSS·(1 − VGS/VP)²·(1 + λ·VDS)
+       Ohmic:      ID = (IDSS/VP²)·[2(VGS − VP)·VDS − VDS²]·(1 + λ·VDS)
+       (the (1 + λ·VDS) factor is applied to the ohmic branch too, as in topic 8.2,
+        so the curves are continuous at pinch-off)
+     Small-signal formulas (λ·VDS neglected, as in the text):
+       gm = gm0·(1 − VGS/VP), gm0 = 2·IDSS/|VP|;  rd ≈ 1/(λ·ID);  μ = gm·rd
+     ========================================================= */
+  const IDSS = 10e-3, VP = -4, LAM = 0.01, GM0 = 2 * IDSS / Math.abs(VP);
+  const shock = (v, is, vp) => { is = is || IDSS; vp = vp || VP; return v <= vp ? 0 : is * Math.pow(1 - v / vp, 2); };
+  const gmOf = (v, is, vp) => { is = is || IDSS; vp = vp || VP; return v <= vp ? 0 : 2 * is / Math.abs(vp) * (1 - v / vp); };
+  function chan(vgs, vds) {
+    if (vgs <= VP || vds <= 0) return 0;
+    const vov = vgs - VP, base = vds < vov ? IDSS / (VP * VP) * (2 * vov * vds - vds * vds) : IDSS * Math.pow(1 - vgs / VP, 2);
+    return base * (1 + LAM * vds);
+  }
+  function dchan(vgs, vds) {   // ∂ID/∂VDS at constant VGS
+    if (vgs <= VP) return 0;
+    const vov = vgs - VP;
+    if (vds < vov) { const f = IDSS / (VP * VP) * (2 * vov * vds - vds * vds), fp = IDSS / (VP * VP) * (2 * vov - 2 * vds); return fp * (1 + LAM * vds) + LAM * f; }
+    return LAM * IDSS * Math.pow(1 - vgs / VP, 2);
+  }
+
+  const fV = (v, d) => (v < -1e-9 ? '−' : '') + Math.abs(v).toFixed(d == null ? 2 : d) + ' V';
+  const fN = (v, d) => (v < -1e-9 ? '−' : '') + Math.abs(v).toFixed(d || 0);
+  const fmA = i => (i * 1e3).toFixed(2) + ' mA';
+  const fmS = g => (g * 1e3).toFixed(2) + ' mS';
+  const fR = r => !isFinite(r) || r > 1e9 ? '∞' : r >= 1e6 ? (r / 1e6).toFixed(2) + ' MΩ' : r >= 1e3 ? (r / 1e3).toFixed(r >= 1e5 ? 0 : 1) + ' kΩ' : r.toFixed(0) + ' Ω';
+  const fMu = m => !isFinite(m) || m > 1e6 ? '∞' : m >= 100 ? m.toFixed(0) : m.toFixed(1);
+
+  /* ---------- Canvas helpers ---------- */
+  let FS = 1;
+  function Cv(id, W, H, cap) { this.el = $(id); this.W = W; this.H = H; this.cap = cap || 2; this.ctx = this.el.getContext('2d'); }
+  Cv.prototype.begin = function () {
+    const w = this.el.clientWidth; if (!w) return null;
+    const dpr = window.devicePixelRatio || 1;
+    const pw = Math.round(w * dpr), ph = Math.round(w * dpr * this.H / this.W);
+    if (this.el.width !== pw || this.el.height !== ph) { this.el.width = pw; this.el.height = ph; }
+    const c = this.ctx, s = pw / this.W;
+    FS = Math.min(this.cap, Math.max(1, 1.15 * this.W / w));
+    c.setTransform(s, 0, 0, s, 0, 0); c.clearRect(0, 0, this.W, this.H);
+    c.textBaseline = 'middle'; c.textAlign = 'left'; c.globalAlpha = 1; c.setLineDash([]); c.lineCap = 'butt'; c.shadowBlur = 0;
+    return c;
+  };
+  // Watermark: drawn inside the canvas, bottom-right, 13 px on screen at any size.
+  Cv.prototype.wm = function (c) {
+    const k = this.W / this.el.clientWidth, s = 13 * k;
+    c.save(); c.setTransform(this.el.width / this.W, 0, 0, this.el.width / this.W, 0, 0);
+    c.globalAlpha = 1; c.shadowBlur = 0; c.font = '500 ' + s.toFixed(1) + 'px ' + FONT; c.fillStyle = 'rgba(255,255,255,.35)';
+    c.textAlign = 'right'; c.textBaseline = 'bottom'; c.fillText('© Naveen Bokka', this.W - 6 * k, this.H - 4 * k); c.restore();
+  };
+  Cv.prototype.pt = function (e) {
+    const r = this.el.getBoundingClientRect();
+    return { x: (e.clientX - r.left) * this.W / r.width, y: (e.clientY - r.top) * this.H / r.height };
+  };
+  function circ(c, x, y, r, fill, stroke, lw) {
+    c.beginPath(); c.arc(x, y, Math.max(0, r), 0, TAU);
+    if (fill) { c.fillStyle = fill; c.fill(); }
+    if (stroke) { c.strokeStyle = stroke; c.lineWidth = lw || 1.5; c.stroke(); }
+  }
+  function txt(c, s, x, y, col, size, weight, align, font) {
+    c.font = (weight || 600) + ' ' + ((size || 12) * FS).toFixed(1) + 'px ' + (font || FONT);
+    c.fillStyle = col || C.text; c.textAlign = align || 'left'; c.fillText(s, x, y);
+  }
+  // Label made of [main, subscript] parts, e.g. [['g','m'],[' = 2.5 mS','']]
+  function subs(c, parts, x, y, col, size, align) {
+    const z = (size || 13) * FS, zs = z * 0.72;
+    let w = 0;
+    const ws = parts.map(p => {
+      c.font = '700 ' + z.toFixed(1) + 'px ' + FONT; const a = c.measureText(p[0]).width;
+      c.font = '700 ' + zs.toFixed(1) + 'px ' + FONT; const b = p[1] ? c.measureText(p[1]).width : 0;
+      w += a + b; return [a, b];
+    });
+    let x0 = align === 'right' ? x - w : align === 'center' ? x - w / 2 : x;
+    c.fillStyle = col; c.textAlign = 'left';
+    parts.forEach((p, k) => {
+      c.font = '700 ' + z.toFixed(1) + 'px ' + FONT; c.fillText(p[0], x0, y); x0 += ws[k][0];
+      if (p[1]) { c.font = '700 ' + zs.toFixed(1) + 'px ' + FONT; c.fillText(p[1], x0, y + z * 0.3); x0 += ws[k][1]; }
+    });
+    return w;
+  }
+  function line(c, x0, y0, x1, y1, col, lw, dash) {
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []);
+    c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke(); c.setLineDash([]);
+  }
+  function pline(c, pts, col, lw, dash) {
+    if (pts.length < 2) return;
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []); c.lineJoin = 'round';
+    c.beginPath(); pts.forEach((p, k) => k ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); c.stroke(); c.setLineDash([]);
+  }
+  function gline(c, pts, col, lw) { c.save(); c.shadowColor = col; c.shadowBlur = 5; pline(c, pts, col, lw || 2.6); c.restore(); }
+  function arrow(c, x0, y0, x1, y1, col, lw, head) {
+    const dx = x1 - x0, dy = y1 - y0, L = Math.hypot(dx, dy); if (L < 2) return;
+    const ux = dx / L, uy = dy / L, hs = Math.min(head || 10, L * 0.8), hw = Math.max(hs * 0.55, lw * 0.9);
+    line(c, x0, y0, x1 - ux * hs * 0.9, y1 - uy * hs * 0.9, col, lw || 3);
+    c.fillStyle = col; c.beginPath(); c.moveTo(x1, y1);
+    c.lineTo(x1 - ux * hs - uy * hw, y1 - uy * hs + ux * hw);
+    c.lineTo(x1 - ux * hs + uy * hw, y1 - uy * hs - ux * hw); c.closePath(); c.fill();
+  }
+  function poly(c, pts, fill, stroke, lw) {
+    c.beginPath(); c.moveTo(pts[0][0], pts[0][1]); for (let k = 1; k < pts.length; k++) c.lineTo(pts[k][0], pts[k][1]); c.closePath();
+    if (fill) { c.fillStyle = fill; c.fill(); }
+    if (stroke) { c.strokeStyle = stroke; c.lineWidth = lw || 1.2; c.stroke(); }
+  }
+  function qDot(c, x, y, r) {
+    c.save(); c.shadowColor = C.q; c.shadowBlur = 16; circ(c, x, y, r || 7, C.q); c.restore();
+    circ(c, x, y, r || 7, null, '#fff', 1.6);
+  }
+  function segSel(root, attr, val) {
+    root.querySelectorAll('[data-' + attr + ']').forEach(b => b.setAttribute('aria-pressed', String(b.dataset[attr] === String(val))));
+  }
+  function onDrag(cv, f, start) {
+    let d = false;
+    cv.el.addEventListener('pointerdown', e => { d = true; cv.el.setPointerCapture(e.pointerId); if (start) start(); f(cv.pt(e)); e.preventDefault(); });
+    cv.el.addEventListener('pointermove', e => { if (d) f(cv.pt(e)); });
+    ['pointerup', 'pointercancel'].forEach(tp => cv.el.addEventListener(tp, () => { d = false; }));
+  }
+
+  /* ---------- plotting helpers ---------- */
+  function mkP(l, r, t, b, x0, x1, y0, y1) { const P = { l: l, r: r, t: t, b: b, x0: x0, x1: x1, y0: y0, y1: y1 }; P.X = v => l + (v - x0) / (x1 - x0) * (r - l); P.Y = v => b - (v - y0) / (y1 - y0) * (b - t); P.ix = x => x0 + (x - l) / (r - l) * (x1 - x0); P.iy = y => y0 + (b - y) / (b - t) * (y1 - y0); return P; }
+  // Axes, grid and tick labels; yl is drawn above the y axis, xl under the x axis.
+  function frame(c, P, xs, ys, xf, yf, xl, yl) {
+    xs.forEach(v => { line(c, P.X(v), P.t, P.X(v), P.b, C.grid, 1); if (xf) txt(c, xf(v), P.X(v), P.b + 7 + 6 * FS, C.muted, 10, 500, 'center'); });
+    ys.forEach(v => { line(c, P.l, P.Y(v), P.r, P.Y(v), C.grid, 1); if (yf) txt(c, yf(v), P.l - 7, P.Y(v), C.muted, 10, 500, 'right'); });
+    line(c, P.l, P.b, P.r, P.b, C.muted, 1.5); line(c, P.l, P.t, P.l, P.b, C.muted, 1.5);
+    if (xl) subs(c, xl, (P.l + P.r) / 2, P.b + 16 + 14 * FS, C.muted, 12, 'center');
+    if (yl) subs(c, yl, P.l - 6, P.t - 4 - 8 * FS, C.muted, 12, 'left');
+  }
+  const clip = (c, P) => { c.save(); c.beginPath(); c.rect(P.l, P.t, P.r - P.l, P.b - P.t); c.clip(); };
+  const ticks = (a, b, st) => { const o = []; for (let v = Math.ceil(a / st - 1e-9) * st; v <= b + 1e-9; v += st) o.push(+v.toFixed(6)); return o; };
+  const XG = [['V', 'GS'], [' (V)', '']], XD = [['V', 'DS'], [' (V)', '']], YI = [['I', 'D'], [' (mA)', '']];
+  const mAf = d => v => (v * 1e3).toFixed(d || 0);
+  // Right-angle slope triangle: hypotenuse A→B on a straight line, legs horizontal (yellow) and vertical (green)
+  function slopeTri(c, A, B, hcol, vcol) {
+    const Rc = [B[0], A[1]];
+    poly(c, [A, Rc, B], 'rgba(206,147,216,.13)');
+    line(c, A[0], A[1], Rc[0], Rc[1], hcol, 2.4); line(c, Rc[0], Rc[1], B[0], B[1], vcol, 2.4);
+    const s = 7 * Math.sign(B[0] - A[0] || 1), u = 7 * Math.sign(B[1] - A[1] || -1);
+    pline(c, [[Rc[0] - s, Rc[1]], [Rc[0] - s, Rc[1] + u], [Rc[0], Rc[1] + u]], 'rgba(255,255,255,.5)', 1);
+    return Rc;
+  }
+
+  /* ---------- Animation framework: own Play/Pause/Reset, runs only while visible ---------- */
+  const anims = [];
+  function Anim(rootId, o) {
+    this.root = $(rootId); this.o = o; this.playing = !RM; this.visible = true; this.dirty = true;
+    this.pb = this.root.querySelector('[data-act="play"]');
+    this.pb.addEventListener('click', () => this.setPlaying(!this.playing));
+    this.root.querySelector('[data-act="reset"]').addEventListener('click', () => { o.reset(); this.setPlaying(!RM); });
+    o.reset(); this.sync(); anims.push(this);
+    if ('IntersectionObserver' in window) {
+      this.visible = false;
+      new IntersectionObserver(es => es.forEach(e => { this.visible = e.isIntersecting; if (this.visible) this.dirty = true; }))
+        .observe(this.root);
+    }
+  }
+  Anim.prototype.setPlaying = function (p) { this.playing = p; this.sync(); this.dirty = true; };
+  Anim.prototype.sync = function () { this.pb.textContent = this.playing ? 'Pause' : 'Play'; };
+
+  /* =========================================================
+     0. Why small-signal parameters: graphical wiggle on the transfer curve
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv0', 600, 400), bz = $('z0');
+    const W = TAU * 0.35, T = 2 / 0.35, VQ = -2, SW = 0.2;
+    let t = 0, zoom = false, z = 0, A;
+    const vg = s => VQ + SW * Math.sin(W * s);
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const x0 = lerp(-4.2, -2.5, z), x1 = lerp(0, -1.5, z), y0 = lerp(0, 1.5e-3, z), y1 = lerp(10.5e-3, 3.6e-3, z);
+      const P = mkP(200, 580, 30, 236, x0, x1, y0, y1), wide = x1 - x0 > 2, tall = y1 - y0 > 5e-3;
+      frame(c, P, ticks(x0, x1, wide ? 1 : 0.25), ticks(y0, y1, tall ? 2e-3 : 0.5e-3), v => fN(v, wide ? 0 : 2), mAf(tall ? 0 : 1), XG, YI);
+      clip(c, P);
+      const pts = []; for (let k = 0; k <= 240; k++) { const v = x0 + (x1 - x0) * k / 240; pts.push([P.X(v), P.Y(shock(v))]); }
+      gline(c, pts, C.trc, 2.8);
+      if (z < 0.99) { c.globalAlpha = 1 - z; c.strokeStyle = 'rgba(255,255,255,.45)'; c.lineWidth = 1.2; c.setLineDash([4, 4]); c.strokeRect(P.X(-2.5), P.Y(3.6e-3), P.X(-1.5) - P.X(-2.5), P.Y(1.5e-3) - P.Y(3.6e-3)); c.setLineDash([]); c.globalAlpha = 1; }
+      if (z > 0.01) { const g = gmOf(VQ), I = shock(VQ); c.globalAlpha = z; line(c, P.X(-2.6), P.Y(I - 0.6 * g), P.X(-1.4), P.Y(I + 0.6 * g), C.tan, 1.8, [7, 5]); c.globalAlpha = 1; }
+      c.restore();
+      const v = vg(t), px = P.X(v), py = P.Y(shock(v)), qx = P.X(VQ), qy = P.Y(shock(VQ));
+      // input wiggle below the graph (time runs downward)
+      const yb0 = P.b + 30 + 18 * FS, yb1 = 366, K = (yb1 - yb0) / T;
+      line(c, qx, yb0 - 4, qx, yb1, 'rgba(255,255,255,.18)', 1);
+      line(c, px, py, px, yb0, 'rgba(255,213,79,.5)', 1.2, [4, 4]);
+      const pin = []; for (let s = 0; s <= T + 1e-9; s += T / 180) pin.push([P.X(vg(t - s)), yb0 + s * K]);
+      gline(c, pin, C.v, 2.4);
+      subs(c, [['ΔV', 'GS']], Math.max(P.X(VQ + SW), qx + 30) + 10, yb0 + 22, C.v, 12, 'left');
+      // output wiggle left of the graph (time runs leftward)
+      const xl0 = P.l - 54, xl1 = 14, K2 = (xl0 - xl1) / T;
+      line(c, xl0 + 4, qy, xl1, qy, 'rgba(255,255,255,.18)', 1);
+      line(c, px, py, xl0, py, 'rgba(129,199,132,.5)', 1.2, [4, 4]);
+      const pout = []; for (let s = 0; s <= T + 1e-9; s += T / 180) pout.push([xl0 - s * K2, P.Y(shock(vg(t - s)))]);
+      gline(c, pout, C.cur, 2.4);
+      const amp = Math.abs(P.Y(shock(VQ + SW)) - qy);
+      subs(c, [['ΔI', 'D']], xl1 + 4, Math.max(P.t + 6, qy - amp - 14), C.cur, 12, 'left');
+      // Q (rest point) and moving point
+      circ(c, qx, qy, 10, null, 'rgba(255,255,255,.55)', 1.4);
+      txt(c, 'Q', qx + 14, qy + 16, C.q, 13, 700, 'left');
+      qDot(c, px, py, 6.5);
+      if (z > 0.5) { c.globalAlpha = (z - 0.5) * 2; txt(c, 'zoomed', P.r - 6, P.t + 12, C.muted, 11, 700, 'right'); c.globalAlpha = 1; }
+      cv.wm(c);
+    }
+    const o = {
+      reset() { t = 0; zoom = false; z = 0; bz.setAttribute('aria-pressed', 'false'); },
+      step(dt) { t += dt; z = lerp(z, zoom ? 1 : 0, 1 - Math.exp(-dt * 4)); },
+      draw: draw
+    };
+    A = new Anim('anim0', o);
+    bz.addEventListener('click', () => { zoom = !zoom; bz.setAttribute('aria-pressed', String(zoom)); if (!A.playing) z = zoom ? 1 : 0; A.dirty = true; });
+  })();
+
+  /* =========================================================
+     1. Transconductance: tangent on the transfer curve, gm against VGS
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv1', 600, 370), cb = new Cv('cv1b', 600, 250), sl = $('a1'), DV = 0.6;
+    const P = mkP(70, 580, 30, 280, -4.5, 0, 0, 11e-3), P2 = mkP(70, 580, 30, 160, -4.5, 0, 0, 5.6e-3);
+    let tt = 0, A;
+    function upd() {
+      const v = +sl.value, g = gmOf(v);
+      $('a1o').textContent = fV(v); $('c1g').textContent = fV(v); $('c1i').textContent = fmA(shock(v));
+      $('c1d').textContent = fmA(g * DV); $('c1gm').textContent = fmS(g);
+      if (A) A.dirty = true;
+    }
+    function draw() {
+      const v = +sl.value, I = shock(v), g = gmOf(v), c = cv.begin();
+      if (c) {
+        frame(c, P, [-4, -3, -2, -1, 0], [0, 2e-3, 4e-3, 6e-3, 8e-3, 10e-3], v => fN(v), mAf(), XG, YI);
+        line(c, P.X(VP), P.t, P.X(VP), P.b, 'rgba(255,255,255,.2)', 1, [3, 3]); subs(c, [['V', 'P']], P.X(VP) + 6, P.t + 10, C.muted, 11, 'left');
+        clip(c, P);
+        const pts = [[P.X(-4.5), P.Y(0)]]; for (let x = VP; x <= 1e-9; x += 0.02) pts.push([P.X(x), P.Y(shock(x))]);
+        gline(c, pts, C.trc, 2.8);
+        const tl = u => [P.X(u), P.Y(I + g * (u - v))];
+        const a = tl(v - 1.5), b = tl(v + 1.5); line(c, a[0], a[1], b[0], b[1], C.tan, 2.2);
+        const c0 = clamp(v, VP + DV / 2, -DV / 2), A0 = tl(c0 - DV / 2), B0 = tl(c0 + DV / 2);
+        const Rc = slopeTri(c, A0, B0, C.v, C.cur);
+        c.restore();
+        subs(c, [['ΔV', 'GS']], (A0[0] + Rc[0]) / 2, Rc[1] + 14, C.v, 11, 'center');
+        subs(c, [['ΔI', 'D']], Rc[0] + 6, (Rc[1] + B0[1]) / 2, C.cur, 11, 'left');
+        const e = tl(Math.max(v - 1.5, -4.4)); if (e[1] > P.t + 6 && e[1] < P.b - 4) subs(c, [['g', 'm']], e[0], e[1] - 12, C.gm, 13, 'left');
+        line(c, P.X(v), P.Y(I), P.X(v), P.b, 'rgba(255,138,101,.55)', 1.2, [4, 4]);
+        qDot(c, P.X(v), P.Y(I)); txt(c, 'Q', P.X(v) - 12, P.Y(I) - 14, C.q, 13, 700, 'right');
+        cv.wm(c);
+      }
+      const d = cb.begin();
+      if (d) {
+        frame(d, P2, [-4, -3, -2, -1, 0], [0, 1e-3, 2e-3, 3e-3, 4e-3, 5e-3], v => fN(v), mAf(), XG, [['g', 'm'], [' (mS)', '']]);
+        clip(d, P2);
+        gline(d, [[P2.X(-4.5), P2.Y(0)], [P2.X(VP), P2.Y(0)], [P2.X(0), P2.Y(GM0)]], C.gm, 2.8);
+        d.restore();
+        subs(d, [['g', 'm0'], [' = 5 mS', '']], P2.X(0) - 8, P2.Y(GM0) + 22, C.gm, 11, 'right');
+        line(d, P2.X(v), P2.Y(g), P2.X(v), P2.b, 'rgba(255,138,101,.55)', 1.2, [4, 4]);
+        qDot(d, P2.X(v), P2.Y(g), 6);
+        cb.wm(d);
+      }
+    }
+    const o = {
+      reset() { tt = 0; sl.value = -2; upd(); },
+      step(dt) { tt += dt; sl.value = (-2 + 1.6 * Math.sin(TAU * tt / 12)).toFixed(3); upd(); },
+      draw: draw
+    };
+    A = new Anim('anim1', o);
+    sl.addEventListener('input', () => { A.setPlaying(false); upd(); });
+    onDrag(cv, p => { sl.value = clamp(P.ix(p.x), -4, 0).toFixed(2); upd(); }, () => A.setPlaying(false));
+  })();
+
+  /* =========================================================
+     2. Drain resistance: tangent on a drain curve
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv2', 600, 400), sl = $('a2'), root = $('anim2'), GS = [0, -1, -2, -3];
+    const P = mkP(70, 580, 30, 296, 0, 15, 0, 12e-3);
+    let g = -2, tt = 0, A;
+    function upd() {
+      const d = +sl.value, id = chan(g, d), s = dchan(g, d), ohm = d < g - VP;
+      $('a2o').textContent = d.toFixed(1) + ' V'; segSel(root, 'g', g);
+      $('c2v').textContent = fN(g) + ' V, ' + d.toFixed(1) + ' V'; $('c2i').textContent = fmA(id); $('c2r').textContent = fR(1 / s);
+      $('c2box').classList.toggle('ohm', ohm);
+      const b = $('b2'); b.className = 'bdg ' + (ohm ? 'r-ohm' : 'r-sat'); b.textContent = ohm ? 'ohmic region: steep curve, small rd' : 'saturation region: nearly flat curve, large rd';
+      if (A) A.dirty = true;
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const d = +sl.value, id = chan(g, d), s = dchan(g, d), ohm = d < g - VP;
+      frame(c, P, [0, 3, 6, 9, 12, 15], [0, 2e-3, 4e-3, 6e-3, 8e-3, 10e-3, 12e-3], v => String(v), mAf(), XD, YI);
+      clip(c, P);
+      const loc = []; for (let v = VP; v <= 1e-9; v += 0.05) loc.push([P.X(v - VP), P.Y(chan(v, v - VP))]);
+      poly(c, [[P.X(0), P.Y(0)]].concat(loc, [[P.X(4), P.t], [P.X(0), P.t]]), 'rgba(2,119,189,.12)');
+      poly(c, loc.concat([[P.X(4), P.t], [P.X(15), P.t], [P.X(15), P.Y(0)]]), 'rgba(27,94,32,.12)');
+      pline(c, loc, 'rgba(255,213,79,.6)', 1.4, [6, 4]);
+      GS.forEach(v => { const pts = []; for (let x = 0; x <= 15.001; x += 0.05) pts.push([P.X(x), P.Y(chan(v, x))]); if (v === g) gline(c, pts, VPAL[v], 3); else pline(c, pts, VPAL[v], 1.8); });
+      // tangent and slope triangle
+      const tl = u => [P.X(u), P.Y(id + s * (u - d))];
+      const a = tl(d - 2.6), b = tl(d + 2.6); line(c, a[0], a[1], b[0], b[1], C.tan, 2.2);
+      const dv = Math.min(2, 2.5e-3 / Math.max(s, 1e-9)), left = d - dv > 0.05;
+      const A0 = left ? tl(d - dv) : tl(d), B0 = left ? tl(d) : tl(d + dv);
+      const Rc = slopeTri(c, A0, B0, C.v, C.cur);
+      c.restore();
+      subs(c, [['ΔV', 'DS']], (A0[0] + Rc[0]) / 2, Rc[1] + 14, C.v, 11, 'center');
+      subs(c, [['ΔI', 'D']], Rc[0] + 10, Math.min((Rc[1] + B0[1]) / 2, Rc[1] - 10), C.cur, 11, 'left');
+      GS.forEach(v => txt(c, (v ? '−' + Math.abs(v) : '0') + ' V', P.r - 4, P.Y(chan(v, 15)) - 10, VPAL[v], 10, 700, 'right'));
+      subs(c, [['V', 'GS']], P.r - 4, P.Y(chan(0, 15)) - 26, C.muted, 10, 'right');
+      txt(c, 'ohmic', P.X(1.2), P.t + 12, '#4fc3f7', 11, 700, 'center'); txt(c, 'saturation', P.X(9), P.t + 12, '#66bb6a', 11, 700, 'center');
+      qDot(c, P.X(d), P.Y(id)); txt(c, 'Q', P.X(d) - 10, P.Y(id) - 16, C.q, 13, 700, 'right');
+      subs(c, [['r', 'd'], [' = ' + fR(1 / s), '']], P.X(9), P.t + 32, ohm ? '#4fc3f7' : C.rd, 14, 'center');
+      cv.wm(c);
+    }
+    const o = {
+      reset() { g = -2; tt = 0; sl.value = 8; upd(); },
+      step(dt) { tt += dt; sl.value = (7.55 - 7.45 * Math.cos(TAU * tt / 14 + Math.acos(-0.45 / 7.45))).toFixed(2); upd(); },
+      draw: draw
+    };
+    A = new Anim('anim2', o);
+    root.querySelectorAll('[data-g]').forEach(b => b.addEventListener('click', () => { g = +b.dataset.g; upd(); }));
+    sl.addEventListener('input', () => { A.setPlaying(false); upd(); });
+    onDrag(cv, p => {
+      const d = clamp(P.ix(p.x), 0.1, 15), y = p.y;
+      let best = g, bd = 1e9; GS.forEach(v => { const e = Math.abs(P.Y(chan(v, d)) - y); if (e < bd) { bd = e; best = v; } });
+      g = best; sl.value = d.toFixed(2); upd();
+    }, () => A.setPlaying(false));
+  })();
+
+  /* =========================================================
+     3. Amplification factor: the tug of war at constant ID
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv3', 600, 400), sl = $('a3'), G0 = -2, D0 = 10, CYC = 7.5;
+    const P = mkP(78, 580, 30, 296, 0, 14, 2.40e-3, 2.90e-3);
+    let p = 0, A, r = null;
+    function solve() {
+      const dg = +sl.value * 1e-3, g1 = G0 + dg, IT = chan(G0, D0), I1 = chan(g1, D0), I0n = shock(g1), d2 = (IT / I0n - 1) / LAM;
+      return { dg: dg, g1: g1, IT: IT, I1: I1, d2: d2, dI: I1 - IT, dD: d2 - D0 };
+    }
+    function upd() {
+      r = solve();
+      $('a3o').textContent = '+' + (+sl.value).toFixed(0) + ' mV'; $('c3g').textContent = '+' + (+sl.value).toFixed(0) + ' mV';
+      $('c3i').textContent = '+' + (r.dI * 1e3).toFixed(3) + ' mA'; $('c3d').textContent = fV(r.dD);
+      const mu = Math.abs(r.dD / r.dg), gm = r.dI / r.dg, rd = Math.abs(r.dD) / r.dI;
+      $('c3m').textContent = mu.toFixed(0); $('k3g').textContent = fmS(gm); $('k3r').textContent = fR(rd);
+      $('k3p').textContent = (gm * rd).toFixed(0); $('k3m').textContent = mu.toFixed(0);
+      if (A) A.dirty = true;
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      frame(c, P, [0, 2, 4, 6, 8, 10, 12, 14], [2.4e-3, 2.5e-3, 2.6e-3, 2.7e-3, 2.8e-3, 2.9e-3], v => String(v), v => (v * 1e3).toFixed(1), XD, YI);
+      txt(c, 'zoomed', P.l + 8, P.t + 12, C.muted, 10, 700, 'left');
+      clip(c, P);
+      const cur = (v, col, w) => { const pts = []; for (let x = 0.05; x <= 14.001; x += 0.05) pts.push([P.X(x), P.Y(chan(v, x))]); gline(c, pts, col, w); };
+      cur(G0, VPAL['-2'], 2.6); cur(r.g1, '#f06292', 2.6);
+      line(c, P.l, P.Y(r.IT), P.r, P.Y(r.IT), 'rgba(255,255,255,.3)', 1.2, [6, 5]);
+      c.restore();
+      subs(c, [['V', 'GS']], P.r - 4, P.Y(chan(G0, 14)) + 14, VPAL['-2'], 11, 'right');
+      subs(c, [['V', 'GS'], [' + ΔV', 'GS']], P.r - 4, P.Y(chan(r.g1, 14)) - 13, '#f06292', 11, 'right');
+      subs(c, [['I', 'D'], [' constant', '']], P.l + 8, P.Y(r.IT) + 13, C.muted, 10, 'left');
+      // phases: 0–1 rest, 1–2.4 gate step (up), 2.4–4.6 drain pull (down-left along the new curve), then hold
+      const u1 = ease((p - 1) / 1.4), u2 = ease((p - 2.4) / 2.2);
+      const x0 = P.X(D0), y0 = P.Y(r.IT), y1 = P.Y(r.I1);
+      let qx = x0, qy = lerp(y0, y1, u1);
+      if (u2 > 0) { const d = lerp(D0, r.d2, u2); qx = P.X(d); qy = P.Y(chan(r.g1, d)); }
+      circ(c, x0, y0, 10, null, 'rgba(255,255,255,.55)', 1.4); txt(c, 'Q', x0 + 13, y0 + 14, C.q, 13, 700, 'left');
+      if (u1 > 0.02) { arrow(c, x0, y0, x0, lerp(y0, y1, u1), C.cur, 3, 10); subs(c, [['ΔI', 'D']], x0 + 10, (y0 + y1) / 2 - 2, C.cur, 12, 'left'); subs(c, [['+ΔV', 'GS']], x0 + 10, y1 - 14, '#f06292', 11, 'left'); }
+      if (u2 > 0.02) { const xe = lerp(x0, P.X(r.d2), u2), yb = y0 + 34; arrow(c, x0, yb, xe, yb, C.rd, 3, 10); line(c, x0, y0 + 4, x0, yb + 6, 'rgba(255,183,77,.4)', 1, [3, 3]); line(c, xe, qy, xe, yb + 6, 'rgba(255,183,77,.4)', 1, [3, 3]); subs(c, [['ΔV', 'DS']], (x0 + xe) / 2, yb + 16, C.rd, 12, 'center'); }
+      qDot(c, qx, qy, 6.5);
+      if (p > 4.6) { c.globalAlpha = clamp((p - 4.6) / 0.6, 0, 1); txt(c, 'μ = ' + Math.abs(r.dD / r.dg).toFixed(0), P.X(r.d2) - 10, P.Y(r.IT) - 26, C.mu, 14, 700, 'right'); c.globalAlpha = 1; }
+      cv.wm(c);
+    }
+    const o = {
+      reset() { p = RM ? 6 : 0; sl.value = 20; upd(); },
+      step(dt) { p += dt; if (p > CYC) p = 0; },
+      draw: draw
+    };
+    upd();
+    A = new Anim('anim3', o);
+    sl.addEventListener('input', () => { if (!A.playing) p = 6; upd(); });
+  })();
+
+  /* =========================================================
+     4. gm, rd and μ against the Q-point
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv4', 600, 636), sl = $('a4');
+    const mk = (t, b, ymax) => mkP(80, 580, t, b, -4, 0, 0, ymax);
+    const P1 = mk(34, 158, 5.5e-3), P2 = mk(222, 346, 400e3), P3 = mk(410, 534, 400);
+    let tt = 0, A;
+    const rdOf = v => 1 / (LAM * shock(v)), muOf = v => gmOf(v) * rdOf(v);
+    function upd() {
+      const v = +sl.value;
+      $('a4o').textContent = fV(v); $('c4i').textContent = fmA(shock(v)); $('c4g').textContent = fmS(gmOf(v)); $('c4r').textContent = fR(rdOf(v)); $('c4m').textContent = fMu(muOf(v));
+      if (A) A.dirty = true;
+    }
+    function plot(c, P, f, col, ys, yf, yl, last) {
+      frame(c, P, [-4, -3, -2, -1, 0], ys, v => fN(v), yf, last ? XG : null, yl);
+      clip(c, P);
+      const pts = []; for (let v = -3.995; v <= 1e-9; v += 0.005) pts.push([P.X(v), P.Y(Math.min(f(v), P.y1 * 1.2))]);
+      gline(c, pts, col, 2.6);
+      c.restore();
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const v = +sl.value;
+      plot(c, P1, gmOf, C.gm, [0, 1e-3, 2e-3, 3e-3, 4e-3, 5e-3], mAf(), [['g', 'm'], [' (mS)', '']]);
+      plot(c, P2, rdOf, C.rd, [0, 100e3, 200e3, 300e3, 400e3], v => (v / 1e3).toFixed(0), [['r', 'd'], [' (kΩ)', '']]);
+      plot(c, P3, muOf, C.mu, [0, 100, 200, 300, 400], v => String(v), [['μ', '']], true);
+      [P2, P3].forEach(P => txt(c, '↑ ∞', P.X(VP) + 6, P.t + 10, C.muted, 11, 700, 'left'));
+      const x = P1.X(v);
+      line(c, x, P1.t, x, P3.b, 'rgba(255,138,101,.55)', 1.4, [5, 4]);
+      [[P1, gmOf(v), fmS(gmOf(v)), C.gm, true], [P2, rdOf(v), fR(rdOf(v)), C.rd], [P3, muOf(v), 'μ = ' + fMu(muOf(v)), C.mu]].forEach(q => {
+        const P = q[0], y = q[1] > P.y1 ? P.t : P.Y(q[1]), lf = q[4] ? x > 200 : x > 440;
+        qDot(c, x, y, 6);
+        txt(c, q[2], x + (lf ? -12 : 12), Math.max(P.t + 10, y - 14), q[3], 12, 700, lf ? 'right' : 'left', MONO);
+      });
+      cv.wm(c);
+    }
+    const o = {
+      reset() { tt = 0; sl.value = -2; upd(); },
+      step(dt) { tt += dt; sl.value = (-1.85 - 1.85 * Math.sin(TAU * tt / 14 + Math.asin(0.15 / 1.85))).toFixed(3); upd(); },
+      draw: draw
+    };
+    A = new Anim('anim4', o);
+    sl.addEventListener('input', () => { A.setPlaying(false); upd(); });
+  })();
+
+  /* =========================================================
+     5. Summary calculator
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv5', 600, 362), root = $('anim5');
+    const sS = $('a5s'), sP = $('a5p'), sL = $('a5l'), sG = $('a5g'), sI = $('a5i');
+    let mode = 'vgs', ph = 0, A, q = null;
+    function calc() {
+      const is = +sS.value * 1e-3, vp = +sP.value, lam = +sL.value;
+      sG.min = vp; if (+sG.value < vp) sG.value = vp;
+      let vgs;
+      if (mode === 'vgs') { vgs = clamp(+sG.value, vp, 0); sI.value = Math.max(1, Math.round(100 * shock(vgs, is, vp) / is)); }
+      else { vgs = vp * (1 - Math.sqrt(+sI.value / 100)); sG.value = vgs.toFixed(2); }
+      const id = shock(vgs, is, vp), gm0 = 2 * is / Math.abs(vp), gm = gmOf(vgs, is, vp), rd = id > 0 ? 1 / (lam * id) : Infinity;
+      return { is: is, vp: vp, lam: lam, vgs: vgs, id: id, gm0: gm0, gm: gm, rd: rd, mu: id > 0 ? gm * rd : Infinity };
+    }
+    function upd() {
+      q = calc();
+      $('a5so').textContent = (q.is * 1e3).toFixed(1) + ' mA'; $('a5po').textContent = fV(q.vp, 1); $('a5lo').textContent = q.lam.toFixed(3) + ' /V';
+      $('a5go').textContent = fV(q.vgs); $('a5io').textContent = (+sI.value).toFixed(0) + ' %';
+      $('c5g0').textContent = fmS(q.gm0); $('c5g').textContent = fmS(q.gm); $('c5i').textContent = fmA(q.id); $('c5r').textContent = fR(q.rd); $('c5m').textContent = fMu(q.mu);
+      segSel(root, 'm', mode); $('a5gw').hidden = mode !== 'vgs'; $('a5iw').hidden = mode !== 'id';
+      if (A) A.dirty = true;
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const ymax = q.is * 1.12, xmin = q.vp * 1.08, P = mkP(70, 580, 30, 244, xmin, 0, 0, ymax);
+      const xst = Math.abs(q.vp) > 4 ? 2 : Math.abs(q.vp) > 2 ? 1 : 0.5, yst = q.is > 10e-3 ? 5e-3 : q.is > 4e-3 ? 2e-3 : q.is > 2e-3 ? 1e-3 : 0.5e-3;
+      frame(c, P, ticks(xmin, 0, xst), ticks(0, ymax, yst), v => fN(v, xst < 1 ? 1 : 0), mAf(yst < 1e-3 ? 1 : 0), XG, YI);
+      clip(c, P);
+      const pts = [[P.X(xmin), P.Y(0)]]; for (let k = 0; k <= 200; k++) { const v = q.vp * (1 - k / 200); pts.push([P.X(v), P.Y(shock(v, q.is, q.vp))]); }
+      gline(c, pts, C.trc, 2.8);
+      const span = Math.abs(q.vp) * 0.35, a = q.vgs - span, b = q.vgs + span;
+      line(c, P.X(a), P.Y(q.id + q.gm * (a - q.vgs)), P.X(b), P.Y(q.id + q.gm * (b - q.vgs)), C.tan, 2.2);
+      c.restore();
+      subs(c, [['V', 'P']], P.X(q.vp), P.b - 12, C.muted, 10, 'center');
+      const qx = P.X(q.vgs), qy = P.Y(q.id), pulse = 6.5 + 1.2 * Math.sin(ph * 3);
+      line(c, qx, qy, qx, P.b, 'rgba(255,138,101,.55)', 1.2, [4, 4]); line(c, qx, qy, P.l, qy, 'rgba(255,138,101,.55)', 1.2, [4, 4]);
+      qDot(c, qx, qy, pulse); txt(c, 'Q', qx - 12, qy - 14, C.q, 13, 700, 'right');
+      const ex = P.X(b), ey = P.Y(q.id + q.gm * span);
+      if (ey > P.t + 8 && ex < P.r - 20) subs(c, [['g', 'm']], ex + 6, ey, C.gm, 13, 'left');
+      cv.wm(c);
+    }
+    const o = { reset() { mode = 'vgs'; ph = 0; sS.value = 10; sP.value = -4; sL.value = 0.01; sG.min = -4; sG.value = -2; sI.value = 25; upd(); }, step(dt) { ph += dt; }, draw: draw };
+    A = new Anim('anim5', o);
+    [sS, sP, sL, sG, sI].forEach(s => s.addEventListener('input', upd));
+    root.querySelectorAll('[data-m]').forEach(b => b.addEventListener('click', () => { mode = b.dataset.m; upd(); }));
+  })();
+
+  /* ---------- sticky mini-nav highlight ---------- */
+  (function () {
+    const links = Array.from(document.querySelectorAll('.toc a'));
+    const secs = links.map(l => document.querySelector(l.getAttribute('href')));
+    function upd() {
+      let cur = 0;
+      secs.forEach((s, i) => { if (s.getBoundingClientRect().top < 120) cur = i; });
+      links.forEach((l, i) => l.classList.toggle('active', i === cur));
+    }
+    window.addEventListener('scroll', upd, { passive: true }); upd();
+  })();
+
+  let last = performance.now();
+  function frameLoop(ts) {
+    const dt = Math.min(0.05, Math.max(0, (ts - last) / 1000)); last = ts;
+    anims.forEach(a => {
+      if (!a.visible) return;
+      if (a.playing) { a.o.step(dt); a.o.draw(); }
+      else if (a.dirty) a.o.draw();
+      a.dirty = false;
+    });
+    requestAnimationFrame(frameLoop);
+  }
+  function onResize() { anims.forEach(a => { a.dirty = true; }); }
+  window.addEventListener('resize', onResize);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(onResize);
+  requestAnimationFrame(frameLoop);
+})();
+</script>
+</body>
+</html>
