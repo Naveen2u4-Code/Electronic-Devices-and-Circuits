@@ -197,7 +197,6 @@
       <li><a href="#s0">Amplification</a></li>
       <li><a href="#s1">Biasing</a></li>
       <li><a href="#s2">CE amplifier</a></li>
-      <li><a href="#s3">Gain</a></li>
       <li><a href="#s4">Distortion</a></li>
       <li><a href="#s5">Load lines</a></li>
       <li><a href="#s6">Summary</a></li>
@@ -384,66 +383,6 @@
             <li>v<sub>in</sub> → small change in V<sub>BE</sub> and I<sub>B</sub> → β times larger change in I<sub>C</sub> → large change in V<sub>C</sub>.</li>
             <li>V<sub>C</sub> falls when the input rises: the output is inverted (180°).</li>
             <li>Remove a bias part (R<sub>1</sub>, R<sub>2</sub>, R<sub>E</sub>) and the Q-point leaves the active region; remove C<sub>E</sub> and the gain collapses; remove a coupling capacitor and the signal or the bias is lost.</li>
-          </ul>
-        </aside>
-      </section>
-      <hr class="sep">
-
-      <!-- ================= SECTION 3 ================= -->
-      <section id="s3" aria-labelledby="h3s">
-        <h2 id="h3s">How much gain?</h2>
-        <div class="prose">
-          <p>The key small-signal quantity of a BJT is its <strong>TRANSCONDUCTANCE g<sub>m</sub></strong>, which tells how much the collector current changes for a small change in V<sub>BE</sub>:</p>
-          <p class="eq">g<sub>m</sub> = I<sub>C</sub> / V<sub>T</sub>, where V<sub>T</sub> = kT/q ≈ 25.9 mV at room temperature.</p>
-          <p>For I<sub>C</sub> = 1 mA, g<sub>m</sub> ≈ 38.6 mA/V: a 1 mV change at the base changes the collector current by about 38.6 µA.</p>
-          <p>With the emitter bypassed, the collector voltage change is that current change times R<sub>C</sub>, so the <strong>VOLTAGE GAIN</strong> is approximately:</p>
-          <p class="eq">A<sub>v</sub> = v<sub>out</sub> / v<sub>in</sub> ≈ −g<sub>m</sub>·R<sub>C</sub></p>
-          <p>The minus sign means <strong>phase inversion</strong>. In the example amplifier, I<sub>C</sub> ≈ 0.9 mA gives g<sub>m</sub> ≈ 35 mA/V, and with R<sub>C</sub> = 5.6 kΩ, <strong>A<sub>v</sub> ≈ −195</strong>.</p>
-          <p>If a load resistor R<sub>L</sub> is connected at the output, it appears in parallel with R<sub>C</sub> and reduces the gain: <strong>A<sub>v</sub> ≈ −g<sub>m</sub>·(R<sub>C</sub> ∥ R<sub>L</sub>)</strong>. The transistor's own output resistance <strong>r<sub>o</sub> = V<sub>A</sub>/I<sub>C</sub></strong> also appears in parallel.</p>
-          <p>The <strong>CURRENT GAIN</strong> is about β, and the <strong>POWER GAIN</strong> is the product of voltage gain and current gain, which can be in the thousands.</p>
-        </div>
-
-        <figure class="anim" id="anim3">
-          <div class="ctrls">
-            <button class="btn" type="button" data-act="play">Pause</button>
-            <button class="btn" type="button" data-act="reset">Reset</button>
-          </div>
-          <div class="ctrls sl4">
-            <div class="slider">
-              <label for="ic3"><span>I<sub>C</sub></span><output id="ic3o" for="ic3">0.91 mA</output></label>
-              <input type="range" id="ic3" min="0" max="100" step="0.5" value="56.5">
-            </div>
-            <div class="slider">
-              <label for="rc3"><span>R<sub>C</sub></span><output id="rc3o" for="rc3">5.6 kΩ</output></label>
-              <input type="range" id="rc3" min="0" max="100" step="0.5" value="57.5">
-            </div>
-            <div class="slider">
-              <label for="rl3"><span>R<sub>L</sub></span><output id="rl3o" for="rl3">∞</output></label>
-              <input type="range" id="rl3" min="0" max="100" step="1" value="100">
-            </div>
-            <div class="slider">
-              <label for="va3"><span>V<sub>A</sub></span><output id="va3o" for="va3">100 V</output></label>
-              <input type="range" id="va3" min="20" max="200" step="5" value="100">
-            </div>
-          </div>
-          <div class="counters" aria-live="polite">
-            <div class="ctr wide">g<sub>m</sub> = I<sub>C</sub>/V<sub>T</sub><b id="c3gm">35.1 mA/V</b></div>
-            <div class="ctr">r<sub>o</sub> = V<sub>A</sub>/I<sub>C</sub><b id="c3ro">110 kΩ</b></div>
-            <div class="ctr">R<sub>C</sub> ∥ R<sub>L</sub> ∥ r<sub>o</sub><b id="c3rp">5.3 kΩ</b></div>
-            <div class="ctr v">A<sub>v</sub><b id="c3av">−187</b></div>
-            <div class="ctr v">A<sub>v</sub> (dB)<b id="c3db">45.4 dB</b></div>
-            <div class="ctr">Power gain ≈ |A<sub>v</sub>|·β<b id="c3ap">18 700</b></div>
-          </div>
-          <canvas id="cv3" class="narrow inset" style="aspect-ratio:640/280" role="img" aria-label="Small scope: a 5 millivolt input sine in blue and the output in orange scaled by the computed gain and inverted. If the gain would push the output beyond the supply, the output is clipped and drawn in red."></canvas>
-        </figure>
-
-        <aside class="keypoints" aria-label="Key points: gain">
-          <h3>Key points</h3>
-          <ul>
-            <li>g<sub>m</sub> = I<sub>C</sub>/V<sub>T</sub>: about 38.6 mA/V at 1 mA, 35 mA/V at 0.9 mA.</li>
-            <li>A<sub>v</sub> ≈ −g<sub>m</sub>·R<sub>C</sub> with the emitter bypassed: about −195 in the example.</li>
-            <li>R<sub>L</sub> and r<sub>o</sub> = V<sub>A</sub>/I<sub>C</sub> appear in parallel with R<sub>C</sub> and lower the gain.</li>
-            <li>Current gain ≈ β; power gain = voltage gain × current gain, often thousands.</li>
           </ul>
         </aside>
       </section>
@@ -1390,46 +1329,6 @@
     o.reset();
     A = new Anim('anim2b', o);
     sl.addEventListener('input', upd);
-  })();
-
-  /* =========================================================
-     3. Gain calculator with a small scope
-     ========================================================= */
-  (function () {
-    const cv = new Cv('cv3', 640, 280), sI = $('ic3'), sR = $('rc3'), sL = $('rl3'), sV = $('va3');
-    let av = -187, t = 0, A;
-    function upd() {
-      const ic = 1e-4 * Math.pow(50, +sI.value / 100), rc = 1e3 * Math.pow(20, +sR.value / 100), rl = rlOf(+sL.value), va = +sV.value;
-      const gm = ic / AVT, ro = va / ic, rp = par(par(rc, rl), ro);
-      av = -gm * rp;
-      $('ic3o').textContent = fmtA(ic); $('rc3o').textContent = fmtR(rc); $('rl3o').textContent = fmtRL(rl); $('va3o').textContent = va + ' V';
-      $('c3gm').textContent = (gm * 1e3).toFixed(1) + ' mA/V'; $('c3ro').textContent = fmtR(ro); $('c3rp').textContent = fmtR(rp);
-      $('c3av').textContent = '−' + Math.abs(av).toFixed(0); $('c3db').textContent = (20 * Math.log10(Math.abs(av))).toFixed(1) + ' dB';
-      $('c3ap').textContent = Math.round(Math.abs(av) * AB).toLocaleString('en-US').replace(/,/g, ' ');
-      if (A) A.dirty = true;
-    }
-    function draw() {
-      const c = cv.begin(); if (!c) return;
-      const S = { l: 50, r: 610, t: 16, b: 216 }, DY = scopeGrid(c, S, 10, 8), yc = (S.t + S.b) / 2, VIN = 5e-3, LIM = 6;
-      const k1 = DY / 2e-3, k2 = DY / 2;   // CH1 2 mV/div, CH2 2 V/div
-      c.save(); c.beginPath(); c.rect(S.l, S.t, S.r - S.l, S.b - S.t); c.clip();
-      line(c, S.l, yc - LIM * k2, S.r, yc - LIM * k2, 'rgba(239,83,80,.5)', 1.2, [5, 4]); line(c, S.l, yc + LIM * k2, S.r, yc + LIM * k2, 'rgba(239,83,80,.5)', 1.2, [5, 4]);
-      const pi = [], po = [];
-      for (let x = S.l; x <= S.r; x += 3) {
-        const s = Math.sin(TAU * ((x - S.l) / (S.r - S.l) * 2 - t * 0.5)), vo = av * VIN * s, cl = Math.abs(vo) > LIM;
-        pi.push([x, yc - VIN * s * k1]); po.push([x, yc - clamp(vo, -LIM, LIM) * k2, cl]);
-      }
-      glowLine(c, pi, C.in); wave(c, po, C.out);
-      c.restore();
-      txt(c, 'supply limit', S.r - 4, yc - LIM * k2 + 10, C.warn, 10.5, 600, 'right');
-      txt(c, 'CH1  vin   2 mV/div', S.l, S.b + 22, C.in, 12, 700, 'left', MONO);
-      txt(c, 'CH2  vout  2 V/div', S.l, S.b + 42, C.out, 12, 700, 'left', MONO);
-      cv.wm(c);
-    }
-    const o = { reset() { sI.value = 56.5; sR.value = 57.5; sL.value = 100; sV.value = 100; t = 0; upd(); }, step(dt) { t += dt; }, draw: draw };
-    upd();
-    A = new Anim('anim3', o);
-    [sI, sR, sL, sV].forEach(s => s.addEventListener('input', upd));
   })();
 
   /* =========================================================
