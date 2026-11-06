@@ -366,7 +366,7 @@
             </div>
             <p id="liEff"></p>
           </div>
-          <canvas id="cvLs" class="narrow inset" style="aspect-ratio:640/420" role="img" aria-label="Three-trace scope: the input vin, the collector voltage VC on a 0 to 12 volt scale, and the output vout across the load. Dashed grey traces show the normal circuit with every part in place, for comparison."></canvas>
+          <canvas id="cvLs" class="narrow inset" style="aspect-ratio:640/290" role="img" aria-label="Two-trace scope: the input vin and the output vout across the load. A dashed grey trace shows the normal circuit's output with every part in place, for comparison."></canvas>
           <div class="labstat narrow"><span class="statbadge clean" id="cLst" aria-live="polite">Amplifying normally</span></div>
           <div class="counters narrow" aria-live="polite">
             <div class="ctr v">V<sub>B</sub> (DC)<b id="cLvb">2.03 V</b></div>
@@ -1304,11 +1304,11 @@
     txt(c, 'Tap a part to remove it', 12, 368, C.muted, 11, 600, 'left');
   }
   (function () {
-    const cv = new Cv('cvL', 640, 380), cs = new Cv('cvLs', 640, 420), sl = $('aL'), NS = 96;
+    const cv = new Cv('cvL', 640, 380), cs = new Cv('cvLs', 640, 290), sl = $('aL'), NS = 96;
     const btns = Array.from(document.querySelectorAll('#anim2b [data-part]')), seg = $('liSeg');
     const ALL = {}; LKEYS.forEach(k => { ALL[k] = 'in'; });
     let st = Object.assign({}, ALL), sel = null, hov = null, amp = 5e-3, t = 0, pC = 0, ref = null, cur = null, refAmp = -1, A;
-    const fmtI = a => Math.abs(a) > 0.1 ? '> 100 mA' : fmtA(Math.max(0, a));
+    const fmtI = a => Math.abs(a) > 0.1 ? '> 100 mA' : a < 1e-9 ? '0 A' : fmtA(a);
     function info() {
       if (!sel) {
         $('liName').textContent = 'Tap a component to begin';
@@ -1346,7 +1346,6 @@
       const sc = [0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 15].find(v => v >= vmax * 1.1) || 15;
       const L = 70, Rr = 620, H = 96, G = 34, strips = [
         { lab: 'vin', col: C.in, lo: -0.025, hi: 0.025, k: 'vs', note: '±25 mV', ghost: false },
-        { lab: 'VC', col: C.out, lo: 0, hi: 12, k: 'vc', note: '0 to 12 V', ghost: true, dc: cur.VC },
         { lab: 'vout', col: C.out, lo: -sc, hi: sc, k: 'vo', note: '±' + (sc < 1 ? (sc * 1e3).toFixed(0) + ' mV' : sc + ' V'), ghost: true }];
       strips.forEach((s, i) => {
         const S = { l: L, r: Rr, t: 14 + i * (H + G), b: 14 + i * (H + G) + H };
@@ -1363,9 +1362,11 @@
         glowLine(c, pts, s.col);
         c.restore();
         txt(c, s.lab, L - 10, (S.t + S.b) / 2, s.col, 12, 700, 'right');
-        txt(c, s.note, Rr - 4, S.t + 10, C.muted, 10, 600, 'right');
+        c.font = '600 ' + (10 * FS).toFixed(1) + 'px ' + FONT; const nw = c.measureText(s.note).width;
+        rrect(c, Rr - nw - 10, S.t + 2, nw + 10, 16 * FS, 4); c.fillStyle = 'rgba(11,22,18,.85)'; c.fill();
+        txt(c, s.note, Rr - 5, S.t + 2 + 8 * FS, C.muted, 10, 600, 'right');
       });
-      const yl = 14 + 3 * H + 2 * G + 16;
+      const yl = 14 + strips.length * H + (strips.length - 1) * G + 16;
       line(c, L, yl, L + 26, yl, C.out, 2.4); txt(c, 'this circuit', L + 34, yl, C.text, 11, 600, 'left');
       line(c, L + 140, yl, L + 166, yl, 'rgba(176,190,197,.75)', 1.6, [6, 5]); txt(c, 'normal circuit (all parts in)', L + 174, yl, C.text, 11, 600, 'left');
       cs.wm(c);
