@@ -507,7 +507,6 @@
           <div class="counters narrow" aria-live="polite">
             <div class="ctr ok">I<sub>CQ</sub><b id="c6ic">0.91 mA</b></div>
             <div class="ctr v">V<sub>CEQ</sub><b id="c6vce">5.5 V</b></div>
-            <div class="ctr">Small-signal A<sub>v</sub><b id="c6av">−188</b></div>
             <div class="ctr">Measured gain<b id="c6mg">−187</b></div>
           </div>
           <div class="formulas">
@@ -1428,7 +1427,6 @@
       amp = new Amp({ VCC: EX.VCC, R1: EX.R1, R2: r2, RE: EX.RE, RC: rc }, rl); cy = amp.cycle(A0, 256); st = status(cy);
       const q = amp.q;
       $('c6ic').textContent = fmtA(q.ic); $('c6vce').textContent = q.vce.toFixed(2) + ' V';
-      $('c6av').textContent = (amp.av < 0 ? '−' : '') + Math.abs(amp.av).toFixed(0);
       let mx = -1e9, mn = 1e9; cy.forEach(r => { mx = Math.max(mx, r.vc); mn = Math.min(mn, r.vc); });
       $('c6mg').textContent = A0 > 0 ? '−' + ((mx - mn) / (2 * A0)).toFixed(0) : '—';
       const b = $('b6'); b.textContent = st; b.className = 'statbadge ' + st;
