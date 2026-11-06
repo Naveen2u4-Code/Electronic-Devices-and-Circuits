@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>8.4 MOSFET Basics: The MOS Capacitor</title>
+  <meta name="description" content="The MOS capacitor: gate, oxide and p-type silicon, Cox = εox/tox, accumulation, depletion and inversion, threshold at a surface bending of 2φF, the band diagram view and the C-V curve. An interactive lesson.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1420;
+      --panel: #1a2132;
+      --panel-hover: #212a3f;
+      --border: #2a3448;
+      --text: #e6e9ef;
+      --muted: #9aa4b8;
+      --electron: #4fc3f7;
+      --hole: #ff8a65;
+      --energy: #ffd54f;
+      --success: #81c784;
+      --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+      --max: 960px;
+      --radius: 12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: var(--font); font-size: 16px; line-height: 1.65;
+      overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column;
+    }
+    a { color: var(--electron); }
+    .wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 16px; }
+
+    /* Sticky mini-nav */
+    .toc {
+      position: sticky; top: 0; z-index: 10; background: rgba(15, 20, 32, .95);
+      border-bottom: 1px solid var(--border); backdrop-filter: blur(6px);
+    }
+    .toc ul { display: flex; gap: 4px; list-style: none; margin: 0 auto; padding: 8px 16px; max-width: var(--max); overflow-x: auto; scrollbar-width: none; }
+    .toc ul::-webkit-scrollbar { display: none; }
+    .toc a {
+      display: block; white-space: nowrap; text-decoration: none; color: var(--muted);
+      font-size: 0.85rem; font-weight: 500; padding: 6px 10px; border-radius: 999px;
+    }
+    .toc a:hover { color: var(--text); background: var(--panel); }
+    .toc a.active { color: var(--bg); background: var(--electron); }
+
+    main { flex: 1; padding: 24px 0 48px; }
+    .crumbs { font-size: 0.875rem; color: var(--muted); margin: 0 0 16px; }
+    .crumbs a { color: var(--muted); }
+    .crumbs a:hover { color: var(--electron); }
+    .eyebrow { font-family: var(--mono); font-size: 0.8rem; color: var(--electron); letter-spacing: .04em; margin: 0; }
+    h1 { font-size: clamp(1.5rem, 6vw, 2.2rem); line-height: 1.2; margin: 4px 0 6px; }
+    .subtitle { color: var(--muted); margin: 0 0 8px; }
+    section { scroll-margin-top: 64px; padding-top: 28px; }
+    h2 { font-size: clamp(1.3rem, 5vw, 1.6rem); line-height: 1.25; margin: 0 0 14px; }
+    h3 { font-size: 1.05rem; margin: 0 0 8px; }
+    .prose { font-size: 17px; line-height: 1.7; max-width: 70ch; }
+    .prose p, .prose ul, .prose ol { margin: 0 0 14px; }
+    .prose ul, .prose ol { padding-left: 22px; }
+    .prose li { margin: 4px 0; }
+    .prose strong { color: #fff; }
+    .prose p.eq { text-align: center; font-family: var(--mono); font-size: 16px; background: #141b2b; border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; overflow-wrap: anywhere; }
+    hr.sep { border: 0; border-top: 1px solid var(--border); margin: 40px 0 0; }
+    .rm-note { font-size: 0.78rem; color: var(--muted); margin: 0 0 8px; }
+
+    /* Buttons & controls */
+    .btn {
+      font: inherit; font-size: 0.88rem; font-weight: 600; color: var(--text);
+      background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+      padding: 7px 12px; cursor: pointer; min-height: 38px;
+    }
+    .btn:hover:not(:disabled) { background: var(--panel-hover); border-color: var(--electron); }
+    .btn:focus-visible, input:focus-visible, canvas:focus-visible { outline: 2px solid var(--electron); outline-offset: 2px; }
+    .btn[aria-pressed="true"] { background: rgba(255,213,79,.14); border-color: var(--energy); color: var(--energy); }
+    .seg { display: inline-flex; gap: 0; flex-wrap: nowrap; }
+    .seg .btn { border-radius: 0; padding: 7px 10px; }
+    .seg .btn:first-child { border-radius: 8px 0 0 8px; }
+    .seg .btn:last-child { border-radius: 0 8px 8px 0; }
+    .seg .btn + .btn { margin-left: -1px; }
+    .glabel { font-size: 0.8rem; font-weight: 700; color: var(--muted); }
+
+    figure.anim {
+      margin: 18px 0 0; background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 12px; min-width: 0;
+    }
+    .ctrls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-bottom: 12px; }
+    .slider { flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; }
+    .slider label { display: flex; justify-content: space-between; gap: 8px; font-size: 0.8rem; color: var(--muted); }
+    .slider output { font-family: var(--mono); color: var(--energy); white-space: nowrap; }
+    .slider[hidden] { display: none; }
+    input[type="range"] { width: 100%; accent-color: var(--energy); margin: 4px 0 0; }
+    canvas { display: block; width: 100%; border-radius: 8px; background: #141b2b; }
+    canvas.drag { cursor: crosshair; touch-action: none; }
+    .narrow { max-width: 760px; margin-left: auto; margin-right: auto; }
+    .inset { margin-top: 10px; }
+
+    .counters { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px auto 0; }
+    .ctr {
+      flex: 1 1 100px; background: #141b2b; border: 1px solid var(--border); border-radius: 8px;
+      padding: 6px 10px; font-size: 0.78rem; color: var(--muted); min-width: 0;
+    }
+    .ctr b { display: block; font-family: var(--mono); font-size: 1.02rem; font-weight: 500; white-space: nowrap; color: var(--text); overflow: hidden; text-overflow: ellipsis; }
+    .ctr.v b { color: var(--energy); } .ctr.q b { color: var(--hole); } .ctr.cur b { color: var(--success); }
+    .ctr.gm b { color: #4fc3f7; } .ctr.rd b { color: #ffb74d; } .ctr.mu b { color: #81c784; }
+    .ctr.rd.ohm b { color: #4fc3f7; }
+
+    .badges { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 10px auto 0; }
+    .bdg { font-size: 0.82rem; font-weight: 700; border-radius: 999px; padding: 4px 12px; border: 1.5px solid; white-space: normal; }
+    .bdg.r-ohm { color: #4fc3f7; border-color: #4fc3f7; background: rgba(2,119,189,.2); }
+    .bdg.r-sat { color: #66bb6a; border-color: #66bb6a; background: rgba(27,94,32,.35); }
+
+    .keypoints {
+      margin-top: 16px; padding: 14px 16px; border-radius: var(--radius);
+      background: rgba(129,199,132,.07); border: 1px solid rgba(129,199,132,.35);
+    }
+    .keypoints h3 { color: var(--success); font-size: 0.95rem; text-transform: uppercase; letter-spacing: .05em; }
+    .keypoints ul { margin: 0; padding-left: 20px; }
+    .keypoints li { margin: 4px 0; }
+
+    .formulas { margin: 14px 0 0; background: #141b2b; border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; }
+    .formulas h3 { color: var(--energy); font-size: .9rem; text-transform: uppercase; letter-spacing: .05em; }
+    .formulas ul { margin: 0; padding-left: 20px; font-family: var(--mono); font-size: .9rem; }
+    .formulas li { margin: 4px 0; overflow-wrap: anywhere; }
+
+    .pager { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 48px; }
+    .pager a {
+      display: block; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 12px 14px; text-decoration: none; color: var(--text); min-width: 0;
+    }
+    .pager a:hover { border-color: var(--electron); }
+    .pager small { display: block; color: var(--muted); font-size: 0.75rem; }
+    .pager .next { text-align: right; }
+    .site-foot { border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; text-align: center; padding: 18px 16px; }
+
+    /* Justified paragraphs on desktop; phones stay left-aligned to avoid wide word gaps. */
+    @media (min-width: 768px) {
+      .prose p, .prose li, .keypoints li { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+      .prose p.eq { text-align: center; }
+    }
+    /* Topic 8.4 */
+    .bdg.acc { color: #ff8a65; border-color: #ff8a65; background: rgba(255,138,101,.12); }
+    .bdg.dep { color: #cfd8dc; border-color: #b0bec5; background: rgba(58,63,79,.6); }
+    .bdg.inv { color: #26c6da; border-color: #26c6da; background: rgba(38,198,218,.14); }
+    .bdg.acc, .bdg.dep, .bdg.inv { letter-spacing: .06em; font-size: .9rem; }
+    .rbar { display: flex; margin: 4px 8px 0; height: 18px; border-radius: 4px; overflow: hidden; font-size: .68rem; font-weight: 700; line-height: 18px; text-align: center; }
+    .rbar span { white-space: nowrap; overflow: hidden; }
+    .rbar .acc { background: rgba(255,138,101,.18); color: #ff8a65; }
+    .rbar .dep { background: rgba(176,190,197,.16); color: #cfd8dc; }
+    .rbar .inv { background: rgba(38,198,218,.16); color: #26c6da; }
+    .ctr.wide { flex-basis: 180px; }
+    .rnote { font-size: .74rem; color: var(--muted); margin: 3px 8px 0; }
+  </style>
+</head>
+<body>
+
+  <nav class="toc" aria-label="Sections">
+    <ul>
+      <li><a href="#s0">MOS structure</a></li>
+      <li><a href="#s1">Accumulation</a></li>
+      <li><a href="#s2">Depletion</a></li>
+      <li><a href="#s3">Inversion</a></li>
+      <li><a href="#s4">Band diagram</a></li>
+      <li><a href="#s5">C-V curve</a></li>
+      <li><a href="#s6">Summary</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="wrap">
+      <header>
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="../../index.html">Home</a> / <a href="../index.html">Unit 8</a> / 8.4
+        </nav>
+        <p class="eyebrow">TOPIC 8.4</p>
+        <h1>MOSFET Basics: The MOS Capacitor</h1>
+        <p class="subtitle">Gate, oxide and silicon: how a gate voltage gathers or repels charge without any current</p>
+        <p class="rm-note" id="rmNote" hidden>Your device asks for reduced motion, so every animation starts paused. Press Play on any animation to run it. Sliders and buttons still update the picture.</p>
+      </header>
+
+      <!-- ================= SECTION 0 ================= -->
+      <section id="s0" aria-labelledby="h0">
+        <h2 id="h0">The MOS structure</h2>
+        <div class="prose">
+          <p>The MOSFET, the transistor inside almost every modern chip, is built on a simple sandwich called the <strong>MOS STRUCTURE</strong>:</p>
+          <ul>
+            <li><strong>METAL</strong>: the top electrode, called the <strong>GATE</strong>. In modern chips it is often heavily doped polysilicon or a metal.</li>
+            <li><strong>OXIDE</strong>: a very thin insulating layer of silicon dioxide (SiO<sub>2</sub>), only a few nanometres thick in modern devices.</li>
+            <li><strong>SEMICONDUCTOR</strong>: the silicon underneath, called the <strong>SUBSTRATE</strong> or <strong>BODY</strong>. Here we use p-type silicon.</li>
+          </ul>
+          <p>Because the oxide is an insulator, <strong>NO DC current</strong> flows through the gate. The structure is a <strong>capacitor</strong>: the gate is one plate, the silicon is the other, and the oxide is the dielectric. Its capacitance per unit area is:</p>
+          <p class="eq">C<sub>ox</sub> = ε<sub>ox</sub> / t<sub>ox</sub></p>
+          <p>where ε<sub>ox</sub> = 3.9 × 8.85 × 10<sup>−12</sup> F/m is the permittivity of SiO<sub>2</sub>. For t<sub>ox</sub> = 10 nm, C<sub>ox</sub> ≈ 3.45 × 10<sup>−3</sup> F/m², or about <strong>3.45 fF per square micrometre</strong>.</p>
+          <p>The key idea of this topic: the gate voltage can <strong>pull charges toward or push them away</strong> from the silicon surface just under the oxide, without any current flowing through the oxide.</p>
+        </div>
+
+        <figure class="anim" id="anim0">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="slider">
+              <label for="t0"><span>Oxide thickness t<sub>ox</sub></span><output id="t0o" for="t0">10 nm</output></label>
+              <input type="range" id="t0" min="2" max="100" step="1" value="10">
+            </div>
+          </div>
+          <canvas id="cv0" class="narrow" style="aspect-ratio:600/400" role="img" aria-label="Exploded view: the gate, the oxide and the p-type substrate slide together into a stack, with the body contact at the bottom grounded. An ammeter in the gate lead reads IG = 0. The oxide is drawn thicker or thinner as tox changes, not to scale."></canvas>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr">t<sub>ox</sub><b id="c0t">10 nm</b></div>
+            <div class="ctr v">C<sub>ox</sub> = ε<sub>ox</sub>/t<sub>ox</sub><b id="c0c">3.45 fF/µm²</b></div>
+            <div class="ctr cur">Gate current I<sub>G</sub><b>0</b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: MOS structure">
+          <h3>Key points</h3>
+          <ul>
+            <li>MOS = metal (gate), oxide (SiO<sub>2</sub>) and semiconductor (substrate or body).</li>
+            <li>The oxide is an insulator, so no DC current flows into the gate.</li>
+            <li>It is a capacitor: C<sub>ox</sub> = ε<sub>ox</sub>/t<sub>ox</sub> ≈ 3.45 fF/µm² for 10 nm.</li>
+            <li>The gate voltage moves charge at the silicon surface without any gate current.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 1 ================= -->
+      <section id="s1" aria-labelledby="h1s">
+        <h2 id="h1s">Accumulation (negative gate voltage)</h2>
+        <div class="prose">
+          <p>Apply a <strong>NEGATIVE</strong> voltage to the gate (more precisely, below the flat-band voltage V<sub>FB</sub>). The negative charge on the gate attracts the positive majority carriers of the p-type substrate, the <strong>HOLES</strong>, toward the surface. A thin layer with extra holes forms just under the oxide. This is called <strong>ACCUMULATION</strong>.</p>
+          <p>The silicon surface is now strongly p-type. The capacitor behaves like a simple parallel-plate capacitor with capacitance C<sub>ox</sub>: negative charge on the gate, equal positive charge (holes) right at the surface.</p>
+        </div>
+
+        <figure class="anim" id="anim1">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="slider">
+              <label for="g1"><span>Gate voltage V<sub>G</sub></span><output id="g1o" for="g1">-2</output></label>
+              <input type="range" id="g1" min="-3" max="3" step="0.01" value="-2">
+              <div class="rbar" aria-hidden="true"><span class="acc" style="width:33.333%">accumulation</span><span class="dep" style="width:25%">depletion</span><span class="inv" style="width:41.667%">inversion</span></div>
+              <div class="rnote">V<sub>FB</sub> ≈ −1 V, V<sub>T</sub> ≈ +0.5 V (illustrative values)</div>
+            </div>
+          </div>
+          <div class="badges narrow" aria-live="polite"><span class="bdg acc" id="b1">ACCUMULATION</span></div>
+          <canvas id="cv1" class="narrow inset" style="aspect-ratio:600/380" role="img" aria-label="MOS stack with the gate voltage set in the accumulation range. Holes drift up and crowd just below the oxide, minus signs sit on the gate plate, and field arrows run from the holes up to the gate charges."></canvas>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr v">V<sub>G</sub><b id="c1v"></b></div><div class="ctr q wide">Extra holes at the surface<b id="c1h"></b></div><div class="ctr ">C/C<sub>ox</sub><b id="c1c"></b></div>
+          </div>
+        </figure>
+        <aside class="keypoints" aria-label="Key points: accumulation">
+          <h3>Key points</h3>
+          <ul>
+            <li>Accumulation happens for V<sub>G</sub> below the flat-band voltage V<sub>FB</sub>.</li>
+            <li>The negative gate attracts holes, the majority carriers, to the surface.</li>
+            <li>The surface becomes strongly p-type.</li>
+            <li>It acts as a parallel-plate capacitor: C = C<sub>ox</sub>.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 2 ================= -->
+      <section id="s2" aria-labelledby="h2s">
+        <h2 id="h2s">Depletion (small positive gate voltage)</h2>
+        <div class="prose">
+          <p>Now make the gate voltage <strong>POSITIVE</strong> (above V<sub>FB</sub> but below the threshold voltage V<sub>T</sub>). The positive gate repels the holes away from the surface. Left behind near the surface are the fixed, negatively charged <strong>ACCEPTOR IONS</strong>, which cannot move. A region with no free carriers, the <strong>DEPLETION REGION</strong>, forms under the oxide.</p>
+          <p>The positive charge on the gate is balanced by the negative charge of these fixed ions. As the gate voltage increases, more holes are pushed away and the depletion region grows deeper.</p>
+          <p>The total capacitance is now C<sub>ox</sub> in <strong>SERIES</strong> with the depletion capacitance, so it is <strong>SMALLER</strong> than C<sub>ox</sub>, and it keeps decreasing as the depletion region gets wider.</p>
+        </div>
+
+        <figure class="anim" id="anim2">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="slider">
+              <label for="g2"><span>Gate voltage V<sub>G</sub></span><output id="g2o" for="g2">0</output></label>
+              <input type="range" id="g2" min="-3" max="3" step="0.01" value="0">
+              <div class="rbar" aria-hidden="true"><span class="acc" style="width:33.333%">accumulation</span><span class="dep" style="width:25%">depletion</span><span class="inv" style="width:41.667%">inversion</span></div>
+              <div class="rnote">V<sub>FB</sub> ≈ −1 V, V<sub>T</sub> ≈ +0.5 V (illustrative values)</div>
+            </div>
+          </div>
+          <div class="badges narrow" aria-live="polite"><span class="bdg acc" id="b2">ACCUMULATION</span></div>
+          <canvas id="cv2" class="narrow inset" style="aspect-ratio:600/380" role="img" aria-label="MOS stack in the depletion range. Holes retreat downward and a hatched depletion region containing fixed circled minus acceptor ions grows from the surface; plus signs sit on the gate plate. An arrow marks the depletion width."></canvas>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr v">V<sub>G</sub><b id="c2v"></b></div><div class="ctr ">Depletion width W<sub>d</sub><b id="c2w"></b></div><div class="ctr ">C/C<sub>ox</sub><b id="c2c"></b></div>
+          </div>
+        </figure>
+        <aside class="keypoints" aria-label="Key points: depletion">
+          <h3>Key points</h3>
+          <ul>
+            <li>Depletion: V<sub>FB</sub> &lt; V<sub>G</sub> &lt; V<sub>T</sub>.</li>
+            <li>Holes are pushed away, leaving fixed negative acceptor ions.</li>
+            <li>The depletion region grows deeper as V<sub>G</sub> rises.</li>
+            <li>C<sub>ox</sub> in series with the depletion capacitance: C is smaller than C<sub>ox</sub>.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 3 ================= -->
+      <section id="s3" aria-labelledby="h3s">
+        <h2 id="h3s">Inversion (gate voltage above threshold)</h2>
+        <div class="prose">
+          <p>If the gate voltage is increased further, the positive gate begins to attract the <strong>MINORITY</strong> carriers of the p-type substrate, the <strong>ELECTRONS</strong>, which are always present in small numbers (generated thermally). They collect in a very thin layer right at the surface.</p>
+          <p>When the gate voltage reaches the <strong>THRESHOLD VOLTAGE V<sub>T</sub></strong>, the electron concentration at the surface becomes as large as the hole concentration deep in the substrate. The surface has turned from p-type into n-type: it has been <strong>INVERTED</strong>. This thin electron layer is called the <strong>INVERSION LAYER</strong>.</p>
+          <p>The threshold condition is that the surface potential reaches twice the Fermi potential, 2φ<sub>F</sub>, where:</p>
+          <p class="eq">φ<sub>F</sub> = (kT/q) · ln(N<sub>A</sub> / n<sub>i</sub>)</p>
+          <p>For N<sub>A</sub> = 10<sup>17</sup> cm<sup>−3</sup> and n<sub>i</sub> = 10<sup>10</sup> cm<sup>−3</sup> at 300 K, φ<sub>F</sub> ≈ 0.42 V, so the surface band bending at threshold is about <strong>0.84 V</strong>.</p>
+          <p>Above V<sub>T</sub>, the depletion region <strong>stops growing</strong> (it has reached its maximum width). Any extra gate charge is balanced by <strong>MORE ELECTRONS</strong> in the inversion layer:</p>
+          <p class="eq">Q<sub>inv</sub> ≈ C<sub>ox</sub> · (V<sub>G</sub> − V<sub>T</sub>)   (charge per unit area)</p>
+          <p>This inversion layer is exactly the conducting <strong>CHANNEL</strong> of a MOSFET. In the next topic, adding n<sup>+</sup> source and drain regions on either side will let current flow through it.</p>
+        </div>
+
+        <figure class="anim" id="anim3">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <button class="btn" type="button" id="p3" aria-pressed="false">Preview MOSFET</button>
+            <div class="slider">
+              <label for="g3"><span>Gate voltage V<sub>G</sub></span><output id="g3o" for="g3">1.5</output></label>
+              <input type="range" id="g3" min="-3" max="3" step="0.01" value="1.5">
+              <div class="rbar" aria-hidden="true"><span class="acc" style="width:33.333%">accumulation</span><span class="dep" style="width:25%">depletion</span><span class="inv" style="width:41.667%">inversion</span></div>
+              <div class="rnote">V<sub>FB</sub> ≈ −1 V, V<sub>T</sub> ≈ +0.5 V (illustrative values)</div>
+            </div>
+          </div>
+          <div class="badges narrow" aria-live="polite"><span class="bdg acc" id="b3">ACCUMULATION</span></div>
+          <canvas id="cv3" class="narrow inset" style="aspect-ratio:600/380" role="img" aria-label="MOS stack above threshold. A thin cyan inversion layer of electrons forms at the surface and gets denser as VG rises; the depletion region stays at its maximum depth, marked max. Preview MOSFET adds two n+ regions at the ends of the surface, joined by the inversion layer."></canvas>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr v">V<sub>G</sub><b id="c3v"></b></div><div class="ctr cur wide">Q<sub>inv</sub>/q = C<sub>ox</sub>(V<sub>G</sub> − V<sub>T</sub>)/q<b id="c3q"></b></div><div class="ctr ">Depletion width<b id="c3w"></b></div>
+          </div>
+        </figure>
+        <aside class="keypoints" aria-label="Key points: inversion">
+          <h3>Key points</h3>
+          <ul>
+            <li>Above V<sub>T</sub> the gate gathers electrons, the minority carriers, at the surface.</li>
+            <li>Threshold: surface band bending = 2φ<sub>F</sub> ≈ 0.84 V for N<sub>A</sub> = 10<sup>17</sup> cm<sup>−3</sup>.</li>
+            <li>The depletion region stops at its maximum width; extra charge is Q<sub>inv</sub> ≈ C<sub>ox</sub>(V<sub>G</sub> − V<sub>T</sub>).</li>
+            <li>The inversion layer is the channel of the MOSFET.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 4 ================= -->
+      <section id="s4" aria-labelledby="h4s">
+        <h2 id="h4s">The band diagram view</h2>
+        <div class="prose">
+          <p>The same three regimes can be seen on the <strong>energy band diagram</strong> of the silicon near the surface. The Fermi level E<sub>F</sub> in the substrate is flat; the bands (E<sub>c</sub>, E<sub>i</sub>, E<sub>v</sub>) <strong>BEND</strong> near the surface as the gate voltage changes.</p>
+          <ul>
+            <li><strong>Accumulation</strong>: the bands bend <strong>UP</strong> at the surface. E<sub>v</sub> moves closer to E<sub>F</sub>, so there are more holes.</li>
+            <li><strong>Depletion</strong>: the bands bend <strong>DOWN</strong> slightly. E<sub>v</sub> moves away from E<sub>F</sub>, so holes are pushed away.</li>
+            <li><strong>Inversion</strong>: the bands bend down so far that E<sub>i</sub> at the surface drops <strong>BELOW E<sub>F</sub></strong>. Where E<sub>i</sub> is below E<sub>F</sub>, the material behaves as n-type. At threshold, E<sub>F</sub> is as far above E<sub>i</sub> at the surface as it is below E<sub>i</sub> in the bulk (a total bending of 2φ<sub>F</sub>).</li>
+          </ul>
+        </div>
+
+        <figure class="anim" id="anim4">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="slider">
+              <label for="g4"><span>Gate voltage V<sub>G</sub></span><output id="g4o" for="g4">-0.5</output></label>
+              <input type="range" id="g4" min="-3" max="3" step="0.01" value="-0.5">
+              <div class="rbar" aria-hidden="true"><span class="acc" style="width:33.333%">accumulation</span><span class="dep" style="width:25%">depletion</span><span class="inv" style="width:41.667%">inversion</span></div>
+              <div class="rnote">V<sub>FB</sub> ≈ −1 V, V<sub>T</sub> ≈ +0.5 V (illustrative values)</div>
+            </div>
+          </div>
+          <div class="badges narrow" aria-live="polite"><span class="bdg acc" id="b4">ACCUMULATION</span></div>
+          <canvas id="cv4" class="narrow inset" style="aspect-ratio:600/380" role="img" aria-label="MOS stack beside the energy band diagram of the silicon near the surface. Ec, Ei and Ev bend near the surface as VG changes while EF stays flat and dashed. Where Ei drops below EF at the surface the region is highlighted in cyan. A marker shows the 2φF level."></canvas>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr ">Surface band bending ψ<sub>s</sub><b id="c4p"></b></div><div class="ctr v">Reference 2φ<sub>F</sub><b id="c4r">0.84 V</b></div><div class="ctr ">E<sub>i</sub> − E<sub>F</sub> at the surface<b id="c4e"></b></div>
+          </div>
+        </figure>
+        <aside class="keypoints" aria-label="Key points: band diagram">
+          <h3>Key points</h3>
+          <ul>
+            <li>E<sub>F</sub> stays flat; E<sub>c</sub>, E<sub>i</sub> and E<sub>v</sub> bend near the surface.</li>
+            <li>Accumulation: bands bend up, E<sub>v</sub> nears E<sub>F</sub>.</li>
+            <li>Depletion: bands bend down slightly.</li>
+            <li>Inversion: E<sub>i</sub> drops below E<sub>F</sub> at the surface; threshold at a bending of 2φ<sub>F</sub>.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 5 ================= -->
+      <section id="s5" aria-labelledby="h5s">
+        <h2 id="h5s">The C-V curve</h2>
+        <div class="prose">
+          <p>Measuring the capacitance of a MOS capacitor while sweeping the gate voltage gives the <strong>C-V CURVE</strong>, a standard way to check the quality of an oxide in chip fabrication.</p>
+          <ul>
+            <li>In <strong>accumulation</strong>, C = C<sub>ox</sub> (maximum).</li>
+            <li>In <strong>depletion</strong>, C falls as the depletion region widens.</li>
+            <li>In <strong>inversion</strong>, the result depends on the measurement frequency. At <strong>LOW</strong> frequency the inversion electrons can follow the signal, so C rises back to C<sub>ox</sub>. At <strong>HIGH</strong> frequency they cannot, and C stays at its minimum value.</li>
+          </ul>
+        </div>
+
+        <figure class="anim" id="anim5">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="seg" role="group" aria-label="Measurement frequency"><button class="btn" type="button" data-f="lf">Low freq.</button><button class="btn" type="button" data-f="hf">High freq.</button></div>
+            <div class="slider">
+              <label for="g5"><span>Gate voltage V<sub>G</sub></span><output id="g5o" for="g5">-2</output></label>
+              <input type="range" id="g5" min="-3" max="3" step="0.01" value="-2">
+              <div class="rbar" aria-hidden="true"><span class="acc" style="width:33.333%">accumulation</span><span class="dep" style="width:25%">depletion</span><span class="inv" style="width:41.667%">inversion</span></div>
+              <div class="rnote">V<sub>FB</sub> ≈ −1 V, V<sub>T</sub> ≈ +0.5 V (illustrative values)</div>
+            </div>
+          </div>
+          <div class="badges narrow" aria-live="polite"><span class="bdg acc" id="b5">ACCUMULATION</span></div>
+          <canvas id="cv5" class="narrow inset" style="aspect-ratio:600/360" role="img" aria-label="C/Cox against VG from −3 to +3 V with the low-frequency and high-frequency curves and the three regimes shaded. A dot on the chosen curve follows the gate slider, next to a small MOS stack showing the charges."></canvas>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr v">V<sub>G</sub><b id="c5v"></b></div><div class="ctr cur">C/C<sub>ox</sub> low freq.<b id="c5l"></b></div><div class="ctr ">C/C<sub>ox</sub> high freq.<b id="c5h"></b></div>
+          </div>
+        </figure>
+        <aside class="keypoints" aria-label="Key points: C-V curve">
+          <h3>Key points</h3>
+          <ul>
+            <li>The C-V curve is measured by sweeping V<sub>G</sub>; it checks oxide quality.</li>
+            <li>Accumulation: C = C<sub>ox</sub>, the maximum.</li>
+            <li>Depletion: C falls as the depletion region widens.</li>
+            <li>Inversion: low frequency returns to C<sub>ox</sub>; high frequency stays at the minimum.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 6 ================= -->
+      <section id="s6" aria-labelledby="h6s">
+        <h2 id="h6s">Summary</h2>
+        <div class="prose">
+          <p>The MOS capacitor is a gate, a thin oxide and a semiconductor body, with capacitance <strong>C<sub>ox</sub> = ε<sub>ox</sub>/t<sub>ox</sub></strong> and no DC gate current. On p-type silicon: negative gate voltage gives <strong>accumulation</strong> of holes; small positive voltage gives <strong>depletion</strong>; a voltage above the threshold V<sub>T</sub> gives an <strong>inversion</strong> layer of electrons at the surface. That inversion layer is the channel of the n-channel MOSFET, and its charge is about C<sub>ox</sub>·(V<sub>G</sub> − V<sub>T</sub>).</p>
+        </div>
+
+        <figure class="anim" id="anim6">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="slider">
+              <label for="g6"><span>Gate voltage V<sub>G</sub></span><output id="g6o" for="g6">1</output></label>
+              <input type="range" id="g6" min="-3" max="3" step="0.01" value="1">
+              <div class="rbar" aria-hidden="true"><span class="acc" style="width:33.333%">accumulation</span><span class="dep" style="width:25%">depletion</span><span class="inv" style="width:41.667%">inversion</span></div>
+              <div class="rnote">V<sub>FB</sub> ≈ −1 V, V<sub>T</sub> ≈ +0.5 V (illustrative values)</div>
+            </div>
+          </div>
+          <div class="badges narrow" aria-live="polite"><span class="bdg acc" id="b6">ACCUMULATION</span></div>
+          <canvas id="cv6" class="narrow inset" style="aspect-ratio:600/520" role="img" aria-label="Recap: the MOS stack and the band diagram side by side, and the high-frequency C-V curve below with a dot, all driven by one gate slider."></canvas>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr ">ψ<sub>s</sub><b id="c6p"></b></div><div class="ctr ">W<sub>d</sub><b id="c6w"></b></div><div class="ctr ">C/C<sub>ox</sub> (HF)<b id="c6c"></b></div><div class="ctr cur wide">Q<sub>inv</sub>/q<b id="c6q"></b></div>
+          </div>
+        </figure>
+        <div class="formulas" aria-label="Key formulas">
+          <h3>Key formulas</h3>
+          <ul>
+            <li>C<sub>ox</sub> = ε<sub>ox</sub>/t<sub>ox</sub></li>
+            <li>ε<sub>ox</sub> = 3.9ε<sub>0</sub></li>
+            <li>φ<sub>F</sub> = (kT/q)ln(N<sub>A</sub>/n<sub>i</sub>)</li>
+            <li>Threshold when surface bending = 2φ<sub>F</sub></li>
+            <li>Q<sub>inv</sub> ≈ C<sub>ox</sub>(V<sub>G</sub> − V<sub>T</sub>)</li>
+          </ul>
+        </div>
+        <aside class="keypoints" aria-label="Key points: summary">
+          <h3>Key points</h3>
+          <ul>
+            <li>Gate, thin oxide, body: C<sub>ox</sub> = ε<sub>ox</sub>/t<sub>ox</sub>, no DC gate current.</li>
+            <li>p-type body: accumulation (V<sub>G</sub> &lt; V<sub>FB</sub>), depletion, then inversion (V<sub>G</sub> &gt; V<sub>T</sub>).</li>
+            <li>Threshold when the surface bending reaches 2φ<sub>F</sub>.</li>
+            <li>The inversion layer is the MOSFET channel, Q<sub>inv</sub> ≈ C<sub>ox</sub>(V<sub>G</sub> − V<sub>T</sub>).</li>
+          </ul>
+        </aside>
+      </section>
+
+      <nav class="pager" aria-label="Topic navigation">
+        <a href="../8-3-jfet-parameters/index.html"><small>← Previous</small>8.3 JFET Parameters (gm, rd, μ)</a>
+        <a class="next" href="../8-5-enhancement-mosfet/index.html"><small>Next →</small>8.5 Enhancement MOSFET</a>
+      </nav>
+    </div>
+  </main>
+
+  <footer class="site-foot">© 2026 Naveen Bokka</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  const C = {
+    text: '#e6e9ef', muted: '#9aa4b8', v: '#ffd54f', cur: '#81c784', wire: '#cfd8dc', tan: '#ce93d8', q: '#ff8a65',
+    grid: 'rgba(255,255,255,.07)'
+  };
+  const FONT = 'Inter, system-ui, sans-serif';
+  const MONO = '"JetBrains Mono", Consolas, monospace';
+  const RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const TAU = Math.PI * 2;
+  const $ = id => document.getElementById(id);
+  if (RM) $('rmNote').hidden = false;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const lerp = (a, b, u) => a + (b - a) * u;
+  const ease = u => { u = clamp(u, 0, 1); return u * u * (3 - 2 * u); };
+
+  const fV = (v, d) => (v < -1e-9 ? '−' : '') + Math.abs(v).toFixed(d == null ? 2 : d) + ' V';
+  const fN = (v, d) => (v < -1e-9 ? '−' : '') + Math.abs(v).toFixed(d || 0);
+  const fmA = i => (i * 1e3).toFixed(2) + ' mA';
+  const fmS = g => (g * 1e3).toFixed(2) + ' mS';
+  const fR = r => !isFinite(r) || r > 1e9 ? '∞' : r >= 1e6 ? (r / 1e6).toFixed(2) + ' MΩ' : r >= 1e3 ? (r / 1e3).toFixed(r >= 1e5 ? 0 : 1) + ' kΩ' : r.toFixed(0) + ' Ω';
+  const fMu = m => !isFinite(m) || m > 1e6 ? '∞' : m >= 100 ? m.toFixed(0) : m.toFixed(1);
+
+  /* ---------- Canvas helpers ---------- */
+  let FS = 1;
+  function Cv(id, W, H, cap) { this.el = $(id); this.W = W; this.H = H; this.cap = cap || 2; this.ctx = this.el.getContext('2d'); }
+  Cv.prototype.begin = function () {
+    const w = this.el.clientWidth; if (!w) return null;
+    const dpr = window.devicePixelRatio || 1;
+    const pw = Math.round(w * dpr), ph = Math.round(w * dpr * this.H / this.W);
+    if (this.el.width !== pw || this.el.height !== ph) { this.el.width = pw; this.el.height = ph; }
+    const c = this.ctx, s = pw / this.W;
+    FS = Math.min(this.cap, Math.max(1, 1.15 * this.W / w));
+    c.setTransform(s, 0, 0, s, 0, 0); c.clearRect(0, 0, this.W, this.H);
+    c.textBaseline = 'middle'; c.textAlign = 'left'; c.globalAlpha = 1; c.setLineDash([]); c.lineCap = 'butt'; c.shadowBlur = 0;
+    return c;
+  };
+  // Watermark: drawn inside the canvas, bottom-right, 13 px on screen at any size.
+  Cv.prototype.wm = function (c) {
+    const k = this.W / this.el.clientWidth, s = 13 * k;
+    c.save(); c.setTransform(this.el.width / this.W, 0, 0, this.el.width / this.W, 0, 0);
+    c.globalAlpha = 1; c.shadowBlur = 0; c.font = '500 ' + s.toFixed(1) + 'px ' + FONT; c.fillStyle = 'rgba(255,255,255,.35)';
+    c.textAlign = 'right'; c.textBaseline = 'bottom'; c.fillText('© Naveen Bokka', this.W - 6 * k, this.H - 4 * k); c.restore();
+  };
+  Cv.prototype.pt = function (e) {
+    const r = this.el.getBoundingClientRect();
+    return { x: (e.clientX - r.left) * this.W / r.width, y: (e.clientY - r.top) * this.H / r.height };
+  };
+  function circ(c, x, y, r, fill, stroke, lw) {
+    c.beginPath(); c.arc(x, y, Math.max(0, r), 0, TAU);
+    if (fill) { c.fillStyle = fill; c.fill(); }
+    if (stroke) { c.strokeStyle = stroke; c.lineWidth = lw || 1.5; c.stroke(); }
+  }
+  function txt(c, s, x, y, col, size, weight, align, font) {
+    c.font = (weight || 600) + ' ' + ((size || 12) * FS).toFixed(1) + 'px ' + (font || FONT);
+    c.fillStyle = col || C.text; c.textAlign = align || 'left'; c.fillText(s, x, y);
+  }
+  // Label made of [main, subscript] parts, e.g. [['g','m'],[' = 2.5 mS','']]
+  function subs(c, parts, x, y, col, size, align) {
+    const z = (size || 13) * FS, zs = z * 0.72;
+    let w = 0;
+    const ws = parts.map(p => {
+      c.font = '700 ' + z.toFixed(1) + 'px ' + FONT; const a = c.measureText(p[0]).width;
+      c.font = '700 ' + zs.toFixed(1) + 'px ' + FONT; const b = p[1] ? c.measureText(p[1]).width : 0;
+      w += a + b; return [a, b];
+    });
+    let x0 = align === 'right' ? x - w : align === 'center' ? x - w / 2 : x;
+    c.fillStyle = col; c.textAlign = 'left';
+    parts.forEach((p, k) => {
+      c.font = '700 ' + z.toFixed(1) + 'px ' + FONT; c.fillText(p[0], x0, y); x0 += ws[k][0];
+      if (p[1]) { c.font = '700 ' + zs.toFixed(1) + 'px ' + FONT; c.fillText(p[1], x0, y + z * 0.3); x0 += ws[k][1]; }
+    });
+    return w;
+  }
+  function line(c, x0, y0, x1, y1, col, lw, dash) {
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []);
+    c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke(); c.setLineDash([]);
+  }
+  function pline(c, pts, col, lw, dash) {
+    if (pts.length < 2) return;
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []); c.lineJoin = 'round';
+    c.beginPath(); pts.forEach((p, k) => k ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); c.stroke(); c.setLineDash([]);
+  }
+  function gline(c, pts, col, lw) { c.save(); c.shadowColor = col; c.shadowBlur = 5; pline(c, pts, col, lw || 2.6); c.restore(); }
+  function arrow(c, x0, y0, x1, y1, col, lw, head) {
+    const dx = x1 - x0, dy = y1 - y0, L = Math.hypot(dx, dy); if (L < 2) return;
+    const ux = dx / L, uy = dy / L, hs = Math.min(head || 10, L * 0.8), hw = Math.max(hs * 0.55, lw * 0.9);
+    line(c, x0, y0, x1 - ux * hs * 0.9, y1 - uy * hs * 0.9, col, lw || 3);
+    c.fillStyle = col; c.beginPath(); c.moveTo(x1, y1);
+    c.lineTo(x1 - ux * hs - uy * hw, y1 - uy * hs + ux * hw);
+    c.lineTo(x1 - ux * hs + uy * hw, y1 - uy * hs - ux * hw); c.closePath(); c.fill();
+  }
+  function poly(c, pts, fill, stroke, lw) {
+    c.beginPath(); c.moveTo(pts[0][0], pts[0][1]); for (let k = 1; k < pts.length; k++) c.lineTo(pts[k][0], pts[k][1]); c.closePath();
+    if (fill) { c.fillStyle = fill; c.fill(); }
+    if (stroke) { c.strokeStyle = stroke; c.lineWidth = lw || 1.2; c.stroke(); }
+  }
+  function qDot(c, x, y, r) {
+    c.save(); c.shadowColor = C.q; c.shadowBlur = 16; circ(c, x, y, r || 7, C.q); c.restore();
+    circ(c, x, y, r || 7, null, '#fff', 1.6);
+  }
+  function segSel(root, attr, val) {
+    root.querySelectorAll('[data-' + attr + ']').forEach(b => b.setAttribute('aria-pressed', String(b.dataset[attr] === String(val))));
+  }
+  function onDrag(cv, f, start) {
+    let d = false;
+    cv.el.addEventListener('pointerdown', e => { d = true; cv.el.setPointerCapture(e.pointerId); if (start) start(); f(cv.pt(e)); e.preventDefault(); });
+    cv.el.addEventListener('pointermove', e => { if (d) f(cv.pt(e)); });
+    ['pointerup', 'pointercancel'].forEach(tp => cv.el.addEventListener(tp, () => { d = false; }));
+  }
+
+  /* ---------- plotting helpers ---------- */
+  function mkP(l, r, t, b, x0, x1, y0, y1) { const P = { l: l, r: r, t: t, b: b, x0: x0, x1: x1, y0: y0, y1: y1 }; P.X = v => l + (v - x0) / (x1 - x0) * (r - l); P.Y = v => b - (v - y0) / (y1 - y0) * (b - t); P.ix = x => x0 + (x - l) / (r - l) * (x1 - x0); P.iy = y => y0 + (b - y) / (b - t) * (y1 - y0); return P; }
+  // Axes, grid and tick labels; yl is drawn above the y axis, xl under the x axis.
+  function frame(c, P, xs, ys, xf, yf, xl, yl) {
+    xs.forEach(v => { line(c, P.X(v), P.t, P.X(v), P.b, C.grid, 1); if (xf) txt(c, xf(v), P.X(v), P.b + 7 + 6 * FS, C.muted, 10, 500, 'center'); });
+    ys.forEach(v => { line(c, P.l, P.Y(v), P.r, P.Y(v), C.grid, 1); if (yf) txt(c, yf(v), P.l - 7, P.Y(v), C.muted, 10, 500, 'right'); });
+    line(c, P.l, P.b, P.r, P.b, C.muted, 1.5); line(c, P.l, P.t, P.l, P.b, C.muted, 1.5);
+    if (xl) subs(c, xl, (P.l + P.r) / 2, P.b + 16 + 14 * FS, C.muted, 12, 'center');
+    if (yl) subs(c, yl, P.l - 6, P.t - 4 - 8 * FS, C.muted, 12, 'left');
+  }
+  const clip = (c, P) => { c.save(); c.beginPath(); c.rect(P.l, P.t, P.r - P.l, P.b - P.t); c.clip(); };
+  const ticks = (a, b, st) => { const o = []; for (let v = Math.ceil(a / st - 1e-9) * st; v <= b + 1e-9; v += st) o.push(+v.toFixed(6)); return o; };
+  const XG = [['V', 'GS'], [' (V)', '']], XD = [['V', 'DS'], [' (V)', '']], YI = [['I', 'D'], [' (mA)', '']];
+  const mAf = d => v => (v * 1e3).toFixed(d || 0);
+  // Right-angle slope triangle: hypotenuse A→B on a straight line, legs horizontal (yellow) and vertical (green)
+  function slopeTri(c, A, B, hcol, vcol) {
+    const Rc = [B[0], A[1]];
+    poly(c, [A, Rc, B], 'rgba(206,147,216,.13)');
+    line(c, A[0], A[1], Rc[0], Rc[1], hcol, 2.4); line(c, Rc[0], Rc[1], B[0], B[1], vcol, 2.4);
+    const s = 7 * Math.sign(B[0] - A[0] || 1), u = 7 * Math.sign(B[1] - A[1] || -1);
+    pline(c, [[Rc[0] - s, Rc[1]], [Rc[0] - s, Rc[1] + u], [Rc[0], Rc[1] + u]], 'rgba(255,255,255,.5)', 1);
+    return Rc;
+  }
+
+  /* ---------- Animation framework: own Play/Pause/Reset, runs only while visible ---------- */
+  const anims = [];
+  function Anim(rootId, o) {
+    this.root = $(rootId); this.o = o; this.playing = !RM; this.visible = true; this.dirty = true;
+    this.pb = this.root.querySelector('[data-act="play"]');
+    this.pb.addEventListener('click', () => this.setPlaying(!this.playing));
+    this.root.querySelector('[data-act="reset"]').addEventListener('click', () => { o.reset(); this.setPlaying(!RM); });
+    o.reset(); this.sync(); anims.push(this);
+    if ('IntersectionObserver' in window) {
+      this.visible = false;
+      new IntersectionObserver(es => es.forEach(e => { this.visible = e.isIntersecting; if (this.visible) this.dirty = true; }))
+        .observe(this.root);
+    }
+  }
+  Anim.prototype.setPlaying = function (p) { this.playing = p; this.sync(); this.dirty = true; };
+  Anim.prototype.sync = function () { this.pb.textContent = this.playing ? 'Pause' : 'Play'; };
+
+  /* =========================================================
+     MOS capacitor on p-type Si, NA = 1e17 cm⁻³, tox = 10 nm (illustrative VFB = −1 V, VT = +0.5 V).
+     Surface potential ψs against VG:
+       accumulation (VG < VFB): ψs = −2(kT/q)·asinh((VFB − VG)/0.3 V)          (small, smooth, illustrative)
+       depletion (VFB ≤ VG ≤ VT): VG − VFB = ψs + γ·√ψs, γ chosen so ψs = 2φF exactly at VT
+       inversion (VG > VT): ψs = 2φF + 2(kT/q)·ln(1 + (VG − VT)/0.3 V)          (pinned near 2φF)
+     Depletion width Wd = √(2εs·ψs/(q·NA)) (ψs capped at 2φF) → Wmax ≈ 104 nm.
+     Qinv/q = Cox(VG − VT)/q;  accumulated holes = Cox(VFB − VG)/q.
+     C-V (illustrative): C/Cox = 1/(1 + Cox·Weff/εs), Weff = √(Wd² + LD²) (LD·e^(ψs/2kT) in accumulation);
+       low frequency adds a smooth rise back to Cox just above VT.
+     ========================================================= */
+  const VFB = -1, VT = 0.5, KT = 0.0259, PHIF = 0.42, PHI2 = 0.84, VMIN = -3, VMAX = 3;
+  const EPS0 = 8.854e-14, ES = 11.7 * EPS0, QE = 1.602e-19, NA = 1e17, LD = 12.9, WVIS = 260;
+  const COX = 3.9 * EPS0 / 10e-7;   // F/cm² for 10 nm
+  const GAM = (VT - VFB - PHI2) / Math.sqrt(PHI2);
+  const psiOf = vg => vg < VFB ? -2 * KT * Math.asinh((VFB - vg) / 0.3) : vg <= VT ? Math.pow((-GAM + Math.sqrt(GAM * GAM + 4 * (vg - VFB))) / 2, 2) : PHI2 + 2 * KT * Math.log(1 + (vg - VT) / 0.3);
+  const wdOf = psi => psi <= 0 ? 0 : 1e7 * Math.sqrt(2 * ES * Math.min(psi, PHI2) / (QE * NA));   // nm
+  const WMAX = wdOf(PHI2), KC = COX * 1e-7 / ES;
+  function cHF(vg) { const p = psiOf(vg), w = p < 0 ? LD * Math.exp(p / (2 * KT)) : Math.hypot(wdOf(p), LD); return 1 / (1 + KC * w); }
+  const logi = x => 1 / (1 + Math.exp(-x));
+  function cLF(vg) { const h = cHF(vg); return h + (1 - h) * logi((vg - VT - 0.15) / 0.15); }
+  function mstate(vg) {
+    const p = psiOf(vg);
+    return { vg: vg, psi: p, wd: wdOf(p), qinv: vg > VT ? COX * (vg - VT) / QE : 0, qacc: vg < VFB ? COX * (VFB - vg) / QE : 0, reg: vg < VFB ? 'acc' : vg < VT ? 'dep' : 'inv' };
+  }
+  const REG = { acc: 'ACCUMULATION', dep: 'DEPLETION', inv: 'INVERSION' };
+  function setReg(id, reg) { const b = $(id); b.className = 'bdg ' + reg; b.textContent = REG[reg]; }
+  const SUP = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '-': '⁻' };
+  function fSci(x, unit) { if (x <= 0) return '0' + (unit || ''); const e = Math.floor(Math.log10(x)), m = x / Math.pow(10, e); return m.toFixed(2) + ' × 10' + String(e).split('').map(ch => SUP[ch]).join('') + (unit || ''); }
+  const fVG = v => (v > 0.004 ? '+' : v < -0.004 ? '−' : '') + Math.abs(v).toFixed(2) + ' V';
+
+  /* ---------- colours ---------- */
+  const PSI = '#7d3a3a', DEP = '#3a3f4f', OX = '#b0bec5', GATE = '#78909c', INV = '#26c6da', EL = '#4fc3f7', HO = '#ff8a65', ION = '#ef9a9a', NP = '#1e5aa8';
+  let HATCH = null;
+  function hatch(c) {
+    if (!HATCH) { const p = document.createElement('canvas'); p.width = 10; p.height = 10; const g = p.getContext('2d'); g.fillStyle = DEP; g.fillRect(0, 0, 10, 10); g.strokeStyle = 'rgba(255,255,255,.18)'; g.lineWidth = 1.2; g.beginPath(); g.moveTo(-2, 12); g.lineTo(12, -2); g.moveTo(-2, 2); g.lineTo(2, -2); g.moveTo(8, 12); g.lineTo(12, 8); g.stroke(); HATCH = p; }
+    return c.createPattern(HATCH, 'repeat');
+  }
+  function ground(c, x, y, s) {
+    s = s || 1; line(c, x, y, x, y + 7 * s, C.wire, 2);
+    line(c, x - 11 * s, y + 7 * s, x + 11 * s, y + 7 * s, C.wire, 2); line(c, x - 6 * s, y + 11 * s, x + 6 * s, y + 11 * s, C.wire, 2); line(c, x - 2 * s, y + 15 * s, x + 2 * s, y + 15 * s, C.wire, 2);
+  }
+
+  /* ---------- carriers and ions (positions are fractions of the substrate box) ---------- */
+  function rng(s) { return function () { s |= 0; s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  function Parts(seed, nh, ne, ni) {
+    const r = rng(seed), mk = (v0, v1) => { const u = 0.03 + 0.94 * r(), v = v0 + (v1 - v0) * r(); return { u: u, v: v, r2: r(), ph: r() * TAU, x: u, y: v, tx: u, ty: v, al: 1, tal: 1 }; };
+    this.h = []; for (let k = 0; k < nh; k++) this.h.push(mk(0.06, 0.97));
+    this.h.sort((a, b) => a.v - b.v);
+    this.e = []; for (let k = 0; k < ne; k++) { const p = mk(0.3, 0.97); p.al = p.tal = 0; this.e.push(p); }
+    this.i = []; for (let k = 0; k < ni; k++) { const p = mk(0.02, 0.6); p.al = p.tal = 0; this.i.push(p); }
+  }
+  Parts.prototype.target = function (st) {
+    const wf = st.wd / WVIS, nAcc = Math.round(this.h.length * Math.min(0.5, st.qacc / 8.6e12)), m = Math.round(this.e.length * Math.min(1, st.qinv / 5.4e12));
+    this.h.forEach((p, k) => { p.tx = p.u; if (k < nAcc) p.ty = 0.012 + 0.035 * p.r2; else { const vv = (p.v - 0.06) / 0.91; p.ty = wf + 0.03 + vv * (0.95 - wf); } });
+    this.e.forEach((p, k) => { p.tx = p.u; if (k < m) { p.ty = 0.006 + 0.016 * p.r2; p.tal = 1; } else { p.ty = p.v; p.tal = 0; } });
+    this.i.forEach(p => { p.tal = p.v < wf ? 1 : 0; });
+  };
+  Parts.prototype.step = function (dt, snap) {
+    const k = snap ? 1 : 1 - Math.exp(-dt * 2.2), ka = snap ? 1 : 1 - Math.exp(-dt * 4);
+    [this.h, this.e, this.i].forEach(arr => arr.forEach(p => { p.x += (p.tx - p.x) * k; p.y += (p.ty - p.y) * k; p.al += (p.tal - p.al) * ka; }));
+  };
+  function rrect(c, x, y, w, h, r) { c.beginPath(); if (c.roundRect) c.roundRect(x, y, w, h, r); else c.rect(x, y, w, h); }
+  function sgn(c, x, y, r, col, plus) { line(c, x - r * 0.55, y, x + r * 0.55, y, col, 1.6); if (plus) line(c, x, y - r * 0.55, x, y + r * 0.55, col, 1.6); }
+
+  /* ---------- the MOS stack ---------- */
+  // S = {x, y, w, h}; o: mini, gap (exploded view), ot (oxide px), pv (0..1 n+ preview), field, max, wdArrow, amm, labels, t (jitter time)
+  function drawStack(c, S, P, st, o) {
+    o = o || {};
+    const mini = !!o.mini, gap = o.gap || 0, pv = o.pv || 0, t = o.t || 0;
+    const th = o.th || (mini ? 18 : 36), gh = mini ? 12 : 22, ot = o.ot || (mini ? 6 : 12);
+    const sy = S.y + th + gh + ot, sb = S.y + S.h - (mini ? 20 : 34), sh = sb - sy, sx = S.x, sw = S.w;
+    const gx0 = S.x + S.w * 0.18 * pv, gx1 = S.x + S.w * (1 - 0.18 * pv);
+    const oy = sy - ot - gap, gy = oy - gh - gap;
+    const rh = mini ? 2.6 : (o.rh || 4.2);
+    // substrate and depletion region
+    c.fillStyle = PSI; c.fillRect(sx, sy, sw, sh);
+    const dh = Math.min(1, st.wd / WVIS) * sh;
+    if (dh > 0.5) { c.fillStyle = hatch(c); c.fillRect(sx, sy, sw, dh); }
+    c.save(); c.beginPath(); c.rect(sx, sy, sw, sh); c.clip();
+    const jx = p => (o.t != null ? 1.4 * Math.sin(t * 1.6 + p.ph) : 0), jy = p => (o.t != null ? 1.4 * Math.cos(t * 1.3 + p.ph * 1.7) : 0);
+    P.i.forEach(p => { if (p.al < 0.03) return; c.globalAlpha = p.al; const x = sx + p.u * sw, y = sy + p.v * sh; circ(c, x, y, rh, null, ION, 1.2); sgn(c, x, y, rh, ION, false); });
+    c.globalAlpha = 1;
+    P.h.forEach(p => { const x = sx + p.x * sw + jx(p), y = sy + p.y * sh + jy(p); circ(c, x, y, rh, HO); if (!mini) sgn(c, x, y, rh, '#3b1d12', true); });
+    const qf = Math.min(1, st.qinv / 5.4e12);
+    if (qf > 0.002) { c.globalAlpha = 0.3 + 0.55 * qf; c.fillStyle = INV; c.fillRect(sx, sy, sw, (mini ? 1.5 : 2.5) + (mini ? 3 : 6) * qf); c.globalAlpha = 1; }
+    P.e.forEach(p => { if (p.al < 0.03) return; c.globalAlpha = p.al; const x = sx + p.x * sw + jx(p) * 0.5, y = sy + p.y * sh; circ(c, x, y, rh * 0.85, EL); if (!mini) sgn(c, x, y, rh * 0.85, '#0b2a3a', false); });
+    c.globalAlpha = 1;
+    if (pv > 0.01) {
+      c.globalAlpha = pv; c.fillStyle = NP;
+      [[sx, sx + sw * 0.2], [sx + sw * 0.8, sx + sw]].forEach(a => { rrect(c, a[0], sy - 4, a[1] - a[0], sh * 0.24 + 4, 8); c.fill(); });
+      if (qf > 0.002) { c.fillStyle = INV; c.globalAlpha = pv * (0.3 + 0.55 * qf); c.fillRect(sx + sw * 0.18, sy, sw * 0.64, 2.5 + 6 * qf); }
+      c.globalAlpha = pv; txt(c, 'n+', sx + sw * 0.1, sy + sh * 0.12, '#e6e9ef', 12, 700, 'center'); txt(c, 'n+', sx + sw * 0.9, sy + sh * 0.12, '#e6e9ef', 12, 700, 'center');
+      c.globalAlpha = 1;
+    }
+    c.restore();
+    // oxide and gate
+    c.fillStyle = OX; c.fillRect(gx0, oy, gx1 - gx0, ot);
+    c.fillStyle = GATE; c.fillRect(gx0, gy, gx1 - gx0, gh);
+    const q = st.vg - VFB, n = Math.min(mini ? 7 : 12, Math.round(Math.abs(q) * (mini ? 2.4 : 4)));
+    for (let k = 0; k < n; k++) { const x = gx0 + (gx1 - gx0) * (k + 0.5) / n; sgn(c, x, gy + gh - (mini ? 4 : 6), mini ? 4 : 6, q > 0 ? '#ffe082' : '#b3e5fc', q > 0); }
+    // field lines in accumulation: from the surface holes up to the gate charges
+    if (o.field && st.reg === 'acc') for (let k = 0; k < 5; k++) { const x = gx0 + (gx1 - gx0) * (k + 0.5) / 5; arrow(c, x, sy + 12, x, gy + gh + 1, 'rgba(255,213,79,.8)', 1.6, 6); }
+    // gate terminal
+    const cx = (gx0 + gx1) / 2;
+    line(c, cx, gy, cx, S.y + (mini ? 4 : 8), C.wire, 2);
+    if (!mini) subs(c, [['V', 'G'], [o.amm ? '' : ' = ' + fVG(st.vg), '']], cx + 10, S.y + 12, C.v, 12, 'left');
+    // body contact and ground
+    c.fillStyle = GATE; c.fillRect(sx, sb, sw, mini ? 3 : 5);
+    ground(c, sx + sw / 2, sb + (mini ? 3 : 5), mini ? 0.6 : 1);
+    if (o.max && st.wd >= WMAX * 0.995) { const y = sy + WMAX / WVIS * sh; line(c, sx, y, sx + sw, y, 'rgba(255,255,255,.6)', 1.2, [5, 4]); txt(c, 'max', sx + sw + 6, y, C.text, 11, 700, 'left'); }
+    if (o.wdArrow && dh > 6) { const x = sx + sw + 12; arrow(c, x, sy + dh / 2, x, sy + 1, C.text, 1.5, 6); arrow(c, x, sy + dh / 2, x, sy + dh, C.text, 1.5, 6); subs(c, [['W', 'd']], x + 8, sy + dh / 2, C.text, 11, 'left'); }
+    if (o.labels !== false && !mini) {
+      txt(c, 'gate', S.x - 8, gy + gh / 2, C.muted, 11, 600, 'right');
+      txt(c, 'oxide', S.x - 8, Math.max(oy + ot / 2, gy + gh / 2 + 13 * FS), C.muted, 11, 600, 'right');
+      txt(c, 'p-Si', S.x - 8, sy + sh / 2, C.muted, 11, 600, 'right');
+    }
+    return { sx: sx, sy: sy, sw: sw, sh: sh, gy: gy, oy: oy, gh: gh, ot: ot, gx0: gx0, gx1: gx1, sb: sb };
+  }
+
+  /* ---------- band diagram: energy (eV, EF = 0) against depth (nm) ---------- */
+  function drawBand(c, P, st, small) {
+    const ps = st.psi, wd = Math.max(st.wd, 1);
+    const psiAt = x => ps < 0 ? ps * Math.exp(-x / LD) : x < wd ? ps * Math.pow(1 - x / wd, 2) : 0;
+    const Ei = x => PHIF - psiAt(x);
+    // gate and oxide blocks (not to scale)
+    c.fillStyle = 'rgba(120,144,156,.55)'; c.fillRect(P.X(-60), P.t, P.X(-36) - P.X(-60), P.b - P.t);
+    c.fillStyle = 'rgba(176,190,197,.35)'; c.fillRect(P.X(-36), P.t, P.X(0) - P.X(-36), P.b - P.t);
+    if (!small && FS < 1.4) { txt(c, 'gate', (P.X(-60) + P.X(-36)) / 2, P.b - 10, C.text, 9, 600, 'center'); txt(c, 'oxide', (P.X(-36) + P.X(0)) / 2, P.b - 10, '#0f1420', 9, 700, 'center'); }
+    line(c, P.X(0), P.t, P.X(0), P.b, 'rgba(255,255,255,.35)', 1);
+    const pts = f => { const a = []; for (let x = 0; x <= P.x1 + 1e-9; x += 2) a.push([P.X(x), P.Y(f(x))]); return a; };
+    // n-type region near the surface (Ei below EF)
+    if (Ei(0) < 0 && ps > PHIF) {
+      const xc = wd * (1 - Math.sqrt(PHIF / ps)), a = [];
+      for (let x = 0; x <= xc; x += 0.5) a.push([P.X(x), P.Y(Ei(x))]);
+      a.push([P.X(xc), P.Y(0)], [P.X(0), P.Y(0)]);
+      poly(c, a, 'rgba(38,198,218,.28)');
+      c.save(); c.shadowColor = INV; c.shadowBlur = 12; circ(c, P.X(xc), P.Y(0), small ? 4 : 5.5, INV); c.restore();
+      if (!small) txt(c, 'n', P.X(xc / 2), P.Y(0) + 12, INV, 12, 700, 'center');
+    }
+    pline(c, pts(x => Ei(x) + 0.56), C.text, 2.2);
+    pline(c, pts(x => Ei(x) - 0.56), C.text, 2.2);
+    pline(c, pts(Ei), C.muted, 1.6, [6, 4]);
+    line(c, P.X(0), P.Y(0), P.r, P.Y(0), C.v, 1.8, [7, 4]);
+    // 2φF reference at the surface and the present bending
+    line(c, P.X(0), P.Y(PHIF - PHI2), P.X(70), P.Y(PHIF - PHI2), '#80cbc4', 1.4, [3, 3]);
+    subs(c, [['2φ', 'F']], P.X(72), P.Y(PHIF - PHI2), '#80cbc4', small ? 9 : 10, 'left');
+    if (Math.abs(ps) > 0.02) {
+      line(c, P.X(0), P.Y(PHIF), P.X(40), P.Y(PHIF), 'rgba(206,147,216,.5)', 1, [2, 3]);
+      const x = P.X(small ? 8 : 10); arrow(c, x, P.Y(PHIF), x, P.Y(Ei(0)), '#ce93d8', 1.8, 6);
+      if (!small) subs(c, [['qψ', 's']], x + 6, (P.Y(PHIF) + P.Y(Ei(0))) / 2, '#ce93d8', 10, 'left');
+    }
+    const lx = P.r + 6, s = small ? 9 : 11;
+    subs(c, [['E', 'c']], lx, P.Y(PHIF + 0.56), C.text, s, 'left');
+    subs(c, [['E', 'i']], lx, P.Y(PHIF), C.muted, s, 'left');
+    subs(c, [['E', 'F']], lx, P.Y(0), C.v, s, 'left');
+    subs(c, [['E', 'v']], lx, P.Y(PHIF - 0.56), C.text, s, 'left');
+    if (!small) { txt(c, 'depth →', P.r, P.b + 12, C.muted, 10, 600, 'right'); txt(c, 'E ↑', P.X(-60) - 4, P.t + 6, C.muted, 10, 700, 'right'); }
+  }
+
+  /* ---------- C-V graph ---------- */
+  function drawCV(c, P, vg, mode, small) {
+    small = small || FS > 1.4;
+    c.fillStyle = 'rgba(255,138,101,.08)'; c.fillRect(P.X(-3), P.t, P.X(VFB) - P.X(-3), P.b - P.t);
+    c.fillStyle = 'rgba(176,190,197,.10)'; c.fillRect(P.X(VFB), P.t, P.X(VT) - P.X(VFB), P.b - P.t);
+    c.fillStyle = 'rgba(38,198,218,.08)'; c.fillRect(P.X(VT), P.t, P.X(3) - P.X(VT), P.b - P.t);
+    frame(c, P, [-3, -2, -1, 0, 1, 2, 3], [0, 0.25, 0.5, 0.75, 1], v => fN(v), v => v.toFixed(2), [['V', 'G'], [' (V)', '']], [['C/C', 'ox']]);
+    const ty = P.t + 9;
+    txt(c, small ? 'acc.' : 'accumulation', (P.X(-3) + P.X(VFB)) / 2, ty, HO, small ? 9 : 10, 700, 'center');
+    txt(c, small ? 'dep.' : 'depletion', (P.X(VFB) + P.X(VT)) / 2, ty, '#b0bec5', small ? 9 : 10, 700, 'center');
+    txt(c, small ? 'inv.' : 'inversion', (P.X(VT) + P.X(3)) / 2, ty, INV, small ? 9 : 10, 700, 'center');
+    [[VFB, 'FB'], [VT, 'T']].forEach(a => { line(c, P.X(a[0]), P.t + 18, P.X(a[0]), P.b, 'rgba(255,255,255,.25)', 1, [3, 3]); subs(c, [['V', a[1]]], P.X(a[0]) + 4, P.b - 10, C.muted, 9, 'left'); });
+    const curve = f => { const a = []; for (let v = -3; v <= 3.0001; v += 0.02) a.push([P.X(v), P.Y(f(v))]); return a; };
+    const LFc = '#81c784', HFc = '#ce93d8';
+    if (mode === 'lf') { pline(c, curve(cHF), 'rgba(206,147,216,.45)', 1.6, [5, 4]); gline(c, curve(cLF), LFc, 3); }
+    else { pline(c, curve(cLF), 'rgba(129,199,132,.45)', 1.6, [5, 4]); gline(c, curve(cHF), HFc, 3); }
+    txt(c, 'LF', P.r - 4, P.Y(cLF(3)) - 9, LFc, 10, 700, 'right');
+    txt(c, 'HF', P.r - 4, P.Y(cHF(3)) - 9, HFc, 10, 700, 'right');
+    const cc = mode === 'lf' ? cLF(vg) : cHF(vg);
+    line(c, P.X(vg), P.Y(cc), P.X(vg), P.b, 'rgba(255,138,101,.55)', 1.2, [4, 4]);
+    qDot(c, P.X(vg), P.Y(cc), small ? 5 : 6.5);
+  }
+  function notScale(c, x, y) { txt(c, 'not to scale', x, y, C.muted, 10, 600, 'left'); }
+
+  /* =========================================================
+     0. The MOS structure: exploded view, tox slider, IG = 0
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv0', 600, 400), sl = $('t0'), P = new Parts(11, 60, 0, 0), st = mstate(VFB);
+    let t = 0, A;
+    P.target(st); P.step(0, true);
+    function upd() {
+      const tox = +sl.value, cox = 34.53 / tox;
+      $('t0o').textContent = tox + ' nm'; $('c0t').textContent = tox + ' nm'; $('c0c').textContent = cox.toFixed(2) + ' fF/µm²';
+      if (A) A.dirty = true;
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const tox = +sl.value, ot = 4 + 30 * Math.log(tox / 2) / Math.log(50), gap = 70 * (1 - ease((t - 0.4) / 1.8));
+      const S = { x: 130, y: 20, w: 260, h: 330 };
+      const g = drawStack(c, S, P, st, { ot: ot, gap: gap, th: 92, amm: true });
+      // ammeter in the gate lead
+      const cx = (g.gx0 + g.gx1) / 2, ay = Math.min(S.y + 48, g.gy - 22);
+      circ(c, cx, ay, 15, '#141b2b', C.wire, 2); txt(c, 'A', cx, ay + 1, C.wire, 13, 700, 'center');
+      subs(c, [['I', 'G'], [' = 0', '']], cx + 22, ay, C.cur, 13, 'left');
+      // tox bracket and Cox
+      const bx = g.gx1 + 10, oy = g.oy;
+      line(c, bx, oy, bx + 6, oy, C.text, 1.2); line(c, bx, oy + g.ot, bx + 6, oy + g.ot, C.text, 1.2); line(c, bx + 6, oy, bx + 6, oy + g.ot, C.text, 1.2);
+      subs(c, [['t', 'ox']], bx + 12, oy + g.ot / 2 - 9, C.text, 12, 'left');
+      subs(c, [['C', 'ox'], [' = ' + (34.53 / tox).toFixed(2) + ' fF/µm²', '']], bx + 12, oy + g.ot / 2 + 9, C.v, 11, 'left');
+      txt(c, 'body', g.sx + g.sw + 8, g.sb + 3, C.muted, 11, 600, 'left');
+      notScale(c, 10, 388);
+      cv.wm(c);
+    }
+    const o = { reset() { t = RM ? 9 : 0; sl.value = 10; upd(); }, step(dt) { t = Math.min(t + dt, 9); }, draw: draw };
+    A = new Anim('anim0', o);
+    sl.addEventListener('input', upd);
+  })();
+
+  /* ---------- shared: a section with one stack canvas driven by a VG slider ---------- */
+  function vgSection(n, def, seed, opts, extra) {
+    const cv = new Cv('cv' + n, 600, opts.H || 380), sl = $('g' + n), P = new Parts(seed, 70, 40, 46);
+    let t = 0, pv = 0, pvT = 0, st = null, A;
+    function upd() {
+      const vg = +sl.value; st = mstate(vg); P.target(st);
+      if (A && !A.playing) { P.step(0, true); pv = pvT; }
+      $('g' + n + 'o').textContent = fVG(vg); setReg('b' + n, st.reg);
+      if (extra && extra.upd) extra.upd(st);
+      if (A) A.dirty = true;
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const S = opts.S;
+      drawStack(c, S, P, st, Object.assign({ t: t, pv: pv }, opts.o));
+      if (extra && extra.draw) extra.draw(c, st);
+      notScale(c, 10, cv.H - 12);
+      cv.wm(c);
+    }
+    const o = {
+      reset() { t = 0; pv = pvT = 0; sl.value = def; if (extra && extra.reset) extra.reset(); upd(); P.step(0, true); },
+      step(dt) { t += dt; P.step(dt, false); pv += (pvT - pv) * (1 - Math.exp(-dt * 3)); },
+      draw: draw
+    };
+    A = new Anim('anim' + n, o);
+    sl.addEventListener('input', upd);
+    return { setPv(v) { pvT = v; if (!A.playing) pv = v; A.dirty = true; }, A: A, cv: cv, P: P, get st() { return st; }, get t() { return t; }, get pv() { return pv; } };
+  }
+
+  /* 1. Accumulation */
+  vgSection(1, -2, 21, { S: { x: 120, y: 10, w: 400, h: 350 }, o: { field: true } }, {
+    upd(st) { $('c1v').textContent = fVG(st.vg); $('c1h').textContent = fSci(st.qacc, ' cm⁻²'); $('c1c').textContent = cHF(st.vg).toFixed(2); }
+  });
+
+  /* 2. Depletion */
+  vgSection(2, 0, 31, { S: { x: 120, y: 10, w: 400, h: 350 }, o: { wdArrow: true } }, {
+    upd(st) { $('c2v').textContent = fVG(st.vg); $('c2w').textContent = st.wd.toFixed(0) + ' nm'; $('c2c').textContent = cHF(st.vg).toFixed(2); }
+  });
+
+  /* 3. Inversion, with the MOSFET preview */
+  (function () {
+    const bp = $('p3'); let on = false;
+    const sec = vgSection(3, 1.5, 41, { S: { x: 120, y: 10, w: 400, h: 350 }, o: { max: true } }, {
+      upd(st) { $('c3v').textContent = fVG(st.vg); $('c3q').textContent = fSci(st.qinv, ' cm⁻²'); $('c3w').textContent = st.wd.toFixed(0) + ' nm' + (st.wd >= WMAX * 0.995 ? ' (max)' : ''); },
+      reset() { on = false; bp.setAttribute('aria-pressed', 'false'); }
+    });
+    bp.addEventListener('click', () => { on = !on; bp.setAttribute('aria-pressed', String(on)); sec.setPv(on ? 1 : 0); });
+  })();
+
+  /* 4. Band diagram beside the stack */
+  vgSection(4, -0.5, 51, { S: { x: 80, y: 10, w: 160, h: 350 }, o: { rh: 3 } }, {
+    draw(c, st) { drawBand(c, mkP(300, 552, 26, 318, -60, 250, -1.2, 1.3), st, false); },
+    upd(st) { $('c4p').textContent = fVG(st.psi).replace(' V', ' V'); $('c4e').textContent = (PHIF - st.psi >= 0 ? '' : '−') + Math.abs(PHIF - st.psi).toFixed(2) + ' eV'; }
+  });
+
+  /* 5. C-V curve with a thumbnail stack */
+  (function () {
+    let mode = 'hf';
+    const root = $('anim5');
+    const sec = vgSection(5, -2, 61, { H: 360, S: { x: 462, y: 30, w: 120, h: 270 }, o: { mini: true } }, {
+      draw(c, st) { drawCV(c, mkP(62, 420, 30, 290, -3, 3, 0, 1.1), st.vg, mode, false); },
+      upd(st) { $('c5v').textContent = fVG(st.vg); $('c5l').textContent = cLF(st.vg).toFixed(2); $('c5h').textContent = cHF(st.vg).toFixed(2); segSel(root, 'f', mode); },
+      reset() { mode = 'hf'; segSel(root, 'f', mode); }
+    });
+    root.querySelectorAll('[data-f]').forEach(b => b.addEventListener('click', () => { mode = b.dataset.f; segSel(root, 'f', mode); sec.A.dirty = true; }));
+  })();
+
+  /* 6. Summary: stack, band diagram and C-V dot together */
+  vgSection(6, 1, 71, { H: 520, S: { x: 80, y: 6, w: 160, h: 290 }, o: { rh: 3 } }, {
+    draw(c, st) { drawBand(c, mkP(300, 552, 26, 282, -60, 250, -1.2, 1.3), st, true); drawCV(c, mkP(70, 560, 336, 448, -3, 3, 0, 1.1), st.vg, 'hf', true); },
+    upd(st) { $('c6p').textContent = fVG(st.psi); $('c6w').textContent = st.wd.toFixed(0) + ' nm'; $('c6c').textContent = cHF(st.vg).toFixed(2); $('c6q').textContent = fSci(st.qinv, ' cm⁻²'); }
+  });
+
+  /* ---------- sticky mini-nav highlight ---------- */
+  (function () {
+    const links = Array.from(document.querySelectorAll('.toc a'));
+    const secs = links.map(l => document.querySelector(l.getAttribute('href')));
+    function upd() {
+      let cur = 0;
+      secs.forEach((s, i) => { if (s.getBoundingClientRect().top < 120) cur = i; });
+      links.forEach((l, i) => l.classList.toggle('active', i === cur));
+    }
+    window.addEventListener('scroll', upd, { passive: true }); upd();
+  })();
+
+  let last = performance.now();
+  function frameLoop(ts) {
+    const dt = Math.min(0.05, Math.max(0, (ts - last) / 1000)); last = ts;
+    anims.forEach(a => {
+      if (!a.visible) return;
+      if (a.playing) { a.o.step(dt); a.o.draw(); }
+      else if (a.dirty) a.o.draw();
+      a.dirty = false;
+    });
+    requestAnimationFrame(frameLoop);
+  }
+  function onResize() { anims.forEach(a => { a.dirty = true; }); }
+  window.addEventListener('resize', onResize);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(onResize);
+  requestAnimationFrame(frameLoop);
+})();
+</script>
+</body>
+</html>
