@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>8.5 Enhancement MOSFET</title>
+  <meta name="description" content="The n-channel enhancement MOSFET: structure, threshold voltage and the induced channel, the triode region as a resistor, channel tapering and pinch-off, saturation and the square law, symbols and the PMOS. An interactive lesson.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1420;
+      --panel: #1a2132;
+      --panel-hover: #212a3f;
+      --border: #2a3448;
+      --text: #e6e9ef;
+      --muted: #9aa4b8;
+      --electron: #4fc3f7;
+      --hole: #ff8a65;
+      --energy: #ffd54f;
+      --success: #81c784;
+      --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+      --max: 960px;
+      --radius: 12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: var(--font); font-size: 16px; line-height: 1.65;
+      overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column;
+    }
+    a { color: var(--electron); }
+    .wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 16px; }
+
+    /* Sticky mini-nav */
+    .toc {
+      position: sticky; top: 0; z-index: 10; background: rgba(15, 20, 32, .95);
+      border-bottom: 1px solid var(--border); backdrop-filter: blur(6px);
+    }
+    .toc ul { display: flex; gap: 4px; list-style: none; margin: 0 auto; padding: 8px 16px; max-width: var(--max); overflow-x: auto; scrollbar-width: none; }
+    .toc ul::-webkit-scrollbar { display: none; }
+    .toc a {
+      display: block; white-space: nowrap; text-decoration: none; color: var(--muted);
+      font-size: 0.85rem; font-weight: 500; padding: 6px 10px; border-radius: 999px;
+    }
+    .toc a:hover { color: var(--text); background: var(--panel); }
+    .toc a.active { color: var(--bg); background: var(--electron); }
+
+    main { flex: 1; padding: 24px 0 48px; }
+    .crumbs { font-size: 0.875rem; color: var(--muted); margin: 0 0 16px; }
+    .crumbs a { color: var(--muted); }
+    .crumbs a:hover { color: var(--electron); }
+    .eyebrow { font-family: var(--mono); font-size: 0.8rem; color: var(--electron); letter-spacing: .04em; margin: 0; }
+    h1 { font-size: clamp(1.5rem, 6vw, 2.2rem); line-height: 1.2; margin: 4px 0 6px; }
+    .subtitle { color: var(--muted); margin: 0 0 8px; }
+    section { scroll-margin-top: 64px; padding-top: 28px; }
+    h2 { font-size: clamp(1.3rem, 5vw, 1.6rem); line-height: 1.25; margin: 0 0 14px; }
+    h3 { font-size: 1.05rem; margin: 0 0 8px; }
+    .prose { font-size: 17px; line-height: 1.7; max-width: 70ch; }
+    .prose p, .prose ul, .prose ol { margin: 0 0 14px; }
+    .prose ul, .prose ol { padding-left: 22px; }
+    .prose li { margin: 4px 0; }
+    .prose strong { color: #fff; }
+    .prose p.eq { text-align: center; font-family: var(--mono); font-size: 16px; background: #141b2b; border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; overflow-wrap: anywhere; }
+    hr.sep { border: 0; border-top: 1px solid var(--border); margin: 40px 0 0; }
+    .rm-note { font-size: 0.78rem; color: var(--muted); margin: 0 0 8px; }
+
+    /* Buttons & controls */
+    .btn {
+      font: inherit; font-size: 0.88rem; font-weight: 600; color: var(--text);
+      background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+      padding: 7px 12px; cursor: pointer; min-height: 38px;
+    }
+    .btn:hover:not(:disabled) { background: var(--panel-hover); border-color: var(--electron); }
+    .btn:focus-visible, input:focus-visible, canvas:focus-visible { outline: 2px solid var(--electron); outline-offset: 2px; }
+    .btn[aria-pressed="true"] { background: rgba(255,213,79,.14); border-color: var(--energy); color: var(--energy); }
+    .seg { display: inline-flex; gap: 0; flex-wrap: nowrap; }
+    .seg .btn { border-radius: 0; padding: 7px 10px; }
+    .seg .btn:first-child { border-radius: 8px 0 0 8px; }
+    .seg .btn:last-child { border-radius: 0 8px 8px 0; }
+    .seg .btn + .btn { margin-left: -1px; }
+    .glabel { font-size: 0.8rem; font-weight: 700; color: var(--muted); }
+
+    figure.anim {
+      margin: 18px 0 0; background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 12px; min-width: 0;
+    }
+    .ctrls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-bottom: 12px; }
+    .slider { flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; }
+    .slider label { display: flex; justify-content: space-between; gap: 8px; font-size: 0.8rem; color: var(--muted); }
+    .slider output { font-family: var(--mono); color: var(--energy); white-space: nowrap; }
+    .slider[hidden] { display: none; }
+    input[type="range"] { width: 100%; accent-color: var(--energy); margin: 4px 0 0; }
+    canvas { display: block; width: 100%; border-radius: 8px; background: #141b2b; }
+    canvas.drag { cursor: crosshair; touch-action: none; }
+    .narrow { max-width: 760px; margin-left: auto; margin-right: auto; }
+    .inset { margin-top: 10px; }
+
+    .counters { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px auto 0; }
+    .ctr {
+      flex: 1 1 100px; background: #141b2b; border: 1px solid var(--border); border-radius: 8px;
+      padding: 6px 10px; font-size: 0.78rem; color: var(--muted); min-width: 0;
+    }
+    .ctr b { display: block; font-family: var(--mono); font-size: 1.02rem; font-weight: 500; white-space: nowrap; color: var(--text); overflow: hidden; text-overflow: ellipsis; }
+    .ctr.v b { color: var(--energy); } .ctr.q b { color: var(--hole); } .ctr.cur b { color: var(--success); }
+    .ctr.gm b { color: #4fc3f7; } .ctr.rd b { color: #ffb74d; } .ctr.mu b { color: #81c784; }
+    .ctr.rd.ohm b { color: #4fc3f7; }
+
+    .badges { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 10px auto 0; }
+    .bdg { font-size: 0.82rem; font-weight: 700; border-radius: 999px; padding: 4px 12px; border: 1.5px solid; white-space: normal; }
+    .bdg.r-ohm { color: #4fc3f7; border-color: #4fc3f7; background: rgba(2,119,189,.2); }
+    .bdg.r-sat { color: #66bb6a; border-color: #66bb6a; background: rgba(27,94,32,.35); }
+
+    .keypoints {
+      margin-top: 16px; padding: 14px 16px; border-radius: var(--radius);
+      background: rgba(129,199,132,.07); border: 1px solid rgba(129,199,132,.35);
+    }
+    .keypoints h3 { color: var(--success); font-size: 0.95rem; text-transform: uppercase; letter-spacing: .05em; }
+    .keypoints ul { margin: 0; padding-left: 20px; }
+    .keypoints li { margin: 4px 0; }
+
+    .formulas { margin: 14px 0 0; background: #141b2b; border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; }
+    .formulas h3 { color: var(--energy); font-size: .9rem; text-transform: uppercase; letter-spacing: .05em; }
+    .formulas ul { margin: 0; padding-left: 20px; font-family: var(--mono); font-size: .9rem; }
+    .formulas li { margin: 4px 0; overflow-wrap: anywhere; }
+
+    .pager { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 48px; }
+    .pager a {
+      display: block; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 12px 14px; text-decoration: none; color: var(--text); min-width: 0;
+    }
+    .pager a:hover { border-color: var(--electron); }
+    .pager small { display: block; color: var(--muted); font-size: 0.75rem; }
+    .pager .next { text-align: right; }
+    .site-foot { border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; text-align: center; padding: 18px 16px; }
+
+    /* Justified paragraphs on desktop; phones stay left-aligned to avoid wide word gaps. */
+    @media (min-width: 768px) {
+      .prose p, .prose li, .keypoints li { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+      .prose p.eq { text-align: center; }
+    }
+    /* Topic 8.5 */
+    .bdg.r-cut { color: #d0d0d0; border-color: #9aa4b8; background: rgba(66,66,66,.4); }
+    .bdg.r-tri { color: #4fc3f7; border-color: #4fc3f7; background: rgba(2,119,189,.2); }
+    .bdg.r-sat { color: #66bb6a; border-color: #66bb6a; background: rgba(27,94,32,.35); }
+    .rnote { font-size: .74rem; color: var(--muted); margin: 3px 0 0; }
+    .trk { position: relative; }
+    .vmark { position: absolute; top: -3px; width: 3px; height: 22px; margin-left: -1px; background: #ffd54f; border-radius: 2px; pointer-events: none; }
+    .ctr.wide { flex-basis: 180px; }
+  </style>
+</head>
+<body>
+
+  <nav class="toc" aria-label="Sections">
+    <ul>
+      <li><a href="#s0">Structure</a></li>
+      <li><a href="#s1">Threshold</a></li>
+      <li><a href="#s2">Small VDS</a></li>
+      <li><a href="#s3">Pinch-off</a></li>
+      <li><a href="#s4">Saturation</a></li>
+      <li><a href="#s5">Symbols &amp; PMOS</a></li>
+      <li><a href="#s6">Summary</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="wrap">
+      <header>
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="../../index.html">Home</a> / <a href="../index.html">Unit 8</a> / 8.5
+        </nav>
+        <p class="eyebrow">TOPIC 8.5</p>
+        <h1>Enhancement MOSFET</h1>
+        <p class="subtitle">A normally-off transistor whose channel is created by the gate voltage</p>
+        <p class="rm-note" id="rmNote" hidden>Your device asks for reduced motion, so every animation starts paused. Press Play on any animation to run it. Sliders and buttons still update the picture.</p>
+      </header>
+
+      <!-- ================= SECTION 0 ================= -->
+      <section id="s0" aria-labelledby="h0">
+        <h2 id="h0">Structure of an n-channel enhancement MOSFET</h2>
+        <div class="prose">
+          <p>Take the MOS capacitor of topic 8.4 (gate, thin oxide, p-type substrate) and add two heavily doped <strong>n<sup>+</sup> regions</strong> in the substrate, one on each side of the gate. These are the <strong>SOURCE</strong> and the <strong>DRAIN</strong>. The result is an <strong>n-channel MOSFET</strong> (metal-oxide-semiconductor field-effect transistor).</p>
+          <p>The device has <strong>four terminals</strong>: gate (G), source (S), drain (D) and body or substrate (B). The body is usually connected to the source.</p>
+          <p>The region of substrate under the gate, between source and drain, is where the channel will form. Its length is the <strong>CHANNEL LENGTH L</strong> (the distance from source to drain) and its width is the <strong>CHANNEL WIDTH W</strong>. In modern chips L can be just a few tens of nanometres.</p>
+          <p>With zero gate voltage there is <strong>NO channel</strong>. Between the n<sup>+</sup> source and n<sup>+</sup> drain lies p-type silicon, which forms two <strong>back-to-back PN junctions</strong>. Whatever the polarity of V<sub>DS</sub>, one of them is reverse biased, so no current flows. Because the device is OFF with no gate voltage, and a channel must be created ("enhanced") by the gate voltage, it is called an <strong>ENHANCEMENT MOSFET</strong> or "normally-off" MOSFET.</p>
+        </div>
+
+        <figure class="anim" id="anim0">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <button class="btn" type="button" id="d0" aria-pressed="false">Back-to-back diodes</button>
+          </div>
+          <canvas id="cv0" class="narrow" style="aspect-ratio:600/360" role="img" aria-label="The MOSFET cross-section builds up: p-type substrate, n+ source and drain, thin oxide, gate, then the S, G and D contacts and the body contact B tied to the source. The channel length L is marked and a small top view shows L and W. With VGS = 0 and VDS = 5 V a reverse-biased depletion region surrounds the drain and the ID meter reads 0. The diodes overlay shows the two junction diodes back to back."></canvas>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr v">V<sub>GS</sub><b id="c0g">0 V</b></div><div class="ctr v">V<sub>DS</sub><b id="c0d">5 V</b></div><div class="ctr cur">I<sub>D</sub><b id="c0i">0</b></div>
+          </div>
+        </figure>
+        <aside class="keypoints" aria-label="Key points: structure">
+          <h3>Key points</h3>
+          <ul>
+            <li>MOS capacitor + two n<sup>+</sup> regions = n-channel MOSFET (source and drain).</li>
+            <li>Four terminals: G, S, D and B; the body is usually tied to the source.</li>
+            <li>Channel length L (source to drain) and width W; L can be tens of nanometres.</li>
+            <li>At V<sub>GS</sub> = 0 two back-to-back junctions block current: normally off.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 1 ================= -->
+      <section id="s1" aria-labelledby="h1s">
+        <h2 id="h1s">Creating the channel: the threshold voltage</h2>
+        <div class="prose">
+          <p>Apply a positive voltage V<sub>GS</sub> between gate and source (keep V<sub>DS</sub> small). As in the MOS capacitor, holes are pushed away from the surface under the gate, creating a depletion region. When V<sub>GS</sub> reaches the <strong>THRESHOLD VOLTAGE V<sub>T</sub></strong>, an inversion layer of electrons forms at the surface. This thin n-type layer <strong>CONNECTS</strong> the n<sup>+</sup> source to the n<sup>+</sup> drain: a conducting channel now exists. Because it is created by the gate, it is called an <strong>INDUCED channel</strong>.</p>
+          <p>The larger V<sub>GS</sub> is above V<sub>T</sub>, the more electrons are in the channel (charge ≈ C<sub>ox</sub>·(V<sub>GS</sub> − V<sub>T</sub>) per unit area), so the channel conducts better. The quantity V<sub>GS</sub> − V<sub>T</sub> is called the <strong>OVERDRIVE voltage</strong> (or effective voltage).</p>
+          <p>Typical V<sub>T</sub> values are a few tenths of a volt in modern chips and about 1 to 4 V in discrete power MOSFETs. We use <strong>V<sub>T</sub> = 1 V</strong>.</p>
+          <p>The threshold voltage also rises if the source is at a higher voltage than the body (the <strong>BODY EFFECT</strong>), which is why the body is usually tied to the source in discrete circuits.</p>
+        </div>
+
+        <figure class="anim" id="anim1">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="slider">
+              <label for="a1"><span>Gate voltage V<sub>GS</sub> (V<sub>DS</sub> = 0.1 V)</span><output id="a1o" for="a1">2.00 V</output></label>
+              <input type="range" id="a1" min="0" max="5" step="0.01" value="2">
+            </div>
+          </div>
+          <canvas id="cv1" class="narrow" style="aspect-ratio:600/330" role="img" aria-label="Cross-section with VDS = 0.1 V. Below VT the depletion region under the gate grows and there is no channel. At VT a thin cyan channel links source and drain; above VT it thickens and more electrons stream from source to drain."></canvas>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr v">V<sub>GS</sub><b id="c1g"></b></div><div class="ctr ">V<sub>T</sub><b id="c1t">1.00 V</b></div><div class="ctr ">Overdrive V<sub>GS</sub> − V<sub>T</sub><b id="c1o"></b></div><div class="ctr cur">I<sub>D</sub><b id="c1i"></b></div>
+          </div>
+        </figure>
+        <aside class="keypoints" aria-label="Key points: threshold">
+          <h3>Key points</h3>
+          <ul>
+            <li>At V<sub>GS</sub> = V<sub>T</sub> an inversion layer links source and drain: an induced channel.</li>
+            <li>Channel charge ≈ C<sub>ox</sub>(V<sub>GS</sub> − V<sub>T</sub>) per unit area.</li>
+            <li>V<sub>GS</sub> − V<sub>T</sub> is the overdrive voltage; here V<sub>T</sub> = 1 V.</li>
+            <li>A source above the body raises V<sub>T</sub> (body effect).</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 2 ================= -->
+      <section id="s2" aria-labelledby="h2s">
+        <h2 id="h2s">Small V<sub>DS</sub>: the MOSFET as a resistor</h2>
+        <div class="prose">
+          <p>With a channel present and a small V<sub>DS</sub>, the channel has nearly the same thickness everywhere, and it behaves like a <strong>resistor</strong>. The drain current is proportional to V<sub>DS</sub>:</p>
+          <p class="eq">I<sub>D</sub> ≈ 2·K<sub>n</sub>·(V<sub>GS</sub> − V<sub>T</sub>)·V<sub>DS</sub></p>
+          <p>The channel resistance is r<sub>DS</sub> = 1 / [2·K<sub>n</sub>·(V<sub>GS</sub> − V<sub>T</sub>)], which <strong>DECREASES</strong> as V<sub>GS</sub> increases. This is the <strong>TRIODE</strong> (or linear, or ohmic) region. The MOSFET can be used as a voltage-controlled resistor or, when V<sub>GS</sub> is large, as a closed switch with a low on-resistance.</p>
+          <p>Example: with K<sub>n</sub> = 0.5 mA/V² and V<sub>GS</sub> = 5 V, r<sub>DS</sub> = 1 / (2 × 0.5 mA/V² × 4 V) = <strong>250 Ω</strong>.</p>
+        </div>
+
+        <figure class="anim" id="anim2">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="slider">
+              <label for="a2"><span>Gate voltage V<sub>GS</sub></span><output id="a2o" for="a2">5.0 V</output></label>
+              <input type="range" id="a2" min="1" max="5" step="0.1" value="5">
+            </div>
+          </div>
+          <canvas id="cv2" class="narrow" style="aspect-ratio:600/400" role="img" aria-label="ID against VDS from 0 to 0.5 V for VGS = 2, 3, 4 and 5 V: nearly straight lines through the origin. The line for the chosen VGS is highlighted and a resistor icon below shortens as rDS falls."></canvas>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr v">V<sub>GS</sub><b id="c2g"></b></div><div class="ctr ">Overdrive<b id="c2o"></b></div><div class="ctr q">r<sub>DS</sub> = 1/[2K<sub>n</sub>(V<sub>GS</sub> − V<sub>T</sub>)]<b id="c2r"></b></div>
+          </div>
+        </figure>
+        <aside class="keypoints" aria-label="Key points: triode at small VDS">
+          <h3>Key points</h3>
+          <ul>
+            <li>At small V<sub>DS</sub> the channel is uniform and acts as a resistor.</li>
+            <li>I<sub>D</sub> ≈ 2K<sub>n</sub>(V<sub>GS</sub> − V<sub>T</sub>)V<sub>DS</sub>: straight lines through the origin.</li>
+            <li>r<sub>DS</sub> = 1/[2K<sub>n</sub>(V<sub>GS</sub> − V<sub>T</sub>)] falls as V<sub>GS</sub> rises; 250 Ω at V<sub>GS</sub> = 5 V.</li>
+            <li>Used as a voltage-controlled resistor or a closed switch.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 3 ================= -->
+      <section id="s3" aria-labelledby="h3s">
+        <h2 id="h3s">Larger V<sub>DS</sub>: channel tapering and pinch-off</h2>
+        <div class="prose">
+          <p>As V<sub>DS</sub> increases, the voltage inside the channel rises from 0 at the source to V<sub>DS</sub> at the drain. The gate-to-channel voltage is therefore V<sub>GS</sub> at the source end but only V<sub>GS</sub> − V<sub>DS</sub> at the drain end. Fewer electrons are induced near the drain, so the channel <strong>TAPERS</strong>, becoming thinner toward the drain. The resistance increases and the I<sub>D</sub>-V<sub>DS</sub> curve bends.</p>
+          <p>The full triode equation is:</p>
+          <p class="eq">I<sub>D</sub> = K<sub>n</sub>·[2(V<sub>GS</sub> − V<sub>T</sub>)·V<sub>DS</sub> − V<sub>DS</sub>²]</p>
+          <p>When the gate-to-drain voltage falls to V<sub>T</sub>, the channel just disappears at the drain end. This is <strong>PINCH-OFF</strong>, and it happens at:</p>
+          <p class="eq">V<sub>DS(sat)</sub> = V<sub>GS</sub> − V<sub>T</sub></p>
+          <p>For V<sub>GS</sub> = 3 V and V<sub>T</sub> = 1 V, pinch-off occurs at V<sub>DS</sub> = 2 V.</p>
+          <p>As with the JFET, current still flows: electrons reaching the pinch-off point are swept across the short depleted region to the drain by the strong field there.</p>
+        </div>
+
+        <figure class="anim" id="anim3">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="slider">
+              <label for="a3g"><span>Gate voltage V<sub>GS</sub></span><output id="a3go" for="a3g">3.00 V</output></label>
+              <input type="range" id="a3g" min="0" max="5" step="0.01" value="3">
+            </div>
+            <div class="slider">
+              <label for="a3d"><span>Drain voltage V<sub>DS</sub></span><output id="a3do" for="a3d">1.00 V</output></label>
+              <div class="trk"><input type="range" id="a3d" min="0" max="10" step="0.01" value="1"><span class="vmark" id="m3"></span></div><div class="rnote" id="m3t"></div>
+            </div>
+          </div>
+          <div class="badges narrow" aria-live="polite"><span class="bdg r-sat" id="b3"></span></div>
+          <canvas id="cv3" class="narrow" style="aspect-ratio:600/330" role="img" aria-label="Cross-section with the channel drawn tapered from the model: thick at the source, thinner toward the drain. At VDS = VGS − VT its drain end reaches zero thickness; beyond that a small pinched gap opens at the drain end and electrons cross it as fast streaks."></canvas>
+          <canvas id="cv3b" class="narrow inset" style="aspect-ratio:600/270" role="img" aria-label="ID against VDS for the chosen VGS with the triode and saturation parts shaded, the pinch-off point marked by a dot and the operating point shown."></canvas>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr ">V<sub>DS</sub>(sat)<b id="c3s"></b></div><div class="ctr cur">I<sub>D</sub><b id="c3i"></b></div>
+          </div>
+        </figure>
+        <aside class="keypoints" aria-label="Key points: pinch-off">
+          <h3>Key points</h3>
+          <ul>
+            <li>The channel voltage rises from 0 at the source to V<sub>DS</sub> at the drain, so the channel tapers.</li>
+            <li>Triode: I<sub>D</sub> = K<sub>n</sub>[2(V<sub>GS</sub> − V<sub>T</sub>)V<sub>DS</sub> − V<sub>DS</sub>²]; the curve bends.</li>
+            <li>Pinch-off at V<sub>DS(sat)</sub> = V<sub>GS</sub> − V<sub>T</sub> (2 V for V<sub>GS</sub> = 3 V).</li>
+            <li>Electrons are swept across the pinched region, so current keeps flowing.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 4 ================= -->
+      <section id="s4" aria-labelledby="h4s">
+        <h2 id="h4s">Saturation: the square law</h2>
+        <div class="prose">
+          <p>Beyond pinch-off, increasing V<sub>DS</sub> hardly changes the current, because the voltage across the channel stays at about V<sub>GS</sub> − V<sub>T</sub>; the extra drain voltage is dropped across the small pinched region. The drain current <strong>SATURATES</strong> at:</p>
+          <p class="eq">I<sub>D</sub> = K<sub>n</sub> · (V<sub>GS</sub> − V<sub>T</sub>)²</p>
+          <p>where K<sub>n</sub> = ½·μ<sub>n</sub>·C<sub>ox</sub>·(W/L). This is the <strong>SQUARE LAW</strong> of the MOSFET. A wider (larger W) or shorter (smaller L) transistor gives more current.</p>
+          <p>Example (K<sub>n</sub> = 0.5 mA/V², V<sub>T</sub> = 1 V): V<sub>GS</sub> = 3 V gives I<sub>D</sub> = 0.5 × 2² = <strong>2 mA</strong>; V<sub>GS</sub> = 5 V gives <strong>8 mA</strong>.</p>
+          <p>In reality the pinch-off point moves slightly toward the source as V<sub>DS</sub> increases, making the effective channel shorter, so I<sub>D</sub> still rises a little. This <strong>CHANNEL-LENGTH MODULATION</strong> is modelled by:</p>
+          <p class="eq">I<sub>D</sub> = K<sub>n</sub>·(V<sub>GS</sub> − V<sub>T</sub>)²·(1 + λ·V<sub>DS</sub>)</p>
+          <p>The saturation region is used for <strong>AMPLIFIERS</strong>. (Note: MOSFET "saturation" corresponds to the BJT "active" region, not to BJT saturation.)</p>
+        </div>
+
+        <figure class="anim" id="anim4">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="slider">
+              <label for="a4k"><span>W/L (sets K<sub>n</sub>)</span><output id="a4ko" for="a4k">0.50 mA/V²</output></label>
+              <input type="range" id="a4k" min="0.1" max="2" step="0.05" value="0.5">
+            </div>
+            <span class="glabel">λ</span><div class="seg" role="group" aria-label="Channel-length modulation λ"><button class="btn" type="button" data-l="0">0</button><button class="btn" type="button" data-l="0.01">0.01</button><button class="btn" type="button" data-l="0.05">0.05 /V</button></div>
+          </div>
+          <canvas id="cv4" class="narrow" style="aspect-ratio:600/400" role="img" aria-label="Output characteristics for VGS = 2, 3, 4 and 5 V with the dashed pinch-off boundary separating triode on the left from saturation on the right. W/L scales all the curves; λ makes the saturation parts flat or sloped. A small top view of the transistor gets wider as W/L grows."></canvas>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr ">K<sub>n</sub><b id="c4k"></b></div><div class="ctr ">W/L (relative)<b id="c4w"></b></div><div class="ctr cur">K<sub>n</sub>(V<sub>GS</sub> − V<sub>T</sub>)² at 3 V<b id="c4a"></b></div><div class="ctr cur">at 5 V<b id="c4b"></b></div>
+          </div>
+        </figure>
+        <aside class="keypoints" aria-label="Key points: saturation">
+          <h3>Key points</h3>
+          <ul>
+            <li>Beyond pinch-off: I<sub>D</sub> = K<sub>n</sub>(V<sub>GS</sub> − V<sub>T</sub>)², the square law.</li>
+            <li>K<sub>n</sub> = ½μ<sub>n</sub>C<sub>ox</sub>(W/L): wider or shorter means more current.</li>
+            <li>Channel-length modulation: a slight rise, (1 + λV<sub>DS</sub>).</li>
+            <li>MOSFET saturation is used for amplifiers (like the BJT active region).</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 5 ================= -->
+      <section id="s5" aria-labelledby="h5s">
+        <h2 id="h5s">Symbols and the p-channel MOSFET</h2>
+        <div class="prose">
+          <p>The enhancement MOSFET symbol has a gate line separated from the channel (showing the insulating oxide), and the channel line is drawn <strong>BROKEN</strong> into three segments, showing that no channel exists until it is induced. The body terminal has an arrow: pointing <strong>IN</strong> for n-channel (from p body to n channel), pointing <strong>OUT</strong> for p-channel. Simplified symbols used in digital circuits often omit the body and instead show an arrow on the source, or a small circle on the gate for the p-channel device.</p>
+          <p>A <strong>P-CHANNEL</strong> enhancement MOSFET (PMOS) is the complement: n-type substrate, p<sup>+</sup> source and drain, and a channel of <strong>HOLES</strong> induced by a <strong>NEGATIVE</strong> gate voltage. Its threshold voltage is negative (for example V<sub>T</sub> = −1 V), and it conducts when V<sub>GS</sub> &lt; V<sub>T</sub>. All voltages and currents are reversed. Holes have lower mobility than electrons (about two to three times lower in silicon), so a PMOS must be made <strong>wider</strong> than an NMOS to carry the same current. Using NMOS and PMOS together gives <strong>CMOS</strong> (topic 8.12).</p>
+        </div>
+
+        <figure class="anim" id="anim5">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="seg" role="group" aria-label="Device"><button class="btn" type="button" data-m="n">NMOS</button><button class="btn" type="button" data-m="p">PMOS</button></div>
+            <div class="slider">
+              <label for="a5g"><span>Gate drive |V<sub>GS</sub>| (V<sub>DS</sub> = ±0.1 V)</span><output id="a5go" for="a5g">3.00 V</output></label>
+              <input type="range" id="a5g" min="0" max="5" step="0.01" value="3">
+            </div>
+            <div class="slider">
+              <label for="a5w"><span>PMOS width W<sub>p</sub>/W<sub>n</sub></span><output id="a5wo" for="a5w">× 1.00</output></label>
+              <input type="range" id="a5w" min="1" max="4" step="0.05" value="1"><div class="rnote">Equal currents at about × 2.5 (mobility ratio 2.5)</div>
+            </div>
+          </div>
+          <canvas id="cv5" class="narrow" style="aspect-ratio:600/330" role="img" aria-label="Cross-section that switches between NMOS (p-substrate, n+ source and drain, electron channel for positive VGS) and PMOS (n-substrate, p+ source and drain, hole channel for negative VGS)."></canvas>
+          <canvas id="cv5b" class="narrow inset" style="aspect-ratio:600/420" role="img" aria-label="Symbols: four-terminal NMOS and PMOS with the broken channel line highlighted and the body arrow pointing in for NMOS and out for PMOS; simplified three-terminal NMOS with an arrow on the source and PMOS with a circle on the gate."></canvas>
+          <canvas id="cv5c" class="narrow inset" style="aspect-ratio:600/300" role="img" aria-label="Width comparison: an NMOS and a PMOS drawn side by side with bars for their currents. The PMOS width slider makes the PMOS wider until the two currents are equal, at about 2.5 times the width."></canvas>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr v">V<sub>GS</sub><b id="c5g"></b></div><div class="ctr ">V<sub>T</sub><b id="c5t"></b></div><div class="ctr cur">I<sub>D</sub><b id="c5i"></b></div><div class="ctr ">I<sub>p</sub>/I<sub>n</sub><b id="c5r"></b></div>
+          </div>
+        </figure>
+        <aside class="keypoints" aria-label="Key points: symbols and PMOS">
+          <h3>Key points</h3>
+          <ul>
+            <li>Broken channel line = enhancement (no channel until induced); the gate line is separate.</li>
+            <li>Body arrow points in for NMOS, out for PMOS.</li>
+            <li>PMOS: n-substrate, p<sup>+</sup> source and drain, hole channel, V<sub>T</sub> negative.</li>
+            <li>Holes are slower, so a PMOS is made about 2 to 3 times wider; together they form CMOS.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 6 ================= -->
+      <section id="s6" aria-labelledby="h6s">
+        <h2 id="h6s">Summary</h2>
+        <div class="prose">
+          <p>An n-channel enhancement MOSFET has <strong>no channel at V<sub>GS</sub> = 0</strong>. When V<sub>GS</sub> exceeds V<sub>T</sub>, an inversion layer links source and drain. For small V<sub>DS</sub> it acts as a resistor controlled by V<sub>GS</sub> (<strong>triode</strong>). At V<sub>DS</sub> = V<sub>GS</sub> − V<sub>T</sub> the channel pinches off at the drain, and beyond that I<sub>D</sub> <strong>saturates</strong> at K<sub>n</sub>(V<sub>GS</sub> − V<sub>T</sub>)². The broken channel line in the symbol marks it as an enhancement device. PMOS works the same way with all polarities reversed.</p>
+        </div>
+
+        <figure class="anim" id="anim6">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="slider">
+              <label for="a6g"><span>Gate voltage V<sub>GS</sub></span><output id="a6go" for="a6g">3.00 V</output></label>
+              <input type="range" id="a6g" min="0" max="5" step="0.01" value="3">
+            </div>
+            <div class="slider">
+              <label for="a6d"><span>Drain voltage V<sub>DS</sub></span><output id="a6do" for="a6d">4.00 V</output></label>
+              <input type="range" id="a6d" min="0" max="10" step="0.01" value="4">
+            </div>
+          </div>
+          <div class="badges narrow" aria-live="polite"><span class="bdg r-sat" id="b6"></span></div>
+          <canvas id="cv6" class="narrow" style="aspect-ratio:600/330" role="img" aria-label="Playground cross-section with the channel drawn from the model for the chosen VGS and VDS."></canvas>
+          <canvas id="cv6b" class="narrow inset" style="aspect-ratio:600/330" role="img" aria-label="Output characteristics with the operating point moving on the curve for the chosen VGS, and the NMOS symbol whose broken channel line lights up when a channel exists."></canvas>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr cur">I<sub>D</sub><b id="c6i"></b></div><div class="ctr ">Overdrive<b id="c6s"></b></div>
+          </div>
+        </figure>
+        <div class="formulas" aria-label="Key formulas">
+          <h3>Key formulas</h3>
+          <ul>
+            <li>Cutoff, V<sub>GS</sub> &lt; V<sub>T</sub>: I<sub>D</sub> = 0</li>
+            <li>Triode: I<sub>D</sub> = K<sub>n</sub>[2(V<sub>GS</sub> − V<sub>T</sub>)V<sub>DS</sub> − V<sub>DS</sub>²]</li>
+            <li>Saturation: I<sub>D</sub> = K<sub>n</sub>(V<sub>GS</sub> − V<sub>T</sub>)²(1 + λV<sub>DS</sub>)</li>
+            <li>K<sub>n</sub> = ½μ<sub>n</sub>C<sub>ox</sub>(W/L)</li>
+            <li>V<sub>DS(sat)</sub> = V<sub>GS</sub> − V<sub>T</sub></li>
+            <li>r<sub>DS</sub> ≈ 1/[2K<sub>n</sub>(V<sub>GS</sub> − V<sub>T</sub>)]</li>
+          </ul>
+        </div>
+        <aside class="keypoints" aria-label="Key points: summary">
+          <h3>Key points</h3>
+          <ul>
+            <li>No channel at V<sub>GS</sub> = 0; above V<sub>T</sub> an inversion layer links S and D.</li>
+            <li>Small V<sub>DS</sub>: triode, a resistor controlled by V<sub>GS</sub>.</li>
+            <li>V<sub>DS</sub> ≥ V<sub>GS</sub> − V<sub>T</sub>: pinch-off, I<sub>D</sub> saturates at K<sub>n</sub>(V<sub>GS</sub> − V<sub>T</sub>)².</li>
+            <li>Broken channel line = enhancement; PMOS has all polarities reversed.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <nav class="pager" aria-label="Topic navigation">
+        <a href="../8-4-mos-capacitor/index.html"><small>← Previous</small>8.4 MOSFET Basics: the MOS Capacitor</a>
+        <a class="next" href="../8-6-depletion-mosfet/index.html"><small>Next →</small>8.6 Depletion MOSFET</a>
+      </nav>
+    </div>
+  </main>
+
+  <footer class="site-foot">© 2026 Naveen Bokka</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  const C = {
+    text: '#e6e9ef', muted: '#9aa4b8', v: '#ffd54f', cur: '#81c784', wire: '#cfd8dc', tan: '#ce93d8', q: '#ff8a65',
+    grid: 'rgba(255,255,255,.07)'
+  };
+  const FONT = 'Inter, system-ui, sans-serif';
+  const MONO = '"JetBrains Mono", Consolas, monospace';
+  const RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const TAU = Math.PI * 2;
+  const $ = id => document.getElementById(id);
+  if (RM) $('rmNote').hidden = false;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const lerp = (a, b, u) => a + (b - a) * u;
+  const ease = u => { u = clamp(u, 0, 1); return u * u * (3 - 2 * u); };
+
+  const fV = (v, d) => (v < -1e-9 ? '−' : '') + Math.abs(v).toFixed(d == null ? 2 : d) + ' V';
+  const fN = (v, d) => (v < -1e-9 ? '−' : '') + Math.abs(v).toFixed(d || 0);
+  const fmA = i => (i * 1e3).toFixed(2) + ' mA';
+  const fmS = g => (g * 1e3).toFixed(2) + ' mS';
+  const fR = r => !isFinite(r) || r > 1e9 ? '∞' : r >= 1e6 ? (r / 1e6).toFixed(2) + ' MΩ' : r >= 1e3 ? (r / 1e3).toFixed(r >= 1e5 ? 0 : 1) + ' kΩ' : r.toFixed(0) + ' Ω';
+  const fMu = m => !isFinite(m) || m > 1e6 ? '∞' : m >= 100 ? m.toFixed(0) : m.toFixed(1);
+
+  /* ---------- Canvas helpers ---------- */
+  let FS = 1;
+  function Cv(id, W, H, cap) { this.el = $(id); this.W = W; this.H = H; this.cap = cap || 2; this.ctx = this.el.getContext('2d'); }
+  Cv.prototype.begin = function () {
+    const w = this.el.clientWidth; if (!w) return null;
+    const dpr = window.devicePixelRatio || 1;
+    const pw = Math.round(w * dpr), ph = Math.round(w * dpr * this.H / this.W);
+    if (this.el.width !== pw || this.el.height !== ph) { this.el.width = pw; this.el.height = ph; }
+    const c = this.ctx, s = pw / this.W;
+    FS = Math.min(this.cap, Math.max(1, 1.15 * this.W / w));
+    c.setTransform(s, 0, 0, s, 0, 0); c.clearRect(0, 0, this.W, this.H);
+    c.textBaseline = 'middle'; c.textAlign = 'left'; c.globalAlpha = 1; c.setLineDash([]); c.lineCap = 'butt'; c.shadowBlur = 0;
+    return c;
+  };
+  // Watermark: drawn inside the canvas, bottom-right, 13 px on screen at any size.
+  Cv.prototype.wm = function (c) {
+    const k = this.W / this.el.clientWidth, s = 13 * k;
+    c.save(); c.setTransform(this.el.width / this.W, 0, 0, this.el.width / this.W, 0, 0);
+    c.globalAlpha = 1; c.shadowBlur = 0; c.font = '500 ' + s.toFixed(1) + 'px ' + FONT; c.fillStyle = 'rgba(255,255,255,.35)';
+    c.textAlign = 'right'; c.textBaseline = 'bottom'; c.fillText('© Naveen Bokka', this.W - 6 * k, this.H - 4 * k); c.restore();
+  };
+  Cv.prototype.pt = function (e) {
+    const r = this.el.getBoundingClientRect();
+    return { x: (e.clientX - r.left) * this.W / r.width, y: (e.clientY - r.top) * this.H / r.height };
+  };
+  function circ(c, x, y, r, fill, stroke, lw) {
+    c.beginPath(); c.arc(x, y, Math.max(0, r), 0, TAU);
+    if (fill) { c.fillStyle = fill; c.fill(); }
+    if (stroke) { c.strokeStyle = stroke; c.lineWidth = lw || 1.5; c.stroke(); }
+  }
+  function txt(c, s, x, y, col, size, weight, align, font) {
+    c.font = (weight || 600) + ' ' + ((size || 12) * FS).toFixed(1) + 'px ' + (font || FONT);
+    c.fillStyle = col || C.text; c.textAlign = align || 'left'; c.fillText(s, x, y);
+  }
+  // Label made of [main, subscript] parts, e.g. [['g','m'],[' = 2.5 mS','']]
+  function subs(c, parts, x, y, col, size, align) {
+    const z = (size || 13) * FS, zs = z * 0.72;
+    let w = 0;
+    const ws = parts.map(p => {
+      c.font = '700 ' + z.toFixed(1) + 'px ' + FONT; const a = c.measureText(p[0]).width;
+      c.font = '700 ' + zs.toFixed(1) + 'px ' + FONT; const b = p[1] ? c.measureText(p[1]).width : 0;
+      w += a + b; return [a, b];
+    });
+    let x0 = align === 'right' ? x - w : align === 'center' ? x - w / 2 : x;
+    c.fillStyle = col; c.textAlign = 'left';
+    parts.forEach((p, k) => {
+      c.font = '700 ' + z.toFixed(1) + 'px ' + FONT; c.fillText(p[0], x0, y); x0 += ws[k][0];
+      if (p[1]) { c.font = '700 ' + zs.toFixed(1) + 'px ' + FONT; c.fillText(p[1], x0, y + z * 0.3); x0 += ws[k][1]; }
+    });
+    return w;
+  }
+  function line(c, x0, y0, x1, y1, col, lw, dash) {
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []);
+    c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke(); c.setLineDash([]);
+  }
+  function pline(c, pts, col, lw, dash) {
+    if (pts.length < 2) return;
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []); c.lineJoin = 'round';
+    c.beginPath(); pts.forEach((p, k) => k ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); c.stroke(); c.setLineDash([]);
+  }
+  function gline(c, pts, col, lw) { c.save(); c.shadowColor = col; c.shadowBlur = 5; pline(c, pts, col, lw || 2.6); c.restore(); }
+  function arrow(c, x0, y0, x1, y1, col, lw, head) {
+    const dx = x1 - x0, dy = y1 - y0, L = Math.hypot(dx, dy); if (L < 2) return;
+    const ux = dx / L, uy = dy / L, hs = Math.min(head || 10, L * 0.8), hw = Math.max(hs * 0.55, lw * 0.9);
+    line(c, x0, y0, x1 - ux * hs * 0.9, y1 - uy * hs * 0.9, col, lw || 3);
+    c.fillStyle = col; c.beginPath(); c.moveTo(x1, y1);
+    c.lineTo(x1 - ux * hs - uy * hw, y1 - uy * hs + ux * hw);
+    c.lineTo(x1 - ux * hs + uy * hw, y1 - uy * hs - ux * hw); c.closePath(); c.fill();
+  }
+  function poly(c, pts, fill, stroke, lw) {
+    c.beginPath(); c.moveTo(pts[0][0], pts[0][1]); for (let k = 1; k < pts.length; k++) c.lineTo(pts[k][0], pts[k][1]); c.closePath();
+    if (fill) { c.fillStyle = fill; c.fill(); }
+    if (stroke) { c.strokeStyle = stroke; c.lineWidth = lw || 1.2; c.stroke(); }
+  }
+  function qDot(c, x, y, r) {
+    c.save(); c.shadowColor = C.q; c.shadowBlur = 16; circ(c, x, y, r || 7, C.q); c.restore();
+    circ(c, x, y, r || 7, null, '#fff', 1.6);
+  }
+  function segSel(root, attr, val) {
+    root.querySelectorAll('[data-' + attr + ']').forEach(b => b.setAttribute('aria-pressed', String(b.dataset[attr] === String(val))));
+  }
+  function onDrag(cv, f, start) {
+    let d = false;
+    cv.el.addEventListener('pointerdown', e => { d = true; cv.el.setPointerCapture(e.pointerId); if (start) start(); f(cv.pt(e)); e.preventDefault(); });
+    cv.el.addEventListener('pointermove', e => { if (d) f(cv.pt(e)); });
+    ['pointerup', 'pointercancel'].forEach(tp => cv.el.addEventListener(tp, () => { d = false; }));
+  }
+
+  /* ---------- plotting helpers ---------- */
+  function mkP(l, r, t, b, x0, x1, y0, y1) { const P = { l: l, r: r, t: t, b: b, x0: x0, x1: x1, y0: y0, y1: y1 }; P.X = v => l + (v - x0) / (x1 - x0) * (r - l); P.Y = v => b - (v - y0) / (y1 - y0) * (b - t); P.ix = x => x0 + (x - l) / (r - l) * (x1 - x0); P.iy = y => y0 + (b - y) / (b - t) * (y1 - y0); return P; }
+  // Axes, grid and tick labels; yl is drawn above the y axis, xl under the x axis.
+  function frame(c, P, xs, ys, xf, yf, xl, yl) {
+    xs.forEach(v => { line(c, P.X(v), P.t, P.X(v), P.b, C.grid, 1); if (xf) txt(c, xf(v), P.X(v), P.b + 7 + 6 * FS, C.muted, 10, 500, 'center'); });
+    ys.forEach(v => { line(c, P.l, P.Y(v), P.r, P.Y(v), C.grid, 1); if (yf) txt(c, yf(v), P.l - 7, P.Y(v), C.muted, 10, 500, 'right'); });
+    line(c, P.l, P.b, P.r, P.b, C.muted, 1.5); line(c, P.l, P.t, P.l, P.b, C.muted, 1.5);
+    if (xl) subs(c, xl, (P.l + P.r) / 2, P.b + 16 + 14 * FS, C.muted, 12, 'center');
+    if (yl) subs(c, yl, P.l - 6, P.t - 4 - 8 * FS, C.muted, 12, 'left');
+  }
+  const clip = (c, P) => { c.save(); c.beginPath(); c.rect(P.l, P.t, P.r - P.l, P.b - P.t); c.clip(); };
+  const ticks = (a, b, st) => { const o = []; for (let v = Math.ceil(a / st - 1e-9) * st; v <= b + 1e-9; v += st) o.push(+v.toFixed(6)); return o; };
+  const XG = [['V', 'GS'], [' (V)', '']], XD = [['V', 'DS'], [' (V)', '']], YI = [['I', 'D'], [' (mA)', '']];
+  const mAf = d => v => (v * 1e3).toFixed(d || 0);
+  // Right-angle slope triangle: hypotenuse A→B on a straight line, legs horizontal (yellow) and vertical (green)
+  function slopeTri(c, A, B, hcol, vcol) {
+    const Rc = [B[0], A[1]];
+    poly(c, [A, Rc, B], 'rgba(206,147,216,.13)');
+    line(c, A[0], A[1], Rc[0], Rc[1], hcol, 2.4); line(c, Rc[0], Rc[1], B[0], B[1], vcol, 2.4);
+    const s = 7 * Math.sign(B[0] - A[0] || 1), u = 7 * Math.sign(B[1] - A[1] || -1);
+    pline(c, [[Rc[0] - s, Rc[1]], [Rc[0] - s, Rc[1] + u], [Rc[0], Rc[1] + u]], 'rgba(255,255,255,.5)', 1);
+    return Rc;
+  }
+
+  /* ---------- Animation framework: own Play/Pause/Reset, runs only while visible ---------- */
+  const anims = [];
+  function Anim(rootId, o) {
+    this.root = $(rootId); this.o = o; this.playing = !RM; this.visible = true; this.dirty = true;
+    this.pb = this.root.querySelector('[data-act="play"]');
+    this.pb.addEventListener('click', () => this.setPlaying(!this.playing));
+    this.root.querySelector('[data-act="reset"]').addEventListener('click', () => { o.reset(); this.setPlaying(!RM); });
+    o.reset(); this.sync(); anims.push(this);
+    if ('IntersectionObserver' in window) {
+      this.visible = false;
+      new IntersectionObserver(es => es.forEach(e => { this.visible = e.isIntersecting; if (this.visible) this.dirty = true; }))
+        .observe(this.root);
+    }
+  }
+  Anim.prototype.setPlaying = function (p) { this.playing = p; this.sync(); this.dirty = true; };
+  Anim.prototype.sync = function () { this.pb.textContent = this.playing ? 'Pause' : 'Play'; };
+
+  /* =========================================================
+     n-channel enhancement MOSFET: VT = 1 V, Kn = 0.5 mA/V², λ = 0.01 /V.
+       Cutoff (VGS < VT): ID = 0
+       Triode (VDS < VGS − VT): ID = Kn·[2(VGS − VT)·VDS − VDS²]·(1 + λ·VDS)
+       Saturation:              ID = Kn·(VGS − VT)²·(1 + λ·VDS)
+       (the (1 + λ·VDS) factor is applied in triode too so the curves join at pinch-off)
+     Channel drawing (gradual channel): local thickness ∝ VGS − V(x) − VT, with
+       V(x) from 0 at the source to min(VDS, VGS − VT) at the pinch-off point.
+     ========================================================= */
+  const VT = 1, KN = 0.5e-3, LAM = 0.01;
+  function idOf(vgs, vds, kn, lam) {
+    kn = kn == null ? KN : kn; lam = lam == null ? LAM : lam;
+    const vov = vgs - VT; if (vov <= 0 || vds <= 0) return 0;
+    return (vds < vov ? kn * (2 * vov * vds - vds * vds) : kn * vov * vov) * (1 + lam * vds);
+  }
+  const regOf = (vgs, vds) => vgs < VT ? 'cut' : vds < vgs - VT ? 'tri' : 'sat';
+  const RN = { cut: ['r-cut', 'cutoff'], tri: ['r-tri', 'triode'], sat: ['r-sat', 'saturation'] };
+  function setRB(id, r) { const b = $(id); b.className = 'bdg ' + RN[r][0]; b.textContent = RN[r][1]; }
+  function prof(vgs, vds) {   // magnitudes; null when there is no channel
+    const vov = vgs - VT; if (vov <= 0) return null;
+    const vde = Math.min(Math.max(vds, 0), vov), A = 2 * vov * vde - vde * vde, pinch = vds >= vov;
+    const dl = pinch ? Math.min(0.16, 0.022 * (vds - vov)) : 0;
+    return { vov: vov, end: 1 - dl, pinch: pinch, thk: s => s > 1 - dl ? 0 : Math.sqrt(Math.max(0, vov * vov - (s / (1 - dl)) * A)) };
+  }
+  const fI = i => i >= 1e-3 ? (i * 1e3).toFixed(2) + ' mA' : i >= 1e-6 ? (i * 1e6).toFixed(0) + ' µA' : '0';
+  const fVs = (v, d) => (v < -1e-9 ? '−' : '') + Math.abs(v).toFixed(d == null ? 2 : d) + ' V';
+
+  /* ---------- colours and small helpers ---------- */
+  const NC = '#2e4a7d', PC = '#7d3a3a', DEP = '#3a3f4f', OX = '#b0bec5', GATE = '#78909c', CH = '#26c6da', EL = '#4fc3f7', HO = '#ff8a65', MET = '#90a4ae';
+  const VPAL = { 2: '#f06292', 3: '#4db6ac', 4: '#9fa8da', 5: '#ffb74d' };
+  function rrect(c, x, y, w, h, r) { c.beginPath(); if (c.roundRect) c.roundRect(x, y, w, h, r); else c.rect(x, y, w, h); }
+  let HATCH = null;
+  function hatch(c) {
+    if (!HATCH) { const p = document.createElement('canvas'); p.width = 10; p.height = 10; const g = p.getContext('2d'); g.fillStyle = DEP; g.fillRect(0, 0, 10, 10); g.strokeStyle = 'rgba(255,255,255,.18)'; g.lineWidth = 1.2; g.beginPath(); g.moveTo(-2, 12); g.lineTo(12, -2); g.moveTo(-2, 2); g.lineTo(2, -2); g.moveTo(8, 12); g.lineTo(12, 8); g.stroke(); HATCH = p; }
+    return c.createPattern(HATCH, 'repeat');
+  }
+  function ground(c, x, y, s) {
+    s = s || 1; line(c, x, y, x, y + 7 * s, C.wire, 2);
+    line(c, x - 10 * s, y + 7 * s, x + 10 * s, y + 7 * s, C.wire, 2); line(c, x - 6 * s, y + 11 * s, x + 6 * s, y + 11 * s, C.wire, 2); line(c, x - 2 * s, y + 15 * s, x + 2 * s, y + 15 * s, C.wire, 2);
+  }
+  function rng(s) { return function () { s |= 0; s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  // well with a flat top and rounded bottom corners
+  function well(c, x0, x1, y, d, r) {
+    r = Math.min(r, d, (x1 - x0) / 2);
+    c.beginPath(); c.moveTo(x0, y); c.lineTo(x0, y + d - r); c.quadraticCurveTo(x0, y + d, x0 + r, y + d); c.lineTo(x1 - r, y + d); c.quadraticCurveTo(x1, y + d, x1, y + d - r); c.lineTo(x1, y); c.closePath();
+  }
+  function notScale(c, x, y) { txt(c, 'not to scale', x, y, C.muted, 10, 600, 'left'); }
+
+  /* ---------- carriers ---------- */
+  function Flow(n, seed) { const r = rng(seed); this.p = []; for (let k = 0; k < n; k++) this.p.push({ s: r(), r: r() }); this.r = r; const sub = []; for (let k = 0; k < 60; k++) sub.push({ u: r(), v: r() }); this.sub = sub; }
+  Flow.prototype.step = function (dt, pr, id) {
+    if (!pr || id <= 0) return;
+    const base = 0.08 + 0.3 * Math.min(1, id / 4e-3);
+    this.p.forEach(q => { const th = pr.thk(q.s) / pr.vov, v = q.s > pr.end ? 2.6 : base / Math.max(0.3, th); q.s += v * dt; if (q.s > 1) { q.s -= 1; q.r = this.r(); } });
+  };
+
+  /* ---------- the MOSFET cross-section ----------
+     S = {x, y, w, h}; st = {vgs, vds, id, pmos}; F = Flow; o = {b (build fractions), diodes, L, bias, t} */
+  function drawMOS(c, S, st, F, o) {
+    o = o || {};
+    const b = Object.assign({ sub: 1, np: 1, ox: 1, gate: 1, cont: 1 }, o.b || {});
+    const pm = !!st.pmos, subC = pm ? NC : PC, rgC = pm ? PC : NC, car = pm ? HO : EL, maj = pm ? EL : HO;
+    const y0 = S.y + 40 + 34 * FS, sb = S.y + S.h - 22, nd = (sb - y0) * 0.3;
+    const xS0 = S.x + 0.05 * S.w, xS1 = S.x + 0.3 * S.w, xD0 = S.x + 0.7 * S.w, xD1 = S.x + 0.95 * S.w;
+    const ot = 6, gh = 14, gx0 = xS1 - 6, gx1 = xD0 + 6;
+    const vgs = Math.abs(st.vgs), vds = Math.abs(st.vds), pr = prof(vgs, vds), npd = nd * b.np;
+    const tpx = th => Math.max(1.4, 5 * th);
+    // substrate
+    c.globalAlpha = b.sub; c.fillStyle = subC; c.fillRect(S.x, y0, S.w, sb - y0);
+    // depletion regions (hatched)
+    if (b.np > 0.05) {
+      const hs = 3, hd = 3 + 10 * Math.sqrt(Math.min(1, vds / 10)) * (o.bias == null ? 1 : o.bias), dg = b.gate > 0.5 ? 15 * Math.sqrt(Math.min(1, vgs / VT)) : 0;
+      c.fillStyle = hatch(c);
+      well(c, xS0 - hs, xS1 + hs, y0, npd + hs, 12 + hs); c.fill();
+      well(c, xD0 - hd, Math.min(xD1 + hd, S.x + S.w), y0, npd + hd, 12 + hd); c.fill();
+      if (dg > 0.5) { c.beginPath(); c.moveTo(xS1, y0); c.lineTo(xS1, y0 + dg); for (let k = 0; k <= 20; k++) { const u = k / 20; c.lineTo(xS1 + u * (xD0 - xS1), y0 + dg + (hd - 3) * 0.8 * u * u); } c.lineTo(xD0, y0); c.closePath(); c.fill(); }
+    }
+    // majority carriers in the substrate (outside the depleted zone)
+    F.sub.forEach(p => { const x = S.x + 8 + p.u * (S.w - 16), y = y0 + nd + 16 + p.v * (sb - y0 - nd - 24); circ(c, x, y, 2.6, maj); });
+    // source and drain wells
+    if (b.np > 0.01) {
+      c.fillStyle = rgC; well(c, xS0, xS1, y0, npd, 12); c.fill(); well(c, xD0, xD1, y0, npd, 12); c.fill();
+      for (let k = 0; k < 8; k++) { const fx = (k % 4 + 0.6) / 4.4, fy = (Math.floor(k / 4) + 0.6) / 2.4; circ(c, xS0 + fx * (xS1 - xS0), y0 + fy * npd, 2.4, car); circ(c, xD0 + fx * (xD1 - xD0), y0 + fy * npd, 2.4, car); }
+      if (b.np > 0.6) { const lab = pm ? 'p+' : 'n+'; txt(c, lab, (xS0 + xS1) / 2, y0 + npd * 0.5, '#fff', 12, 700, 'center'); txt(c, lab, (xD0 + xD1) / 2, y0 + npd * 0.5, '#fff', 12, 700, 'center'); }
+    }
+    c.globalAlpha = 1;
+    // induced channel and moving carriers
+    if (pr && b.gate > 0.99) {
+      const X = s => xS1 + s * (xD0 - xS1), pts = [[xS1 - 2, y0]];
+      for (let k = 0; k <= 40; k++) { const s = k / 40 * pr.end; pts.push([X(s), y0 + tpx(pr.thk(s))]); }
+      pts.push([X(pr.end), y0]);
+      c.save(); c.globalAlpha = 0.45 + 0.4 * Math.min(1, pr.vov / 3); c.shadowColor = CH; c.shadowBlur = 8; poly(c, pts, CH); c.restore();
+      const nv = Math.max(3, Math.round(F.p.length * Math.min(1, pr.vov / 3)));
+      for (let k = 0; k < nv; k++) {
+        const q = F.p[k], x = X(q.s);
+        if (q.s <= pr.end) circ(c, x, y0 + 1 + q.r * Math.max(0.5, tpx(pr.thk(q.s)) - 2.5), 2.3, car);
+        else { c.globalAlpha = 0.85; line(c, x - 10, y0 + 2, x, y0 + 2, car, 2); c.globalAlpha = 1; }
+      }
+    }
+    // oxide, gate, contacts and wires
+    const gc = (gx0 + gx1) / 2, sc = (xS0 + xS1) / 2 - 4, dc = (xD0 + xD1) / 2 + 4, ty = S.y + 8 + 10 * FS;
+    if (b.ox > 0.01) { c.globalAlpha = b.ox; c.fillStyle = OX; c.fillRect(gx0, y0 - ot, gx1 - gx0, ot); c.globalAlpha = 1; }
+    if (b.gate > 0.01) { c.globalAlpha = b.gate; c.fillStyle = GATE; c.fillRect(gx0, y0 - ot - gh, gx1 - gx0, gh); c.globalAlpha = 1; }
+    if (b.cont > 0.01) {
+      c.globalAlpha = b.cont;
+      c.fillStyle = MET; c.fillRect(xS0 + 8, y0 - 6, xS1 - xS0 - 24, 6); c.fillRect(xD0 + 16, y0 - 6, xD1 - xD0 - 24, 6); c.fillRect(S.x, sb, S.w, 5);
+      line(c, sc, y0 - 6, sc, ty, C.wire, 2); line(c, gc, y0 - ot - gh, gc, ty, C.wire, 2); line(c, dc, y0 - 6, dc, ty, C.wire, 2);
+      // body tied to the source
+      const bx = S.x - 10; line(c, S.x, sb + 3, bx, sb + 3, C.wire, 2); line(c, bx, sb + 3, bx, ty + 12, C.wire, 2); line(c, bx, ty + 12, sc, ty + 12, C.wire, 2); circ(c, sc, ty + 12, 3, C.wire);
+      const tl = ty - 2 - 7 * FS; txt(c, 'S', sc, tl, C.text, 13, 700, 'center'); txt(c, 'G', gc, tl, C.text, 13, 700, 'center'); txt(c, 'D', dc, tl, C.text, 13, 700, 'center');
+      txt(c, 'B', S.x - 18, sb + 3, C.text, 12, 700, 'right');
+      if (o.volt !== false) {
+        const vy = ty + 2 + 8 * FS; subs(c, [['V', 'GS'], [' = ' + fVs(st.vgs, 1), '']], gc - 8, vy, C.v, 11, 'right');
+        const rt = dc + 8 + 92 * FS < (o.cw || 600), dx = rt ? dc + 8 : dc - 8, al = rt ? 'left' : 'right';
+        if (o.bias == null || o.bias > 0.5) subs(c, [['V', 'DS'], [' = ' + fVs(st.vds, 1), '']], dx, vy, C.v, 11, al);
+        if (o.meter !== false && (o.bias == null || o.bias > 0.5)) {
+          subs(c, [['I', 'D'], [' = ' + fI(st.id), '']], dx, ty + 4 + 22 * FS, C.cur, 11, al);
+          if (st.id > 1e-6) { const y1 = ty + 30, y2 = y0 - 10; if (pm) arrow(c, dc, y2, dc, y1, C.cur, 2.4, 8); else arrow(c, dc, y1, dc, y2, C.cur, 2.4, 8); }
+        }
+      }
+      c.globalAlpha = 1;
+    }
+    if (b.sub > 0.6) txt(c, pm ? 'n-sub' : 'p-sub', S.x + S.w / 2, sb - 12, '#fff', 12, 700, 'center');
+    if (o.L) { const y = y0 + npd + 12; arrow(c, (xS1 + xD0) / 2, y, xS1, y, C.text, 1.4, 6); arrow(c, (xS1 + xD0) / 2, y, xD0, y, C.text, 1.4, 6); txt(c, 'L', (xS1 + xD0) / 2, y + 11, C.text, 12, 700, 'center'); }
+    if (o.diodes > 0.01) {
+      c.globalAlpha = o.diodes;
+      [(xS0 + xS1) / 2, (xD0 + xD1) / 2].forEach(x => {
+        const yb = y0 + npd + 18, yt = y0 + npd - 6;
+        rrect(c, x - 13, yt - 6, 26, yb - yt + 12, 6); c.fillStyle = 'rgba(15,20,32,.85)'; c.fill();
+        line(c, x, yb + 4, x, yt - 4, '#fff', 1.6);
+        poly(c, [[x - 8, yb - 4], [x + 8, yb - 4], [x, yt + 4]], '#fff'); line(c, x - 8, yt + 3, x + 8, yt + 3, '#fff', 2);
+      });
+      c.globalAlpha = 1;
+    }
+    return { y0: y0, sb: sb, nd: nd, xS1: xS1, xD0: xD0, gx0: gx0, gx1: gx1 };
+  }
+
+  /* ---------- isometric inset showing L and W ---------- */
+  function iso(c, x, y, wf, pm, len) {
+    len = len || 80; const d = 26 * wf, dx = d * 0.87, dy = d * 0.5, T = 16;
+    const P = (u, v) => [x + u * len + v * dx, y - v * dy];   // u along L, v along W
+    poly(c, [P(0, 0), P(1, 0), [P(1, 0)[0], P(1, 0)[1] + T], [P(0, 0)[0], P(0, 0)[1] + T]], pm ? '#25406b' : '#6a3030');
+    poly(c, [P(1, 0), P(1, 1), [P(1, 1)[0], P(1, 1)[1] + T], [P(1, 0)[0], P(1, 0)[1] + T]], pm ? '#1f3659' : '#5a2828');
+    poly(c, [P(0, 0), P(1, 0), P(1, 1), P(0, 1)], pm ? NC : PC);
+    const strip = (u0, u1, col) => poly(c, [P(u0, 0), P(u1, 0), P(u1, 1), P(u0, 1)], col);
+    strip(0.02, 0.3, pm ? PC : NC); strip(0.7, 0.98, pm ? PC : NC); strip(0.34, 0.66, GATE);
+    const a = P(0.34, 0), bq = P(0.66, 0);
+    line(c, a[0], a[1] + T + 8, bq[0], bq[1] + T + 8, C.text, 1.2); txt(c, 'L', (a[0] + bq[0]) / 2, a[1] + T + 18, C.text, 11, 700, 'center');
+    const e0 = P(1, 0), e1 = P(1, 1);
+    line(c, e0[0] + 8, e0[1] + 4, e1[0] + 8, e1[1] + 4, C.text, 1.2); txt(c, 'W', (e0[0] + e1[0]) / 2 + 14, (e0[1] + e1[1]) / 2 + 4, C.text, 11, 700, 'left');
+  }
+
+  /* ---------- output characteristics ---------- */
+  function outChars(c, P, o) {
+    const kn = o.kn == null ? KN : o.kn, lam = o.lam == null ? LAM : o.lam;
+    frame(c, P, o.xs, o.ys, v => String(v), v => (v * 1e3).toFixed(o.yd || 0), [['V', 'DS'], [' (V)', '']], [['I', 'D'], [' (mA)', '']]);
+    clip(c, P);
+    if (o.bound) {
+      const bp = []; for (let v = 0; v <= P.x1 + 1e-9; v += P.x1 / 200) bp.push([P.X(v), P.Y(kn * v * v * (1 + lam * v))]);
+      pline(c, bp, 'rgba(255,213,79,.7)', 1.6, [6, 4]);
+    }
+    (o.list || []).forEach(g => {
+      const pts = []; for (let v = 0; v <= P.x1 + 1e-9; v += P.x1 / 200) pts.push([P.X(v), P.Y(idOf(g, v, kn, lam))]);
+      if (g === o.hl) gline(c, pts, VPAL[g], 3); else pline(c, pts, VPAL[g], o.hl == null ? 2.2 : 1.6);
+    });
+    c.restore();
+    (o.list || []).forEach(g => { const y = P.Y(idOf(g, P.x1, kn, lam)); if (y > P.t + 6) txt(c, g + ' V', P.r - 4, y - 9, VPAL[g], 10, 700, 'right'); });
+  }
+
+  /* ---------- MOSFET symbols ---------- */
+  function sym(c, x, y, s, o) {
+    o = o || {}; const pm = !!o.p, W = C.wire, lw = 2.2;
+    const gx = x - 8 * s;
+    line(c, gx, y - 22 * s, gx, y + 22 * s, W, lw);
+    if (o.three && pm) { circ(c, gx - 6 * s, y, 5 * s, null, W, 1.8); line(c, x - 40 * s, y, gx - 11 * s, y, W, lw); }
+    else line(c, x - 40 * s, y, gx, y, W, lw);
+    txt(c, 'G', x - 46 * s, y, C.text, 11, 700, 'right');
+    if (o.three) line(c, x, y - 26 * s, x, y + 26 * s, W, 3);
+    else [[-26, -13], [-6, 6], [13, 26]].forEach(a => { if (o.hl) { c.save(); c.shadowColor = CH; c.shadowBlur = 8; line(c, x, y + a[0] * s, x, y + a[1] * s, CH, 3.4); c.restore(); } else line(c, x, y + a[0] * s, x, y + a[1] * s, W, 3); });
+    const dy = pm ? 20 : -20, sy = -dy;   // drain on top for NMOS, source on top for PMOS
+    line(c, x, y + dy * s, x + 26 * s, y + dy * s, W, lw); line(c, x + 26 * s, y + dy * s, x + 26 * s, y + dy * 2.3 * s, W, lw);
+    line(c, x, y + sy * s, x + 26 * s, y + sy * s, W, lw); line(c, x + 26 * s, y + sy * s, x + 26 * s, y + sy * 2.3 * s, W, lw);
+    txt(c, 'D', x + 32 * s, y + dy * 2.1 * s, C.text, 11, 700, 'left'); txt(c, 'S', x + 32 * s, y + sy * 2.1 * s, C.text, 11, 700, 'left');
+    if (!o.three) {
+      line(c, x, y, x + 26 * s, y, W, lw); txt(c, 'B', x + 32 * s, y, C.text, 11, 700, 'left');
+      if (pm) arrow(c, x + 4 * s, y, x + 20 * s, y, W, 2, 8 * s); else arrow(c, x + 22 * s, y, x + 3 * s, y, W, 2, 8 * s);
+    } else if (!pm) arrow(c, x + 4 * s, y + sy * s, x + 22 * s, y + sy * s, W, 2, 8 * s);
+    if (o.lab) txt(c, o.lab, x - 6 * s, y + 66 * s, o.labc || C.muted, 11, 700, 'center');
+  }
+
+  /* =========================================================
+     0. Structure: build-up, VDS = 5 V with VGS = 0, back-to-back diodes
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv0', 600, 360), bd = $('d0'), F = new Flow(20, 3);
+    let t = 0, dio = false, da = 0, A;
+    const ph = (a, b) => ease((t - a) / (b - a));
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const bias = ph(4.4, 5.4), st = { vgs: 0, vds: 5 * bias, id: 0 };
+      drawMOS(c, { x: 40, y: 8, w: 380, h: 300 }, st, F, { b: { sub: ph(0, 0.7), np: ph(0.8, 1.8), ox: ph(1.9, 2.5), gate: ph(2.6, 3.2), cont: ph(3.3, 4.1) }, bias: bias, L: t > 4.1, diodes: da });
+      if (t > 4.1) { c.globalAlpha = ph(4.1, 4.6); iso(c, 446, 170, 1.3, false, 96); txt(c, 'top view', 500, 236, C.muted, 10, 600, 'center'); c.globalAlpha = 1; }
+      notScale(c, 10, 346);
+      cv.wm(c);
+    }
+    const o = {
+      reset() { t = RM ? 9 : 0; dio = false; da = 0; bd.setAttribute('aria-pressed', 'false'); },
+      step(dt) { t = Math.min(t + dt, 9); da += ((dio ? 1 : 0) - da) * (1 - Math.exp(-dt * 5)); },
+      draw: draw
+    };
+    A = new Anim('anim0', o);
+    bd.addEventListener('click', () => { dio = !dio; bd.setAttribute('aria-pressed', String(dio)); if (!A.playing) da = dio ? 1 : 0; A.dirty = true; });
+  })();
+
+  /* =========================================================
+     1. Threshold: VGS slider with VDS = 0.1 V
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv1', 600, 330), sl = $('a1'), F = new Flow(30, 5), VD = 0.1;
+    let A;
+    function upd() {
+      const v = +sl.value, id = idOf(v, VD);
+      $('a1o').textContent = fVs(v); $('c1g').textContent = fVs(v); $('c1o').textContent = fVs(v - VT); $('c1i').textContent = fI(id);
+      if (A) A.dirty = true;
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const v = +sl.value;
+      drawMOS(c, { x: 40, y: 8, w: 520, h: 300 }, { vgs: v, vds: VD, id: idOf(v, VD) }, F, {});
+      notScale(c, 10, 318);
+      cv.wm(c);
+    }
+    const o = { reset() { sl.value = 2; upd(); }, step(dt) { const v = +sl.value; F.step(dt, prof(v, VD), idOf(v, VD) * 8); }, draw: draw };
+    A = new Anim('anim1', o);
+    sl.addEventListener('input', upd);
+  })();
+
+  /* =========================================================
+     2. Small VDS: straight lines and rDS
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv2', 600, 400), sl = $('a2');
+    const P = mkP(76, 560, 30, 262, 0, 0.5, 0, 2e-3);
+    let ph = 0, A;
+    function upd() {
+      const v = +sl.value, r = v > VT ? 1 / (2 * KN * (v - VT)) : Infinity;
+      $('a2o').textContent = fVs(v, 1); $('c2g').textContent = fVs(v, 1); $('c2o').textContent = fVs(v - VT, 1); $('c2r').textContent = isFinite(r) ? (r >= 1e3 ? (r / 1e3).toFixed(2) + ' kΩ' : r.toFixed(0) + ' Ω') : '∞ (no channel)';
+      if (A) A.dirty = true;
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const v = +sl.value, r = v > VT ? 1 / (2 * KN * (v - VT)) : Infinity;
+      outChars(c, P, { xs: [0, 0.1, 0.2, 0.3, 0.4, 0.5], ys: [0, 0.5e-3, 1e-3, 1.5e-3, 2e-3], yd: 1, list: [2, 3, 4, 5] });
+      clip(c, P);
+      if (v > VT) { const pts = []; for (let x = 0; x <= 0.5001; x += 0.005) pts.push([P.X(x), P.Y(idOf(v, x))]); gline(c, pts, C.v, 2.6); }
+      c.restore();
+      // resistor icon: length follows rDS (log scale)
+      const yR = 350, x0 = 110, len = isFinite(r) ? 40 + 300 * clamp(Math.log(r / 250) / Math.log(40), 0, 1) : 400;
+      line(c, 60, yR, x0, yR, C.wire, 2.2);
+      if (isFinite(r)) resH(c, x0, x0 + len, yR, C.v); else { c.setLineDash([5, 5]); line(c, x0, yR, x0 + len, yR, 'rgba(255,255,255,.3)', 2); c.setLineDash([]); }
+      line(c, x0 + len, yR, x0 + len + 20, yR, C.wire, 2.2);
+      circ(c, 60, yR, 3.5, C.wire); circ(c, x0 + len + 20, yR, 3.5, C.wire);
+      subs(c, [['r', 'DS'], [' = ' + (isFinite(r) ? (r >= 1e3 ? (r / 1e3).toFixed(2) + ' kΩ' : r.toFixed(0) + ' Ω') : '∞'), '']], 60, yR - 26, C.v, 12, 'left');
+      cv.wm(c);
+    }
+    function resH(c, x0, x1, y, col) { const n = 8, d = (x1 - x0) / n, pts = [[x0, y]]; for (let k = 0; k < n; k++) pts.push([x0 + d * (k + 0.5), y + (k % 2 ? 8 : -8)]); pts.push([x1, y]); gline(c, pts, col, 2.4); }
+    const o = { reset() { ph = 0; sl.value = 5; upd(); }, step(dt) { ph += dt; }, draw: draw };
+    A = new Anim('anim2', o);
+    sl.addEventListener('input', upd);
+  })();
+
+  /* =========================================================
+     3. Tapering and pinch-off
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv3', 600, 330), cg = new Cv('cv3b', 600, 270), sG = $('a3g'), sD = $('a3d'), F = new Flow(30, 7);
+    let A;
+    function upd() {
+      const g = +sG.value, d = +sD.value, id = idOf(g, d), r = regOf(g, d), vs = Math.max(0, g - VT);
+      $('a3go').textContent = fVs(g); $('a3do').textContent = fVs(d); $('c3s').textContent = g > VT ? fVs(vs) : '—'; $('c3i').textContent = fI(id);
+      setRB('b3', r);
+      const m = $('m3'); m.hidden = g <= VT || vs > 10; m.style.left = (vs / 10 * 100) + '%';
+      $('m3t').innerHTML = g > VT ? 'V<sub>DS(sat)</sub> = V<sub>GS</sub> − V<sub>T</sub> = ' + fVs(vs) + ' (marked on the slider)' : 'No channel: V<sub>GS</sub> is below V<sub>T</sub>';
+      if (A) A.dirty = true;
+    }
+    function draw() {
+      const g = +sG.value, d = +sD.value, id = idOf(g, d), c = cv.begin();
+      if (c) { drawMOS(c, { x: 40, y: 8, w: 520, h: 300 }, { vgs: g, vds: d, id: id }, F, {}); notScale(c, 10, 318); cv.wm(c); }
+      const e = cg.begin(); if (!e) return;
+      const vov = Math.max(0, g - VT), ymax = Math.max(1e-3, KN * vov * vov * 1.25 * (1 + LAM * 10));
+      const st = ymax > 8e-3 ? 2e-3 : ymax > 4e-3 ? 1e-3 : ymax > 2e-3 ? 0.5e-3 : 0.25e-3;
+      const P = mkP(76, 560, 30, 196, 0, 10, 0, ymax);
+      frame(e, P, [0, 2, 4, 6, 8, 10], ticks(0, ymax, st), v => String(v), v => (v * 1e3).toFixed(st < 1e-3 ? 2 : 0), [['V', 'DS'], [' (V)', '']], [['I', 'D'], [' (mA)', '']]);
+      clip(e, P);
+      if (vov > 0) { e.fillStyle = 'rgba(79,195,247,.08)'; e.fillRect(P.l, P.t, P.X(vov) - P.l, P.b - P.t); e.fillStyle = 'rgba(102,187,106,.08)'; e.fillRect(P.X(vov), P.t, P.r - P.X(vov), P.b - P.t); }
+      const pts = []; for (let x = 0; x <= 10.0001; x += 0.05) pts.push([P.X(x), P.Y(idOf(g, x))]); gline(e, pts, C.cur, 2.6);
+      e.restore();
+      if (vov > 0 && vov <= 10) { const px = P.X(vov), py = P.Y(idOf(g, vov)); line(e, px, py, px, P.b, 'rgba(255,213,79,.6)', 1.2, [4, 4]); circ(e, px, py, 6, C.v, '#fff', 1.4); txt(e, 'pinch-off', px + 8, py - 12, C.v, 10, 700, 'left'); }
+      qDot(e, P.X(d), P.Y(id), 6.5);
+      cg.wm(e);
+    }
+    const o = { reset() { sG.value = 3; sD.value = 1; upd(); }, step(dt) { const g = +sG.value, d = +sD.value; F.step(dt, prof(g, d), idOf(g, d)); }, draw: draw };
+    A = new Anim('anim3', o);
+    [sG, sD].forEach(s => s.addEventListener('input', upd));
+  })();
+
+  /* =========================================================
+     4. Saturation: output characteristics, W/L and λ
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv4', 600, 400), sK = $('a4k'), root = $('anim4');
+    const P = mkP(76, 430, 30, 330, 0, 10, 0, 20e-3);
+    let lam = LAM, ph = 0, A;
+    function upd() {
+      const kn = +sK.value * 1e-3;
+      $('a4ko').textContent = (kn * 1e3).toFixed(2) + ' mA/V²'; $('c4k').textContent = (kn * 1e3).toFixed(2) + ' mA/V²'; $('c4w').textContent = '× ' + (kn / KN).toFixed(2);
+      $('c4a').textContent = fI(kn * 4); $('c4b').textContent = fI(kn * 16); segSel(root, 'l', lam);
+      if (A) A.dirty = true;
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const kn = +sK.value * 1e-3;
+      outChars(c, P, { kn: kn, lam: lam, xs: [0, 2, 4, 6, 8, 10], ys: [0, 4e-3, 8e-3, 12e-3, 16e-3, 20e-3], list: [2, 3, 4, 5], bound: true });
+      txt(c, 'triode', P.X(0.9), P.t + 10, '#4fc3f7', 10, 700, 'center'); txt(c, 'saturation', P.X(7), P.t + 10, '#66bb6a', 10, 700, 'center');
+      // a point sliding along the VGS = 4 V curve
+      const vd = 5 - 4.6 * Math.cos(ph * 0.6), id = idOf(4, vd, kn, lam);
+      if (id < 20e-3) qDot(c, P.X(vd), P.Y(id), 5.5);
+      iso(c, 452, 230, clamp(kn / KN, 0.2, 4) * 0.55 + 0.25, false, 66);
+      txt(c, 'W/L × ' + (kn / KN).toFixed(2), 500, 292, C.text, 11, 700, 'center');
+      cv.wm(c);
+    }
+    const o = { reset() { lam = LAM; ph = 0; sK.value = 0.5; upd(); }, step(dt) { ph += dt; }, draw: draw };
+    A = new Anim('anim4', o);
+    sK.addEventListener('input', upd);
+    root.querySelectorAll('[data-l]').forEach(b => b.addEventListener('click', () => { lam = +b.dataset.l; upd(); }));
+  })();
+
+  /* =========================================================
+     5. Symbols, PMOS and the width ratio
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv5', 600, 330), cs = new Cv('cv5b', 600, 420), cw = new Cv('cv5c', 600, 300);
+    const sG = $('a5g'), sW = $('a5w'), root = $('anim5'), F = new Flow(30, 9), VD = 0.1, MU = 2.5;
+    let pm = false, A;
+    function upd() {
+      const g = +sG.value, wp = +sW.value, sgn = pm ? -1 : 1;
+      $('a5go').textContent = fVs(sgn * g); segSel(root, 'm', pm ? 'p' : 'n');
+      $('c5g').textContent = fVs(sgn * g); $('c5t').textContent = pm ? '−1 V' : '+1 V'; $('c5i').textContent = (pm ? '−' : '') + fI(idOf(g, VD));
+      $('a5wo').textContent = '× ' + wp.toFixed(2); $('c5r').textContent = (wp / MU).toFixed(2);
+      if (A) A.dirty = true;
+    }
+    function draw() {
+      const g = +sG.value, wp = +sW.value, sgn = pm ? -1 : 1;
+      const c = cv.begin();
+      if (c) { drawMOS(c, { x: 40, y: 8, w: 520, h: 300 }, { vgs: sgn * g, vds: sgn * VD, id: idOf(g, VD), pmos: pm }, F, {}); notScale(c, 10, 318); cv.wm(c); }
+      const d = cs.begin();
+      if (d) {
+        txt(d, '4-terminal', 300, 20, C.muted, 11, 700, 'center'); txt(d, '3-terminal (simplified)', 300, 206, C.muted, 11, 700, 'center');
+        sym(d, 170, 100, 1.05, { hl: true, lab: 'NMOS', labc: pm ? C.muted : C.text }); sym(d, 430, 100, 1.05, { p: true, hl: true, lab: 'PMOS', labc: pm ? C.text : C.muted });
+        sym(d, 170, 284, 1.05, { three: true, lab: 'NMOS', labc: pm ? C.muted : C.text }); sym(d, 430, 284, 1.05, { p: true, three: true, lab: 'PMOS', labc: pm ? C.text : C.muted });
+        cs.wm(d);
+      }
+      const e = cw.begin();
+      if (e) {
+        iso(e, 60, 116, 1, false, 90); iso(e, 330, 116, wp, true, 90);
+        txt(e, 'NMOS', 105, 172, C.text, 11, 700, 'center'); txt(e, 'PMOS', 375, 172, C.text, 11, 700, 'center');
+        const In = MU * 1, Ip = wp, k = 70, eq = Math.abs(Ip - In) / In < 0.04;
+        [[In, 216, 'NMOS', EL], [Ip, 254, 'PMOS', HO]].forEach(q => {
+          rrect(e, 110, q[1] - 10, q[0] * k, 20, 4); e.fillStyle = eq ? '#66bb6a' : q[3]; e.fill();
+          txt(e, q[2], 100, q[1], C.text, 11, 700, 'right');
+        });
+        subs(e, [['I', 'D']], 110, 194, C.cur, 11, 'left');
+        if (eq) txt(e, '=', 110 + In * k + 16, 235, '#66bb6a', 20, 700, 'left');
+        cw.wm(e);
+      }
+    }
+    const o = { reset() { pm = false; sG.value = 3; sW.value = 1; upd(); }, step(dt) { F.step(dt, prof(+sG.value, VD), idOf(+sG.value, VD) * 8); }, draw: draw };
+    A = new Anim('anim5', o);
+    [sG, sW].forEach(s => s.addEventListener('input', upd));
+    root.querySelectorAll('[data-m]').forEach(b => b.addEventListener('click', () => { pm = b.dataset.m === 'p'; upd(); }));
+  })();
+
+  /* =========================================================
+     6. Summary playground
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv6', 600, 330), cg = new Cv('cv6b', 600, 330), sG = $('a6g'), sD = $('a6d'), F = new Flow(30, 13);
+    const P = mkP(76, 420, 30, 262, 0, 10, 0, 10e-3);
+    let A;
+    function upd() {
+      const g = +sG.value, d = +sD.value, id = idOf(g, d);
+      $('a6go').textContent = fVs(g); $('a6do').textContent = fVs(d); $('c6i').textContent = fI(id); $('c6s').textContent = g > VT ? fVs(g - VT) : '—';
+      setRB('b6', regOf(g, d));
+      if (A) A.dirty = true;
+    }
+    function draw() {
+      const g = +sG.value, d = +sD.value, id = idOf(g, d), c = cv.begin();
+      if (c) { drawMOS(c, { x: 40, y: 8, w: 520, h: 300 }, { vgs: g, vds: d, id: id }, F, {}); notScale(c, 10, 318); cv.wm(c); }
+      const e = cg.begin(); if (!e) return;
+      outChars(e, P, { xs: [0, 2, 4, 6, 8, 10], ys: [0, 2e-3, 4e-3, 6e-3, 8e-3, 10e-3], list: [2, 3, 4, 5], bound: true });
+      clip(e, P); const pts = []; for (let x = 0; x <= 10.0001; x += 0.05) pts.push([P.X(x), P.Y(idOf(g, x))]); if (g > VT) gline(e, pts, C.v, 2.4); e.restore();
+      if (id <= 10e-3) qDot(e, P.X(d), P.Y(id), 6.5);
+      sym(e, 520, 130, 1.05, { hl: g > VT, lab: 'NMOS' });
+      cg.wm(e);
+    }
+    const o = { reset() { sG.value = 3; sD.value = 4; upd(); }, step(dt) { const g = +sG.value, d = +sD.value; F.step(dt, prof(g, d), idOf(g, d)); }, draw: draw };
+    A = new Anim('anim6', o);
+    [sG, sD].forEach(s => s.addEventListener('input', upd));
+  })();
+
+  /* ---------- sticky mini-nav highlight ---------- */
+  (function () {
+    const links = Array.from(document.querySelectorAll('.toc a'));
+    const secs = links.map(l => document.querySelector(l.getAttribute('href')));
+    function upd() {
+      let cur = 0;
+      secs.forEach((s, i) => { if (s.getBoundingClientRect().top < 120) cur = i; });
+      links.forEach((l, i) => l.classList.toggle('active', i === cur));
+    }
+    window.addEventListener('scroll', upd, { passive: true }); upd();
+  })();
+
+  let last = performance.now();
+  function frameLoop(ts) {
+    const dt = Math.min(0.05, Math.max(0, (ts - last) / 1000)); last = ts;
+    anims.forEach(a => {
+      if (!a.visible) return;
+      if (a.playing) { a.o.step(dt); a.o.draw(); }
+      else if (a.dirty) a.o.draw();
+      a.dirty = false;
+    });
+    requestAnimationFrame(frameLoop);
+  }
+  function onResize() { anims.forEach(a => { a.dirty = true; }); }
+  window.addEventListener('resize', onResize);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(onResize);
+  requestAnimationFrame(frameLoop);
+})();
+</script>
+</body>
+</html>
