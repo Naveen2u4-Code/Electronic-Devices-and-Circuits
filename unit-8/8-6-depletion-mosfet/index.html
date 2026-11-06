@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>8.6 Depletion MOSFET</title>
+  <meta name="description" content="The depletion MOSFET: a built-in channel, depletion mode with negative gate voltage, enhancement mode with positive gate voltage, drain characteristics, and a comparison with the JFET and the enhancement MOSFET. An interactive lesson.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1420;
+      --panel: #1a2132;
+      --panel-hover: #212a3f;
+      --border: #2a3448;
+      --text: #e6e9ef;
+      --muted: #9aa4b8;
+      --electron: #4fc3f7;
+      --hole: #ff8a65;
+      --energy: #ffd54f;
+      --success: #81c784;
+      --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+      --max: 960px;
+      --radius: 12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: var(--font); font-size: 16px; line-height: 1.65;
+      overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column;
+    }
+    a { color: var(--electron); }
+    .wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 16px; }
+
+    /* Sticky mini-nav */
+    .toc {
+      position: sticky; top: 0; z-index: 10; background: rgba(15, 20, 32, .95);
+      border-bottom: 1px solid var(--border); backdrop-filter: blur(6px);
+    }
+    .toc ul { display: flex; gap: 4px; list-style: none; margin: 0 auto; padding: 8px 16px; max-width: var(--max); overflow-x: auto; scrollbar-width: none; }
+    .toc ul::-webkit-scrollbar { display: none; }
+    .toc a {
+      display: block; white-space: nowrap; text-decoration: none; color: var(--muted);
+      font-size: 0.85rem; font-weight: 500; padding: 6px 10px; border-radius: 999px;
+    }
+    .toc a:hover { color: var(--text); background: var(--panel); }
+    .toc a.active { color: var(--bg); background: var(--electron); }
+
+    main { flex: 1; padding: 24px 0 48px; }
+    .crumbs { font-size: 0.875rem; color: var(--muted); margin: 0 0 16px; }
+    .crumbs a { color: var(--muted); }
+    .crumbs a:hover { color: var(--electron); }
+    .eyebrow { font-family: var(--mono); font-size: 0.8rem; color: var(--electron); letter-spacing: .04em; margin: 0; }
+    h1 { font-size: clamp(1.5rem, 6vw, 2.2rem); line-height: 1.2; margin: 4px 0 6px; }
+    .subtitle { color: var(--muted); margin: 0 0 8px; }
+    section { scroll-margin-top: 64px; padding-top: 28px; }
+    h2 { font-size: clamp(1.3rem, 5vw, 1.6rem); line-height: 1.25; margin: 0 0 14px; }
+    h3 { font-size: 1.05rem; margin: 0 0 8px; }
+    .prose { font-size: 17px; line-height: 1.7; max-width: 70ch; }
+    .prose p, .prose ul, .prose ol { margin: 0 0 14px; }
+    .prose ul, .prose ol { padding-left: 22px; }
+    .prose li { margin: 4px 0; }
+    .prose strong { color: #fff; }
+    .prose p.eq { text-align: center; font-family: var(--mono); font-size: 16px; background: #141b2b; border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; overflow-wrap: anywhere; }
+    hr.sep { border: 0; border-top: 1px solid var(--border); margin: 40px 0 0; }
+    .rm-note { font-size: 0.78rem; color: var(--muted); margin: 0 0 8px; }
+
+    /* Buttons & controls */
+    .btn {
+      font: inherit; font-size: 0.88rem; font-weight: 600; color: var(--text);
+      background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+      padding: 7px 12px; cursor: pointer; min-height: 38px;
+    }
+    .btn:hover:not(:disabled) { background: var(--panel-hover); border-color: var(--electron); }
+    .btn:focus-visible, input:focus-visible, canvas:focus-visible { outline: 2px solid var(--electron); outline-offset: 2px; }
+    .btn[aria-pressed="true"] { background: rgba(255,213,79,.14); border-color: var(--energy); color: var(--energy); }
+    .seg { display: inline-flex; gap: 0; flex-wrap: nowrap; }
+    .seg .btn { border-radius: 0; padding: 7px 10px; }
+    .seg .btn:first-child { border-radius: 8px 0 0 8px; }
+    .seg .btn:last-child { border-radius: 0 8px 8px 0; }
+    .seg .btn + .btn { margin-left: -1px; }
+    .glabel { font-size: 0.8rem; font-weight: 700; color: var(--muted); }
+
+    figure.anim {
+      margin: 18px 0 0; background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 12px; min-width: 0;
+    }
+    .ctrls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-bottom: 12px; }
+    .slider { flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; }
+    .slider label { display: flex; justify-content: space-between; gap: 8px; font-size: 0.8rem; color: var(--muted); }
+    .slider output { font-family: var(--mono); color: var(--energy); white-space: nowrap; }
+    .slider[hidden] { display: none; }
+    input[type="range"] { width: 100%; accent-color: var(--energy); margin: 4px 0 0; }
+    canvas { display: block; width: 100%; border-radius: 8px; background: #141b2b; }
+    canvas.drag { cursor: crosshair; touch-action: none; }
+    .narrow { max-width: 760px; margin-left: auto; margin-right: auto; }
+    .inset { margin-top: 10px; }
+
+    .counters { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px auto 0; }
+    .ctr {
+      flex: 1 1 100px; background: #141b2b; border: 1px solid var(--border); border-radius: 8px;
+      padding: 6px 10px; font-size: 0.78rem; color: var(--muted); min-width: 0;
+    }
+    .ctr b { display: block; font-family: var(--mono); font-size: 1.02rem; font-weight: 500; white-space: nowrap; color: var(--text); overflow: hidden; text-overflow: ellipsis; }
+    .ctr.v b { color: var(--energy); } .ctr.q b { color: var(--hole); } .ctr.cur b { color: var(--success); }
+    .ctr.gm b { color: #4fc3f7; } .ctr.rd b { color: #ffb74d; } .ctr.mu b { color: #81c784; }
+    .ctr.rd.ohm b { color: #4fc3f7; }
+
+    .badges { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 10px auto 0; }
+    .bdg { font-size: 0.82rem; font-weight: 700; border-radius: 999px; padding: 4px 12px; border: 1.5px solid; white-space: normal; }
+    .bdg.r-ohm { color: #4fc3f7; border-color: #4fc3f7; background: rgba(2,119,189,.2); }
+    .bdg.r-sat { color: #66bb6a; border-color: #66bb6a; background: rgba(27,94,32,.35); }
+
+    .keypoints {
+      margin-top: 16px; padding: 14px 16px; border-radius: var(--radius);
+      background: rgba(129,199,132,.07); border: 1px solid rgba(129,199,132,.35);
+    }
+    .keypoints h3 { color: var(--success); font-size: 0.95rem; text-transform: uppercase; letter-spacing: .05em; }
+    .keypoints ul { margin: 0; padding-left: 20px; }
+    .keypoints li { margin: 4px 0; }
+
+    .formulas { margin: 14px 0 0; background: #141b2b; border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; }
+    .formulas h3 { color: var(--energy); font-size: .9rem; text-transform: uppercase; letter-spacing: .05em; }
+    .formulas ul { margin: 0; padding-left: 20px; font-family: var(--mono); font-size: .9rem; }
+    .formulas li { margin: 4px 0; overflow-wrap: anywhere; }
+
+    .pager { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 48px; }
+    .pager a {
+      display: block; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 12px 14px; text-decoration: none; color: var(--text); min-width: 0;
+    }
+    .pager a:hover { border-color: var(--electron); }
+    .pager small { display: block; color: var(--muted); font-size: 0.75rem; }
+    .pager .next { text-align: right; }
+    .site-foot { border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; text-align: center; padding: 18px 16px; }
+
+    /* Justified paragraphs on desktop; phones stay left-aligned to avoid wide word gaps. */
+    @media (min-width: 768px) {
+      .prose p, .prose li, .keypoints li { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+      .prose p.eq { text-align: center; }
+    }
+    /* Topic 8.6 */
+    .bdg.r-cut, .bdg.m-cut { color: #d0d0d0; border-color: #9aa4b8; background: rgba(66,66,66,.4); }
+    .bdg.r-ohm { color: #4fc3f7; border-color: #4fc3f7; background: rgba(2,119,189,.2); }
+    .bdg.r-sat { color: #66bb6a; border-color: #66bb6a; background: rgba(27,94,32,.35); }
+    .bdg.m-dep { color: #26c6da; border-color: #26c6da; background: rgba(38,198,218,.14); }
+    .bdg.m-enh { color: #ce93d8; border-color: #ce93d8; background: rgba(206,147,216,.14); }
+    .pair { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    @media (min-width: 720px) { .pair { grid-template-columns: 1fr 1fr; } }
+    .pair > div { min-width: 0; }
+    .ptitle { margin: 0 0 6px; font-size: .85rem; font-weight: 700; color: var(--muted); text-align: center; }
+    .ctr.wide { flex-basis: 160px; }
+  </style>
+</head>
+<body>
+
+  <nav class="toc" aria-label="Sections">
+    <ul>
+      <li><a href="#s0">Structure</a></li>
+      <li><a href="#s1">Depletion mode</a></li>
+      <li><a href="#s2">Enhancement mode</a></li>
+      <li><a href="#s3">Drain curves</a></li>
+      <li><a href="#s4">Comparison</a></li>
+      <li><a href="#s5">Summary</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="wrap">
+      <header>
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="../../index.html">Home</a> / <a href="../index.html">Unit 8</a> / 8.6
+        </nav>
+        <p class="eyebrow">TOPIC 8.6</p>
+        <h1>Depletion MOSFET</h1>
+        <p class="subtitle">A normally-on MOSFET whose built-in channel the gate can empty or fill</p>
+        <p class="rm-note" id="rmNote" hidden>Your device asks for reduced motion, so every animation starts paused. Press Play on any animation to run it. Sliders and dragging still update the picture.</p>
+      </header>
+
+      <!-- ================= SECTION 0 ================= -->
+      <section id="s0" aria-labelledby="h0">
+        <h2 id="h0">Structure: a channel built in</h2>
+        <div class="prose">
+          <p>A <strong>DEPLETION MOSFET</strong> has the same basic structure as an enhancement MOSFET: a p-type substrate, n<sup>+</sup> source and drain, a thin oxide and a gate. The difference is that, during manufacturing, a thin lightly doped <strong>N-TYPE CHANNEL</strong> is diffused or implanted between the source and the drain, just under the oxide.</p>
+          <p>So a channel <strong>ALREADY EXISTS</strong> with zero gate voltage. Current can flow from drain to source as soon as V<sub>DS</sub> is applied, even with V<sub>GS</sub> = 0. That is why the depletion MOSFET is called <strong>"normally-on"</strong>.</p>
+          <p>In the circuit symbol, the channel line is drawn as a <strong>SOLID</strong> line (not broken), showing that the channel is present without any gate voltage.</p>
+        </div>
+
+        <figure class="anim" id="anim0">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="pair">
+            <div><p class="ptitle">Enhancement MOSFET</p><canvas id="cv0a" style="aspect-ratio:600/340" role="img" aria-label="Enhancement MOSFET cross-section with VGS = 0 and VDS = 5 V: no channel under the oxide and ID = 0."></canvas></div>
+            <div><p class="ptitle">Depletion MOSFET</p><canvas id="cv0b" style="aspect-ratio:600/340" role="img" aria-label="Depletion MOSFET cross-section with VGS = 0 and VDS = 5 V: a built-in cyan n channel under the oxide carries flowing electrons and ID = IDSS = 6 mA."></canvas></div>
+          </div>
+          <canvas id="cv0c" class="narrow inset" style="aspect-ratio:600/230" role="img" aria-label="The two symbols: the enhancement MOSFET with a broken channel line and the depletion MOSFET with a solid channel line, both highlighted."></canvas>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr v">V<sub>GS</sub>, V<sub>DS</sub><b>0 V, 5 V</b></div>
+            <div class="ctr">I<sub>D</sub> enhancement<b>0</b></div>
+            <div class="ctr cur">I<sub>D</sub> depletion<b>6.00 mA</b></div>
+          </div>
+        </figure>
+        <aside class="keypoints" aria-label="Key points: structure">
+          <h3>Key points</h3>
+          <ul>
+            <li>Same structure as an enhancement MOSFET, plus a thin implanted n-type channel under the oxide.</li>
+            <li>The channel exists at V<sub>GS</sub> = 0, so current flows as soon as V<sub>DS</sub> is applied.</li>
+            <li>It is a "normally-on" device: I<sub>D</sub> = I<sub>DSS</sub> = 6 mA at V<sub>GS</sub> = 0 here.</li>
+            <li>Its symbol has a solid channel line.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 1 ================= -->
+      <section id="s1" aria-labelledby="h1s">
+        <h2 id="h1s">Depletion mode: negative V<sub>GS</sub></h2>
+        <div class="prose">
+          <p>Make the gate <strong>NEGATIVE</strong> with respect to the source. The negative gate repels electrons from the channel (and attracts holes from the substrate that recombine with channel electrons). The channel loses carriers: it is <strong>DEPLETED</strong>. Its conductivity falls, and so does the drain current.</p>
+          <p>At a sufficiently negative gate voltage, the channel is emptied of free electrons and I<sub>D</sub> falls to zero. This gate voltage is the <strong>PINCH-OFF VOLTAGE V<sub>P</sub></strong> (also written V<sub>GS(off)</sub>). For our example, <strong>V<sub>P</sub> = −3 V</strong>.</p>
+          <p>In this mode the depletion MOSFET behaves much like an n-channel JFET, and its transfer characteristic follows the same Shockley equation:</p>
+          <p class="eq">I<sub>D</sub> = I<sub>DSS</sub> · (1 − V<sub>GS</sub>/V<sub>P</sub>)²</p>
+          <p>Example: V<sub>GS</sub> = −1.5 V gives I<sub>D</sub> = 6 × (1 − 0.5)² = <strong>1.5 mA</strong>.</p>
+        </div>
+
+        <figure class="anim" id="anim1">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="slider">
+              <label for="a1"><span>Gate voltage V<sub>GS</sub> (V<sub>DS</sub> = 5 V)</span><output id="a1o" for="a1">−1.50 V</output></label>
+              <input type="range" id="a1" min="-4" max="2" step="0.01" value="-1.5">
+            </div>
+          </div>
+          <canvas id="cv1" class="narrow" style="aspect-ratio:600/340" role="img" aria-label="Depletion MOSFET cross-section with VDS = 5 V. As VGS goes negative the channel thins from the oxide side and fades, with fewer electrons; the ID meter falls, and at VGS = VP = −3 V the channel is empty and ID = 0."></canvas>
+          <canvas id="cv1b" class="narrow inset" style="aspect-ratio:600/300" role="img" aria-label="Transfer curve ID against VGS from −4 to +2 V. The part up to the present VGS is drawn solid; the negative half is shaded. IDSS = 6 mA at VGS = 0 and VP = −3 V are marked."></canvas>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr v">V<sub>GS</sub><b id="c1g"></b></div><div class="ctr cur">I<sub>D</sub> = I<sub>DSS</sub>(1 − V<sub>GS</sub>/V<sub>P</sub>)²<b id="c1i"></b></div><div class="ctr ">I<sub>D</sub>/I<sub>DSS</sub><b id="c1r"></b></div>
+          </div>
+        </figure>
+        <aside class="keypoints" aria-label="Key points: depletion mode">
+          <h3>Key points</h3>
+          <ul>
+            <li>A negative gate repels electrons and depletes the channel, so I<sub>D</sub> falls.</li>
+            <li>At V<sub>GS</sub> = V<sub>P</sub> = −3 V (V<sub>GS(off)</sub>) the channel is empty and I<sub>D</sub> = 0.</li>
+            <li>Like a JFET: I<sub>D</sub> = I<sub>DSS</sub>(1 − V<sub>GS</sub>/V<sub>P</sub>)².</li>
+            <li>V<sub>GS</sub> = −1.5 V gives 1.5 mA.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 2 ================= -->
+      <section id="s2" aria-labelledby="h2s">
+        <h2 id="h2s">Enhancement mode: positive V<sub>GS</sub></h2>
+        <div class="prose">
+          <p>Unlike a JFET, the depletion MOSFET can also work with a <strong>POSITIVE</strong> gate voltage. Its gate is insulated by the oxide, so a positive V<sub>GS</sub> causes <strong>no gate current</strong> (in a JFET, a positive gate would forward bias the gate junction).</p>
+          <p>A positive gate attracts <strong>MORE electrons</strong> into the channel, from the n<sup>+</sup> regions and the substrate. The channel becomes more conductive and the drain current rises <strong>ABOVE I<sub>DSS</sub></strong>. This is called the <strong>ENHANCEMENT MODE</strong> of the depletion MOSFET.</p>
+          <p>Shockley's equation still applies:</p>
+          <p>Example: V<sub>GS</sub> = +1 V gives I<sub>D</sub> = 6 × (1 + 1/3)² ≈ <strong>10.7 mA</strong>.</p>
+          <p>So a depletion MOSFET can be operated with <strong>either polarity</strong> of gate voltage. Care is needed not to exceed the maximum drain current or the gate-oxide voltage rating.</p>
+        </div>
+
+        <figure class="anim" id="anim2">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="slider">
+              <label for="a2"><span>Gate voltage V<sub>GS</sub> (V<sub>DS</sub> = 5 V)</span><output id="a2o" for="a2">+1.00 V</output></label>
+              <input type="range" id="a2" min="-4" max="2" step="0.01" value="1">
+            </div>
+          </div>
+          <canvas id="cv2" class="narrow" style="aspect-ratio:600/370" role="img" aria-label="Depletion MOSFET cross-section with a positive gate: more electrons crowd into a thicker, brighter channel, and the ID meter rises above its IDSS mark at 6 mA. A gate ammeter reads IG = 0: insulated gate."></canvas>
+          <canvas id="cv2b" class="narrow inset" style="aspect-ratio:600/300" role="img" aria-label="Transfer curve continuing to the right of VGS = 0 above IDSS, with the positive half shaded."></canvas>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr v">V<sub>GS</sub><b id="c2g"></b></div><div class="ctr cur">I<sub>D</sub><b id="c2i"></b></div><div class="ctr ">I<sub>D</sub>/I<sub>DSS</sub><b id="c2r"></b></div><div class="ctr cur">Gate current I<sub>G</sub><b id="c2a">0</b></div>
+          </div>
+        </figure>
+        <aside class="keypoints" aria-label="Key points: enhancement mode">
+          <h3>Key points</h3>
+          <ul>
+            <li>The insulated gate allows positive V<sub>GS</sub> with no gate current.</li>
+            <li>A positive gate draws more electrons into the channel: I<sub>D</sub> rises above I<sub>DSS</sub>.</li>
+            <li>Shockley's equation still holds: V<sub>GS</sub> = +1 V gives about 10.7 mA.</li>
+            <li>Respect the maximum drain current and the gate-oxide voltage rating.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 3 ================= -->
+      <section id="s3" aria-labelledby="h3s">
+        <h2 id="h3s">Drain characteristics</h2>
+        <div class="prose">
+          <p>The drain characteristics of a depletion MOSFET look like those of a JFET, but with <strong>extra curves above the V<sub>GS</sub> = 0 curve</strong> for positive gate voltages. They have the same regions:</p>
+          <ul>
+            <li><strong>OHMIC</strong> (triode): small V<sub>DS</sub>, the channel acts as a resistor;</li>
+            <li><strong>SATURATION</strong>: V<sub>DS</sub> ≥ V<sub>GS</sub> − V<sub>P</sub>, nearly constant current, used for amplification;</li>
+            <li><strong>CUTOFF</strong>: V<sub>GS</sub> ≤ V<sub>P</sub>, no channel, I<sub>D</sub> = 0.</li>
+          </ul>
+        </div>
+
+        <figure class="anim" id="anim3">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <span class="glabel">Drag the operating point on the graph</span>
+          </div>
+          <div class="badges narrow" aria-live="polite"><span class="bdg" id="b3"></span></div>
+          <canvas id="cv3" class="narrow" style="aspect-ratio:600/400" role="img" aria-label="Drain characteristics for VGS = −2, −1, 0, +1 and +2 V from 0 to 15 V with the dashed pinch-off locus and shaded ohmic, saturation and cutoff regions. The VGS = 0 curve is highlighted and labelled IDSS; curves above it are enhancement mode and below it depletion mode. A draggable operating point and a small cross-section show the channel state."></canvas>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr v">V<sub>GS</sub><b id="c3g"></b></div><div class="ctr v">V<sub>DS</sub><b id="c3d"></b></div><div class="ctr cur">I<sub>D</sub><b id="c3i"></b></div>
+          </div>
+        </figure>
+        <aside class="keypoints" aria-label="Key points: drain characteristics">
+          <h3>Key points</h3>
+          <ul>
+            <li>Like JFET curves, plus curves above V<sub>GS</sub> = 0 for positive gate voltages.</li>
+            <li>Ohmic: small V<sub>DS</sub>, the channel is a resistor.</li>
+            <li>Saturation: V<sub>DS</sub> ≥ V<sub>GS</sub> − V<sub>P</sub>, nearly constant current.</li>
+            <li>Cutoff: V<sub>GS</sub> ≤ V<sub>P</sub>, I<sub>D</sub> = 0.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 4 ================= -->
+      <section id="s4" aria-labelledby="h4s">
+        <h2 id="h4s">Comparing JFET, depletion MOSFET and enhancement MOSFET</h2>
+        <div class="prose">
+          <p>The three n-channel FET types are easiest to compare through their <strong>transfer characteristics</strong>:</p>
+          <ul>
+            <li><strong>JFET</strong>: conducts at V<sub>GS</sub> = 0 (I<sub>D</sub> = I<sub>DSS</sub>); works only with V<sub>GS</sub> between V<sub>P</sub> and 0 (negative). A positive gate would forward bias the gate junction.</li>
+            <li><strong>DEPLETION MOSFET</strong>: conducts at V<sub>GS</sub> = 0 (I<sub>D</sub> = I<sub>DSS</sub>); works with negative V<sub>GS</sub> (depletion mode) AND positive V<sub>GS</sub> (enhancement mode).</li>
+            <li><strong>ENHANCEMENT MOSFET</strong>: no current at V<sub>GS</sub> = 0; needs V<sub>GS</sub> above a positive threshold V<sub>T</sub> to conduct.</li>
+          </ul>
+          <p>The MOSFETs have far <strong>higher input resistance</strong> than the JFET (the oxide insulates the gate completely), but their thin oxide can be damaged by <strong>static electricity</strong>, so they must be handled with ESD care.</p>
+          <p>Depletion MOSFETs are less common than enhancement types. They are used in some RF amplifiers, constant-current sources, start-up circuits in power supplies, and as load devices in older NMOS logic.</p>
+        </div>
+
+        <figure class="anim" id="anim4">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="slider">
+              <label for="a4"><span>Gate voltage V<sub>GS</sub></span><output id="a4o" for="a4">−1.00 V</output></label>
+              <input type="range" id="a4" min="-5" max="5" step="0.01" value="-1">
+            </div>
+          </div>
+          <canvas id="cv4" class="narrow" style="aspect-ratio:600/520" role="img" aria-label="Transfer characteristics from −5 to +5 V: the JFET in orange ending at VGS = 0 with the positive side shaded red as gate conducts, the depletion MOSFET in cyan crossing VGS = 0, and the enhancement MOSFET in purple starting at VT = 1 V. A vertical line marks the chosen VGS. The three symbols sit in the legend below."></canvas>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr wide"><span style="color:#ffb74d">JFET</span> I<sub>D</sub><b id="c4j"></b></div><div class="ctr wide"><span style="color:#26c6da">Depletion MOSFET</span> I<sub>D</sub><b id="c4d"></b></div><div class="ctr wide"><span style="color:#ce93d8">Enhancement MOSFET</span> I<sub>D</sub><b id="c4e"></b></div>
+          </div>
+        </figure>
+        <aside class="keypoints" aria-label="Key points: comparison">
+          <h3>Key points</h3>
+          <ul>
+            <li>JFET: conducts at V<sub>GS</sub> = 0, works only for V<sub>P</sub> ≤ V<sub>GS</sub> ≤ 0.</li>
+            <li>Depletion MOSFET: conducts at V<sub>GS</sub> = 0, works with both polarities.</li>
+            <li>Enhancement MOSFET: off at V<sub>GS</sub> = 0, conducts above V<sub>T</sub>.</li>
+            <li>MOSFET gates have far higher input resistance but need ESD care.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 5 ================= -->
+      <section id="s5" aria-labelledby="h5s">
+        <h2 id="h5s">Summary</h2>
+        <div class="prose">
+          <p>A depletion MOSFET has a channel built in during manufacture, so it <strong>conducts at V<sub>GS</sub> = 0</strong> with I<sub>D</sub> = I<sub>DSS</sub>. Negative V<sub>GS</sub> <strong>depletes</strong> the channel (I<sub>D</sub> falls to zero at V<sub>P</sub>); positive V<sub>GS</sub> <strong>enhances</strong> it (I<sub>D</sub> rises above I<sub>DSS</sub>). It follows I<sub>D</sub> = I<sub>DSS</sub>(1 − V<sub>GS</sub>/V<sub>P</sub>)² on both sides. Its symbol has a solid channel line. A p-channel depletion MOSFET works the same way with all polarities reversed.</p>
+        </div>
+
+        <figure class="anim" id="anim5">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="slider">
+              <label for="a5"><span>Gate voltage V<sub>GS</sub> (V<sub>DS</sub> = 5 V)</span><output id="a5o" for="a5">+0.50 V</output></label>
+              <input type="range" id="a5" min="-4" max="2" step="0.01" value="0.5">
+            </div>
+          </div>
+          <div class="badges narrow" aria-live="polite"><span class="bdg" id="b5"></span></div>
+          <canvas id="cv5" class="narrow" style="aspect-ratio:600/340" role="img" aria-label="Recap cross-section of the depletion MOSFET driven by the gate slider, with the ID meter."></canvas>
+          <canvas id="cv5b" class="narrow inset" style="aspect-ratio:600/300" role="img" aria-label="Recap transfer curve with the operating point."></canvas>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr v">V<sub>GS</sub><b id="c5g"></b></div><div class="ctr cur">I<sub>D</sub><b id="c5i"></b></div>
+          </div>
+        </figure>
+        <div class="formulas" aria-label="Key formulas">
+          <h3>Key formulas</h3>
+          <ul>
+            <li>I<sub>D</sub> = I<sub>DSS</sub>(1 − V<sub>GS</sub>/V<sub>P</sub>)² (saturation)</li>
+            <li>V<sub>DS(sat)</sub> = V<sub>GS</sub> − V<sub>P</sub></li>
+            <li>V<sub>GS</sub> = 0 → I<sub>D</sub> = I<sub>DSS</sub></li>
+            <li>V<sub>GS</sub> = V<sub>P</sub> → I<sub>D</sub> = 0</li>
+          </ul>
+        </div>
+        <aside class="keypoints" aria-label="Key points: summary">
+          <h3>Key points</h3>
+          <ul>
+            <li>Built-in channel: conducts at V<sub>GS</sub> = 0 with I<sub>D</sub> = I<sub>DSS</sub>.</li>
+            <li>Negative V<sub>GS</sub> depletes (zero at V<sub>P</sub>); positive V<sub>GS</sub> enhances (above I<sub>DSS</sub>).</li>
+            <li>I<sub>D</sub> = I<sub>DSS</sub>(1 − V<sub>GS</sub>/V<sub>P</sub>)² on both sides.</li>
+            <li>Solid channel line in the symbol; p-channel has all polarities reversed.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <nav class="pager" aria-label="Topic navigation">
+        <a href="../8-5-enhancement-mosfet/index.html"><small>← Previous</small>8.5 Enhancement MOSFET</a>
+        <a class="next" href="../8-7-mosfet-characteristics/index.html"><small>Next →</small>8.7 MOSFET Characteristics and Regions</a>
+      </nav>
+    </div>
+  </main>
+
+  <footer class="site-foot">© 2026 Naveen Bokka</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  const C = {
+    text: '#e6e9ef', muted: '#9aa4b8', v: '#ffd54f', cur: '#81c784', wire: '#cfd8dc', tan: '#ce93d8', q: '#ff8a65',
+    grid: 'rgba(255,255,255,.07)'
+  };
+  const FONT = 'Inter, system-ui, sans-serif';
+  const MONO = '"JetBrains Mono", Consolas, monospace';
+  const RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const TAU = Math.PI * 2;
+  const $ = id => document.getElementById(id);
+  if (RM) $('rmNote').hidden = false;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const lerp = (a, b, u) => a + (b - a) * u;
+  const ease = u => { u = clamp(u, 0, 1); return u * u * (3 - 2 * u); };
+
+  const fV = (v, d) => (v < -1e-9 ? '−' : '') + Math.abs(v).toFixed(d == null ? 2 : d) + ' V';
+  const fN = (v, d) => (v < -1e-9 ? '−' : '') + Math.abs(v).toFixed(d || 0);
+  const fmA = i => (i * 1e3).toFixed(2) + ' mA';
+  const fmS = g => (g * 1e3).toFixed(2) + ' mS';
+  const fR = r => !isFinite(r) || r > 1e9 ? '∞' : r >= 1e6 ? (r / 1e6).toFixed(2) + ' MΩ' : r >= 1e3 ? (r / 1e3).toFixed(r >= 1e5 ? 0 : 1) + ' kΩ' : r.toFixed(0) + ' Ω';
+  const fMu = m => !isFinite(m) || m > 1e6 ? '∞' : m >= 100 ? m.toFixed(0) : m.toFixed(1);
+
+  /* ---------- Canvas helpers ---------- */
+  let FS = 1;
+  function Cv(id, W, H, cap) { this.el = $(id); this.W = W; this.H = H; this.cap = cap || 2; this.ctx = this.el.getContext('2d'); }
+  Cv.prototype.begin = function () {
+    const w = this.el.clientWidth; if (!w) return null;
+    const dpr = window.devicePixelRatio || 1;
+    const pw = Math.round(w * dpr), ph = Math.round(w * dpr * this.H / this.W);
+    if (this.el.width !== pw || this.el.height !== ph) { this.el.width = pw; this.el.height = ph; }
+    const c = this.ctx, s = pw / this.W;
+    FS = Math.min(this.cap, Math.max(1, 1.15 * this.W / w));
+    c.setTransform(s, 0, 0, s, 0, 0); c.clearRect(0, 0, this.W, this.H);
+    c.textBaseline = 'middle'; c.textAlign = 'left'; c.globalAlpha = 1; c.setLineDash([]); c.lineCap = 'butt'; c.shadowBlur = 0;
+    return c;
+  };
+  // Watermark: drawn inside the canvas, bottom-right, 13 px on screen at any size.
+  Cv.prototype.wm = function (c) {
+    const k = this.W / this.el.clientWidth, s = 13 * k;
+    c.save(); c.setTransform(this.el.width / this.W, 0, 0, this.el.width / this.W, 0, 0);
+    c.globalAlpha = 1; c.shadowBlur = 0; c.font = '500 ' + s.toFixed(1) + 'px ' + FONT; c.fillStyle = 'rgba(255,255,255,.35)';
+    c.textAlign = 'right'; c.textBaseline = 'bottom'; c.fillText('© Naveen Bokka', this.W - 6 * k, this.H - 4 * k); c.restore();
+  };
+  Cv.prototype.pt = function (e) {
+    const r = this.el.getBoundingClientRect();
+    return { x: (e.clientX - r.left) * this.W / r.width, y: (e.clientY - r.top) * this.H / r.height };
+  };
+  function circ(c, x, y, r, fill, stroke, lw) {
+    c.beginPath(); c.arc(x, y, Math.max(0, r), 0, TAU);
+    if (fill) { c.fillStyle = fill; c.fill(); }
+    if (stroke) { c.strokeStyle = stroke; c.lineWidth = lw || 1.5; c.stroke(); }
+  }
+  function txt(c, s, x, y, col, size, weight, align, font) {
+    c.font = (weight || 600) + ' ' + ((size || 12) * FS).toFixed(1) + 'px ' + (font || FONT);
+    c.fillStyle = col || C.text; c.textAlign = align || 'left'; c.fillText(s, x, y);
+  }
+  // Label made of [main, subscript] parts, e.g. [['g','m'],[' = 2.5 mS','']]
+  function subs(c, parts, x, y, col, size, align) {
+    const z = (size || 13) * FS, zs = z * 0.72;
+    let w = 0;
+    const ws = parts.map(p => {
+      c.font = '700 ' + z.toFixed(1) + 'px ' + FONT; const a = c.measureText(p[0]).width;
+      c.font = '700 ' + zs.toFixed(1) + 'px ' + FONT; const b = p[1] ? c.measureText(p[1]).width : 0;
+      w += a + b; return [a, b];
+    });
+    let x0 = align === 'right' ? x - w : align === 'center' ? x - w / 2 : x;
+    c.fillStyle = col; c.textAlign = 'left';
+    parts.forEach((p, k) => {
+      c.font = '700 ' + z.toFixed(1) + 'px ' + FONT; c.fillText(p[0], x0, y); x0 += ws[k][0];
+      if (p[1]) { c.font = '700 ' + zs.toFixed(1) + 'px ' + FONT; c.fillText(p[1], x0, y + z * 0.3); x0 += ws[k][1]; }
+    });
+    return w;
+  }
+  function line(c, x0, y0, x1, y1, col, lw, dash) {
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []);
+    c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke(); c.setLineDash([]);
+  }
+  function pline(c, pts, col, lw, dash) {
+    if (pts.length < 2) return;
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []); c.lineJoin = 'round';
+    c.beginPath(); pts.forEach((p, k) => k ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); c.stroke(); c.setLineDash([]);
+  }
+  function gline(c, pts, col, lw) { c.save(); c.shadowColor = col; c.shadowBlur = 5; pline(c, pts, col, lw || 2.6); c.restore(); }
+  function arrow(c, x0, y0, x1, y1, col, lw, head) {
+    const dx = x1 - x0, dy = y1 - y0, L = Math.hypot(dx, dy); if (L < 2) return;
+    const ux = dx / L, uy = dy / L, hs = Math.min(head || 10, L * 0.8), hw = Math.max(hs * 0.55, lw * 0.9);
+    line(c, x0, y0, x1 - ux * hs * 0.9, y1 - uy * hs * 0.9, col, lw || 3);
+    c.fillStyle = col; c.beginPath(); c.moveTo(x1, y1);
+    c.lineTo(x1 - ux * hs - uy * hw, y1 - uy * hs + ux * hw);
+    c.lineTo(x1 - ux * hs + uy * hw, y1 - uy * hs - ux * hw); c.closePath(); c.fill();
+  }
+  function poly(c, pts, fill, stroke, lw) {
+    c.beginPath(); c.moveTo(pts[0][0], pts[0][1]); for (let k = 1; k < pts.length; k++) c.lineTo(pts[k][0], pts[k][1]); c.closePath();
+    if (fill) { c.fillStyle = fill; c.fill(); }
+    if (stroke) { c.strokeStyle = stroke; c.lineWidth = lw || 1.2; c.stroke(); }
+  }
+  function qDot(c, x, y, r) {
+    c.save(); c.shadowColor = C.q; c.shadowBlur = 16; circ(c, x, y, r || 7, C.q); c.restore();
+    circ(c, x, y, r || 7, null, '#fff', 1.6);
+  }
+  function segSel(root, attr, val) {
+    root.querySelectorAll('[data-' + attr + ']').forEach(b => b.setAttribute('aria-pressed', String(b.dataset[attr] === String(val))));
+  }
+  function onDrag(cv, f, start) {
+    let d = false;
+    cv.el.addEventListener('pointerdown', e => { d = true; cv.el.setPointerCapture(e.pointerId); if (start) start(); f(cv.pt(e)); e.preventDefault(); });
+    cv.el.addEventListener('pointermove', e => { if (d) f(cv.pt(e)); });
+    ['pointerup', 'pointercancel'].forEach(tp => cv.el.addEventListener(tp, () => { d = false; }));
+  }
+
+  /* ---------- plotting helpers ---------- */
+  function mkP(l, r, t, b, x0, x1, y0, y1) { const P = { l: l, r: r, t: t, b: b, x0: x0, x1: x1, y0: y0, y1: y1 }; P.X = v => l + (v - x0) / (x1 - x0) * (r - l); P.Y = v => b - (v - y0) / (y1 - y0) * (b - t); P.ix = x => x0 + (x - l) / (r - l) * (x1 - x0); P.iy = y => y0 + (b - y) / (b - t) * (y1 - y0); return P; }
+  // Axes, grid and tick labels; yl is drawn above the y axis, xl under the x axis.
+  function frame(c, P, xs, ys, xf, yf, xl, yl) {
+    xs.forEach(v => { line(c, P.X(v), P.t, P.X(v), P.b, C.grid, 1); if (xf) txt(c, xf(v), P.X(v), P.b + 7 + 6 * FS, C.muted, 10, 500, 'center'); });
+    ys.forEach(v => { line(c, P.l, P.Y(v), P.r, P.Y(v), C.grid, 1); if (yf) txt(c, yf(v), P.l - 7, P.Y(v), C.muted, 10, 500, 'right'); });
+    line(c, P.l, P.b, P.r, P.b, C.muted, 1.5); line(c, P.l, P.t, P.l, P.b, C.muted, 1.5);
+    if (xl) subs(c, xl, (P.l + P.r) / 2, P.b + 16 + 14 * FS, C.muted, 12, 'center');
+    if (yl) subs(c, yl, P.l - 6, P.t - 4 - 8 * FS, C.muted, 12, 'left');
+  }
+  const clip = (c, P) => { c.save(); c.beginPath(); c.rect(P.l, P.t, P.r - P.l, P.b - P.t); c.clip(); };
+  const ticks = (a, b, st) => { const o = []; for (let v = Math.ceil(a / st - 1e-9) * st; v <= b + 1e-9; v += st) o.push(+v.toFixed(6)); return o; };
+  const XG = [['V', 'GS'], [' (V)', '']], XD = [['V', 'DS'], [' (V)', '']], YI = [['I', 'D'], [' (mA)', '']];
+  const mAf = d => v => (v * 1e3).toFixed(d || 0);
+  // Right-angle slope triangle: hypotenuse A→B on a straight line, legs horizontal (yellow) and vertical (green)
+  function slopeTri(c, A, B, hcol, vcol) {
+    const Rc = [B[0], A[1]];
+    poly(c, [A, Rc, B], 'rgba(206,147,216,.13)');
+    line(c, A[0], A[1], Rc[0], Rc[1], hcol, 2.4); line(c, Rc[0], Rc[1], B[0], B[1], vcol, 2.4);
+    const s = 7 * Math.sign(B[0] - A[0] || 1), u = 7 * Math.sign(B[1] - A[1] || -1);
+    pline(c, [[Rc[0] - s, Rc[1]], [Rc[0] - s, Rc[1] + u], [Rc[0], Rc[1] + u]], 'rgba(255,255,255,.5)', 1);
+    return Rc;
+  }
+
+  /* ---------- Animation framework: own Play/Pause/Reset, runs only while visible ---------- */
+  const anims = [];
+  function Anim(rootId, o) {
+    this.root = $(rootId); this.o = o; this.playing = !RM; this.visible = true; this.dirty = true;
+    this.pb = this.root.querySelector('[data-act="play"]');
+    this.pb.addEventListener('click', () => this.setPlaying(!this.playing));
+    this.root.querySelector('[data-act="reset"]').addEventListener('click', () => { o.reset(); this.setPlaying(!RM); });
+    o.reset(); this.sync(); anims.push(this);
+    if ('IntersectionObserver' in window) {
+      this.visible = false;
+      new IntersectionObserver(es => es.forEach(e => { this.visible = e.isIntersecting; if (this.visible) this.dirty = true; }))
+        .observe(this.root);
+    }
+  }
+  Anim.prototype.setPlaying = function (p) { this.playing = p; this.sync(); this.dirty = true; };
+  Anim.prototype.sync = function () { this.pb.textContent = this.playing ? 'Pause' : 'Play'; };
+
+  /* =========================================================
+     n-channel enhancement MOSFET: VT = 1 V, Kn = 0.5 mA/V², λ = 0.01 /V.
+       Cutoff (VGS < VT): ID = 0
+       Triode (VDS < VGS − VT): ID = Kn·[2(VGS − VT)·VDS − VDS²]·(1 + λ·VDS)
+       Saturation:              ID = Kn·(VGS − VT)²·(1 + λ·VDS)
+       (the (1 + λ·VDS) factor is applied in triode too so the curves join at pinch-off)
+     Channel drawing (gradual channel): local thickness ∝ VGS − V(x) − VT, with
+       V(x) from 0 at the source to min(VDS, VGS − VT) at the pinch-off point.
+     ========================================================= */
+  const VT = 1, KN = 0.5e-3, LAM = 0.01;
+  function idOf(vgs, vds, kn, lam) {
+    kn = kn == null ? KN : kn; lam = lam == null ? LAM : lam;
+    const vov = vgs - VT; if (vov <= 0 || vds <= 0) return 0;
+    return (vds < vov ? kn * (2 * vov * vds - vds * vds) : kn * vov * vov) * (1 + lam * vds);
+  }
+  const regOf = (vgs, vds) => vgs < VT ? 'cut' : vds < vgs - VT ? 'tri' : 'sat';
+  const RN = { cut: ['r-cut', 'cutoff'], tri: ['r-tri', 'triode'], sat: ['r-sat', 'saturation'] };
+  function setRB(id, r) { const b = $(id); b.className = 'bdg ' + RN[r][0]; b.textContent = RN[r][1]; }
+  function prof(vgs, vds) {   // magnitudes; null when there is no channel
+    const vov = vgs - VT; if (vov <= 0) return null;
+    const vde = Math.min(Math.max(vds, 0), vov), A = 2 * vov * vde - vde * vde, pinch = vds >= vov;
+    const dl = pinch ? Math.min(0.16, 0.022 * (vds - vov)) : 0;
+    return { vov: vov, end: 1 - dl, pinch: pinch, thk: s => s > 1 - dl ? 0 : Math.sqrt(Math.max(0, vov * vov - (s / (1 - dl)) * A)) };
+  }
+  const fI = i => i >= 1e-3 ? (i * 1e3).toFixed(2) + ' mA' : i >= 1e-6 ? (i * 1e6).toFixed(0) + ' µA' : '0';
+  const fVs = (v, d) => (v < -1e-9 ? '−' : '') + Math.abs(v).toFixed(d == null ? 2 : d) + ' V';
+
+  /* ---------- colours and small helpers ---------- */
+  const NC = '#2e4a7d', PC = '#7d3a3a', DEP = '#3a3f4f', OX = '#b0bec5', GATE = '#78909c', CH = '#26c6da', EL = '#4fc3f7', HO = '#ff8a65', MET = '#90a4ae';
+  const VPAL = { 2: '#f06292', 3: '#4db6ac', 4: '#9fa8da', 5: '#ffb74d' };
+  function rrect(c, x, y, w, h, r) { c.beginPath(); if (c.roundRect) c.roundRect(x, y, w, h, r); else c.rect(x, y, w, h); }
+  let HATCH = null;
+  function hatch(c) {
+    if (!HATCH) { const p = document.createElement('canvas'); p.width = 10; p.height = 10; const g = p.getContext('2d'); g.fillStyle = DEP; g.fillRect(0, 0, 10, 10); g.strokeStyle = 'rgba(255,255,255,.18)'; g.lineWidth = 1.2; g.beginPath(); g.moveTo(-2, 12); g.lineTo(12, -2); g.moveTo(-2, 2); g.lineTo(2, -2); g.moveTo(8, 12); g.lineTo(12, 8); g.stroke(); HATCH = p; }
+    return c.createPattern(HATCH, 'repeat');
+  }
+  function ground(c, x, y, s) {
+    s = s || 1; line(c, x, y, x, y + 7 * s, C.wire, 2);
+    line(c, x - 10 * s, y + 7 * s, x + 10 * s, y + 7 * s, C.wire, 2); line(c, x - 6 * s, y + 11 * s, x + 6 * s, y + 11 * s, C.wire, 2); line(c, x - 2 * s, y + 15 * s, x + 2 * s, y + 15 * s, C.wire, 2);
+  }
+  function rng(s) { return function () { s |= 0; s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  // well with a flat top and rounded bottom corners
+  function well(c, x0, x1, y, d, r) {
+    r = Math.min(r, d, (x1 - x0) / 2);
+    c.beginPath(); c.moveTo(x0, y); c.lineTo(x0, y + d - r); c.quadraticCurveTo(x0, y + d, x0 + r, y + d); c.lineTo(x1 - r, y + d); c.quadraticCurveTo(x1, y + d, x1, y + d - r); c.lineTo(x1, y); c.closePath();
+  }
+  function notScale(c, x, y) { txt(c, 'not to scale', x, y, C.muted, 10, 600, 'left'); }
+
+  /* ---------- carriers ---------- */
+  function Flow(n, seed) { const r = rng(seed); this.p = []; for (let k = 0; k < n; k++) this.p.push({ s: r(), r: r() }); this.r = r; const sub = []; for (let k = 0; k < 60; k++) sub.push({ u: r(), v: r() }); this.sub = sub; }
+  Flow.prototype.step = function (dt, pr, id) {
+    if (!pr || id <= 0) return;
+    const base = 0.08 + 0.3 * Math.min(1, id / 4e-3);
+    this.p.forEach(q => { const th = pr.thk(q.s) / pr.vov, v = q.s > pr.end ? 2.6 : base / Math.max(0.3, th); q.s += v * dt; if (q.s > 1) { q.s -= 1; q.r = this.r(); } });
+  };
+
+  /* ---------- isometric inset showing L and W ---------- */
+  function iso(c, x, y, wf, pm, len) {
+    len = len || 80; const d = 26 * wf, dx = d * 0.87, dy = d * 0.5, T = 16;
+    const P = (u, v) => [x + u * len + v * dx, y - v * dy];   // u along L, v along W
+    poly(c, [P(0, 0), P(1, 0), [P(1, 0)[0], P(1, 0)[1] + T], [P(0, 0)[0], P(0, 0)[1] + T]], pm ? '#25406b' : '#6a3030');
+    poly(c, [P(1, 0), P(1, 1), [P(1, 1)[0], P(1, 1)[1] + T], [P(1, 0)[0], P(1, 0)[1] + T]], pm ? '#1f3659' : '#5a2828');
+    poly(c, [P(0, 0), P(1, 0), P(1, 1), P(0, 1)], pm ? NC : PC);
+    const strip = (u0, u1, col) => poly(c, [P(u0, 0), P(u1, 0), P(u1, 1), P(u0, 1)], col);
+    strip(0.02, 0.3, pm ? PC : NC); strip(0.7, 0.98, pm ? PC : NC); strip(0.34, 0.66, GATE);
+    const a = P(0.34, 0), bq = P(0.66, 0);
+    line(c, a[0], a[1] + T + 8, bq[0], bq[1] + T + 8, C.text, 1.2); txt(c, 'L', (a[0] + bq[0]) / 2, a[1] + T + 18, C.text, 11, 700, 'center');
+    const e0 = P(1, 0), e1 = P(1, 1);
+    line(c, e0[0] + 8, e0[1] + 4, e1[0] + 8, e1[1] + 4, C.text, 1.2); txt(c, 'W', (e0[0] + e1[0]) / 2 + 14, (e0[1] + e1[1]) / 2 + 4, C.text, 11, 700, 'left');
+  }
+
+  /* ---------- output characteristics ---------- */
+  function outChars(c, P, o) {
+    const kn = o.kn == null ? KN : o.kn, lam = o.lam == null ? LAM : o.lam;
+    frame(c, P, o.xs, o.ys, v => String(v), v => (v * 1e3).toFixed(o.yd || 0), [['V', 'DS'], [' (V)', '']], [['I', 'D'], [' (mA)', '']]);
+    clip(c, P);
+    if (o.bound) {
+      const bp = []; for (let v = 0; v <= P.x1 + 1e-9; v += P.x1 / 200) bp.push([P.X(v), P.Y(kn * v * v * (1 + lam * v))]);
+      pline(c, bp, 'rgba(255,213,79,.7)', 1.6, [6, 4]);
+    }
+    (o.list || []).forEach(g => {
+      const pts = []; for (let v = 0; v <= P.x1 + 1e-9; v += P.x1 / 200) pts.push([P.X(v), P.Y(idOf(g, v, kn, lam))]);
+      if (g === o.hl) gline(c, pts, VPAL[g], 3); else pline(c, pts, VPAL[g], o.hl == null ? 2.2 : 1.6);
+    });
+    c.restore();
+    (o.list || []).forEach(g => { const y = P.Y(idOf(g, P.x1, kn, lam)); if (y > P.t + 6) txt(c, g + ' V', P.r - 4, y - 9, VPAL[g], 10, 700, 'right'); });
+  }
+
+  /* ---------- MOSFET symbols ---------- */
+  function sym(c, x, y, s, o) {
+    o = o || {}; const pm = !!o.p, W = C.wire, lw = 2.2;
+    const gx = x - 8 * s;
+    line(c, gx, y - 22 * s, gx, y + 22 * s, W, lw);
+    if (o.three && pm) { circ(c, gx - 6 * s, y, 5 * s, null, W, 1.8); line(c, x - 40 * s, y, gx - 11 * s, y, W, lw); }
+    else line(c, x - 40 * s, y, gx, y, W, lw);
+    txt(c, 'G', x - 46 * s, y, C.text, 11, 700, 'right');
+    const hc = o.hlc || CH;
+    if (o.three || o.solid) { if (o.hl) { c.save(); c.shadowColor = hc; c.shadowBlur = 8; line(c, x, y - 26 * s, x, y + 26 * s, hc, 3.4); c.restore(); } else line(c, x, y - 26 * s, x, y + 26 * s, W, 3); }
+    else [[-26, -13], [-6, 6], [13, 26]].forEach(a => { if (o.hl) { c.save(); c.shadowColor = hc; c.shadowBlur = 8; line(c, x, y + a[0] * s, x, y + a[1] * s, hc, 3.4); c.restore(); } else line(c, x, y + a[0] * s, x, y + a[1] * s, W, 3); });
+    const dy = pm ? 20 : -20, sy = -dy;   // drain on top for NMOS, source on top for PMOS
+    line(c, x, y + dy * s, x + 26 * s, y + dy * s, W, lw); line(c, x + 26 * s, y + dy * s, x + 26 * s, y + dy * 2.3 * s, W, lw);
+    line(c, x, y + sy * s, x + 26 * s, y + sy * s, W, lw); line(c, x + 26 * s, y + sy * s, x + 26 * s, y + sy * 2.3 * s, W, lw);
+    txt(c, 'D', x + 32 * s, y + dy * 2.1 * s, C.text, 11, 700, 'left'); txt(c, 'S', x + 32 * s, y + sy * 2.1 * s, C.text, 11, 700, 'left');
+    if (!o.three) {
+      line(c, x, y, x + 26 * s, y, W, lw); txt(c, 'B', x + 32 * s, y, C.text, 11, 700, 'left');
+      if (pm) arrow(c, x + 4 * s, y, x + 20 * s, y, W, 2, 8 * s); else arrow(c, x + 22 * s, y, x + 3 * s, y, W, 2, 8 * s);
+    } else if (!pm) arrow(c, x + 4 * s, y + sy * s, x + 22 * s, y + sy * s, W, 2, 8 * s);
+    if (o.lab) txt(c, o.lab, x - 6 * s, y + 66 * s, o.labc || C.muted, 11, 700, 'center');
+  }
+
+  /* =========================================================
+     n-channel depletion MOSFET: IDSS = 6 mA, VP = VGS(off) = −3 V, λ = 0.01 /V.
+       Cutoff (VGS ≤ VP): ID = 0
+       Triode (VDS < VGS − VP): ID = (IDSS/VP²)·[2(VGS − VP)·VDS − VDS²]·(1 + λ·VDS)
+       Saturation:              ID = IDSS·(1 − VGS/VP)²·(1 + λ·VDS)
+       (the (1 + λ·VDS) factor is applied in triode too so the curves join at pinch-off)
+     Transfer curves and the meters in the cross-sections use the saturation value
+     with λ·VDS neglected: ID = IDSS·(1 − VGS/VP)².
+     Comparison: JFET IDSS = 10 mA, VP = −4 V; enhancement MOSFET VT = 1 V, Kn = 0.5 mA/V².
+     ========================================================= */
+  const IDSS = 6e-3, VPD = -3, LAMD = 0.01, VMAXG = 2;
+  const shk = (v, is, vp) => { is = is || IDSS; vp = vp || VPD; return v <= vp ? 0 : is * Math.pow(1 - v / vp, 2); };
+  function idD(vgs, vds) {
+    const vov = vgs - VPD; if (vov <= 0 || vds <= 0) return 0;
+    return (vds < vov ? IDSS / (VPD * VPD) * (2 * vov * vds - vds * vds) : IDSS * Math.pow(1 - vgs / VPD, 2)) * (1 + LAMD * vds);
+  }
+  // VGS that puts the curve through (vds, id), for dragging the operating point
+  function vgsFor(vds, id) { let lo = VPD, hi = VMAXG; if (id >= idD(hi, vds)) return hi; for (let k = 0; k < 50; k++) { const m = (lo + hi) / 2; if (idD(m, vds) > id) hi = m; else lo = m; } return (lo + hi) / 2; }
+  function profV(vov, vds) {
+    if (vov <= 0) return null;
+    const vde = Math.min(Math.max(vds, 0), vov), A = 2 * vov * vde - vde * vde, pinch = vds >= vov;
+    const dl = pinch ? Math.min(0.16, 0.022 * (vds - vov)) : 0;
+    return { vov: vov, end: 1 - dl, pinch: pinch, thk: s => s > 1 - dl ? 0 : Math.sqrt(Math.max(0, vov * vov - (s / (1 - dl)) * A)) };
+  }
+  const MODE = v => v <= VPD ? ['m-cut', 'cutoff'] : v < 0 ? ['m-dep', 'depletion mode'] : ['m-enh', 'enhancement mode'];
+  function setMode(id, v) { const b = $(id), m = MODE(v); b.className = 'bdg ' + m[0]; b.textContent = m[1]; }
+  const RD = { ohm: ['r-ohm', 'ohmic'], sat: ['r-sat', 'saturation'], cut: ['r-cut', 'cutoff'] };
+  const regD = (vgs, vds) => vgs <= VPD ? 'cut' : vds < vgs - VPD ? 'ohm' : 'sat';
+  const JC = '#ffb74d', DC = '#26c6da', EC = '#ce93d8';
+
+  /* ---------- cross-section of an enhancement (kind 'enh') or depletion (kind 'dep') MOSFET ---------- */
+  function drawDM(c, S, st, F, o) {
+    o = o || {};
+    const mini = !!o.mini, dep = st.kind !== 'enh', extra = o.amm ? 26 * FS : 0;
+    const y0 = S.y + (mini ? 22 : 40 + 34 * FS + extra), sb = S.y + S.h - (mini ? 12 : 22), nd = (sb - y0) * 0.3;
+    const xS0 = S.x + 0.05 * S.w, xS1 = S.x + 0.3 * S.w, xD0 = S.x + 0.7 * S.w, xD1 = S.x + 0.95 * S.w;
+    const ot = mini ? 4 : 6, gh = mini ? 8 : 14, gx0 = xS1 - 6, gx1 = xD0 + 6;
+    const vgs = st.vgs, vds = st.vds, vov = dep ? vgs - VPD : vgs - VT, pr = profV(vov, vds);
+    const Tc = mini ? 6 : 12, kpx = dep ? (mini ? 2 : 4) : (mini ? 2.5 : 5), cr = mini ? 1.5 : 2.3;
+    c.fillStyle = PC; c.fillRect(S.x, y0, S.w, sb - y0);
+    // depletion: around source and drain, and under the gate of an enhancement device
+    const hs = 3, hd = 3 + 10 * Math.sqrt(Math.min(1, vds / 10)) * (mini ? 0.5 : 1);
+    c.fillStyle = hatch(c);
+    well(c, xS0 - hs, xS1 + hs, y0, nd + hs, 12 + hs); c.fill();
+    well(c, xD0 - hd, Math.min(xD1 + hd, S.x + S.w), y0, nd + hd, 12 + hd); c.fill();
+    if (!dep && vgs > 0) { const dg = 15 * Math.sqrt(Math.min(1, vgs / VT)); c.fillRect(xS1, y0, xD0 - xS1, dg); }
+    // the implanted n channel: shown hatched where it has been depleted
+    if (dep) { c.fillStyle = hatch(c); c.fillRect(xS1, y0, xD0 - xS1, Tc + 2); }
+    F.sub.forEach(p => { const x = S.x + 8 + p.u * (S.w - 16), y = y0 + nd + 16 + p.v * (sb - y0 - nd - 24); if (y < sb - 3) circ(c, x, y, mini ? 1.4 : 2.6, HO); });
+    c.fillStyle = NC; well(c, xS0, xS1, y0, nd, mini ? 6 : 12); c.fill(); well(c, xD0, xD1, y0, nd, mini ? 6 : 12); c.fill();
+    for (let k = 0; k < 8; k++) { const fx = (k % 4 + 0.6) / 4.4, fy = (Math.floor(k / 4) + 0.6) / 2.4; circ(c, xS0 + fx * (xS1 - xS0), y0 + fy * nd, cr, EL); circ(c, xD0 + fx * (xD1 - xD0), y0 + fy * nd, cr, EL); }
+    if (!mini) { txt(c, 'n+', (xS0 + xS1) / 2, y0 + nd * 0.5, '#fff', 12, 700, 'center'); txt(c, 'n+', (xD0 + xD1) / 2, y0 + nd * 0.5, '#fff', 12, 700, 'center'); }
+    // channel: thickness ∝ local (VGS − V(x) − VP); a depleted implant thins from the oxide side
+    if (pr) {
+      const X = s => xS1 + s * (xD0 - xS1), t = s => Math.max(1.2, kpx * pr.thk(s)), bot = s => y0 + (dep ? Math.max(Tc, t(s)) : t(s));
+      const top = [], btm = [];
+      for (let k = 0; k <= 40; k++) { const s = k / 40 * pr.end; top.push([X(s), bot(s) - t(s)]); btm.push([X(s), bot(s)]); }
+      c.save(); c.globalAlpha = 0.35 + 0.5 * Math.min(1, vov / 4); c.shadowColor = CH; c.shadowBlur = 8; poly(c, top.concat(btm.reverse()), CH); c.restore();
+      const nv = Math.max(2, Math.round(F.p.length * Math.min(1, vov / 4.5)));
+      for (let k = 0; k < nv; k++) {
+        const q = F.p[k], x = X(q.s);
+        if (q.s <= pr.end) circ(c, x, bot(q.s) - t(q.s) + 0.8 + q.r * Math.max(0.3, t(q.s) - 1.6), cr, EL);
+        else { c.globalAlpha = 0.85; line(c, x - 10, y0 + 2, x, y0 + 2, EL, 2); c.globalAlpha = 1; }
+      }
+    }
+    c.fillStyle = OX; c.fillRect(gx0, y0 - ot, gx1 - gx0, ot);
+    c.fillStyle = GATE; c.fillRect(gx0, y0 - ot - gh, gx1 - gx0, gh);
+    c.fillStyle = MET; c.fillRect(S.x, sb, S.w, mini ? 3 : 5);
+    if (mini) { if (dep && pr && FS < 1.4) txt(c, 'n channel', (xS1 + xD0) / 2, y0 + Tc + 14, CH, 9, 700, 'center'); return; }
+    c.fillRect(xS0 + 8, y0 - 6, xS1 - xS0 - 24, 6); c.fillRect(xD0 + 16, y0 - 6, xD1 - xD0 - 24, 6);
+    const gc = (gx0 + gx1) / 2, sc = (xS0 + xS1) / 2 - 4, dc = (xD0 + xD1) / 2 + 4, ty = S.y + 8 + 10 * FS;
+    line(c, sc, y0 - 6, sc, ty, C.wire, 2); line(c, gc, y0 - ot - gh, gc, ty, C.wire, 2); line(c, dc, y0 - 6, dc, ty, C.wire, 2);
+    const bx = S.x - 10; line(c, S.x, sb + 3, bx, sb + 3, C.wire, 2); line(c, bx, sb + 3, bx, ty + 12, C.wire, 2); line(c, bx, ty + 12, sc, ty + 12, C.wire, 2); circ(c, sc, ty + 12, 3, C.wire);
+    const tl = ty - 2 - 7 * FS; txt(c, 'S', sc, tl, C.text, 13, 700, 'center'); txt(c, 'G', gc, tl, C.text, 13, 700, 'center'); txt(c, 'D', dc, tl, C.text, 13, 700, 'center');
+    txt(c, 'B', S.x - 18, sb + 3, C.text, 12, 700, 'right');
+    const vy = ty + 2 + 8 * FS;
+    subs(c, [['V', 'GS'], [' = ' + fVs(vgs, 1), '']], gc - (o.amm ? 14 : 8), vy, C.v, 11, 'right');
+    const rt = dc + 8 + 92 * FS < (o.cw || 600), dx = rt ? dc + 8 : dc - 8, al = rt ? 'left' : 'right';
+    subs(c, [['V', 'DS'], [' = ' + fVs(vds, 1), '']], dx, vy, C.v, 11, al);
+    subs(c, [['I', 'D'], [' = ' + fI(st.id), '']], dx, ty + 4 + 22 * FS, C.cur, 11, al);
+    if (st.id > 1e-6) arrow(c, dc, ty + 30, dc, y0 - 10, C.cur, 2.4, 8);
+    if (o.amm) {
+      const ay = ty + 6 + 34 * FS;
+      circ(c, gc, ay, 9, '#141b2b', C.wire, 1.8); txt(c, 'A', gc, ay + 1, C.wire, 10, 700, 'center');
+      subs(c, [['I', 'G'], [' = 0', '']], gc + 14, ay, C.cur, 11, 'left');
+      txt(c, 'insulated gate', gc + 14, ay + 15 * FS, C.muted, 10, 600, 'left');
+    }
+    txt(c, 'p-sub', S.x + S.w / 2, sb - 12, '#fff', 12, 700, 'center');
+    if (dep && pr) txt(c, 'n channel', (xS1 + xD0) / 2, y0 + Math.max(Tc, kpx * pr.vov) + 14, CH, 11, 700, 'center');
+  }
+
+  /* ---------- vertical ID meter with an IDSS mark ---------- */
+  function meter(c, x, y0, y1, id, max) {
+    const Y = v => y1 - Math.min(v, max) / max * (y1 - y0);
+    rrect(c, x, y0, 16, y1 - y0, 4); c.fillStyle = '#0f1420'; c.fill(); c.strokeStyle = 'rgba(255,255,255,.25)'; c.lineWidth = 1; c.stroke();
+    if (id > 0) { rrect(c, x + 2, Y(id), 12, y1 - Y(id), 3); c.fillStyle = id > IDSS * 1.001 ? DC : C.cur; c.fill(); }
+    line(c, x - 6, Y(IDSS), x + 22, Y(IDSS), C.v, 1.6);
+    subs(c, [['I', 'DSS']], x - 8, Y(IDSS), C.v, 10, 'right');
+    subs(c, [['I', 'D']], x + 8, y0 - 12, C.cur, 11, 'center');
+  }
+
+  /* ---------- transfer curve of the depletion MOSFET ---------- */
+  function transfer(c, P, vgs, o) {
+    o = o || {};
+    if (o.shade === 'neg') { c.fillStyle = 'rgba(38,198,218,.06)'; c.fillRect(P.X(VPD), P.t, P.X(0) - P.X(VPD), P.b - P.t); }
+    if (o.shade === 'pos') { c.fillStyle = 'rgba(206,147,216,.08)'; c.fillRect(P.X(0), P.t, P.X(2) - P.X(0), P.b - P.t); }
+    frame(c, P, [-4, -3, -2, -1, 0, 1, 2], [0, 3e-3, 6e-3, 9e-3, 12e-3, 15e-3, 18e-3], v => fN(v), v => (v * 1e3).toFixed(0), [['V', 'GS'], [' (V)', '']], [['I', 'D'], [' (mA)', '']]);
+    clip(c, P);
+    const full = []; for (let v = -4; v <= 2.0001; v += 0.02) full.push([P.X(v), P.Y(shk(v))]);
+    pline(c, full, 'rgba(38,198,218,.35)', 1.6, [5, 4]);
+    const tr = []; for (let v = -4; v <= vgs + 1e-9; v += 0.02) tr.push([P.X(v), P.Y(shk(v))]); tr.push([P.X(vgs), P.Y(shk(vgs))]);
+    gline(c, tr, DC, 3);
+    c.restore();
+    line(c, P.X(0), P.t, P.X(0), P.b, 'rgba(255,255,255,.3)', 1);
+    circ(c, P.X(0), P.Y(IDSS), 5, C.v); subs(c, [['I', 'DSS'], [' = 6 mA', '']], P.X(0) - 8, P.Y(IDSS) - 12, C.v, 11, 'right');
+    circ(c, P.X(VPD), P.Y(0), 5, C.v); subs(c, [['V', 'P'], [' = −3 V', '']], P.X(VPD) + 6, P.Y(0) - 12, C.v, 11, 'left');
+    const id = shk(vgs); line(c, P.X(vgs), P.Y(id), P.X(vgs), P.b, 'rgba(255,138,101,.55)', 1.2, [4, 4]);
+    qDot(c, P.X(vgs), P.Y(id), 6.5);
+  }
+
+  /* ---------- JFET symbol (n-channel) ---------- */
+  function symJ(c, x, y, s, lab, labc) {
+    const W = C.wire;
+    line(c, x, y - 26 * s, x, y + 26 * s, W, 3.4);
+    line(c, x, y - 18 * s, x + 26 * s, y - 18 * s, W, 2.2); line(c, x + 26 * s, y - 18 * s, x + 26 * s, y - 44 * s, W, 2.2);
+    line(c, x, y + 18 * s, x + 26 * s, y + 18 * s, W, 2.2); line(c, x + 26 * s, y + 18 * s, x + 26 * s, y + 44 * s, W, 2.2);
+    arrow(c, x - 40 * s, y + 10 * s, x - 1, y + 10 * s, W, 2.2, 9 * s);
+    txt(c, 'G', x - 46 * s, y + 10 * s, C.text, 11, 700, 'right'); txt(c, 'D', x + 32 * s, y - 40 * s, C.text, 11, 700, 'left'); txt(c, 'S', x + 32 * s, y + 40 * s, C.text, 11, 700, 'left');
+    if (lab) txt(c, lab, x - 6 * s, y + 66 * s, labc || C.muted, 11, 700, 'center');
+  }
+
+  /* =========================================================
+     0. Structure: enhancement vs depletion at VGS = 0, VDS = 5 V
+     ========================================================= */
+  (function () {
+    const ca = new Cv('cv0a', 600, 340), cb = new Cv('cv0b', 600, 340), cs = new Cv('cv0c', 600, 230);
+    const Fa = new Flow(30, 3), Fb = new Flow(30, 5), VD = 5;
+    let A;
+    function draw() {
+      let c = ca.begin();
+      if (c) { drawDM(c, { x: 40, y: 8, w: 520, h: 300 }, { kind: 'enh', vgs: 0, vds: VD, id: 0 }, Fa, {}); notScale(c, 10, 326); ca.wm(c); }
+      c = cb.begin();
+      if (c) { drawDM(c, { x: 40, y: 8, w: 520, h: 300 }, { kind: 'dep', vgs: 0, vds: VD, id: IDSS }, Fb, {}); notScale(c, 10, 326); cb.wm(c); }
+      c = cs.begin();
+      if (c) {
+        sym(c, 170, 96, 1.05, { hl: true, hlc: EC, lab: FS > 1.4 ? 'enhancement' : 'enhancement (broken line)' });
+        sym(c, 430, 96, 1.05, { solid: true, hl: true, lab: FS > 1.4 ? 'depletion' : 'depletion (solid line)' });
+        cs.wm(c);
+      }
+    }
+    const o = { reset() { }, step(dt) { Fb.step(dt, profV(-VPD, VD), IDSS); }, draw: draw };
+    A = new Anim('anim0', o);
+  })();
+
+  /* ---------- shared: cross-section + transfer curve driven by a VGS slider ---------- */
+  function vgsPair(n, def, o) {
+    const cv = new Cv('cv' + n, 600, o.H || 340), cg = new Cv('cv' + n + 'b', 600, 300), sl = $('a' + n), F = new Flow(34, 7 + n), VD = 5;
+    let A;
+    function upd() {
+      const v = +sl.value, id = shk(v);
+      $('a' + n + 'o').textContent = fVs(v); if (o.upd) o.upd(v, id);
+      if (A) A.dirty = true;
+    }
+    function draw() {
+      const v = +sl.value, id = shk(v), c = cv.begin();
+      if (c) { drawDM(c, { x: 40, y: 8, w: 490, h: (o.H || 340) - 40 }, { kind: 'dep', vgs: v, vds: VD, id: id }, F, { amm: o.amm, cw: 548 }); meter(c, 566, 70, (o.H || 340) - 50, id, 18e-3); notScale(c, 10, (o.H || 340) - 14); cv.wm(c); }
+      const e = cg.begin(); if (!e) return;
+      transfer(e, mkP(76, 560, 30, 236, -4, 2, 0, 18e-3), v, { shade: o.shade });
+      cg.wm(e);
+    }
+    const ob = { reset() { sl.value = def; upd(); }, step(dt) { const v = +sl.value; F.step(dt, profV(v - VPD, VD), shk(v)); }, draw: draw };
+    A = new Anim('anim' + n, ob);
+    sl.addEventListener('input', upd);
+  }
+  vgsPair(1, -1.5, { shade: 'neg', upd(v, id) { $('c1g').textContent = fVs(v); $('c1i').textContent = fI(id); $('c1r').textContent = (id / IDSS * 100).toFixed(0) + ' %'; } });
+  vgsPair(2, 1, { shade: 'pos', amm: true, H: 370, upd(v, id) { $('c2g').textContent = fVs(v); $('c2i').textContent = fI(id); $('c2r').textContent = (id / IDSS * 100).toFixed(0) + ' %'; } });
+
+  /* =========================================================
+     3. Drain characteristics with a draggable operating point
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv3', 600, 400), F = new Flow(20, 21), GS = [-2, -1, 0, 1, 2];
+    const COL = { '-2': '#f06292', '-1': '#9fa8da', '0': '#ffd54f', '1': '#4db6ac', '2': '#80deea' };
+    const P = mkP(76, 410, 30, 330, 0, 15, 0, 20e-3);
+    let g = 0, d = 8, A;
+    function upd() {
+      const id = idD(g, d), r = regD(g, d);
+      $('c3g').textContent = fVs(g); $('c3d').textContent = fVs(d); $('c3i').textContent = fI(id);
+      const b = $('b3'); b.className = 'bdg ' + RD[r][0]; b.textContent = RD[r][1];
+      if (A) A.dirty = true;
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      frame(c, P, [0, 3, 6, 9, 12, 15], [0, 4e-3, 8e-3, 12e-3, 16e-3, 20e-3], v => String(v), v => (v * 1e3).toFixed(0), [['V', 'DS'], [' (V)', '']], [['I', 'D'], [' (mA)', '']]);
+      clip(c, P);
+      const loc = []; for (let v = VPD; v <= 2.0001; v += 0.05) loc.push([P.X(v - VPD), P.Y(idD(v, v - VPD))]);
+      const lt = loc[loc.length - 1];
+      poly(c, [[P.X(0), P.Y(0)]].concat(loc, [[lt[0], P.t], [P.X(0), P.t]]), 'rgba(2,119,189,.12)');
+      poly(c, loc.concat([[lt[0], P.t], [P.X(15), P.t], [P.X(15), P.Y(0)]]), 'rgba(27,94,32,.12)');
+      c.fillStyle = 'rgba(66,66,66,.4)'; c.fillRect(P.l, P.Y(0.35e-3), P.r - P.l, P.b - P.Y(0.35e-3));
+      pline(c, loc, 'rgba(255,213,79,.7)', 1.5, [6, 4]);
+      GS.forEach(v => { const pts = []; for (let x = 0; x <= 15.001; x += 0.05) pts.push([P.X(x), P.Y(idD(v, x))]); if (v === 0) gline(c, pts, COL[v], 3.2); else pline(c, pts, COL[v], v === g ? 2.8 : 1.8); });
+      if (GS.indexOf(g) < 0 && g > VPD) { const pts = []; for (let x = 0; x <= 15.001; x += 0.05) pts.push([P.X(x), P.Y(idD(g, x))]); pline(c, pts, 'rgba(255,255,255,.6)', 1.4, [4, 3]); }
+      c.restore();
+      GS.forEach(v => { const y = P.Y(idD(v, 15)); if (y > P.t + 8) txt(c, (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v) + ' V', P.r + 4, y, COL[v], 10, 700, 'left'); });
+      subs(c, [['I', 'DSS']], P.X(9), P.Y(idD(0, 9)) - 12, COL[0], 11, 'center');
+      txt(c, 'enhancement mode', P.X(10.5), P.Y(idD(2, 10.5)) - 12, '#80deea', 10, 700, 'center');
+      txt(c, 'depletion mode', P.X(10.5), P.Y(idD(-1, 10.5)) + 14, '#9fa8da', 10, 700, 'center');
+      txt(c, 'ohmic', P.X(1.4), P.t + 10, '#4fc3f7', 10, 700, 'center'); txt(c, 'cutoff', P.X(12), P.b - 7, '#d0d0d0', 9, 700, 'center');
+      const id = idD(g, d); qDot(c, P.X(d), P.Y(Math.min(id, 20e-3)), 7);
+      drawDM(c, { x: 450, y: 140, w: 140, h: 110 }, { kind: 'dep', vgs: g, vds: d, id: id }, F, { mini: true });
+      subs(c, [['V', 'GS'], [' = ' + fVs(g, 1), '']], 520, 126, C.v, 10, 'center');
+      cv.wm(c);
+    }
+    const o = { reset() { g = 0; d = 8; upd(); }, step(dt) { F.step(dt, profV(g - VPD, d), idD(g, d)); }, draw: draw };
+    A = new Anim('anim3', o);
+    onDrag(cv, p => {
+      if (p.x > P.r + 20) return;
+      d = clamp(P.ix(p.x), 0.05, 15); const id = clamp(P.iy(p.y), 0, 20e-3);
+      g = id < 0.2e-3 ? VPD - 0.2 : vgsFor(d, id);
+      upd();
+    });
+  })();
+
+  /* =========================================================
+     4. Comparison of the three transfer characteristics
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv4', 600, 520), sl = $('a4');
+    const P = mkP(76, 560, 30, 292, -5, 5, 0, 15e-3);
+    const jf = v => v <= -4 ? 0 : v > 0 ? NaN : 10e-3 * Math.pow(1 + v / 4, 2);
+    const em = v => v <= VT ? 0 : KN * Math.pow(v - VT, 2);
+    let ph = 0, A;
+    function upd() {
+      const v = +sl.value;
+      $('a4o').textContent = fVs(v);
+      $('c4j').textContent = v > 0 ? 'gate conducts' : fI(jf(v)); $('c4d').textContent = fI(shk(v)); $('c4e').textContent = fI(em(v));
+      if (A) A.dirty = true;
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const v = +sl.value;
+      c.fillStyle = 'rgba(239,83,80,.10)'; c.fillRect(P.X(0), P.t, P.r - P.X(0), P.b - P.t);
+      frame(c, P, [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5], [0, 3e-3, 6e-3, 9e-3, 12e-3, 15e-3], x => fN(x), y => (y * 1e3).toFixed(0), [['V', 'GS'], [' (V)', '']], [['I', 'D'], [' (mA)', '']]);
+      txt(c, 'JFET gate conducts', P.X(3.4), P.t + 12, '#ef9a9a', 10, 700, 'center');
+      clip(c, P);
+      const cur = (f, x0, x1, col) => { const pts = []; for (let x = x0; x <= x1 + 1e-9; x += 0.02) pts.push([P.X(x), P.Y(f(x))]); gline(c, pts, col, 2.8); };
+      cur(jf, -5, 0, JC); cur(shk, -5, 5, DC); cur(em, -5, 5, EC);
+      c.restore();
+      circ(c, P.X(0), P.Y(10e-3), 4.5, JC); circ(c, P.X(VT), P.Y(0), 4.5, EC); subs(c, [['V', 'T']], P.X(VT) + 6, P.Y(0) - 10, EC, 10, 'left');
+      line(c, P.X(v), P.t, P.X(v), P.b, 'rgba(255,213,79,.7)', 1.6, [5, 4]);
+      [[jf(v), JC], [shk(v), DC], [em(v), EC]].forEach(q => { if (isFinite(q[0]) && q[0] <= 15e-3) qDot(c, P.X(v), P.Y(q[0]), 5.5); });
+      // legend with symbols
+      const ly = 420, sh = FS > 1.4;
+      [[110, JC, 'JFET', 0], [300, DC, sh ? 'D-MOSFET' : 'depletion MOSFET', 1], [490, EC, sh ? 'E-MOSFET' : 'enhancement MOSFET', 2]].forEach(q => {
+        line(c, q[0] - 40, ly - 56, q[0] + 30, ly - 56, q[1], 3);
+        if (q[3] === 0) symJ(c, q[0], ly, 0.8); else sym(c, q[0], ly, 0.8, { solid: q[3] === 1 });
+        txt(c, q[2], q[0], ly + 56, q[1], 11, 700, 'center');
+      });
+      cv.wm(c);
+    }
+    const o = { reset() { ph = 0; sl.value = -1; upd(); }, step(dt) { ph += dt; sl.value = (-0.5 + 4.2 * Math.sin(ph * 0.35)).toFixed(2); upd(); }, draw: draw };
+    A = new Anim('anim4', o);
+    sl.addEventListener('input', () => { A.setPlaying(false); upd(); });
+  })();
+
+  /* =========================================================
+     5. Summary: cross-section and transfer curve with a mode badge
+     ========================================================= */
+  vgsPair(5, 0.5, { upd(v, id) { setMode('b5', v); $('c5g').textContent = fVs(v); $('c5i').textContent = fI(id); } });
+
+  /* ---------- sticky mini-nav highlight ---------- */
+  (function () {
+    const links = Array.from(document.querySelectorAll('.toc a'));
+    const secs = links.map(l => document.querySelector(l.getAttribute('href')));
+    function upd() {
+      let cur = 0;
+      secs.forEach((s, i) => { if (s.getBoundingClientRect().top < 120) cur = i; });
+      links.forEach((l, i) => l.classList.toggle('active', i === cur));
+    }
+    window.addEventListener('scroll', upd, { passive: true }); upd();
+  })();
+
+  let last = performance.now();
+  function frameLoop(ts) {
+    const dt = Math.min(0.05, Math.max(0, (ts - last) / 1000)); last = ts;
+    anims.forEach(a => {
+      if (!a.visible) return;
+      if (a.playing) { a.o.step(dt); a.o.draw(); }
+      else if (a.dirty) a.o.draw();
+      a.dirty = false;
+    });
+    requestAnimationFrame(frameLoop);
+  }
+  function onResize() { anims.forEach(a => { a.dirty = true; }); }
+  window.addEventListener('resize', onResize);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(onResize);
+  requestAnimationFrame(frameLoop);
+})();
+</script>
+</body>
+</html>
