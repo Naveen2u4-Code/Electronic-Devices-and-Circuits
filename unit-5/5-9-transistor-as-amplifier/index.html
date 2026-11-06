@@ -168,6 +168,26 @@
     .formulas h3 { color: var(--energy); font-size: .9rem; text-transform: uppercase; letter-spacing: .05em; }
     .formulas ul { margin: 0; padding-left: 20px; font-family: var(--mono); font-size: .9rem; }
     .formulas li { margin: 4px 0; }
+
+    /* Component lab */
+    .labh { margin: 26px 0 8px; }
+    .parts { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: 10px auto 0; }
+    .part {
+      font: inherit; font-size: .9rem; font-weight: 700; color: var(--text); background: var(--panel);
+      border: 1.5px solid var(--border); border-radius: 8px; padding: 6px 10px; min-width: 58px; min-height: 38px; cursor: pointer;
+    }
+    .part:hover { border-color: var(--electron); }
+    .part[data-state="open"] { color: #ef5350; border-color: #ef5350; border-style: dashed; background: rgba(239,83,80,.1); text-decoration: line-through; }
+    .part[data-state="short"] { color: #ffb74d; border-color: #ffb74d; background: rgba(255,183,77,.1); }
+    .part.sel { box-shadow: 0 0 0 2px var(--energy); }
+    .labinfo { margin: 10px auto 0; background: #141b2b; border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; }
+    .labinfo h4 { margin: 0; font-size: 1rem; }
+    .labinfo .lv { color: var(--muted); font-family: var(--mono); font-size: .85rem; font-weight: 500; }
+    .labinfo p { margin: 6px 0 0; font-size: .95rem; }
+    .labinfo .seg { margin-top: 8px; }
+    .labinfo .seg[hidden] { display: none; }
+    .labinfo .seg .btn { font-size: .82rem; padding: 6px 10px; }
+    .labstat { display: flex; justify-content: center; margin: 10px auto 0; text-align: center; }
   </style>
 </head>
 <body>
@@ -311,6 +331,51 @@
           </div>
         </figure>
 
+        <h3 class="labh">Component lab: take a part out and watch the output</h3>
+        <div class="prose">
+          <p>Every component in this circuit has one job. <strong>Tap a component</strong> in the circuit, or use the buttons under it, to <strong>remove</strong> it from the board. Tap it again to put it back. You can also <strong>short</strong> a part (replace it with a plain wire) from the panel. The scope compares the output with the normal circuit (dashed grey), and the readings show what happened to the bias.</p>
+        </div>
+
+        <figure class="anim" id="anim2b">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Put all back</button>
+            <div class="slider">
+              <label for="aL"><span>Input amplitude v<sub>in</sub> (peak)</span><output id="aLo" for="aL">5.0 mV</output></label>
+              <input type="range" id="aL" min="1" max="20" step="0.5" value="5">
+            </div>
+          </div>
+          <canvas id="cvL" class="narrow" style="aspect-ratio:640/380" role="img" aria-label="The common emitter amplifier with a 50 ohm signal source and a 10 kilohm load. Each component can be tapped to remove it (drawn as a dashed red outline) or shorted (drawn as an orange wire). Dots in the collector branch show the collector current."></canvas>
+          <div class="parts narrow" role="group" aria-label="Remove or put back a component">
+            <button class="part" type="button" data-part="R1">R<sub>1</sub></button>
+            <button class="part" type="button" data-part="R2">R<sub>2</sub></button>
+            <button class="part" type="button" data-part="RC">R<sub>C</sub></button>
+            <button class="part" type="button" data-part="RE">R<sub>E</sub></button>
+            <button class="part" type="button" data-part="CE">C<sub>E</sub></button>
+            <button class="part" type="button" data-part="Cin">C<sub>in</sub></button>
+            <button class="part" type="button" data-part="Cout">C<sub>out</sub></button>
+            <button class="part" type="button" data-part="RL">R<sub>L</sub></button>
+          </div>
+          <div class="labinfo narrow" aria-live="polite">
+            <h4 id="liName">Tap a component to begin</h4>
+            <p id="liRole">Each part has one job. Take it out and see what happens to the bias (V<sub>B</sub>, V<sub>C</sub>, I<sub>C</sub>) and to the output signal.</p>
+            <div class="seg" id="liSeg" role="group" aria-label="State of the selected component" hidden>
+              <button class="btn" type="button" data-st="in" aria-pressed="true">In circuit</button>
+              <button class="btn" type="button" data-st="open" aria-pressed="false">Removed (open)</button>
+              <button class="btn" type="button" data-st="short" aria-pressed="false">Shorted (wire)</button>
+            </div>
+            <p id="liEff"></p>
+          </div>
+          <canvas id="cvLs" class="narrow inset" style="aspect-ratio:640/420" role="img" aria-label="Three-trace scope: the input vin, the collector voltage VC on a 0 to 12 volt scale, and the output vout across the load. Dashed grey traces show the normal circuit with every part in place, for comparison."></canvas>
+          <div class="labstat narrow"><span class="statbadge clean" id="cLst" aria-live="polite">Amplifying normally</span></div>
+          <div class="counters narrow" aria-live="polite">
+            <div class="ctr v">V<sub>B</sub> (DC)<b id="cLvb">2.03 V</b></div>
+            <div class="ctr v">V<sub>C</sub> (DC)<b id="cLvc">6.89 V</b></div>
+            <div class="ctr ok">I<sub>C</sub> (DC)<b id="cLic">0.91 mA</b></div>
+            <div class="ctr v">Gain |v<sub>out</sub>/v<sub>in</sub>|<b id="cLav">120</b></div>
+          </div>
+        </figure>
+
         <aside class="keypoints" aria-label="Key points: CE amplifier">
           <h3>Key points</h3>
           <ul>
@@ -318,6 +383,7 @@
             <li>Coupling capacitors pass the signal and block DC.</li>
             <li>v<sub>in</sub> → small change in V<sub>BE</sub> and I<sub>B</sub> → β times larger change in I<sub>C</sub> → large change in V<sub>C</sub>.</li>
             <li>V<sub>C</sub> falls when the input rises: the output is inverted (180°).</li>
+            <li>Remove a bias part (R<sub>1</sub>, R<sub>2</sub>, R<sub>E</sub>) and the Q-point leaves the active region; remove C<sub>E</sub> and the gain collapses; remove a coupling capacitor and the signal or the bias is lost.</li>
           </ul>
         </aside>
       </section>
@@ -1055,6 +1121,273 @@
     };
     upd();
     An = new Anim('anim2', o);
+    sl.addEventListener('input', upd);
+  })();
+
+  /* =========================================================
+     2b. Component lab: remove (open) or short any part of the CE amplifier.
+     The whole circuit is solved by Newton's method at every sample with the
+     Ebers-Moll model above. Capacitors are open for DC; for the signal they
+     keep their DC voltage (ideal, large capacitors at the signal frequency).
+     ========================================================= */
+  const LV = { VCC: 12, RS: 50, R1: 47e3, R2: 10e3, RC: 5.6e3, RE: 1.5e3, RL: 10e3 };
+  const LGMIN = 1e-12, LRSH = 1e-3, VJM = 0.85, EJM = Math.exp(VJM / VT);
+  const lex = v => v <= VJM ? Math.exp(v / VT) - 1 : EJM * (1 + (v - VJM) / VT) - 1;   // exp, continued linearly above VJM
+  const lexd = v => v <= VJM ? Math.exp(v / VT) / VT : EJM / VT;
+  function gauss(A, y) {
+    const n = y.length; A = A.map((r, i) => r.concat([y[i]]));
+    for (let c = 0; c < n; c++) {
+      let p = c; for (let r = c + 1; r < n; r++) if (Math.abs(A[r][c]) > Math.abs(A[p][c])) p = r;
+      const tmp = A[c]; A[c] = A[p]; A[p] = tmp;
+      for (let r = c + 1; r < n; r++) { const f = A[r][c] / A[c][c]; for (let k = c; k <= n; k++) A[r][k] -= f * A[c][k]; }
+    }
+    const x = new Array(n).fill(0);
+    for (let r = n - 1; r >= 0; r--) { let s = A[r][n]; for (let k = r + 1; k < n; k++) s -= A[r][k] * x[k]; x[r] = s / A[r][r]; }
+    return x;
+  }
+  // Nodes: 0 S (source side of Cin), 1 B, 2 E, 3 C, 4 O (load side of Cout); −1 ground, −2 VCC.
+  function labSolve(st, ac, vs, cdc, V0) {
+    const N = 5, G = [], I = new Array(N).fill(0);
+    for (let i = 0; i < N; i++) { G.push(new Array(N).fill(0)); G[i][i] = LGMIN; }
+    function g2(a, b, g, E) {   // conductance g from a to b with a series EMF E (Va − Vb = E at zero current)
+      E = E || 0;
+      if (a >= 0) { G[a][a] += g; I[a] += g * E; }
+      if (b >= 0) { G[b][b] += g; I[b] -= g * E; }
+      if (a >= 0 && b >= 0) { G[a][b] -= g; G[b][a] -= g; }
+      if (a >= 0 && b === -2) I[a] += g * LV.VCC;
+    }
+    const R = (k, a, b) => { if (st[k] === 'in') g2(a, b, 1 / LV[k]); else if (st[k] === 'short') g2(a, b, 1 / LRSH); };
+    const Cp = (k, a, b, E) => { if (st[k] === 'short') g2(a, b, 1 / LRSH); else if (st[k] === 'in' && ac) g2(a, b, 1 / LRSH, E); };
+    g2(0, -1, 1 / LV.RS, vs);
+    Cp('Cin', 0, 1, cdc && cdc.cin); R('R1', 1, -2); R('R2', 1, -1); R('RC', 3, -2); R('RE', 2, -1);
+    Cp('CE', 2, -1, cdc && cdc.ce); Cp('Cout', 3, 4, cdc && cdc.co); R('RL', 4, -1);
+    const V = (V0 || [0, 2, 1.3, 7, 0]).slice(), kr = 1 + 1 / BR;
+    for (let it = 0; it < 600; it++) {
+      const vb = V[1], ve = V[2], vc = V[3], vbe = vb - ve, vbc = vb - vc;
+      const icc = IS * lex(vbe), iec = IS * lex(vbc), gf = IS * lexd(vbe), gr = IS * lexd(vbc), ea = 1 + (vc - vb) / VA;
+      const ic = icc * ea - iec * kr, ib = icc / BF + iec / BR;
+      const dic = [gf * ea - icc / VA - gr * kr, -gf * ea, icc / VA + gr * kr], dib = [gf / BF + gr / BR, -gf / BF, -gr / BR];
+      const F = new Array(N).fill(0), J = G.map(r => r.slice());
+      for (let i = 0; i < N; i++) { let s = -I[i]; for (let j = 0; j < N; j++) s += G[i][j] * V[j]; F[i] = s; }
+      F[1] += ib; F[3] += ic; F[2] -= ic + ib;
+      for (let j = 0; j < 3; j++) { J[1][j + 1] += dib[j]; J[3][j + 1] += dic[j]; J[2][j + 1] -= dic[j] + dib[j]; }
+      const d = gauss(J, F.map(x => -x));
+      let m = 0; d.forEach(x => { m = Math.max(m, Math.abs(x)); });
+      const k = m > 0.3 ? 0.3 / m : 1;
+      for (let i = 0; i < N; i++) V[i] += d[i] * k;
+      if (m < 1e-9) break;
+    }
+    const vbe = V[1] - V[2], vbc = V[1] - V[3], icc = IS * lex(vbe), iec = IS * lex(vbc);
+    return { V: V, ic: icc * (1 + (V[3] - V[1]) / VA) - iec * kr, ib: icc / BF + iec / BR };
+  }
+  // DC operating point plus one period of the signal
+  function labRun(st, amp, NS) {
+    const dc = labSolve(st, false, 0, null, null), D = dc.V;
+    const cdc = { cin: D[0] - D[1], ce: D[2], co: D[3] - D[4] }, cy = [];
+    let V = D;
+    for (let k = 0; k < NS; k++) {
+      const vs = amp * Math.sin(TAU * k / NS), r = labSolve(st, true, vs, cdc, V); V = r.V;
+      cy.push({ vs: vs, vb: V[1], ve: V[2], vc: V[3], vo: V[4], ic: r.ic });
+    }
+    let re = 0, im = 0; cy.forEach((s, k) => { re += s.vo * Math.cos(TAU * k / NS); im += s.vo * Math.sin(TAU * k / NS); });
+    const r = { VB: D[1], VE: D[2], VC: D[3], VO: D[4], IC: dc.ic, IB: dc.ib, cy: cy, gain: 2 * Math.hypot(re, im) / NS / amp };
+    r.clip = cy.some(s => s.vc - s.ve < 0.25 || s.ic < 0.03 * dc.ic);
+    return r;
+  }
+  function labStatus(r, ref) {
+    if (Math.abs(r.IC) > 0.1 || Math.abs(r.IB) > 0.02) return ['clipping', 'Overload: huge current, the transistor would burn out'];
+    if (r.IC < 5e-6) return ['clipping', 'Cut off: transistor OFF, no output'];
+    if (r.VC - r.VE < 0.3) return ['clipping', 'Saturated: transistor fully ON, no output'];
+    if (r.gain < 0.05) return ['clipping', 'No output signal at the load'];
+    if (r.gain < 0.2 * ref.gain) return ['distorted', 'Working, but the gain is very low'];
+    if (Math.abs(r.VO) > 0.5) return ['distorted', 'Amplifying, but DC reaches the load'];
+    if (r.clip) return ['distorted', 'Amplifying, but the output clips'];
+    if (r.gain > 1.25 * ref.gain) return ['clean', 'Amplifying, higher gain (no load)'];
+    return ['clean', 'Amplifying normally'];
+  }
+  // Part geometry on the 640 × 380 schematic: span a → b, label position, kind r (resistor) or c (capacitor)
+  const LXC = 298.5;
+  const LP = {
+    R1: { k: 'r', a: [200, 48], b: [200, 112], s: ['R', '1'], val: '47 kΩ', lab: [182, 74, 'right'],
+      h: 'R<sub>1</sub>', what: 'upper bias resistor',
+      role: 'With R<sub>2</sub> it forms the voltage divider that sets the DC base voltage (V<sub>B</sub> ≈ 2.0 V), placing the Q-point in the middle of the active region.',
+      open: 'Nothing feeds the base from V<sub>CC</sub>, so V<sub>B</sub> drops to 0 V. The base-emitter junction never turns on: I<sub>C</sub> = 0, V<sub>C</sub> = 12 V. The transistor is in <strong>cutoff</strong> and a few millivolts of input cannot switch it on, so there is <strong>no output</strong>.',
+      short: 'The base is tied straight to +12 V. The base current jumps from about 9 µA to about 7 mA and the transistor is driven deep into <strong>saturation</strong>: the collector is pinned just above the emitter and the input has no effect. <strong>No output</strong>, and the base is badly overloaded.' },
+    R2: { k: 'r', a: [200, 210], b: [200, 290], s: ['R', '2'], val: '10 kΩ', lab: [182, 244, 'right'],
+      h: 'R<sub>2</sub>', what: 'lower bias resistor',
+      role: 'The lower half of the divider. It pulls V<sub>B</sub> down to about 2 V so that only a small, correct base current flows.',
+      open: 'Only R<sub>1</sub> feeds the base, so about 180 µA flows instead of 9 µA. I<sub>C</sub> tries to rise far beyond what R<sub>C</sub> + R<sub>E</sub> allow and the transistor <strong>saturates</strong> (V<sub>CE</sub> ≈ 0.06 V). The output is almost flat: gain about 2 instead of 120.',
+      short: 'The base is shorted to ground: V<sub>B</sub> = 0 V. The transistor is in <strong>cutoff</strong>, V<sub>C</sub> sits at 12 V and there is <strong>no output</strong>.' },
+    RC: { k: 'r', a: [LXC, 40], b: [LXC, 82], s: ['R', 'C'], val: '5.6 kΩ', lab: [LXC + 18, 54, 'left'],
+      h: 'R<sub>C</sub>', what: 'collector (load) resistor',
+      role: 'Turns the changing collector current into a changing voltage: v<sub>c</sub> = −i<sub>c</sub>·(R<sub>C</sub> ∥ R<sub>L</sub>). Its value sets the gain.',
+      open: 'With no path from V<sub>CC</sub> to the collector, no collector current can flow. The base current (now about 150 µA) simply flows out of the emitter and the collector floats at about 0.25 V. <strong>No output</strong>.',
+      short: 'The collector is tied directly to +12 V. The collector current still follows the input, but there is no resistor to turn that current change into a voltage change: V<sub>C</sub> stays fixed at 12 V and v<sub>out</sub> = 0. This is exactly why R<sub>C</sub> is needed.' },
+    RE: { k: 'r', a: [LXC, 256], b: [LXC, 316], s: ['R', 'E'], val: '1.5 kΩ', lab: [LXC - 18, 280, 'right'],
+      h: 'R<sub>E</sub>', what: 'emitter resistor',
+      role: 'Gives the emitter its DC path to ground and stabilises the Q-point: if I<sub>C</sub> rises, V<sub>E</sub> rises and V<sub>BE</sub> falls, pulling I<sub>C</sub> back (DC negative feedback).',
+      open: 'The emitter has no DC path to ground (C<sub>E</sub> blocks DC), so no emitter current can flow. The transistor turns <strong>off</strong>: I<sub>C</sub> = 0, V<sub>C</sub> = 12 V, <strong>no output</strong>.',
+      short: 'The emitter is grounded directly. The divider now pushes far too much current into the base (about 170 µA), V<sub>B</sub> sags to 0.68 V and the transistor <strong>saturates</strong> (V<sub>C</sub> ≈ 0.07 V). The output is almost flat. Even with a smaller base current, the Q-point would now drift strongly with β and temperature.' },
+    CE: { k: 'c', a: [352, 277], b: [352, 313], s: ['C', 'E'], val: '100 µF', lab: [372, 288, 'left'],
+      h: 'C<sub>E</sub>', what: 'emitter bypass capacitor',
+      role: 'A short circuit for the signal, so the emitter stays at signal ground and the gain is the full −(R<sub>C</sub> ∥ R<sub>L</sub>)/r<sub>e</sub>. For DC it is open, so R<sub>E</sub> still stabilises the bias.',
+      open: 'The bias does not change at all (V<sub>C</sub> still 6.9 V), but the signal now sees R<sub>E</sub> in the emitter. The gain falls from about 120 to about 2.3 ≈ (R<sub>C</sub> ∥ R<sub>L</sub>)/(r<sub>e</sub> + R<sub>E</sub>). The output is clean and still inverted, but <strong>tiny</strong>. This is AC negative feedback: very stable, very low gain.',
+      short: 'A shorted C<sub>E</sub> shorts R<sub>E</sub> for DC as well, which is the same as replacing R<sub>E</sub> by a wire: the transistor <strong>saturates</strong> and the output is lost.' },
+    Cin: { k: 'c', a: [112, 160], b: [148, 160], s: ['C', 'in'], val: '10 µF', lab: [130, 120, 'center'],
+      h: 'C<sub>in</sub>', what: 'input coupling capacitor',
+      role: 'Lets the AC signal into the base but blocks DC, so the source cannot disturb the bias set by R<sub>1</sub> and R<sub>2</sub>.',
+      open: 'The signal can no longer reach the base. The bias is perfect (V<sub>B</sub> = 2.03 V, V<sub>C</sub> = 6.9 V) but there is nothing to amplify: the output is a <strong>flat line</strong>.',
+      short: 'The signal generator (50 Ω, at 0 V DC) is now wired straight to the base. Its low resistance sits in parallel with R<sub>2</sub> and drags V<sub>B</sub> down to about 0.01 V. The transistor is <strong>cut off</strong> and there is no output. This is why the input capacitor must block DC.' },
+    Cout: { k: 'c', a: [362, 88], b: [398, 88], s: ['C', 'out'], val: '10 µF', lab: [380, 52, 'center'],
+      h: 'C<sub>out</sub>', what: 'output coupling capacitor',
+      role: 'Passes only the AC part of V<sub>C</sub> to the load and blocks the 6.9 V DC level, so the load and the bias do not affect each other.',
+      open: 'The load is disconnected, so v<sub>out</sub> = 0. The collector still swings (a little more than before, because R<sub>L</sub> no longer loads it), but <strong>nothing reaches the load</strong>.',
+      short: 'DC now flows into the load. R<sub>L</sub> is in parallel with R<sub>C</sub> for DC, so V<sub>C</sub> drops from 6.9 V to about 4.4 V and the load sits at 4.4 V DC with the signal on top. The Q-point has moved off-centre, so the output <strong>clips sooner</strong> when the input is made larger.' },
+    RL: { k: 'r', a: [424, 150], b: [424, 230], s: ['R', 'L'], val: '10 kΩ', lab: [442, 184, 'left'],
+      h: 'R<sub>L</sub>', what: 'load (next stage, speaker…)',
+      role: 'What the amplifier drives. For the signal it is in parallel with R<sub>C</sub>, so it sets the gain: A<sub>v</sub> ≈ −(R<sub>C</sub> ∥ R<sub>L</sub>)/r<sub>e</sub>.',
+      open: 'With no load the gain rises from about 120 to about 185 (≈ −R<sub>C</sub>/r<sub>e</sub>). The collector signal is bigger, but there is nothing to deliver it to.',
+      short: 'A short across the output: v<sub>out</sub> = 0. Through C<sub>out</sub> the collector is also shorted to ground for the signal, so V<sub>C</sub> stops swinging. The bias itself is unaffected.' }
+  };
+  const LKEYS = Object.keys(LP);
+  LKEYS.forEach(k => {
+    const p = LP[k], v = p.a[0] === p.b[0];
+    const w = p.k === 'r' ? 14 : 17; p.v = v; p.box = v ? [p.a[0] - w, p.a[1] - 6, 2 * w, p.b[1] - p.a[1] + 12] : [p.a[0] - 6, p.a[1] - w, p.b[0] - p.a[0] + 12, 2 * w];
+  });
+  function labShape(c, p, col) {
+    const [ax, ay] = p.a, [bx, by] = p.b;
+    if (p.k === 'r') { if (p.v) resV(c, ax, ay, by, col); else resH(c, ax, bx, ay, col); return; }
+    const my = (ay + by) / 2, mx = (ax + bx) / 2;
+    if (p.v) { line(c, ax, ay, ax, my - 4, col, 2.5); line(c, ax, my + 4, ax, by, col, 2.5); line(c, ax - 12, my - 4, ax + 12, my - 4, col, 3); line(c, ax - 12, my + 4, ax + 12, my + 4, col, 3); }
+    else { line(c, ax, ay, mx - 4, ay, col, 2.5); line(c, mx + 4, ay, bx, ay, col, 2.5); line(c, mx - 4, ay - 12, mx - 4, ay + 12, col, 3); line(c, mx + 4, ay - 12, mx + 4, ay + 12, col, 3); }
+  }
+  function labPart(c, p, st, sel, hov) {
+    const [ax, ay] = p.a, [bx, by] = p.b, mx = (ax + bx) / 2, my = (ay + by) / 2, B = p.box;
+    if (sel || hov) {
+      rrect(c, B[0], B[1], B[2], B[3], 6); c.fillStyle = sel ? 'rgba(255,213,79,.10)' : 'rgba(255,213,79,.05)'; c.fill();
+      c.strokeStyle = sel ? C.v : 'rgba(255,213,79,.5)'; c.lineWidth = 1.5; c.setLineDash([4, 3]); c.stroke(); c.setLineDash([]);
+    }
+    if (st === 'in') labShape(c, p, C.wire);
+    else if (st === 'open') {
+      c.globalAlpha = 0.3; c.setLineDash([4, 4]); labShape(c, p, C.warn); c.setLineDash([]); c.globalAlpha = 1;
+      circ(c, ax, ay, 3.5, C.warn); circ(c, bx, by, 3.5, C.warn);
+      line(c, mx - 7, my - 7, mx + 7, my + 7, C.warn, 3); line(c, mx - 7, my + 7, mx + 7, my - 7, C.warn, 3);
+    } else { line(c, ax, ay, bx, by, '#ffb74d', 3.5); }
+    const col = st === 'in' ? C.muted : st === 'open' ? C.warn : '#ffb74d', L = p.lab;
+    subU(c, p.s[0], p.s[1], '', L[0], L[1], col, 12, L[2]);
+    if (FS < 1.35) txt(c, st === 'in' ? p.val : st === 'open' ? 'removed' : 'shorted', L[0], L[1] + 15, col, 10, 600, L[2], st === 'in' ? MONO : FONT);
+  }
+  function labSchem(c, st, sel, hov, pC) {
+    const xc = LXC, yb = 160;
+    line(c, 200, 30, 470, 30, C.wire, 2.5); circ(c, 200, 30, 4.5, '#141b2b', C.v, 2); txt(c, '+12 V', 188, 30, C.v, 12, 700, 'right');
+    line(c, 60, 340, 470, 340, C.wire, 2.5); ground(c, 250, 340);
+    // divider wires
+    line(c, 200, 30, 200, 48, C.wire, 2.5); line(c, 200, 112, 200, 210, C.wire, 2.5); line(c, 200, 290, 200, 340, C.wire, 2.5);
+    // 50 Ω signal source and the input wires
+    line(c, 60, 340, 60, 266, C.wire, 2.5); circ(c, 60, 250, 16, '#141b2b', C.in, 2.2);
+    const sw = []; for (let k = 0; k <= 14; k++) sw.push([53 + k, 250 - 5 * Math.sin(k / 14 * TAU)]); pline(c, sw, C.in, 2);
+    if (FS < 1.35) { txt(c, 'source', 84, 244, C.muted, 10, 600, 'left'); txt(c, '50 Ω', 84, 258, C.muted, 10, 500, 'left', MONO); }
+    line(c, 60, 234, 60, yb, C.wire, 2.5); line(c, 60, yb, 112, yb, C.wire, 2.5); line(c, 148, yb, 205, yb, C.wire, 2.5);
+    // transistor, collector and emitter wires
+    bjtSym(c, 260, yb, 0.55);
+    line(c, xc, 30, xc, 40, C.wire, 2.5); line(c, xc, 82, xc, 92, C.wire, 2.5);
+    line(c, xc, 228, xc, 256, C.wire, 2.5); line(c, xc, 316, xc, 340, C.wire, 2.5);
+    line(c, xc, 250, 352, 250, C.wire, 2.5); line(c, 352, 250, 352, 277, C.wire, 2.5); line(c, 352, 313, 352, 340, C.wire, 2.5);
+    circ(c, xc, 250, 3.5, C.wire);
+    // output wires and load
+    line(c, xc, 88, 362, 88, C.wire, 2.5); circ(c, xc, 88, 3.5, C.wire); line(c, 398, 88, 424, 88, C.wire, 2.5);
+    line(c, 424, 88, 424, 150, C.wire, 2.5); line(c, 424, 230, 424, 340, C.wire, 2.5);
+    LKEYS.forEach(k => labPart(c, LP[k], st[k], sel === k, hov === k));
+    if (pC != null) flowDots(c, [[xc, 30], [xc, 92]], pC, 16, C.cur, 3);
+    const probe = (x, y, lab, col, dx) => { circ(c, x, y, 5, col); txt(c, lab, x + dx, y - 12, col, 12, 700, dx < 0 ? 'right' : 'left'); };
+    probe(60, yb, 'vin', C.in, -10); probe(200, yb, 'VB', C.in, -10); probe(xc, 92, 'VC', C.out, -10); probe(424, 88, 'vout', C.out, 10);
+    txt(c, 'Tap a part to remove it', 12, 368, C.muted, 11, 600, 'left');
+  }
+  (function () {
+    const cv = new Cv('cvL', 640, 380), cs = new Cv('cvLs', 640, 420), sl = $('aL'), NS = 96;
+    const btns = Array.from(document.querySelectorAll('#anim2b [data-part]')), seg = $('liSeg');
+    const ALL = {}; LKEYS.forEach(k => { ALL[k] = 'in'; });
+    let st = Object.assign({}, ALL), sel = null, hov = null, amp = 5e-3, t = 0, pC = 0, ref = null, cur = null, refAmp = -1, A;
+    const fmtI = a => Math.abs(a) > 0.1 ? '> 100 mA' : fmtA(Math.max(0, a));
+    function info() {
+      if (!sel) {
+        $('liName').textContent = 'Tap a component to begin';
+        $('liRole').innerHTML = 'Each part has one job. Take it out and see what happens to the bias (V<sub>B</sub>, V<sub>C</sub>, I<sub>C</sub>) and to the output signal.';
+        $('liEff').innerHTML = ''; seg.hidden = true; return;
+      }
+      const p = LP[sel], s = st[sel], others = LKEYS.filter(k => k !== sel && st[k] !== 'in').length;
+      $('liName').innerHTML = p.h + ' <span class="lv">' + p.val + '</span> · ' + p.what;
+      $('liRole').innerHTML = '<strong>Job:</strong> ' + p.role;
+      seg.hidden = false; segSel(seg, 'st', s);
+      $('liEff').innerHTML = s === 'in'
+        ? '<strong>In circuit.</strong> Remove it or short it to see what changes.'
+        : '<strong>' + (s === 'open' ? 'Removed' : 'Shorted') + ':</strong> ' + p[s] + (others ? ' <em>(Other parts are also changed, so the readings show the combined effect.)</em>' : '');
+    }
+    function upd() {
+      amp = +sl.value * 1e-3; $('aLo').textContent = (+sl.value).toFixed(1) + ' mV';
+      if (refAmp !== amp) { ref = labRun(ALL, amp, NS); refAmp = amp; }
+      cur = LKEYS.every(k => st[k] === 'in') ? ref : labRun(st, amp, NS);
+      $('cLvb').textContent = fmtV(cur.VB); $('cLvc').textContent = fmtV(cur.VC); $('cLic').textContent = fmtI(cur.IC);
+      $('cLav').textContent = cur.gain < 0.05 ? '0' : cur.gain.toFixed(cur.gain < 10 ? 1 : 0);
+      const s = labStatus(cur, ref), b = $('cLst'); b.className = 'statbadge ' + s[0]; b.textContent = s[1];
+      btns.forEach(bt => {
+        const k = bt.dataset.part; bt.dataset.state = st[k]; bt.classList.toggle('sel', k === sel);
+        bt.setAttribute('aria-pressed', String(st[k] !== 'in'));
+        bt.setAttribute('aria-label', k + ', ' + (st[k] === 'in' ? 'in circuit' : st[k] === 'open' ? 'removed' : 'shorted'));
+      });
+      info();
+      if (A) A.dirty = true;
+    }
+    function toggle(k) { sel = k; st[k] = st[k] === 'in' ? 'open' : 'in'; upd(); }
+    const sample = (r, ph) => { const f = ((ph % 1) + 1) % 1 * NS, i = Math.floor(f), w = f - i, a = r.cy[i], b = r.cy[(i + 1) % NS]; return k => a[k] + (b[k] - a[k]) * w; };
+    function drawS() {
+      const c = cs.begin(); if (!c) return;
+      let vmax = 0; [ref, cur].forEach(r => r.cy.forEach(s => { vmax = Math.max(vmax, Math.abs(s.vo)); }));
+      const sc = [0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 15].find(v => v >= vmax * 1.1) || 15;
+      const L = 70, Rr = 620, H = 96, G = 34, strips = [
+        { lab: 'vin', col: C.in, lo: -0.025, hi: 0.025, k: 'vs', note: '±25 mV', ghost: false },
+        { lab: 'VC', col: C.out, lo: 0, hi: 12, k: 'vc', note: '0 to 12 V', ghost: true, dc: cur.VC },
+        { lab: 'vout', col: C.out, lo: -sc, hi: sc, k: 'vo', note: '±' + (sc < 1 ? (sc * 1e3).toFixed(0) + ' mV' : sc + ' V'), ghost: true }];
+      strips.forEach((s, i) => {
+        const S = { l: L, r: Rr, t: 14 + i * (H + G), b: 14 + i * (H + G) + H };
+        scopeGrid(c, S, 8, 4);
+        const Y = v => S.b - (v - s.lo) / (s.hi - s.lo) * (S.b - S.t);
+        c.save(); c.beginPath(); c.rect(S.l, S.t, S.r - S.l, S.b - S.t); c.clip();
+        if (s.dc != null) line(c, S.l, Y(s.dc), S.r, Y(s.dc), 'rgba(154,164,184,.55)', 1, [2, 4]);
+        const pts = [], gp = [];
+        for (let x = S.l; x <= S.r; x += 3) {
+          const ph = (x - S.l) / (S.r - S.l) * 2 - t * 0.5;
+          pts.push([x, Y(sample(cur, ph)(s.k))]); if (s.ghost) gp.push([x, Y(sample(ref, ph)(s.k))]);
+        }
+        if (s.ghost) pline(c, gp, 'rgba(176,190,197,.75)', 1.6, [6, 5]);
+        glowLine(c, pts, s.col);
+        c.restore();
+        txt(c, s.lab, L - 10, (S.t + S.b) / 2, s.col, 12, 700, 'right');
+        txt(c, s.note, Rr - 4, S.t + 10, C.muted, 10, 600, 'right');
+      });
+      const yl = 14 + 3 * H + 2 * G + 16;
+      line(c, L, yl, L + 26, yl, C.out, 2.4); txt(c, 'this circuit', L + 34, yl, C.text, 11, 600, 'left');
+      line(c, L + 140, yl, L + 166, yl, 'rgba(176,190,197,.75)', 1.6, [6, 5]); txt(c, 'normal circuit (all parts in)', L + 174, yl, C.text, 11, 600, 'left');
+      cs.wm(c);
+    }
+    function draw() {
+      const c = cv.begin();
+      if (c) { labSchem(c, st, sel, hov, st.RC === 'open' || cur.IC < 1e-6 ? null : pC); cv.wm(c); }
+      drawS();
+    }
+    const hit = p => LKEYS.find(k => { const B = LP[k].box; return p.x >= B[0] - 10 && p.x <= B[0] + B[2] + 10 && p.y >= B[1] - 6 && p.y <= B[1] + B[3] + 6; }) || null;
+    cv.el.addEventListener('click', e => { const k = hit(cv.pt(e)); if (k) toggle(k); });
+    cv.el.addEventListener('pointermove', e => { const k = hit(cv.pt(e)); if (k !== hov) { hov = k; cv.el.style.cursor = k ? 'pointer' : 'default'; if (A) A.dirty = true; } });
+    cv.el.addEventListener('pointerleave', () => { if (hov) { hov = null; if (A) A.dirty = true; } });
+    btns.forEach(b => b.addEventListener('click', () => toggle(b.dataset.part)));
+    seg.querySelectorAll('[data-st]').forEach(b => b.addEventListener('click', () => { if (sel) { st[sel] = b.dataset.st; upd(); } }));
+    const o = {
+      reset() { st = Object.assign({}, ALL); sel = null; sl.value = 5; t = 0; pC = 0; upd(); },
+      step(dt) { t += dt; const ic = sample(cur, t * 0.5)('ic'); pC += 70 * clamp(ic / ref.IC, 0, 4) * dt; },
+      draw: draw
+    };
+    o.reset();
+    A = new Anim('anim2b', o);
     sl.addEventListener('input', upd);
   })();
 
