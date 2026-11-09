@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>2.3 Forward Bias</title>
+  <meta name="description" content="The forward-biased pn junction: a lower barrier, minority carrier injection and the law of the junction, diffusion and recombination, how the current is carried, the diode equation and the band diagram with quasi-Fermi levels. An interactive lesson.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1420;
+      --panel: #1a2132;
+      --panel-hover: #212a3f;
+      --border: #2a3448;
+      --text: #e6e9ef;
+      --muted: #9aa4b8;
+      --electron: #4fc3f7;
+      --hole: #ff8a65;
+      --energy: #ffd54f;
+      --success: #81c784;
+      --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+      --max: 960px;
+      --radius: 12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: var(--font); font-size: 16px; line-height: 1.65;
+      overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column;
+    }
+    a { color: var(--electron); }
+    .wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 16px; }
+
+    /* Sticky mini-nav */
+    .toc {
+      position: sticky; top: 0; z-index: 10; background: rgba(15, 20, 32, .95);
+      border-bottom: 1px solid var(--border); backdrop-filter: blur(6px);
+    }
+    .toc ul { display: flex; gap: 4px; list-style: none; margin: 0 auto; padding: 8px 16px; max-width: var(--max); overflow-x: auto; scrollbar-width: none; }
+    .toc ul::-webkit-scrollbar { display: none; }
+    .toc a {
+      display: block; white-space: nowrap; text-decoration: none; color: var(--muted);
+      font-size: 0.85rem; font-weight: 500; padding: 6px 10px; border-radius: 999px;
+    }
+    .toc a:hover { color: var(--text); background: var(--panel); }
+    .toc a.active { color: var(--bg); background: var(--electron); }
+
+    main { flex: 1; padding: 24px 0 48px; }
+    .crumbs { font-size: 0.875rem; color: var(--muted); margin: 0 0 16px; }
+    .crumbs a { color: var(--muted); }
+    .crumbs a:hover { color: var(--electron); }
+    .eyebrow { font-family: var(--mono); font-size: 0.8rem; color: var(--electron); letter-spacing: .04em; margin: 0; }
+    h1 { font-size: clamp(1.5rem, 6vw, 2.2rem); line-height: 1.2; margin: 4px 0 6px; }
+    .subtitle { color: var(--muted); margin: 0 0 8px; }
+    section { scroll-margin-top: 64px; padding-top: 28px; }
+    h2 { font-size: clamp(1.3rem, 5vw, 1.6rem); line-height: 1.25; margin: 0 0 14px; }
+    h3 { font-size: 1.05rem; margin: 0 0 8px; }
+    .prose { font-size: 17px; line-height: 1.7; max-width: 70ch; }
+    .prose p, .prose ul, .prose ol { margin: 0 0 14px; }
+    .prose ul, .prose ol { padding-left: 22px; }
+    .prose li { margin: 4px 0; }
+    .prose strong { color: #fff; }
+    .prose p.eq { text-align: center; font-family: var(--mono); font-size: 16px; background: #141b2b; border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; overflow-wrap: anywhere; }
+    hr.sep { border: 0; border-top: 1px solid var(--border); margin: 40px 0 0; }
+    .rm-note { font-size: 0.78rem; color: var(--muted); margin: 0 0 8px; }
+
+    /* Buttons & controls */
+    .btn {
+      font: inherit; font-size: 0.88rem; font-weight: 600; color: var(--text);
+      background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+      padding: 7px 12px; cursor: pointer; min-height: 38px;
+    }
+    .btn:hover:not(:disabled) { background: var(--panel-hover); border-color: var(--electron); }
+    .btn:disabled { opacity: .45; cursor: default; }
+    .btn:focus-visible, input:focus-visible, canvas:focus-visible { outline: 2px solid var(--electron); outline-offset: 2px; }
+    .btn[aria-pressed="true"] { background: rgba(255,213,79,.14); border-color: var(--energy); color: var(--energy); }
+    .seg { display: inline-flex; gap: 0; flex-wrap: nowrap; }
+    .seg .btn { border-radius: 0; padding: 7px 10px; }
+    .seg .btn:first-child { border-radius: 8px 0 0 8px; }
+    .seg .btn:last-child { border-radius: 0 8px 8px 0; }
+    .seg .btn + .btn { margin-left: -1px; }
+
+    figure.anim {
+      margin: 18px 0 0; background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 12px; min-width: 0;
+    }
+    .ctrls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-bottom: 12px; }
+    .sliders { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-bottom: 12px; }
+    .slider { flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; }
+    .slider label { display: flex; justify-content: space-between; gap: 8px; font-size: 0.8rem; color: var(--muted); }
+    .slider output { font-family: var(--mono); color: var(--energy); white-space: nowrap; }
+    input[type="range"] { width: 100%; accent-color: var(--energy); margin: 4px 0 0; }
+    canvas { display: block; width: 100%; border-radius: 8px; background: #141b2b; }
+    canvas.drag { cursor: ew-resize; touch-action: pan-y; }
+    .narrow { max-width: 820px; margin-left: auto; margin-right: auto; }
+    .dopes { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); }
+
+    .counters { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px auto 0; }
+    .ctr {
+      flex: 1 1 110px; background: #141b2b; border: 1px solid var(--border); border-radius: 8px;
+      padding: 6px 10px; font-size: 0.78rem; color: var(--muted); min-width: 0;
+    }
+    .ctr b { display: block; font-family: var(--mono); font-size: 1rem; font-weight: 500; color: var(--text); overflow-wrap: anywhere; }
+    .ctr.v b { color: var(--energy); } .ctr.p b { color: #ef9a9a; } .ctr.n b { color: #90caf9; } .ctr.w b { color: var(--success); }
+
+    .keypoints {
+      margin-top: 16px; padding: 14px 16px; border-radius: var(--radius);
+      background: rgba(129,199,132,.07); border: 1px solid rgba(129,199,132,.35);
+    }
+    .keypoints h3 { color: var(--success); font-size: 0.95rem; text-transform: uppercase; letter-spacing: .05em; }
+    .keypoints ul { margin: 0; padding-left: 20px; }
+    .keypoints li { margin: 4px 0; }
+
+    .further { margin-top: 48px; color: var(--muted); font-size: 0.85rem; }
+    .further h3 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 0 0 6px; }
+    .further ul { margin: 0; padding-left: 18px; }
+    .further li { margin: 3px 0; }
+
+    .pager { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 32px; }
+    .pager a {
+      display: block; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 12px 14px; text-decoration: none; color: var(--text); min-width: 0;
+    }
+    .pager a:hover { border-color: var(--electron); }
+    .pager small { display: block; color: var(--muted); font-size: 0.75rem; }
+    .pager .next { text-align: right; }
+    .site-foot { border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; text-align: center; padding: 18px 16px; }
+
+    /* Justified paragraphs on desktop; phones stay left-aligned to avoid wide word gaps. */
+    @media (min-width: 768px) {
+      .prose p, .prose li, .keypoints li { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+      .prose p.eq { text-align: center; }
+    }
+    .ctr.b b { color: #ce93d8; } .ctr.q b { color: #ff8a65; }
+  </style>
+</head>
+<body>
+
+  <nav class="toc" aria-label="Sections">
+    <ul>
+      <li><a href="#s0">Connecting</a></li>
+      <li><a href="#s1">Injection</a></li>
+      <li><a href="#s2">Diffusion</a></li>
+      <li><a href="#s3">Current flow</a></li>
+      <li><a href="#s4">I–V</a></li>
+      <li><a href="#s5">Band diagram</a></li>
+      <li><a href="#s6">Summary</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="wrap">
+      <header>
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="../../index.html">Home</a> / <a href="../index.html">Unit 2</a> / 2.3
+        </nav>
+        <p class="eyebrow">TOPIC 2.3</p>
+        <h1>Forward Bias</h1>
+        <p class="subtitle">Lowering the barrier: minority carrier injection and the diode equation</p>
+        <p class="rm-note" id="rmNote" hidden>Your device asks for reduced motion, so every animation starts paused. Press Play on any animation to run it. Sliders and buttons still update the picture.</p>
+      </header>
+
+      <!-- ================= SECTION 0 ================= -->
+      <section id="s0" aria-labelledby="h0">
+        <h2 id="h0">Connecting a forward bias</h2>
+        <div class="prose">
+          <p>A pn junction is <strong>FORWARD BIASED</strong> when the p side is connected to the <strong>POSITIVE</strong> terminal of a battery and the n side to the <strong>NEGATIVE</strong> terminal. The applied voltage V is then positive.</p>
+          <p>The neutral p and n regions conduct well, so almost all of the applied voltage appears across the <strong>DEPLETION REGION</strong>, where there are no free carriers and the resistance is high. The applied voltage opposes the built-in potential, so the barrier height is reduced from V<sub>bi</sub> to:</p>
+          <p class="eq">barrier = V<sub>bi</sub> − V</p>
+          <p>A lower barrier needs less uncovered charge, so the depletion region becomes <strong>NARROWER</strong>:</p>
+          <p class="eq">W = √[ (2ε<sub>s</sub>·(V<sub>bi</sub> − V) / q) · (N<sub>A</sub> + N<sub>D</sub>)/(N<sub>A</sub>·N<sub>D</sub>) ]</p>
+          <p>For the example junction, W shrinks from about <strong>0.33 µm at V = 0</strong> to about <strong>0.16 µm at V = 0.58 V</strong>.</p>
+        </div>
+
+        <figure class="anim" id="anim0">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s0v"><span>Forward voltage V</span><output id="o0v"></output></label><input type="range" id="s0v" min="0" max="0.7" step="0.005" value="0.6"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv0" style="aspect-ratio:720/360" role="img" aria-label="A pn junction with a battery: p side to the positive terminal, n side to the negative terminal. As the voltage slider rises, the depletion region narrows and the step in the potential profile below shrinks from Vbi to Vbi minus V; green arrows on the wires show conventional current flowing into the p side."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr b"><span>Barrier V<sub>bi</sub> − V</span><b id="c0b"></b></div>
+            <div class="ctr w"><span>W</span><b id="c0w"></b></div>
+            <div class="ctr n"><span>x<sub>n</sub></span><b id="c0n"></b></div>
+            <div class="ctr p"><span>x<sub>p</sub></span><b id="c0p"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: forward bias connection">
+          <h3>Key points</h3>
+          <ul>
+            <li>Forward bias: p to +, n to −, V &gt; 0.</li>
+            <li>The applied voltage appears across the depletion region and opposes V<sub>bi</sub>.</li>
+            <li>Barrier falls to V<sub>bi</sub> − V; W narrows (0.33 µm → 0.16 µm at 0.58 V).</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 1 ================= -->
+      <section id="s1" aria-labelledby="h1s">
+        <h2 id="h1s">Injection of minority carriers</h2>
+        <div class="prose">
+          <p>Lowering the barrier upsets the balance between diffusion and drift. The diffusion of majority carriers across the junction now greatly exceeds the drift:</p>
+          <ul>
+            <li>many <strong>HOLES</strong> from the p side cross into the n side;</li>
+            <li>many <strong>ELECTRONS</strong> from the n side cross into the p side.</li>
+          </ul>
+          <p>Once across, they become <strong>MINORITY</strong> carriers in a region full of majority carriers of the opposite type. This process is called <strong>MINORITY CARRIER INJECTION</strong>.</p>
+          <p>The concentration of injected minority carriers at the edges of the depletion region rises exponentially with the applied voltage. This is often called the <strong>LAW OF THE JUNCTION</strong>:</p>
+          <p class="eq">p<sub>n</sub>(x<sub>n</sub>) = p<sub>n0</sub> · exp(V/V<sub>T</sub>) &nbsp; and &nbsp; n<sub>p</sub>(−x<sub>p</sub>) = n<sub>p0</sub> · exp(V/V<sub>T</sub>)</p>
+          <p>where p<sub>n0</sub> = n<sub>i</sub><sup>2</sup>/N<sub>D</sub> and n<sub>p0</sub> = n<sub>i</sub><sup>2</sup>/N<sub>A</sub> are the equilibrium minority concentrations.</p>
+          <p>Example: on the n side, p<sub>n0</sub> = (1.5 × 10<sup>10</sup>)<sup>2</sup> / 10<sup>16</sup> ≈ 2.25 × 10<sup>4</sup> cm<sup>−3</sup>. At V = 0.6 V, exp(0.6/0.0259) ≈ 1.15 × 10<sup>10</sup>, so p<sub>n</sub>(x<sub>n</sub>) ≈ 2.6 × 10<sup>14</sup> cm<sup>−3</sup>. That is enormously larger than p<sub>n0</sub>, but still much less than N<sub>D</sub> = 10<sup>16</sup> cm<sup>−3</sup>. This condition, where minority carriers stay far fewer than majority carriers, is called <strong>LOW-LEVEL INJECTION</strong>, and it is assumed in the basic diode theory.</p>
+        </div>
+
+        <figure class="anim" id="anim1">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s1v"><span>Forward voltage V</span><output id="o1v"></output></label><input type="range" id="s1v" min="0" max="0.7" step="0.005" value="0.6"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv1" style="aspect-ratio:720/480" role="img" aria-label="The forward-biased junction with streams of holes crossing into the n side and electrons crossing into the p side, denser at higher voltage. Below, two log-scale bars show the minority concentration at each depletion edge, np at minus xp and pn at xn, with the equilibrium values np0 and pn0 dashed and the majority levels NA and ND marked."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr v"><span>exp(V/V<sub>T</sub>)</span><b id="c1e"></b></div>
+            <div class="ctr w"><span>V / 60 mV (decades)</span><b id="c1d"></b></div>
+            <div class="ctr q"><span>p<sub>n</sub>(x<sub>n</sub>)</span><b id="c1p"></b></div>
+            <div class="ctr n"><span>n<sub>p</sub>(−x<sub>p</sub>)</span><b id="c1n"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: injection">
+          <h3>Key points</h3>
+          <ul>
+            <li>A lower barrier lets diffusion win: holes go p → n, electrons go n → p.</li>
+            <li>Across the junction they are injected minority carriers.</li>
+            <li>Law of the junction: edge concentration = equilibrium value × exp(V/V<sub>T</sub>), ×10 per 60 mV.</li>
+            <li>Low-level injection: injected carriers stay far below the majority level.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 2 ================= -->
+      <section id="s2" aria-labelledby="h2s">
+        <h2 id="h2s">Diffusion and recombination in the neutral regions</h2>
+        <div class="prose">
+          <p>The injected minority carriers are most concentrated at the edge of the depletion region. They <strong>diffuse</strong> away from the junction into the neutral region and, as they go, they <strong>recombine</strong> with the majority carriers there.</p>
+          <p>The <strong>EXCESS</strong> minority concentration (above the equilibrium value) therefore falls off with distance. For a <strong>long diode</strong> (neutral regions much longer than the diffusion length), it decays exponentially:</p>
+          <p class="eq">δp<sub>n</sub>(x) = δp<sub>n</sub>(x<sub>n</sub>) · exp( −(x − x<sub>n</sub>) / L<sub>p</sub> )</p>
+          <p>L<sub>p</sub> = √(D<sub>p</sub>·τ<sub>p</sub>) is the hole <strong>DIFFUSION LENGTH</strong>: the average distance a hole travels in the n region before recombining. D<sub>p</sub> is the hole diffusion coefficient and τ<sub>p</sub> the hole lifetime. With D<sub>p</sub> = 10 cm²/s and τ<sub>p</sub> = 1 µs, L<sub>p</sub> ≈ 32 µm. Similarly, injected electrons in the p region decay over the electron diffusion length L<sub>n</sub> (≈ 16 µm here, with D<sub>n</sub> = 25 cm²/s and τ<sub>n</sub> = 0.1 µs).</p>
+          <p>At a distance of a few diffusion lengths, the minority concentration has returned to its equilibrium value. (If a neutral region is much shorter than the diffusion length, a "short diode", few carriers recombine on the way and the profile becomes nearly a straight line instead.)</p>
+        </div>
+
+        <figure class="anim" id="anim2">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="seg" role="group" aria-label="Concentration scale">
+              <button class="btn" type="button" data-sc="log" aria-pressed="true">Log</button>
+              <button class="btn" type="button" data-sc="lin" aria-pressed="false">Linear</button>
+            </div>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s2t"><span>Hole lifetime τ<sub>p</sub></span><output id="o2t"></output></label><input type="range" id="s2t" min="-1" max="1" step="0.02" value="0"></div>
+            <div class="slider"><label for="s2d"><span>Hole diffusion coefficient D<sub>p</sub></span><output id="o2d"></output></label><input type="range" id="s2d" min="2" max="40" step="0.5" value="10"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv2" style="aspect-ratio:720/540" role="img" aria-label="A wide view of the diode: injected holes spread from the junction into the n side and electrons into the p side, recombining in red flashes that are most frequent near the junction. Below, the minority concentration falls exponentially with distance on both sides, with the diffusion lengths Lp and Ln marked."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr q"><span>L<sub>p</sub> = √(D<sub>p</sub>τ<sub>p</sub>)</span><b id="c2p"></b></div>
+            <div class="ctr n"><span>L<sub>n</sub></span><b id="c2n"></b></div>
+            <div class="ctr v"><span>V (from Section 0)</span><b id="c2v"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: diffusion and recombination">
+          <h3>Key points</h3>
+          <ul>
+            <li>Injected carriers diffuse away from the junction and recombine.</li>
+            <li>Long diode: the excess decays as exp(−distance/L).</li>
+            <li>L<sub>p</sub> = √(D<sub>p</sub>τ<sub>p</sub>) ≈ 32 µm, L<sub>n</sub> ≈ 16 µm for the example.</li>
+            <li>A few diffusion lengths away, the concentration is back to equilibrium.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 3 ================= -->
+      <section id="s3" aria-labelledby="h3s">
+        <h2 id="h3s">Where the current flows</h2>
+        <div class="prose">
+          <p>The total current must be the <strong>same at every cross-section</strong> of the diode. Yet the <strong>CARRIERS</strong> that carry it change along the way:</p>
+          <ul>
+            <li>Near the junction on the n side, the current is mainly carried by <strong>DIFFUSION of injected holes</strong>.</li>
+            <li>As these holes recombine, they are replaced by <strong>ELECTRONS</strong> flowing in from the n contact, which arrive by drift as majority carriers to recombine with them.</li>
+            <li>Far from the junction, the current is carried entirely by <strong>majority carriers drifting</strong> in a small electric field.</li>
+          </ul>
+          <p>The same happens in mirror image on the p side.</p>
+          <p>So the forward current is set by how fast minority carriers diffuse away from the edges of the depletion region. The total current at the junction is the sum of the hole diffusion current at x<sub>n</sub> and the electron diffusion current at −x<sub>p</sub>. <strong>Conventional current flows from the p side to the n side</strong> (from anode to cathode).</p>
+          <p>In our example, the n side is ten times more lightly doped, so ten times more holes are injected into it than electrons into the p side: p<sub>n</sub>(x<sub>n</sub>) is ten times n<sub>p</sub>(−x<sub>p</sub>). The hole current dominates, but only by about two to one, because the injected electrons have a larger diffusion coefficient and a shorter diffusion length:</p>
+          <p class="eq">I<sub>p</sub> / I<sub>n</sub> = (D<sub>p</sub>·L<sub>n</sub>·N<sub>A</sub>) / (D<sub>n</sub>·L<sub>p</sub>·N<sub>D</sub>) ≈ 2</p>
+          <p>So holes carry about 67% of the current at the junction and electrons about 33%.</p>
+        </div>
+
+        <figure class="anim" id="anim3">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s3r"><span>Doping ratio N<sub>A</sub>/N<sub>D</sub> (N<sub>D</sub> = 10<sup>16</sup>)</span><output id="o3r"></output></label><input type="range" id="s3r" min="-1" max="1" step="0.02" value="1"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv3" style="aspect-ratio:720/500" role="img" aria-label="The diode bar with current arrows coloured by carrier type, mostly orange (holes) near the junction on the n side and turning blue (electrons) farther away, and the mirror image on the p side. Below, the hole current, electron current and flat total current are plotted along the diode. A doping-ratio slider changes which carrier dominates at the junction."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr q"><span>Hole share at junction</span><b id="c3h"></b></div>
+            <div class="ctr n"><span>Electron share at junction</span><b id="c3e"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: current flow">
+          <h3>Key points</h3>
+          <ul>
+            <li>Total current is constant along the diode; its carriers change.</li>
+            <li>Near the junction: minority diffusion. Far away: majority drift.</li>
+            <li>I at the junction = hole diffusion at x<sub>n</sub> + electron diffusion at −x<sub>p</sub>; conventional current flows p → n.</li>
+            <li>The lighter-doped side receives more injection: here holes carry ≈ 67%.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 4 ================= -->
+      <section id="s4" aria-labelledby="h4s">
+        <h2 id="h4s">How the current depends on voltage</h2>
+        <div class="prose">
+          <p>The diffusion current is proportional to the slope of the minority-carrier profile, which is proportional to the excess concentration at the depletion edge, and that grows as exp(V/V<sub>T</sub>) − 1. So the total current is:</p>
+          <p class="eq">I = I<sub>S</sub> · [ exp(V/V<sub>T</sub>) − 1 ]</p>
+          <p>where I<sub>S</sub> is the <strong>SATURATION CURRENT</strong>:</p>
+          <p class="eq">I<sub>S</sub> = A · q · n<sub>i</sub><sup>2</sup> · [ D<sub>p</sub>/(L<sub>p</sub>·N<sub>D</sub>) + D<sub>n</sub>/(L<sub>n</sub>·N<sub>A</sub>) ]</p>
+          <p>I<sub>S</sub> is tiny for silicon because n<sub>i</sub><sup>2</sup> is small, typically in the range of femtoamperes (10<sup>−15</sup> A) for small junctions. For the example (A = 10<sup>−4</sup> cm²), <strong>I<sub>S</sub> ≈ 1.7 × 10<sup>−15</sup> A</strong>, so the current is about 1 mA at 0.70 V and about 20 mA at 0.78 V.</p>
+          <p>Consequences:</p>
+          <ul>
+            <li>The current rises <strong>EXPONENTIALLY</strong>: for every increase of about <strong>60 mV</strong> (V<sub>T</sub>·ln10), the current increases <strong>ten times</strong>.</li>
+            <li>Below about 0.5 V, the current in a silicon diode is too small to notice. Between roughly 0.6 and 0.8 V it becomes large. This is why the diode is said to have a <strong>CUT-IN (threshold) voltage</strong> of about 0.5 to 0.6 V and a typical <strong>forward drop of about 0.7 V</strong> for silicon. For germanium the cut-in voltage is only about 0.2 V.</li>
+            <li>Real diodes follow this equation closely over many decades of current. At low currents, recombination in the depletion region adds current that grows as exp(V/2V<sub>T</sub>), and at high currents high-level injection and the resistance of the neutral regions and contacts limit the current. Both are often described by an <strong>ideality factor n</strong> between 1 and 2 in I = I<sub>S</sub>·[exp(V/nV<sub>T</sub>) − 1] (topic 2.5). Some books write it as η and quote η ≈ 1 for germanium and η ≈ 2 for silicon at small currents.</li>
+          </ul>
+        </div>
+
+        <figure class="anim" id="anim4">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="seg" role="group" aria-label="Current axis">
+              <button class="btn" type="button" data-sc="lin" aria-pressed="true">Linear</button>
+              <button class="btn" type="button" data-sc="log" aria-pressed="false">Log</button>
+            </div>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s4v"><span>Forward voltage V</span><output id="o4v"></output></label><input type="range" id="s4v" min="0" max="0.7" step="0.005" value="0.6"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv4" style="aspect-ratio:720/430" role="img" aria-label="The forward I-V curve of the example diode. On the linear axis (0 to 20 mA) the current stays near zero until about 0.6 V and then rises steeply; the cut-in band is shaded and 0.7 V is marked. On the log axis (10^-15 to 10^-1 A) it is a straight line, and a ruler shows 60 mV across and a factor of ten up. A dot follows the voltage slider."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr v"><span>V</span><b id="c4v"></b></div>
+            <div class="ctr w"><span>I</span><b id="c4i"></b></div>
+            <div class="ctr b"><span>I<sub>S</sub></span><b id="c4s"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: diode equation">
+          <h3>Key points</h3>
+          <ul>
+            <li>I = I<sub>S</sub>[exp(V/V<sub>T</sub>) − 1], with I<sub>S</sub> = Aqn<sub>i</sub><sup>2</sup>[D<sub>p</sub>/(L<sub>p</sub>N<sub>D</sub>) + D<sub>n</sub>/(L<sub>n</sub>N<sub>A</sub>)] ≈ 1.7 fA here.</li>
+            <li>×10 current per ≈ 60 mV: a straight line on a log axis.</li>
+            <li>Silicon: cut-in ≈ 0.5–0.6 V, forward drop ≈ 0.7 V; germanium cut-in ≈ 0.2 V.</li>
+            <li>Real diodes: ideality factor n between 1 and 2 (topic 2.5).</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 5 ================= -->
+      <section id="s5" aria-labelledby="h5s">
+        <h2 id="h5s">The band diagram under forward bias</h2>
+        <div class="prose">
+          <p>Under forward bias, the Fermi level is <strong>no longer flat</strong>. Far in the n region it is raised by qV relative to the p region. The band bending across the depletion region is reduced from qV<sub>bi</sub> to <strong>q(V<sub>bi</sub> − V)</strong>, so the barrier for electrons and holes is lower.</p>
+          <p>Inside and near the depletion region, electrons and holes are no longer in equilibrium with each other. Their concentrations are described by two separate <strong>QUASI-FERMI LEVELS</strong>: <strong>E<sub>Fn</sub></strong> for electrons and <strong>E<sub>Fp</sub></strong> for holes. Across the depletion region they are separated by qV. In the neutral regions, the minority quasi-Fermi level slopes back toward the majority one as the injected carriers recombine. It falls by only about kT for every diffusion length, so although the excess carriers are mostly gone within a few diffusion lengths, the two levels meet only where the excess has died out completely (at the latest, at the ohmic contact).</p>
+        </div>
+
+        <figure class="anim" id="anim5">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s5v"><span>Forward voltage V</span><output id="o5v"></output></label><input type="range" id="s5v" min="0" max="0.7" step="0.005" value="0.6"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv5" style="aspect-ratio:720/480" role="img" aria-label="The band diagram under forward bias. The bending shrinks to q(Vbi − V) as the slider rises. Two dashed quasi-Fermi levels, EFn in yellow and EFp in orange, are together far from the junction and separated by qV across the depletion region; the minority one slopes back to meet the majority one in each neutral region. Electrons climb over the lowered barrier in growing numbers."></canvas>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: band diagram">
+          <h3>Key points</h3>
+          <ul>
+            <li>Band bending drops to q(V<sub>bi</sub> − V): a lower barrier.</li>
+            <li>Two quasi-Fermi levels, E<sub>Fn</sub> and E<sub>Fp</sub>, split by qV across the depletion region.</li>
+            <li>In the neutral regions the minority level slopes back (≈ kT per diffusion length) until the two meet again.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 6 ================= -->
+      <section id="s6" aria-labelledby="h6s">
+        <h2 id="h6s">Summary</h2>
+        <div class="prose">
+          <p>In forward bias, the <strong>p side is positive</strong>. The applied voltage reduces the barrier to <strong>V<sub>bi</sub> − V</strong> and narrows the depletion region. Majority carriers cross the junction and become <strong>injected minority carriers</strong>, with concentrations at the depletion edges of <strong>p<sub>n0</sub>·exp(V/V<sub>T</sub>)</strong> and <strong>n<sub>p0</sub>·exp(V/V<sub>T</sub>)</strong>. They diffuse into the neutral regions and recombine over a diffusion length, and majority carriers from the contacts take over the current. The result is the diode equation <strong>I = I<sub>S</sub>[exp(V/V<sub>T</sub>) − 1]</strong>, a current that grows ten times for every 60 mV, with a practical forward drop of about <strong>0.7 V for silicon</strong>.</p>
+        </div>
+
+        <figure class="anim" id="anim6">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s6v"><span>Forward voltage V</span><output id="o6v"></output></label><input type="range" id="s6v" min="0" max="0.7" step="0.005" value="0.6"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv6" style="aspect-ratio:720/750" role="img" aria-label="Recap linked to one forward-voltage slider: the diode bar with injected carrier streams, the minority-carrier profiles on a log scale, the band diagram with quasi-Fermi levels, and the I-V curve with a dot at the present voltage."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr b"><span>Barrier</span><b id="c6b"></b></div>
+            <div class="ctr q"><span>p<sub>n</sub>(x<sub>n</sub>)</span><b id="c6p"></b></div>
+            <div class="ctr w"><span>I</span><b id="c6i"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: summary">
+          <h3>Key points</h3>
+          <ul>
+            <li>p side positive: barrier V<sub>bi</sub> − V, narrower depletion region.</li>
+            <li>Edge minority concentrations rise as exp(V/V<sub>T</sub>).</li>
+            <li>Diffusion + recombination over L<sub>p</sub>, L<sub>n</sub>; majority carriers carry the current far away.</li>
+            <li>I = I<sub>S</sub>[exp(V/V<sub>T</sub>) − 1]: ×10 per 60 mV, ≈ 0.7 V drop for silicon.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <aside class="further" aria-label="Further reading">
+        <h3>Further reading</h3>
+        <ul>
+          <li><em>Semiconductor Physics and Devices</em>, Donald A. Neamen. Chapter: “The pn Junction Diode”.</li>
+          <li><em>Microelectronic Circuits</em> (6th ed.), Adel S. Sedra and Kenneth C. Smith. Chapter: “Semiconductors”.</li>
+          <li><em>Electronic Devices and Circuits</em>, Jacob Millman, Christos C. Halkias and Satyabrata Jit. Chapter: “Semiconductor-Diode Characteristics”.</li>
+          <li><em>Device Electronics for Integrated Circuits</em> (3rd ed.), Richard S. Muller, Theodore I. Kamins and Mansun Chan. Chapter: “Currents in pn Junctions”.</li>
+        </ul>
+      </aside>
+
+      <nav class="pager" aria-label="Topic navigation">
+        <a href="../2-2-barrier-potential-band-diagram/index.html"><small>← Previous</small>2.2 Barrier Potential and the Band Diagram</a>
+        <a class="next" href="../2-4-reverse-bias/index.html"><small>Next →</small>2.4 Reverse Bias</a>
+      </nav>
+    </div>
+  </main>
+
+  <footer class="site-foot">© 2026 Naveen Bokka</footer>
+
+<script>
+(function () {
+  'use strict';
+  /* ---------- colours ---------- */
+  const C = {
+    text: '#e6e9ef', muted: '#9aa4b8', grid: 'rgba(255,255,255,.07)',
+    P: '#7d3a3a', N: '#2e4a7d', DEP: '#3a3f4f', SI: '#3d4558',
+    hole: '#ff8a65', elec: '#4fc3f7', acc: '#ef9a9a', don: '#90caf9',
+    field: '#ffd54f', diff: '#ce93d8', drift: '#81c784', rec: '#ef5350',
+    ok: '#81c784', bad: '#ef5350', axis: '#5a6478'
+  };
+  const FONT = 'Inter, system-ui, sans-serif';
+  const MONO = '"JetBrains Mono", Consolas, monospace';
+  const RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const TAU = Math.PI * 2;
+  const $ = id => document.getElementById(id);
+  if (RM) $('rmNote').hidden = false;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const lerp = (a, b, u) => a + (b - a) * u;
+  const ease = u => { u = clamp(u, 0, 1); return u * u * (3 - 2 * u); };
+  const hash = k => { const s = Math.sin(k * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+
+  /* ---------- number formatting ---------- */
+  const SUP = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '-': '⁻' };
+  const sup = n => String(n).split('').map(ch => SUP[ch] || ch).join('');
+  function sci(v, d) {
+    if (v === 0) return '0';
+    const neg = v < 0; v = Math.abs(v);
+    let e = Math.floor(Math.log10(v)), m = v / Math.pow(10, e);
+    if (+m.toFixed(d) >= 10) { m /= 10; e += 1; }
+    return (neg ? '−' : '') + m.toFixed(d) + ' × 10' + sup(e);
+  }
+  const fUm = v => { const a = Math.abs(v); return (v < 0 ? '−' : '') + (a >= 1 ? a.toFixed(2) : a >= 0.1 ? a.toFixed(3) : a.toFixed(4)) + ' µm'; };
+  const fNum = v => { const a = Math.abs(v); const s = a >= 10 ? a.toFixed(0) : a >= 1 ? a.toFixed(a % 1 ? 1 : 0) : a >= 0.1 ? String(+a.toFixed(2)) : String(+a.toFixed(3)); return (v < 0 ? '−' : '') + s; };
+
+  /* ---------- physics (step junction, depletion approximation, cm units) ---------- */
+  const Q = 1.602e-19, ES = 11.7 * 8.854e-14, VT = 0.0259, NI = 1.5e10;
+  function junction(lgA, lgD) {
+    const NA = Math.pow(10, lgA), ND = Math.pow(10, lgD);
+    const Vbi = VT * Math.log(NA * ND / (NI * NI));
+    const W = Math.sqrt(2 * ES * Vbi / Q * (NA + ND) / (NA * ND));
+    const xn = W * NA / (NA + ND), xp = W * ND / (NA + ND);
+    return { lgA, lgD, NA, ND, Vbi, W, xn, xp, Em: Q * ND * xn / ES };
+  }
+  // x in cm; returns rho (C/cm³), E (V/cm, negative inside), V (V, 0 at −xp)
+  function rhoAt(j, x) { return x < -j.xp || x > j.xn ? 0 : x < 0 ? -Q * j.NA : Q * j.ND; }
+  function eAt(j, x) {
+    if (x <= -j.xp || x >= j.xn) return 0;
+    return x < 0 ? -Q * j.NA / ES * (x + j.xp) : -Q * j.ND / ES * (j.xn - x);
+  }
+  function vAt(j, x) {
+    if (x <= -j.xp) return 0;
+    if (x >= j.xn) return j.Vbi;
+    return x < 0 ? Q * j.NA / (2 * ES) * (x + j.xp) * (x + j.xp) : j.Vbi - Q * j.ND / (2 * ES) * (j.xn - x) * (j.xn - x);
+  }
+  // Half-width of a to-scale window (µm), from a 1-2-5 ladder
+  function niceS(j) {
+    const need = 1.2 * Math.max(j.xn, j.xp) * 1e4;
+    const L = [0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10];
+    for (let k = 0; k < L.length; k++) if (L[k] >= need) return L[k];
+    return 10;
+  }
+
+  /* ---------- Canvas helpers ---------- */
+  let FS = 1;
+  function Cv(id, W, H, cap) { this.el = $(id); this.W = W; this.H = H; this.cap = cap || 2; this.ctx = this.el.getContext('2d'); }
+  Cv.prototype.begin = function () {
+    const w = this.el.clientWidth; if (!w) return null;
+    const dpr = window.devicePixelRatio || 1;
+    const pw = Math.round(w * dpr), ph = Math.round(w * dpr * this.H / this.W);
+    if (this.el.width !== pw || this.el.height !== ph) { this.el.width = pw; this.el.height = ph; }
+    const c = this.ctx, s = pw / this.W;
+    FS = Math.min(this.cap, Math.max(1, 1.15 * this.W / w));
+    c.setTransform(s, 0, 0, s, 0, 0); c.clearRect(0, 0, this.W, this.H);
+    c.textBaseline = 'middle'; c.textAlign = 'left'; c.globalAlpha = 1; c.setLineDash([]); c.lineCap = 'butt'; c.shadowBlur = 0;
+    return c;
+  };
+  // Watermark: drawn inside the canvas, bottom-right, 13 px on screen at any size.
+  Cv.prototype.wm = function (c) {
+    const k = this.W / this.el.clientWidth, s = 13 * k;
+    c.save(); c.setTransform(this.el.width / this.W, 0, 0, this.el.width / this.W, 0, 0);
+    c.globalAlpha = 1; c.shadowBlur = 0; c.font = '500 ' + s.toFixed(1) + 'px ' + FONT; c.fillStyle = 'rgba(255,255,255,.35)';
+    c.textAlign = 'right'; c.textBaseline = 'bottom'; c.fillText('© Naveen Bokka', this.W - 6 * k, this.H - 4 * k); c.restore();
+  };
+  Cv.prototype.pt = function (e) {
+    const r = this.el.getBoundingClientRect();
+    return { x: (e.clientX - r.left) * this.W / r.width, y: (e.clientY - r.top) * this.H / r.height };
+  };
+  function circ(c, x, y, r, fill, stroke, lw) {
+    c.beginPath(); c.arc(x, y, Math.max(0, r), 0, TAU);
+    if (fill) { c.fillStyle = fill; c.fill(); }
+    if (stroke) { c.strokeStyle = stroke; c.lineWidth = lw || 1.5; c.stroke(); }
+  }
+  function txt(c, s, x, y, col, size, weight, align, font) {
+    c.font = (weight || 600) + ' ' + ((size || 12) * FS).toFixed(1) + 'px ' + (font || FONT);
+    c.fillStyle = col || C.text; c.textAlign = align || 'left'; c.fillText(s, x, y);
+  }
+  // Label made of [main, subscript] parts, e.g. [['N','A'],['·x','p']]
+  function subs(c, parts, x, y, col, size, align) {
+    const z = (size || 13) * FS, zs = z * 0.72;
+    let w = 0;
+    const ws = parts.map(p => {
+      c.font = '700 ' + z.toFixed(1) + 'px ' + FONT; const a = c.measureText(p[0]).width;
+      c.font = '700 ' + zs.toFixed(1) + 'px ' + FONT; const b = p[1] ? c.measureText(p[1]).width : 0;
+      w += a + b; return [a, b];
+    });
+    let x0 = align === 'right' ? x - w : align === 'center' ? x - w / 2 : x;
+    c.fillStyle = col; c.textAlign = 'left';
+    parts.forEach((p, k) => {
+      c.font = '700 ' + z.toFixed(1) + 'px ' + FONT; c.fillText(p[0], x0, y); x0 += ws[k][0];
+      if (p[1]) { c.font = '700 ' + zs.toFixed(1) + 'px ' + FONT; c.fillText(p[1], x0, y + z * 0.3); x0 += ws[k][1]; }
+    });
+    return w;
+  }
+  function line(c, x0, y0, x1, y1, col, lw, dash) {
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []);
+    c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke(); c.setLineDash([]);
+  }
+  function pline(c, pts, col, lw, dash) {
+    if (pts.length < 2) return;
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []); c.lineJoin = 'round';
+    c.beginPath(); pts.forEach((p, k) => k ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); c.stroke(); c.setLineDash([]);
+  }
+  function arrow(c, x0, y0, x1, y1, col, lw, head) {
+    const dx = x1 - x0, dy = y1 - y0, L = Math.hypot(dx, dy); if (L < 2) return;
+    lw = lw || 3;
+    const ux = dx / L, uy = dy / L, hs = Math.min(head || 10, L * 0.8), hw = Math.max(hs * 0.55, lw * 0.9);
+    line(c, x0, y0, x1 - ux * hs * 0.9, y1 - uy * hs * 0.9, col, lw);
+    c.fillStyle = col; c.beginPath(); c.moveTo(x1, y1);
+    c.lineTo(x1 - ux * hs - uy * hw, y1 - uy * hs + ux * hw);
+    c.lineTo(x1 - ux * hs + uy * hw, y1 - uy * hs - ux * hw); c.closePath(); c.fill();
+  }
+  function darrow(c, x0, x1, y, col) {   // dimension arrow with end ticks
+    line(c, x0, y - 5, x0, y + 5, col, 1.3); line(c, x1, y - 5, x1, y + 5, col, 1.3);
+    if (x1 - x0 > 14) { arrow(c, (x0 + x1) / 2, y, x0 + 1, y, col, 1.4, 6); arrow(c, (x0 + x1) / 2, y, x1 - 1, y, col, 1.4, 6); }
+    else line(c, x0, y, x1, y, col, 1.4);
+  }
+  function rect(c, x, y, w, h, fill) { c.fillStyle = fill; c.fillRect(x, y, w, h); }
+  function hatch(c, x0, y0, x1, y1) {
+    if (x1 - x0 < 0.5) return;
+    rect(c, x0, y0, x1 - x0, y1 - y0, C.DEP);
+    c.save(); c.beginPath(); c.rect(x0, y0, x1 - x0, y1 - y0); c.clip();
+    c.strokeStyle = 'rgba(255,255,255,.10)'; c.lineWidth = 1; c.beginPath();
+    for (let x = x0 - (y1 - y0); x < x1; x += 9) { c.moveTo(x, y1); c.lineTo(x + (y1 - y0), y0); }
+    c.stroke(); c.restore();
+  }
+  // Fixed ion: circled − (acceptor) or circled + (donor)
+  function ion(c, x, y, r, kind, a) {
+    const col = kind === 'a' ? C.acc : C.don;
+    c.globalAlpha = a; circ(c, x, y, r, null, col, Math.max(1, r * 0.22));
+    c.strokeStyle = col; c.lineWidth = Math.max(1, r * 0.24); c.beginPath();
+    c.moveTo(x - r * 0.5, y); c.lineTo(x + r * 0.5, y);
+    if (kind === 'd') { c.moveTo(x, y - r * 0.5); c.lineTo(x, y + r * 0.5); }
+    c.stroke(); c.globalAlpha = 1;
+  }
+  function carrier(c, x, y, kind, a, r) {
+    c.globalAlpha = a; circ(c, x, y, r || (kind === 'h' ? 3.6 : 3.2), kind === 'h' ? C.hole : C.elec); c.globalAlpha = 1;
+  }
+  const jig = (k, ph, amp) => [amp * Math.sin(ph * 1.7 + k * 1.31), amp * Math.cos(ph * 1.3 + k * 2.07)];
+  function regionLabels(c, B, jx) {
+    const s = 11 * FS;
+    c.fillStyle = 'rgba(15,20,32,.75)';
+    c.fillRect(B.x + 2, B.y + 2, s + 6, s + 8); c.fillRect(B.x + B.w - s - 8, B.y + 2, s + 6, s + 8);
+    txt(c, 'p', B.x + 5 + s / 2, B.y + 6 + s / 2, '#fff', 14, 700, 'center');
+    txt(c, 'n', B.x + B.w - 5 - s / 2, B.y + 6 + s / 2, '#fff', 14, 700, 'center');
+  }
+
+  /* ---------- Animation registry ---------- */
+  const anims = [];
+  function Anim(rootId, o) {
+    this.root = $(rootId); this.o = o; this.playing = !RM; this.visible = true; this.dirty = true;
+    this.pb = this.root.querySelector('[data-act="play"]');
+    this.pb.addEventListener('click', () => this.setPlaying(!this.playing));
+    this.root.querySelector('[data-act="reset"]').addEventListener('click', () => { o.reset(); this.setPlaying(!RM); });
+    o.reset(); this.sync(); anims.push(this);
+    if ('IntersectionObserver' in window) {
+      this.visible = false;
+      new IntersectionObserver(es => es.forEach(e => { this.visible = e.isIntersecting; if (this.visible) this.dirty = true; }))
+        .observe(this.root);
+    }
+  }
+  Anim.prototype.setPlaying = function (p) { this.playing = p; this.sync(); this.dirty = true; };
+  Anim.prototype.sync = function () { this.pb.textContent = this.playing ? 'Pause' : 'Play'; };
+  Object.assign(C, { band: '#e6e9ef', efn: '#ffd54f', efp: '#ff8a65', bar: '#ce93d8', metal: '#b0bec5', volt: '#ffd54f', cur: '#81c784' });
+
+  /* ---------- junction bar drawn to scale (window ±Sw µm) ---------- */
+  const spOf = lg => clamp(40 - 5.5 * (lg - 14), 10, 40);
+  function jbar(c, B, j, Sw, ph) {
+    const jx = B.x + B.w / 2, k = (B.w / 2) / Sw;
+    const eL = Math.max(B.x, jx - j.xp * 1e4 * k), eR = Math.min(B.x + B.w, jx + j.xn * 1e4 * k);
+    rect(c, B.x, B.y, jx - B.x, B.h, C.P); rect(c, jx, B.y, B.x + B.w - jx, B.h, C.N);
+    hatch(c, eL, B.y, eR, B.y + B.h);
+    [['a', j.lgA, -1], ['d', j.lgD, 1]].forEach(s => {
+      const sp = spOf(s[1]), nr = Math.max(2, Math.floor(B.h / sp)), dy = B.h / nr, r = Math.min(6, sp * 0.36);
+      for (let i = 0; ; i++) {
+        const x = jx + s[2] * (sp / 2 + i * sp);
+        if (s[2] < 0 ? x < B.x + 3 : x > B.x + B.w - 3) break;
+        const inDep = s[2] < 0 ? x > eL : x < eR;
+        for (let rr = 0; rr < nr; rr++) {
+          const y = B.y + dy * (rr + 0.5), key = i * 31 + rr * 7 + (s[2] > 0 ? 900 : 0);
+          if (inDep) ion(c, x, y, r, s[0], 1);
+          else if ((i + rr) % 2 === 0) { const d = jig(key, ph, Math.min(2.2, sp * 0.12)); carrier(c, x + d[0], y + d[1], s[0] === 'a' ? 'h' : 'e', 0.95, Math.min(3.4, sp * 0.22)); }
+        }
+      }
+    });
+    line(c, jx, B.y, jx, B.y + B.h, 'rgba(255,255,255,.55)', 1.2, [4, 4]);
+    regionLabels(c, B, jx);
+    return { jx, k, eL, eR };
+  }
+  const tweenLog = (cur, target, dt) => { const a = Math.log(cur), b = Math.log(target); return Math.abs(a - b) < 0.003 ? target : Math.exp(a + (b - a) * Math.min(1, dt * 6)); };
+
+  /* =========================================================
+     Forward-bias model (example junction, long diode, low-level injection)
+       Vbi = VT·ln(NA·ND/ni²), W from (Vbi − V)
+       pn(xn) = pn0·exp(V/VT), np(−xp) = np0·exp(V/VT)
+       δp(x) = pn0(e^{V/VT} − 1)·exp(−d/Lp), δn likewise with Ln
+       IS = A·q·ni²·[Dp/(Lp·ND) + Dn/(Ln·NA)]
+     ========================================================= */
+  const NA0 = 1e17, ND0 = 1e16, PN0 = NI * NI / ND0, NP0 = NI * NI / NA0;
+  const DEV = { A: 1e-4, Dp: 10, tp: 1e-6, Dn: 25, tn: 1e-7 };
+  const LP0 = Math.sqrt(DEV.Dp * DEV.tp) * 1e4, LN0 = Math.sqrt(DEV.Dn * DEV.tn) * 1e4;   // µm
+  const VBI = VT * Math.log(NA0 * ND0 / (NI * NI));
+  function jf(V) {
+    const Vt = Math.max(0.02, VBI - V), W = Math.sqrt(2 * ES * Vt / Q * (NA0 + ND0) / (NA0 * ND0));
+    return { lgA: 17, lgD: 16, NA: NA0, ND: ND0, Vbi: VBI, Vt, W, xn: W * NA0 / (NA0 + ND0), xp: W * ND0 / (NA0 + ND0) };
+  }
+  function phiF(j, x) {   // potential rise from the p-side edge, x in cm
+    if (x <= -j.xp) return 0;
+    if (x >= j.xn) return j.Vt;
+    return x < 0 ? Q * j.NA / (2 * ES) * (x + j.xp) * (x + j.xp) : j.Vt - Q * j.ND / (2 * ES) * (j.xn - x) * (j.xn - x);
+  }
+  function isOf(o) {
+    o = Object.assign({}, DEV, { NA: NA0, ND: ND0 }, o || {});
+    const Lp = Math.sqrt(o.Dp * o.tp), Ln = Math.sqrt(o.Dn * o.tn);
+    return o.A * Q * NI * NI * (o.Dp / (Lp * o.ND) + o.Dn / (Ln * o.NA));
+  }
+  const IS0 = isOf();
+  const iOf = V => IS0 * (Math.exp(V / VT) - 1);
+  const fI = i => i <= 0 ? '0' : i >= 1e-3 ? (i * 1e3).toFixed(i >= 1e-2 ? 1 : 2) + ' mA' : i >= 1e-6 ? (i * 1e6).toFixed(i >= 1e-5 ? 1 : 2) + ' µA' : sci(i, 2) + ' A';
+  const fVv = v => v.toFixed(3) + ' V';
+  const segBtns = (root, key, cb) => {
+    const bs = Array.from(document.querySelectorAll(root + ' [data-' + key + ']'));
+    const set = v => { bs.forEach(b => b.setAttribute('aria-pressed', String(b.dataset[key] === v))); cb(v); };
+    bs.forEach(b => b.addEventListener('click', () => set(b.dataset[key])));
+    return set;
+  };
+
+  /* ---------- shared forward voltage (Sections 0, 1, 2, 4, 5, 6) ---------- */
+  const SV = { V: 0.6, subs: [] };
+  const VSL = ['s0v', 's1v', 's4v', 's5v', 's6v'];
+  function setV(v) {
+    SV.V = clamp(+v, 0, 0.7);
+    VSL.forEach(id => { $(id).value = SV.V; $(id.replace('s', 'o')).textContent = fVv(SV.V); });
+    SV.subs.forEach(f => f());
+  }
+  VSL.forEach(id => $(id).addEventListener('input', e => setV(e.target.value)));
+
+  /* ---------- injected carrier streams (Sections 1 and 6) ---------- */
+  // Holes leave the p-side depletion edge into the n side; electrons the reverse.
+  // Spawn rate grows exponentially with V (visual: ×10 per 150 mV, capped).
+  function Streams() { this.P = []; this.acc = 0; }
+  Streams.prototype.step = function (dt, V, B, g) {
+    const r = Math.min(55, 0.3 * Math.pow(10, (V - 0.35) / 0.15)), sc = B.w / 640;
+    this.acc += r * dt;
+    while (this.acc >= 1) {
+      this.acc -= 1;
+      this.P.push({ k: 'h', x: g.eL - 2, y: B.y + 8 + Math.random() * (B.h - 16), v: 130 * sc, d: (60 + 170 * Math.random()) * sc, s: g.eL });
+      if (Math.random() < 0.5) this.P.push({ k: 'e', x: g.eR + 2, y: B.y + 8 + Math.random() * (B.h - 16), v: -130 * sc, d: (40 + 120 * Math.random()) * sc, s: g.eR });
+    }
+    this.P.forEach(p => { p.x += p.v * dt; p.y += (Math.random() - 0.5) * 40 * dt; p.y = clamp(p.y, B.y + 5, B.y + B.h - 5); });
+    this.P = this.P.filter(p => Math.abs(p.x - p.s) < p.d);
+  };
+  Streams.prototype.draw = function (c) {
+    this.P.forEach(p => {
+      const u = Math.abs(p.x - p.s) / p.d, a = u > 0.75 ? (1 - u) / 0.25 : 1;
+      c.save(); c.shadowColor = p.k === 'h' ? C.hole : C.elec; c.shadowBlur = 6;
+      carrier(c, p.x, p.y, p.k, a, 3.6); c.restore();
+    });
+  };
+
+  /* ---------- minority-carrier profile plot (Sections 2 and 6) ----------
+     G: {x, w, y, h}; o: {V, Lp, Ln (µm), Sx (half-window µm), log} */
+  function profilePlot(c, G, o) {
+    const jx = G.x + G.w / 2, k = (G.w / 2) / o.Sx, ex = Math.exp(o.V / VT);
+    const ppk = PN0 * ex, npk = NP0 * ex;
+    const lgMin = 2, lgMax = 16;
+    const Y = v => o.log ? G.y + G.h - (Math.log10(Math.max(v, 1)) - lgMin) / (lgMax - lgMin) * G.h : G.y + G.h - v / Math.max(ppk, 1) * (G.h - 10);
+    rect(c, G.x, G.y, G.w, G.h, 'rgba(255,255,255,.02)');
+    if (o.log) [4, 8, 12, 16].forEach(lg => { line(c, G.x, Y(Math.pow(10, lg)), G.x + G.w, Y(Math.pow(10, lg)), C.grid, 1); txt(c, '10' + sup(lg), G.x + 4, Y(Math.pow(10, lg)) + 8, C.muted, 10, 500, 'left', MONO); });
+    line(c, G.x, G.y + G.h, G.x + G.w, G.y + G.h, C.axis, 1.2);
+    line(c, jx, G.y, jx, G.y + G.h, 'rgba(255,255,255,.25)', 1, [3, 4]);
+    if (o.log) {
+      pline(c, [[G.x, Y(NP0)], [jx, Y(NP0)]], 'rgba(79,195,247,.45)', 1, [4, 4]);
+      pline(c, [[jx, Y(PN0)], [G.x + G.w, Y(PN0)]], 'rgba(255,138,101,.45)', 1, [4, 4]);
+      subs(c, [['n', 'p0']], jx - 6, Y(NP0) - 9, C.elec, 10, 'right');
+      subs(c, [['p', 'n0']], G.x + G.w - 4, Y(PN0) - 9, C.hole, 10, 'right');
+    }
+    const pp = [], nn = [];
+    for (let px = jx; px <= G.x + G.w; px += 2) pp.push([px, Y(PN0 + (ppk - PN0) * Math.exp(-(px - jx) / k / o.Lp))]);
+    for (let px = jx; px >= G.x; px -= 2) nn.push([px, Y(NP0 + (npk - NP0) * Math.exp(-(jx - px) / k / o.Ln))]);
+    pline(c, pp, C.hole, 2.6); pline(c, nn, C.elec, 2.6);
+    // diffusion-length marks
+    const xLp = jx + o.Lp * k, xLn = jx - o.Ln * k;
+    if (xLp < G.x + G.w - 4) { line(c, xLp, G.y + 4, xLp, G.y + G.h, 'rgba(255,138,101,.5)', 1, [3, 3]); subs(c, [['L', 'p']], xLp + 4, G.y + 12, C.hole, 11, 'left'); }
+    if (xLn > G.x + 4) { line(c, xLn, G.y + 4, xLn, G.y + G.h, 'rgba(79,195,247,.5)', 1, [3, 3]); subs(c, [['L', 'n']], xLn - 4, G.y + 12, C.elec, 11, 'right'); }
+    subs(c, [['p', 'n'], ['(x)', '']], jx + 8, Y(ppk) - (o.log ? 10 : -12), C.hole, 11, 'left');
+    subs(c, [['n', 'p'], ['(x)', '']], jx - 8, Y(npk) - 10, C.elec, 11, 'right');
+    return { jx, k };
+  }
+  function umAxis(c, G, Sx, y) {
+    for (let q = -2; q <= 2; q++) {
+      const x = G.x + G.w / 2 + q / 2 * (G.w / 2);
+      line(c, x, y - 4, x, y + 3, C.axis, 1.2);
+      txt(c, fNum(q * Sx / 2) + (q === 2 ? ' µm' : ''), x, y + 13, C.muted, 10, 500, q === 2 ? 'right' : q === -2 ? 'left' : 'center', MONO);
+    }
+  }
+
+  /* ---------- I–V plot (Sections 4 and 6) ---------- */
+  function ivPlot(c, G, V, log, trace) {
+    const X = v => G.x + v / 0.8 * G.w;
+    const Y = log ? i => G.y + G.h - (Math.log10(Math.max(i, 1e-16)) + 15) / 14 * G.h : i => G.y + G.h - i / 0.02 * G.h;
+    rect(c, G.x, G.y, G.w, G.h, 'rgba(255,255,255,.02)');
+    // cut-in band and 0.7 V
+    c.fillStyle = 'rgba(255,213,79,.07)'; c.fillRect(X(0.5), G.y, X(0.6) - X(0.5), G.h);
+    txt(c, 'cut-in', (X(0.5) + X(0.6)) / 2, G.y + 10, C.muted, 10, 600, 'center');
+    line(c, X(0.7), G.y, X(0.7), G.y + G.h, 'rgba(255,213,79,.45)', 1, [4, 4]);
+    txt(c, '≈0.7 V', X(0.7) + 4, G.y + 26, C.volt, 10, 600, 'left');
+    if (log) [-15, -13, -11, -9, -7, -5, -3, -1].forEach(e => { line(c, G.x, Y(Math.pow(10, e)), G.x + G.w, Y(Math.pow(10, e)), C.grid, 1); txt(c, '10' + sup(e), G.x - 6, Y(Math.pow(10, e)), C.muted, 10, 500, 'right', MONO); });
+    else [0, 5, 10, 15, 20].forEach(m => { line(c, G.x, Y(m / 1000), G.x + G.w, Y(m / 1000), C.grid, 1); txt(c, String(m), G.x - 6, Y(m / 1000), C.muted, 10, 500, 'right', MONO); });
+    txt(c, log ? 'I (A)' : 'I (mA)', G.x - 6, G.y - 10 - 6 * FS, C.muted, 11, 600, 'right');
+    line(c, G.x, G.y + G.h, G.x + G.w, G.y + G.h, C.axis, 1.2); line(c, G.x, G.y, G.x, G.y + G.h, C.axis, 1.2);
+    [0, 0.2, 0.4, 0.6, 0.8].forEach(v => { line(c, X(v), G.y + G.h, X(v), G.y + G.h + 4, C.axis, 1); txt(c, v.toFixed(1) + (v === 0.8 ? ' V' : ''), X(v), G.y + G.h + 14, C.muted, 10, 500, v === 0.8 ? 'right' : 'center', MONO); });
+    c.save(); c.beginPath(); c.rect(G.x, G.y - 2, G.w, G.h + 2); c.clip();
+    const pts = []; for (let v = 0.001; v <= 0.8; v += 0.004) pts.push([X(v), Y(iOf(v))]);
+    pline(c, pts, C.cur, 2.6);
+    if (log) {   // 60 mV / ×10 ruler
+      const v0 = 0.3, v1 = v0 + VT * Math.LN10;
+      pline(c, [[X(v0), Y(iOf(v0))], [X(v1), Y(iOf(v0))], [X(v1), Y(iOf(v1))]], C.volt, 1.6);
+      txt(c, '60 mV', (X(v0) + X(v1)) / 2, Y(iOf(v0)) + 12, C.volt, 10, 600, 'center');
+      txt(c, '×10', X(v1) + 5, (Y(iOf(v0)) + Y(iOf(v1))) / 2, C.volt, 10, 600, 'left');
+    }
+    if (trace != null && trace < V) { c.save(); c.shadowColor = C.cur; c.shadowBlur = 12; circ(c, X(trace), Y(iOf(trace)), 4, '#fff'); c.restore(); }
+    c.restore();
+    const iv = iOf(V), yv = Y(iv), inside = yv >= G.y - 1;
+    line(c, X(V), G.y + G.h, X(V), Math.max(G.y, yv), 'rgba(255,213,79,.35)', 1, [2, 3]);
+    if (inside) circ(c, X(V), yv, 6, C.volt, '#0f1420', 2);
+    else arrow(c, X(V), G.y + 16, X(V), G.y + 1, C.volt, 2, 7);
+  }
+
+  /* ---------- forward-bias band diagram (Sections 5 and 6) ----------
+     Schematic x axis: depletion region drawn wide (width ∝ W), neutral regions
+     represent 3.5 diffusion lengths each (Ln on the p side, Lp on the n side).
+     Energies in eV, EFp (p side) = 0, upward positive. */
+  const DP = VT * Math.log(NA0 / NI), EG = 1.12;
+  function bandLayout(G, V) {
+    const j = jf(V), j0 = jf(0), jx = G.x + G.w * 0.45, Wpx = 190 * G.w / 620 * j.W / j0.W;
+    const eL = jx - Wpx * j.xp / j.W, eR = jx + Wpx * j.xn / j.W;
+    const nL = Math.max(4, V / VT + 4);
+    return { j, jx, eL, eR, pLn: (eL - G.x) / nL, pLp: (G.x + G.w - eR) / nL };
+  }
+  function eiAt(Lg, px) {   // intrinsic level at pixel px
+    const { j, jx, eL, eR } = Lg, a = j.xp / j.W;
+    let s;
+    if (px <= eL) s = 0; else if (px >= eR) s = 1;
+    else if (px < jx) { const u = (px - eL) / (jx - eL); s = a * u * u; }
+    else { const u = (eR - px) / (eR - jx); s = 1 - (1 - a) * u * u; }
+    return DP - s * j.Vt;
+  }
+  function efnAt(Lg, px, V) {   // electron quasi-Fermi level
+    if (px >= Lg.eL) return V;
+    const d = (Lg.eL - px) / Lg.pLn, n = NP0 * (1 + (Math.exp(V / VT) - 1) * Math.exp(-d));
+    return DP + VT * Math.log(n / NI);
+  }
+  function efpAt(Lg, px, V) {   // hole quasi-Fermi level
+    if (px <= Lg.eR) return 0;
+    const d = (px - Lg.eR) / Lg.pLp, p = PN0 * (1 + (Math.exp(V / VT) - 1) * Math.exp(-d));
+    return (DP - Lg.j.Vt) - VT * Math.log(p / NI);
+  }
+  function bandFwd(c, G, V, ph, movers, o) {
+    o = o || {};
+    const Lg = bandLayout(G, V), top = DP + EG / 2 + 0.16, bot = DP - EG / 2 - VBI - 0.12;
+    const Y = E => G.y + (top - E) / (top - bot) * G.h;
+    // schematic bar
+    if (G.bar) {
+      const by = G.bar[0], bh = G.bar[1];
+      rect(c, G.x, by, Lg.jx - G.x, bh, C.P); rect(c, Lg.jx, by, G.x + G.w - Lg.jx, bh, C.N);
+      hatch(c, Lg.eL, by, Lg.eR, by + bh);
+      for (let i = 0; i < 18; i++) {
+        const d = jig(i, ph, 1.6), xh = G.x + 10 + hash(i + 3) * (Lg.eL - G.x - 20), xe = Lg.eR + 10 + hash(i + 9) * (G.x + G.w - Lg.eR - 20);
+        carrier(c, xh + d[0], by + 8 + hash(i + 5) * (bh - 16) + d[1], 'h', 0.9, 3); carrier(c, xe + d[0], by + 8 + hash(i + 7) * (bh - 16) + d[1], 'e', 0.9, 3);
+      }
+      regionLabels(c, { x: G.x, y: by, w: G.w, h: bh }, Lg.jx);
+      [Lg.eL, Lg.eR].forEach(x => line(c, x, by + bh, x, G.y + G.h, 'rgba(255,255,255,.18)', 1, [3, 4]));
+    }
+    const xs = []; for (let px = G.x; px <= G.x + G.w + 0.1; px += 2) xs.push(px);
+    pline(c, xs.map(px => [px, Y(eiAt(Lg, px) + EG / 2)]), C.band, 2.6);
+    pline(c, xs.map(px => [px, Y(eiAt(Lg, px) - EG / 2)]), C.band, 2.6);
+    pline(c, xs.map(px => [px, Y(efnAt(Lg, px, V))]), C.efn, 2, [7, 5]);
+    pline(c, xs.map(px => [px, Y(efpAt(Lg, px, V))]), C.efp, 2, [3, 4]);
+    // diffusion-length ticks
+    const ty = G.y + G.h + 2;
+    line(c, Lg.eL - Lg.pLn, ty - 5, Lg.eL - Lg.pLn, ty + 3, C.muted, 1.2); subs(c, [['L', 'n']], Lg.eL - Lg.pLn, ty + 12, C.elec, 10, 'center');
+    line(c, Lg.eR + Lg.pLp, ty - 5, Lg.eR + Lg.pLp, ty + 3, C.muted, 1.2); subs(c, [['L', 'p']], Lg.eR + Lg.pLp, ty + 12, C.hole, 10, 'center');
+    // labels
+    const lx = G.x - 6;
+    subs(c, [['E', 'c']], lx, Y(DP + EG / 2), C.band, 12, 'right');
+    subs(c, [['E', 'v']], lx, Y(DP - EG / 2) + 7, C.band, 12, 'right');
+    subs(c, [['E', 'Fp']], lx, Y(0) - 7, C.efp, 12, 'right');
+    subs(c, [['E', 'Fn']], G.x + G.w - 4, Y(V) - 11, C.efn, 12, 'right');
+    // qV across the depletion region
+    if (V > 0.02) {
+      const qx = Lg.jx;
+      arrow(c, qx, (Y(0) + Y(V)) / 2, qx, Y(V) + 1, C.volt, 1.6, 6); arrow(c, qx, (Y(0) + Y(V)) / 2, qx, Y(0) - 1, C.volt, 1.6, 6);
+      txt(c, 'qV', qx + 7, (Y(0) + Y(V)) / 2, C.volt, 11, 700, 'left');
+    }
+    // barrier arrow
+    const ax = G.x + G.w - 18, yT = Y(DP + EG / 2), yB = Y(DP + EG / 2 - Lg.j.Vt);
+    line(c, Lg.eR - 4, yT, ax + 8, yT, 'rgba(206,147,216,.6)', 1, [4, 3]);
+    arrow(c, ax, (yT + yB) / 2, ax, yT + 1, C.bar, 2, 7); arrow(c, ax, (yT + yB) / 2, ax, yB - 1, C.bar, 2, 7);
+    subs(c, [['q(V', 'bi'], [' − V)', '']], ax + 6, yT - 12, C.bar, 11, 'right');
+    // electron cloud above Ec on the n side
+    for (let i = 0; i < (o.mini ? 10 : 18); i++) {
+      const d = jig(i + 30, ph, 1.6), xe = Lg.eR + 8 + hash(i + 2) * (G.x + G.w - Lg.eR - 50), e = -Math.log(1 - 0.95 * hash(i + 11)) * 7;
+      carrier(c, xe + d[0], Y(DP + EG / 2 - Lg.j.Vt) - 4 - e + d[1] * 0.4, 'e', 0.85, 3);
+      const xh = G.x + 8 + hash(i + 4) * (Lg.eL - G.x - 16);
+      carrier(c, xh + d[0], Y(DP - EG / 2) + 4 + e + d[1] * 0.4, 'h', 0.85, 3);
+    }
+    // electrons going over the barrier
+    if (movers) movers.forEach(m => {
+      const yTop = yT - 5, start = Lg.eR + m.x0 * (G.x + G.w - Lg.eR - 40);
+      let x, y, a = 1;
+      if (m.t < 0.4) { x = start; y = lerp(yB - 4, yTop, ease(m.t / 0.4)); }
+      else { x = start - (m.t - 0.4) * 170 * G.w / 620; y = yTop; }
+      if (x < Lg.eL) { const d = (Lg.eL - x) / Lg.pLn; a = Math.exp(-d * 0.9); }
+      m.done = x < G.x + 6 || a < 0.05;
+      c.save(); c.shadowColor = C.elec; c.shadowBlur = 8; carrier(c, x, y, 'e', a, 4); c.restore();
+    });
+    return Lg;
+  }
+  function moverStep(list, acc, dt, V) {
+    acc.v += dt * Math.min(14, 0.25 * Math.pow(10, (V - 0.35) / 0.15));
+    while (acc.v >= 1) { acc.v -= 1; list.push({ t: 0, x0: Math.random(), done: false }); }
+    list.forEach(m => { m.t += dt; });
+    return list.filter(m => !m.done);
+  }
+
+  /* =========================================================
+     0. Battery, narrowing depletion region, potential profile
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv0', 720, 360);
+    const B = { x: 72, y: 74, w: 576, h: 66 }, Sw = 0.5;
+    let ph;
+    function counters() {
+      const j = jf(SV.V);
+      $('c0b').textContent = j.Vt.toFixed(3) + ' V'; $('c0w').textContent = fUm(j.W * 1e4);
+      $('c0n').textContent = fUm(j.xn * 1e4); $('c0p').textContent = fUm(j.xp * 1e4);
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const V = SV.V, j = jf(V), I = iOf(V);
+      // wires and battery
+      const wy = 38, lx = 61, rx = 659, bx = 360;
+      const flow = clamp((Math.log10(Math.max(I, 1e-15)) + 9) / 7, 0, 1);
+      pline(c, [[lx, B.y], [lx, wy], [bx - 9, wy]], C.metal, 1.8);
+      pline(c, [[bx + 9, wy], [rx, wy], [rx, B.y]], C.metal, 1.8);
+      line(c, bx - 9, wy - 16, bx - 9, wy + 16, C.volt, 3);   // long plate (+)
+      line(c, bx + 9, wy - 9, bx + 9, wy + 9, C.volt, 5);     // short plate (−)
+      txt(c, '+', bx - 22, wy - 12, C.volt, 14, 700, 'center'); txt(c, '−', bx + 22, wy - 12, C.volt, 14, 700, 'center');
+      txt(c, 'V = ' + V.toFixed(2) + ' V', bx, wy - 26, C.volt, 12, 700, 'center', MONO);
+      rect(c, 50, B.y, 22, B.h, C.metal); rect(c, 648, B.y, 22, B.h, C.metal);
+      if (flow > 0.02) {   // conventional current: out of + into p, out of n into −
+        c.globalAlpha = flow;
+        const off = (ph * 40 * flow) % 24;
+        c.setLineDash([8, 16]); c.lineDashOffset = -off; c.strokeStyle = C.cur; c.lineWidth = 3;
+        c.beginPath(); c.moveTo(bx - 9, wy); c.lineTo(lx, wy); c.lineTo(lx, B.y); c.stroke();
+        c.beginPath(); c.moveTo(rx, B.y); c.lineTo(rx, wy); c.lineTo(bx + 9, wy); c.stroke();
+        c.setLineDash([]); c.lineDashOffset = 0;
+        arrow(c, lx, wy + 8, lx, B.y - 4, C.cur, 2.6, 9); arrow(c, rx, B.y - 4, rx, wy + 8, C.cur, 2.6, 9);
+        txt(c, 'I', lx + 10, (wy + B.y) / 2, C.cur, 13, 700);
+        c.globalAlpha = 1;
+      }
+      const g = jbar(c, B, j, Sw, ph);
+      const yw = B.y + B.h + 14;
+      darrow(c, g.eL, g.eR, yw, C.drift); txt(c, 'W', g.eR + 8, yw, C.drift, 13, 700);
+      // potential profile
+      const gy = 186, gh = 140, Yv = v => gy + gh - 12 - v / VBI * (gh - 30);
+      rect(c, B.x, gy, B.w, gh, 'rgba(255,255,255,.02)');
+      txt(c, 'V(x)', B.x - 6, gy + 10, C.text, 12, 700, 'right');
+      const xs = []; for (let px = B.x; px <= B.x + B.w; px += 2) xs.push(px);
+      const j0 = jf(0), xcm = px => (px - g.jx) / g.k * 1e-4;
+      pline(c, xs.map(px => [px, Yv(phiF(j0, xcm(px)))]), 'rgba(154,164,184,.55)', 1.4, [5, 4]);
+      pline(c, xs.map(px => [px, Yv(phiF(j, xcm(px)))]), C.volt, 2.6);
+      line(c, B.x, Yv(0), B.x + B.w, Yv(0), C.axis, 1);
+      const ax = B.x + B.w - 20;
+      arrow(c, ax, (Yv(0) + Yv(j.Vt)) / 2, ax, Yv(j.Vt) + 1, C.volt, 2, 7); arrow(c, ax, (Yv(0) + Yv(j.Vt)) / 2, ax, Yv(0) - 1, C.volt, 2, 7);
+      subs(c, [['V', 'bi'], [' − V', '']], ax - 8, Yv(j.Vt) + 12, C.volt, 11, 'right');
+      subs(c, [['V', 'bi']], B.x + B.w - 40, Yv(VBI) - 10, C.muted, 11, 'right');
+      cv.wm(c);
+    }
+    const o = { reset() { ph = 0; setV(0.6); }, step(dt) { ph += dt; }, draw };
+    const A = new Anim('anim0', o);
+    SV.subs.push(() => { A.dirty = true; counters(); });
+    counters();
+  })();
+
+  /* =========================================================
+     1. Injection: streams + log bars at the depletion edges
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv1', 720, 480);
+    const B = { x: 40, y: 24, w: 640, h: 100 }, Sw = 0.5;
+    let ph, S;
+    function counters() {
+      const V = SV.V, ex = Math.exp(V / VT);
+      $('c1e').textContent = sci(ex, 2); $('c1d').textContent = (V / (VT * Math.LN10)).toFixed(2);
+      $('c1p').textContent = sci(PN0 * ex, 2) + ' cm⁻³'; $('c1n').textContent = sci(NP0 * ex, 2) + ' cm⁻³';
+    }
+    function logBar(c, x, w, val, eq, maj, col, eqLab, majLab, title) {
+      const y0 = 160, y1 = 396, Y = lg => y1 - (lg - 2) / 16 * (y1 - y0);
+      rect(c, x, y0, w, y1 - y0, '#0f1420');
+      rect(c, x, Y(Math.log10(val)), w, y1 - Y(Math.log10(val)), col);
+      line(c, x - 6, Y(Math.log10(eq)), x + w + 6, Y(Math.log10(eq)), '#fff', 1.4, [4, 3]);
+      subs(c, eqLab, x + w + 10, Y(Math.log10(eq)), C.text, 11, 'left');
+      line(c, x - 6, Y(Math.log10(maj)), x + w + 6, Y(Math.log10(maj)), C.text, 2.2);
+      subs(c, majLab, x + w + 10, Y(Math.log10(maj)), C.text, 11, 'left');
+      subs(c, title, x + w / 2, y1 + 16, col, 12, 'center');
+      return Y;
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const V = SV.V, j = jf(V), ex = Math.exp(V / VT);
+      const g = jbar(c, B, j, Sw, ph);
+      S.draw(c);
+      const Y = logBar(c, 190, 50, NP0 * ex, NP0, NA0, C.elec, [['n', 'p0']], [['N', 'A']], [['n', 'p'], ['(−x', 'p'], [')', '']]);
+      logBar(c, 460, 50, PN0 * ex, PN0, ND0, C.hole, [['p', 'n0']], [['N', 'D']], [['p', 'n'], ['(x', 'n'], [')', '']]);
+      [4, 8, 12, 16].forEach(lg => txt(c, '10' + sup(lg), 150, Y(lg), C.muted, 10, 500, 'right', MONO));
+      line(c, 156, 160, 156, 396, C.axis, 1);
+      // link lines from the bars to the edges
+      line(c, g.eL, B.y + B.h, 215, 154, 'rgba(79,195,247,.3)', 1, [3, 3]);
+      line(c, g.eR, B.y + B.h, 485, 154, 'rgba(255,138,101,.3)', 1, [3, 3]);
+      cv.wm(c);
+    }
+    const o = {
+      reset() { ph = 0; S = new Streams(); setV(0.6); },
+      step(dt) { ph += dt; const j = jf(SV.V), k = (B.w / 2) / Sw, jx = B.x + B.w / 2; S.step(dt, SV.V, B, { eL: jx - j.xp * 1e4 * k, eR: jx + j.xn * 1e4 * k }); },
+      draw
+    };
+    const A = new Anim('anim1', o);
+    SV.subs.push(() => { A.dirty = true; counters(); });
+    counters();
+  })();
+
+  /* =========================================================
+     2. Diffusion + recombination: wide view and profiles
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv2', 720, 540);
+    const B = { x: 40, y: 24, w: 640, h: 90 }, G = { x: 40, y: 150, w: 640, h: 320 };
+    let ph, P, acc, st, Sx, log = true;
+    const Lp = () => Math.sqrt(st.Dp * Math.pow(10, st.lt) * 1e-6) * 1e4;
+    const ladder = L => { const need = 3.0 * Math.max(L, LN0), Ls = [20, 50, 100, 200, 500, 1000]; for (let k = 0; k < Ls.length; k++) if (Ls[k] >= need) return Ls[k]; return 1000; };
+    function sync() {
+      $('s2t').value = st.lt; $('s2d').value = st.Dp;
+      $('o2t').textContent = (Math.pow(10, st.lt)).toFixed(Math.pow(10, st.lt) < 1 ? 2 : 1) + ' µs';
+      $('o2d').textContent = st.Dp.toFixed(1) + ' cm²/s';
+      $('c2p').textContent = fNum(+Lp().toFixed(1)) + ' µm'; $('c2n').textContent = LN0.toFixed(1) + ' µm'; $('c2v').textContent = fVv(SV.V);
+      if (A) A.dirty = true;
+    }
+    let A = null;
+    function step(dt) {
+      ph += dt; tween(dt);
+      const jx = B.x + B.w / 2, k = (B.w / 2) / Sx;
+      acc += dt;
+      while (acc > 0.07) {
+        acc -= 0.07;
+        P.push({ k: 'h', x: jx + 3, y: B.y + 8 + Math.random() * (B.h - 16), r: -Lp() * k * Math.log(1 - 0.985 * Math.random()), f: -1 });
+        if (Math.random() < 0.5) P.push({ k: 'e', x: jx - 3, y: B.y + 8 + Math.random() * (B.h - 16), r: -LN0 * k * Math.log(1 - 0.985 * Math.random()), f: -1 });
+      }
+      P.forEach(p => {
+        if (p.f >= 0) { p.f += dt; return; }
+        const d = Math.abs(p.x - jx);
+        p.x += (p.k === 'h' ? 1 : -1) * 110 * dt; p.y = clamp(p.y + (Math.random() - 0.5) * 60 * dt, B.y + 5, B.y + B.h - 5);
+        if (d >= p.r || p.x < B.x + 4 || p.x > B.x + B.w - 4) p.f = 0;
+      });
+      P = P.filter(p => p.f < 0.4);
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const jx = B.x + B.w / 2;
+      rect(c, B.x, B.y, jx - B.x, B.h, C.P); rect(c, jx, B.y, B.x + B.w - jx, B.h, C.N);
+      hatch(c, jx - 2, B.y, jx + 2, B.y + B.h);
+      for (let i = 0; i < 26; i++) {
+        const d = jig(i, ph, 1.8);
+        carrier(c, B.x + 8 + hash(i + 1) * (jx - B.x - 20) + d[0], B.y + 8 + hash(i + 2) * (B.h - 16) + d[1], 'h', 0.45, 3);
+        carrier(c, jx + 12 + hash(i + 5) * (B.x + B.w - jx - 20) + d[0], B.y + 8 + hash(i + 6) * (B.h - 16) + d[1], 'e', 0.45, 3);
+      }
+      P.forEach(p => {
+        if (p.f < 0) { c.save(); c.shadowColor = p.k === 'h' ? C.hole : C.elec; c.shadowBlur = 7; carrier(c, p.x, p.y, p.k, 1, 3.8); c.restore(); }
+        else { const u = p.f / 0.4; c.globalAlpha = 1 - u; circ(c, p.x, p.y, 3 + 9 * u, 'rgba(239,83,80,.3)', C.rec, 1.8); c.globalAlpha = 1; }
+      });
+      regionLabels(c, B, jx);
+      profilePlot(c, G, { V: SV.V, Lp: Lp(), Ln: LN0, Sx, log });
+      umAxis(c, G, Sx, G.y + G.h + 6);
+      cv.wm(c);
+    }
+    function tween(dt) { const t = ladder(Lp()); if (Sx === t) return false; Sx = tweenLog(Sx, t, dt); return true; }
+    const o = { reset() { ph = 0; P = []; acc = 0; st = { lt: 0, Dp: 10 }; Sx = ladder(LP0); sync(); }, step, tween, draw };
+    A = new Anim('anim2', o);
+    $('s2t').addEventListener('input', e => { st.lt = +e.target.value; sync(); });
+    $('s2d').addEventListener('input', e => { st.Dp = +e.target.value; sync(); });
+    segBtns('#anim2', 'sc', v => { log = v === 'log'; A.dirty = true; });
+    SV.subs.push(sync);
+  })();
+
+  /* =========================================================
+     3. Hole, electron and total current along the diode
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv3', 720, 500);
+    const B = { x: 40, y: 24, w: 640, h: 84 }, G = { x: 40, y: 150, w: 640, h: 290 }, SX = 100;
+    let ph, lr;
+    const share = () => { const NA = ND0 * Math.pow(10, lr), a = DEV.Dp / (LP0 * 1e-4 * ND0), b = DEV.Dn / (LN0 * 1e-4 * NA); return a / (a + b); };
+    function sync() {
+      $('s3r').value = lr; const r = Math.pow(10, lr);
+      $('o3r').textContent = (r >= 1 ? r.toFixed(r >= 9.95 ? 0 : 1) : r.toFixed(2));
+      const f = share(); $('c3h').textContent = (f * 100).toFixed(0) + '%'; $('c3e').textContent = ((1 - f) * 100).toFixed(0) + '%';
+      if (A) A.dirty = true;
+    }
+    let A = null;
+    const holeFrac = (xum, f) => xum >= 0 ? f * Math.exp(-xum / LP0) : 1 - (1 - f) * Math.exp(xum / LN0);
+    const mix = u => { const a = [79, 195, 247], b = [255, 138, 101]; return 'rgb(' + a.map((v, i) => Math.round(v + (b[i] - v) * u)).join(',') + ')'; };
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const f = share(), jx = B.x + B.w / 2, k = (B.w / 2) / SX;
+      rect(c, B.x, B.y, jx - B.x, B.h, C.P); rect(c, jx, B.y, B.x + B.w - jx, B.h, C.N);
+      hatch(c, jx - 2, B.y, jx + 2, B.y + B.h);
+      // current arrows (conventional current, p → n), coloured by carrier share
+      const sp = 58, off = (ph * 40) % sp;
+      for (let r = 0; r < 3; r++) for (let x = B.x - sp + off; x < B.x + B.w; x += sp) {
+        const xa = x + 6, xb = x + 40; if (xa < B.x + 2 || xb > B.x + B.w - 2) continue;
+        const u = holeFrac(((xa + xb) / 2 - jx) / k, f);
+        arrow(c, xa, B.y + 18 + r * 24, xb, B.y + 18 + r * 24, mix(u), 4, 10);
+      }
+      regionLabels(c, B, jx);
+      // current plot (normalised to the total)
+      const Y = v => G.y + G.h - v * (G.h - 30);
+      rect(c, G.x, G.y, G.w, G.h, 'rgba(255,255,255,.02)');
+      line(c, G.x, Y(0), G.x + G.w, Y(0), C.axis, 1.2);
+      line(c, jx, G.y, jx, G.y + G.h, 'rgba(255,255,255,.25)', 1, [3, 4]);
+      const hp = [], ep = [];
+      for (let px = G.x; px <= G.x + G.w; px += 2) { const u = holeFrac((px - jx) / k, f); hp.push([px, Y(u)]); ep.push([px, Y(1 - u)]); }
+      pline(c, [[G.x, Y(1)], [G.x + G.w, Y(1)]], C.cur, 2.6);
+      pline(c, hp, C.hole, 2.4); pline(c, ep, C.elec, 2.4);
+      txt(c, 'I', G.x + 6, Y(1) - 11, C.cur, 13, 700);
+      subs(c, [['I', 'p']], jx + 8, Y(f) - 11, C.hole, 12, 'left');
+      subs(c, [['I', 'n']], jx - 8, Y(1 - f) - 11, C.elec, 12, 'right');
+      const xLp = jx + LP0 * k, xLn = jx - LN0 * k;
+      line(c, xLp, G.y + 20, xLp, G.y + G.h, 'rgba(255,138,101,.4)', 1, [3, 3]); subs(c, [['L', 'p']], xLp + 4, G.y + G.h - 10, C.hole, 11, 'left');
+      line(c, xLn, G.y + 20, xLn, G.y + G.h, 'rgba(79,195,247,.4)', 1, [3, 3]); subs(c, [['L', 'n']], xLn - 4, G.y + G.h - 10, C.elec, 11, 'right');
+      umAxis(c, G, SX, G.y + G.h + 6);
+      cv.wm(c);
+    }
+    const o = { reset() { ph = 0; lr = 1; sync(); }, step(dt) { ph += dt; }, draw };
+    A = new Anim('anim3', o);
+    $('s3r').addEventListener('input', e => { lr = +e.target.value; sync(); });
+  })();
+
+  /* =========================================================
+     4. I–V: linear / log, slider dot, tracing glow
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv4', 720, 430);
+    const G = { x: 90, y: 30, w: 580, h: 340 };
+    let ph, log = false;
+    function counters() { $('c4v').textContent = fVv(SV.V); $('c4i').textContent = fI(iOf(SV.V)); $('c4s').textContent = sci(IS0, 2) + ' A'; }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const tr = ph == null ? null : (ph * 0.25 % 1) * SV.V;
+      ivPlot(c, G, SV.V, log, A && A.playing ? tr : null);
+      cv.wm(c);
+    }
+    let A = null;
+    const o = { reset() { ph = 0; setV(0.6); }, step(dt) { ph += dt; }, draw };
+    A = new Anim('anim4', o);
+    segBtns('#anim4', 'sc', v => { log = v === 'log'; A.dirty = true; });
+    SV.subs.push(() => { A.dirty = true; counters(); });
+    counters();
+  })();
+
+  /* =========================================================
+     5. Band diagram with quasi-Fermi levels
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv5', 720, 480);
+    const G = { x: 64, w: 616, y: 84, h: 340, bar: [14, 48] };
+    let ph, M, acc;
+    const o = {
+      reset() { ph = 0; M = []; acc = { v: 0 }; setV(0.6); },
+      step(dt) { ph += dt; M = moverStep(M, acc, dt, SV.V); },
+      draw() { const c = cv.begin(); if (!c) return; bandFwd(c, G, SV.V, ph, M); cv.wm(c); }
+    };
+    const A = new Anim('anim5', o);
+    SV.subs.push(() => { A.dirty = true; });
+  })();
+
+  /* =========================================================
+     6. Summary recap
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv6', 720, 750);
+    const B = { x: 64, y: 14, w: 616, h: 64 }, Sw = 0.5;
+    const PG = { x: 64, y: 104, w: 616, h: 150 }, BG = { x: 64, w: 616, y: 290, h: 170 }, IG = { x: 104, y: 500, w: 576, h: 160 };
+    let ph, S, M, acc;
+    function counters() {
+      const V = SV.V; $('c6b').textContent = jf(V).Vt.toFixed(3) + ' V';
+      $('c6p').textContent = sci(PN0 * Math.exp(V / VT), 2) + ' cm⁻³'; $('c6i').textContent = fI(iOf(V));
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const V = SV.V;
+      jbar(c, B, jf(V), Sw, ph); S.draw(c);
+      profilePlot(c, PG, { V, Lp: LP0, Ln: LN0, Sx: 100, log: true });
+      bandFwd(c, BG, V, ph, M, { mini: true });
+      ivPlot(c, IG, V, false, null);
+      cv.wm(c);
+    }
+    const o = {
+      reset() { ph = 0; S = new Streams(); M = []; acc = { v: 0 }; setV(0.6); },
+      step(dt) {
+        ph += dt; const j = jf(SV.V), k = (B.w / 2) / Sw, jx = B.x + B.w / 2;
+        S.step(dt, SV.V, B, { eL: jx - j.xp * 1e4 * k, eR: jx + j.xn * 1e4 * k }); M = moverStep(M, acc, dt, SV.V);
+      },
+      draw
+    };
+    const A = new Anim('anim6', o);
+    SV.subs.push(() => { A.dirty = true; counters(); });
+    counters();
+  })();
+
+  /* ---------- sticky mini-nav highlight ---------- */
+  (function () {
+    const links = Array.from(document.querySelectorAll('.toc a'));
+    const secs = links.map(l => document.querySelector(l.getAttribute('href')));
+    function upd() {
+      let cur = 0;
+      secs.forEach((s, i) => { if (s.getBoundingClientRect().top < 120) cur = i; });
+      links.forEach((l, i) => l.classList.toggle('active', i === cur));
+    }
+    window.addEventListener('scroll', upd, { passive: true }); upd();
+  })();
+
+  let last = performance.now();
+  function frameLoop(ts) {
+    const dt = Math.min(0.05, Math.max(0, (ts - last) / 1000)); last = ts;
+    anims.forEach(a => {
+      if (!a.visible) return;
+      if (a.playing) { a.o.step(dt); a.o.draw(); }
+      else if (a.o.tween && a.o.tween(dt)) a.o.draw();
+      else if (a.dirty) a.o.draw();
+      a.dirty = false;
+    });
+    requestAnimationFrame(frameLoop);
+  }
+  function onResize() { anims.forEach(a => { a.dirty = true; }); }
+  window.addEventListener('resize', onResize);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(onResize);
+  requestAnimationFrame(frameLoop);
+})();
+</script>
+</body>
+</html>
