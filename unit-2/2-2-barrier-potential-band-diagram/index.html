@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>2.2 Barrier Potential and the Energy Band Diagram</title>
+  <meta name="description" content="The built-in potential of a pn junction: why it forms, how big it is, why a voltmeter cannot see it, and how it appears as band bending on the equilibrium energy band diagram. An interactive lesson.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1420;
+      --panel: #1a2132;
+      --panel-hover: #212a3f;
+      --border: #2a3448;
+      --text: #e6e9ef;
+      --muted: #9aa4b8;
+      --electron: #4fc3f7;
+      --hole: #ff8a65;
+      --energy: #ffd54f;
+      --success: #81c784;
+      --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+      --max: 960px;
+      --radius: 12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: var(--font); font-size: 16px; line-height: 1.65;
+      overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column;
+    }
+    a { color: var(--electron); }
+    .wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 16px; }
+
+    /* Sticky mini-nav */
+    .toc {
+      position: sticky; top: 0; z-index: 10; background: rgba(15, 20, 32, .95);
+      border-bottom: 1px solid var(--border); backdrop-filter: blur(6px);
+    }
+    .toc ul { display: flex; gap: 4px; list-style: none; margin: 0 auto; padding: 8px 16px; max-width: var(--max); overflow-x: auto; scrollbar-width: none; }
+    .toc ul::-webkit-scrollbar { display: none; }
+    .toc a {
+      display: block; white-space: nowrap; text-decoration: none; color: var(--muted);
+      font-size: 0.85rem; font-weight: 500; padding: 6px 10px; border-radius: 999px;
+    }
+    .toc a:hover { color: var(--text); background: var(--panel); }
+    .toc a.active { color: var(--bg); background: var(--electron); }
+
+    main { flex: 1; padding: 24px 0 48px; }
+    .crumbs { font-size: 0.875rem; color: var(--muted); margin: 0 0 16px; }
+    .crumbs a { color: var(--muted); }
+    .crumbs a:hover { color: var(--electron); }
+    .eyebrow { font-family: var(--mono); font-size: 0.8rem; color: var(--electron); letter-spacing: .04em; margin: 0; }
+    h1 { font-size: clamp(1.5rem, 6vw, 2.2rem); line-height: 1.2; margin: 4px 0 6px; }
+    .subtitle { color: var(--muted); margin: 0 0 8px; }
+    section { scroll-margin-top: 64px; padding-top: 28px; }
+    h2 { font-size: clamp(1.3rem, 5vw, 1.6rem); line-height: 1.25; margin: 0 0 14px; }
+    h3 { font-size: 1.05rem; margin: 0 0 8px; }
+    .prose { font-size: 17px; line-height: 1.7; max-width: 70ch; }
+    .prose p, .prose ul, .prose ol { margin: 0 0 14px; }
+    .prose ul, .prose ol { padding-left: 22px; }
+    .prose li { margin: 4px 0; }
+    .prose strong { color: #fff; }
+    .prose p.eq { text-align: center; font-family: var(--mono); font-size: 16px; background: #141b2b; border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; overflow-wrap: anywhere; }
+    hr.sep { border: 0; border-top: 1px solid var(--border); margin: 40px 0 0; }
+    .rm-note { font-size: 0.78rem; color: var(--muted); margin: 0 0 8px; }
+
+    /* Buttons & controls */
+    .btn {
+      font: inherit; font-size: 0.88rem; font-weight: 600; color: var(--text);
+      background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+      padding: 7px 12px; cursor: pointer; min-height: 38px;
+    }
+    .btn:hover:not(:disabled) { background: var(--panel-hover); border-color: var(--electron); }
+    .btn:disabled { opacity: .45; cursor: default; }
+    .btn:focus-visible, input:focus-visible, canvas:focus-visible { outline: 2px solid var(--electron); outline-offset: 2px; }
+    .btn[aria-pressed="true"] { background: rgba(255,213,79,.14); border-color: var(--energy); color: var(--energy); }
+    .seg { display: inline-flex; gap: 0; flex-wrap: nowrap; }
+    .seg .btn { border-radius: 0; padding: 7px 10px; }
+    .seg .btn:first-child { border-radius: 8px 0 0 8px; }
+    .seg .btn:last-child { border-radius: 0 8px 8px 0; }
+    .seg .btn + .btn { margin-left: -1px; }
+
+    figure.anim {
+      margin: 18px 0 0; background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 12px; min-width: 0;
+    }
+    .ctrls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-bottom: 12px; }
+    .sliders { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-bottom: 12px; }
+    .slider { flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; }
+    .slider label { display: flex; justify-content: space-between; gap: 8px; font-size: 0.8rem; color: var(--muted); }
+    .slider output { font-family: var(--mono); color: var(--energy); white-space: nowrap; }
+    input[type="range"] { width: 100%; accent-color: var(--energy); margin: 4px 0 0; }
+    canvas { display: block; width: 100%; border-radius: 8px; background: #141b2b; }
+    canvas.drag { cursor: ew-resize; touch-action: pan-y; }
+    .narrow { max-width: 820px; margin-left: auto; margin-right: auto; }
+    .dopes { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); }
+
+    .counters { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px auto 0; }
+    .ctr {
+      flex: 1 1 110px; background: #141b2b; border: 1px solid var(--border); border-radius: 8px;
+      padding: 6px 10px; font-size: 0.78rem; color: var(--muted); min-width: 0;
+    }
+    .ctr b { display: block; font-family: var(--mono); font-size: 1rem; font-weight: 500; color: var(--text); overflow-wrap: anywhere; }
+    .ctr.v b { color: var(--energy); } .ctr.p b { color: #ef9a9a; } .ctr.n b { color: #90caf9; } .ctr.w b { color: var(--success); }
+
+    .keypoints {
+      margin-top: 16px; padding: 14px 16px; border-radius: var(--radius);
+      background: rgba(129,199,132,.07); border: 1px solid rgba(129,199,132,.35);
+    }
+    .keypoints h3 { color: var(--success); font-size: 0.95rem; text-transform: uppercase; letter-spacing: .05em; }
+    .keypoints ul { margin: 0; padding-left: 20px; }
+    .keypoints li { margin: 4px 0; }
+
+    .further { margin-top: 48px; color: var(--muted); font-size: 0.85rem; }
+    .further h3 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 0 0 6px; }
+    .further ul { margin: 0; padding-left: 18px; }
+    .further li { margin: 3px 0; }
+
+    .pager { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 32px; }
+    .pager a {
+      display: block; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 12px 14px; text-decoration: none; color: var(--text); min-width: 0;
+    }
+    .pager a:hover { border-color: var(--electron); }
+    .pager small { display: block; color: var(--muted); font-size: 0.75rem; }
+    .pager .next { text-align: right; }
+    .site-foot { border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; text-align: center; padding: 18px 16px; }
+
+    /* Justified paragraphs on desktop; phones stay left-aligned to avoid wide word gaps. */
+    @media (min-width: 768px) {
+      .prose p, .prose li, .keypoints li { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+      .prose p.eq { text-align: center; }
+    }
+    .ctr.b b { color: #ce93d8; }
+  </style>
+</head>
+<body>
+
+  <nav class="toc" aria-label="Sections">
+    <ul>
+      <li><a href="#s0">Barrier</a></li>
+      <li><a href="#s1">How big?</a></li>
+      <li><a href="#s2">Before contact</a></li>
+      <li><a href="#s3">Equilibrium bands</a></li>
+      <li><a href="#s4">Reading the barrier</a></li>
+      <li><a href="#s5">Applied voltage</a></li>
+      <li><a href="#s6">Summary</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="wrap">
+      <header>
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="../../index.html">Home</a> / <a href="../index.html">Unit 2</a> / 2.2
+        </nav>
+        <p class="eyebrow">TOPIC 2.2</p>
+        <h1>Barrier Potential and the Energy Band Diagram of a PN Junction</h1>
+        <p class="subtitle">The built-in potential, and how it bends the energy bands across the junction</p>
+        <p class="rm-note" id="rmNote" hidden>Your device asks for reduced motion, so every animation starts paused. Press Play on any animation to run it. Sliders and buttons still update the picture.</p>
+      </header>
+
+      <!-- ================= SECTION 0 ================= -->
+      <section id="s0" aria-labelledby="h0">
+        <h2 id="h0">The built-in potential barrier</h2>
+        <div class="prose">
+          <p>In topic 2.1 we saw that the fixed ions in the depletion region create an electric field. Because of this field, there is a <strong>POTENTIAL DIFFERENCE</strong> between the neutral n region and the neutral p region. The n side is at a higher potential than the p side. This potential difference is called the <strong>BUILT-IN POTENTIAL V<sub>bi</sub></strong>, also called the barrier potential, contact potential or junction potential. Some textbooks write it as V<sub>0</sub>.</p>
+          <p>It acts as a <strong>BARRIER</strong>: an electron in the n region must climb this potential step to enter the p region, and a hole in the p region must climb it to enter the n region. Only the few carriers with enough thermal energy can cross by diffusion, and this small flow is exactly balanced by drift in equilibrium.</p>
+          <p>The built-in potential <strong>cannot be measured</strong> by connecting a voltmeter across the diode. The metal-semiconductor contacts at the two ends have their own contact potentials, and around the complete loop these exactly cancel V<sub>bi</sub>. If they did not, an unbiased diode would be a battery delivering power for nothing.</p>
+        </div>
+
+        <figure class="anim" id="anim0">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="narrow">
+            <canvas id="cv0" style="aspect-ratio:720/650" role="img" aria-label="A voltmeter across a pn junction reads 0.00 V: the built-in potential Vbi at the junction is cancelled by two opposing contact potentials V1 and V2 at the metal contacts. Below, the potential V(x) rises by Vbi from p to n. Under it, electrons on the n side climb an energy hill toward the p side and most roll back, with an occasional fast one crossing; holes on the p side do the same on an inverted hill."></canvas>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: built-in potential">
+          <h3>Key points</h3>
+          <ul>
+            <li>The depletion-region field makes the n side more positive than the p side by V<sub>bi</sub>.</li>
+            <li>V<sub>bi</sub> is a barrier: only energetic electrons (n → p) and holes (p → n) can cross.</li>
+            <li>A voltmeter reads 0 V: the metal contact potentials cancel V<sub>bi</sub> around the loop.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 1 ================= -->
+      <section id="s1" aria-labelledby="h1s">
+        <h2 id="h1s">How big is the barrier?</h2>
+        <div class="prose">
+          <p>The built-in potential depends on the doping on both sides:</p>
+          <p class="eq">V<sub>bi</sub> = (kT/q) · ln( N<sub>A</sub>·N<sub>D</sub> / n<sub>i</sub><sup>2</sup> )</p>
+          <p>where kT/q ≈ 0.0259 V at 300 K (the <strong>thermal voltage V<sub>T</sub></strong>).</p>
+          <p>For the example silicon junction (N<sub>A</sub> = 10<sup>17</sup>, N<sub>D</sub> = 10<sup>16</sup> cm<sup>−3</sup>, n<sub>i</sub> = 1.5 × 10<sup>10</sup> cm<sup>−3</sup>):</p>
+          <p class="eq">V<sub>bi</sub> = 0.0259 × ln(10<sup>33</sup> / 2.25 × 10<sup>20</sup>) ≈ 0.0259 × 29.1 ≈ 0.754 V</p>
+          <p>(With n<sub>i</sub> = 10<sup>10</sup> cm<sup>−3</sup>, as used in some books and in Unit 1, the result is about 0.775 V.)</p>
+          <p>Important features:</p>
+          <ul>
+            <li>V<sub>bi</sub> depends on doping only through a <strong>LOGARITHM</strong>, so even large changes in doping change it only a little. For typical silicon junctions it is about <strong>0.6 to 0.9 V</strong>.</li>
+            <li>A material with a smaller band gap has a much larger n<sub>i</sub>, and so a smaller V<sub>bi</sub>. A <strong>germanium</strong> junction with the same doping (n<sub>i</sub> = 2.4 × 10<sup>13</sup> cm<sup>−3</sup>, E<sub>g</sub> = 0.66 eV) has <strong>V<sub>bi</sub> ≈ 0.37 V</strong>. Some books use n<sub>i</sub> ≈ 2.5 × 10<sup>13</sup> cm<sup>−3</sup> for germanium, which changes V<sub>bi</sub> by only about 2 mV.</li>
+            <li>As temperature rises, n<sub>i</sub> increases rapidly (n<sub>i</sub> ∝ T<sup>3/2</sup>·exp(−E<sub>g</sub>/2kT)), so <strong>V<sub>bi</sub> DECREASES</strong>. The thermal voltage kT/q also grows, but the rise of n<sub>i</sub> wins.</li>
+          </ul>
+        </div>
+
+        <figure class="anim" id="anim1">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="seg" role="group" aria-label="Material">
+              <button class="btn" type="button" data-mat="Si" aria-pressed="true">Si</button>
+              <button class="btn" type="button" data-mat="Ge" aria-pressed="false">Ge</button>
+            </div>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s1a"><span>N<sub>A</sub> (p side)</span><output id="o1a"></output></label><input type="range" id="s1a" min="14" max="19" step="0.05" value="17"></div>
+            <div class="slider"><label for="s1d"><span>N<sub>D</sub> (n side)</span><output id="o1d"></output></label><input type="range" id="s1d" min="14" max="19" step="0.05" value="16"></div>
+            <div class="slider"><label for="s1t"><span>Temperature</span><output id="o1t"></output></label><input type="range" id="s1t" min="250" max="450" step="1" value="300"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv1" style="aspect-ratio:720/360" role="img" aria-label="Left: a barrier-height bar showing Vbi in volts, with markers for silicon and germanium at the example doping. Right: Vbi plotted against ND on a log axis for the chosen NA, rising slowly; a dot marks the current ND."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr v"><span>V<sub>bi</sub></span><b id="c1v"></b></div>
+            <div class="ctr w"><span>n<sub>i</sub></span><b id="c1n"></b></div>
+            <div class="ctr n"><span>kT/q</span><b id="c1t"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: barrier size">
+          <h3>Key points</h3>
+          <ul>
+            <li>V<sub>bi</sub> = (kT/q)·ln(N<sub>A</sub>N<sub>D</sub>/n<sub>i</sub><sup>2</sup>) ≈ 0.754 V for the example.</li>
+            <li>Logarithmic in doping: typically 0.6–0.9 V for silicon.</li>
+            <li>Smaller band gap → larger n<sub>i</sub> → smaller V<sub>bi</sub> (Ge ≈ 0.37 V).</li>
+            <li>Higher temperature → larger n<sub>i</sub> → smaller V<sub>bi</sub>.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 2 ================= -->
+      <section id="s2" aria-labelledby="h2s">
+        <h2 id="h2s">Band diagrams before contact</h2>
+        <div class="prose">
+          <p>Recall from Unit 1 that on an energy band diagram, the <strong>Fermi level E<sub>F</sub></strong> shows how filled the bands are.</p>
+          <ul>
+            <li>In <strong>p-type</strong> material E<sub>F</sub> lies <strong>BELOW</strong> the intrinsic level E<sub>i</sub>, closer to the valence band: E<sub>i</sub> − E<sub>F</sub> = kT·ln(N<sub>A</sub>/n<sub>i</sub>).</li>
+            <li>In <strong>n-type</strong> material E<sub>F</sub> lies <strong>ABOVE</strong> E<sub>i</sub>, closer to the conduction band: E<sub>F</sub> − E<sub>i</sub> = kT·ln(N<sub>D</sub>/n<sub>i</sub>).</li>
+          </ul>
+          <p>Here kT ≈ 0.0259 eV at 300 K, so the results come out directly in electron-volts. For the example: on the p side, E<sub>i</sub> − E<sub>F</sub> ≈ 0.0259 × ln(10<sup>17</sup>/1.5 × 10<sup>10</sup>) ≈ <strong>0.407 eV</strong>; on the n side, E<sub>F</sub> − E<sub>i</sub> ≈ 0.0259 × ln(10<sup>16</sup>/1.5 × 10<sup>10</sup>) ≈ <strong>0.347 eV</strong>.</p>
+          <p>If we imagine the p and n pieces separately, with their band edges at the same level, their Fermi levels are at different heights: the n-side E<sub>F</sub> is higher by 0.407 + 0.347 ≈ <strong>0.754 eV</strong>.</p>
+        </div>
+
+        <figure class="anim" id="anim2">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s2a"><span>N<sub>A</sub> (p piece)</span><output id="o2a"></output></label><input type="range" id="s2a" min="14" max="19" step="0.05" value="17"></div>
+            <div class="slider"><label for="s2d"><span>N<sub>D</sub> (n piece)</span><output id="o2d"></output></label><input type="range" id="s2d" min="14" max="19" step="0.05" value="16"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv2" style="aspect-ratio:720/380" role="img" aria-label="Two separate band diagrams side by side, p on the left and n on the right, with Ec, Ei and Ev at the same heights. The p-side Fermi level sits below Ei and the n-side Fermi level above it; a purple double arrow between them shows their difference, 0.754 eV for the example."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr p"><span>p side: E<sub>i</sub> − E<sub>F</sub></span><b id="c2p"></b></div>
+            <div class="ctr n"><span>n side: E<sub>F</sub> − E<sub>i</sub></span><b id="c2n"></b></div>
+            <div class="ctr b"><span>Difference</span><b id="c2d"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: before contact">
+          <h3>Key points</h3>
+          <ul>
+            <li>p-type: E<sub>F</sub> is kT·ln(N<sub>A</sub>/n<sub>i</sub>) below E<sub>i</sub> (0.407 eV here).</li>
+            <li>n-type: E<sub>F</sub> is kT·ln(N<sub>D</sub>/n<sub>i</sub>) above E<sub>i</sub> (0.347 eV here).</li>
+            <li>Separately, the two Fermi levels differ by 0.754 eV, which is qV<sub>bi</sub>.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 3 ================= -->
+      <section id="s3" aria-labelledby="h3s">
+        <h2 id="h3s">Band diagram in equilibrium</h2>
+        <div class="prose">
+          <p>In <strong>THERMAL EQUILIBRIUM</strong>, the Fermi level must be the <strong>SAME (flat)</strong> throughout the whole junction. If it were not, electrons would flow from the higher Fermi level to the lower one, and that is exactly what happens during the diffusion of topic 2.1. The flow stops when the Fermi levels have lined up.</p>
+          <p>With E<sub>F</sub> flat, the bands must <strong>BEND</strong> across the depletion region. Far into the p region the bands are high; far into the n region they are low. The total bending equals the original difference between the Fermi levels:</p>
+          <p class="eq">qV<sub>bi</sub> = (E<sub>F</sub> on n side − E<sub>F</sub> on p side, before contact) = kT · ln( N<sub>A</sub>·N<sub>D</sub> / n<sub>i</sub><sup>2</sup> )</p>
+          <p>This gives the same formula for V<sub>bi</sub> as before, seen from the energy point of view.</p>
+          <p>The band bending happens <strong>only inside the depletion region</strong>, where the electric field exists. In the neutral regions, the bands are flat. The shape of the bend follows the potential: <strong>two parabolic pieces</strong>.</p>
+        </div>
+
+        <figure class="anim" id="anim3">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <button class="btn" type="button" id="b3join">Join</button>
+          </div>
+          <div class="narrow">
+            <canvas id="cv3" style="aspect-ratio:720/510" role="img" aria-label="Pressing Join slides the separate p and n band diagrams together; the n-side bands then move down until the two Fermi levels form one flat line, and the bands bend smoothly inside the depletion region, which is marked on the junction bar above by dashed lines. A purple arrow labels the total bending qVbi."></canvas>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: equilibrium band diagram">
+          <h3>Key points</h3>
+          <ul>
+            <li>Equilibrium ⇔ flat Fermi level through the whole junction.</li>
+            <li>The bands bend down from p to n by qV<sub>bi</sub>.</li>
+            <li>Bending only in the depletion region (two parabolas); flat bands in the neutral regions.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 4 ================= -->
+      <section id="s4" aria-labelledby="h4s">
+        <h2 id="h4s">Reading the barrier on the band diagram</h2>
+        <div class="prose">
+          <p>On a band diagram, <strong>electron energy increases upward</strong>, and <strong>hole energy increases downward</strong>.</p>
+          <ul>
+            <li>An <strong>ELECTRON</strong> in the n-side conduction band sees the conduction band edge rise toward the p side: to cross it must climb a hill of height qV<sub>bi</sub>.</li>
+            <li>A <strong>HOLE</strong> in the p-side valence band sees the valence band edge fall toward the n side, which for a hole is also an uphill climb of height qV<sub>bi</sub>.</li>
+          </ul>
+          <p>Electrons in the conduction band are spread over energies above E<sub>c</sub> according to the <strong>Boltzmann tail</strong>. Only the small fraction with energy above the top of the barrier can cross. That fraction is about <strong>exp(−qV<sub>bi</sub>/kT)</strong>. This is why the minority electron concentration on the p side is so much smaller than the majority electron concentration on the n side:</p>
+          <p class="eq">n<sub>p0</sub> = n<sub>n0</sub> · exp(−qV<sub>bi</sub>/kT)</p>
+          <p>For the example this gives n<sub>p0</sub> = 10<sup>16</sup> × exp(−29.1) ≈ 2.25 × 10<sup>3</sup> cm<sup>−3</sup>, the same as n<sub>i</sub><sup>2</sup>/N<sub>A</sub>.</p>
+          <p>The electric field in the depletion region slides electrons downhill (toward the n side) and lets holes float up the diagram (which is downhill for a hole) toward the p side. That is the <strong>drift</strong> that balances the diffusion.</p>
+        </div>
+
+        <figure class="anim" id="anim4">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s4t"><span>Temperature</span><output id="o4t"></output></label><input type="range" id="s4t" min="250" max="450" step="1" value="300"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv4" style="aspect-ratio:720/470" role="img" aria-label="The equilibrium band diagram. Electrons form a thermal cloud just above Ec on the n side, dense at the bottom and thinning upward; holes form a cloud below Ev on the p side. Occasionally an electron rises above the barrier top and moves into the p side, while electrons generated on the p side roll down the slope into the n side. A temperature slider spreads the clouds and changes the barrier height."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr b"><span>e⁻ over the barrier (n → p)</span><b id="c4a"></b></div>
+            <div class="ctr w"><span>e⁻ drift (p → n)</span><b id="c4b"></b></div>
+            <div class="ctr v"><span>V<sub>bi</sub></span><b id="c4v"></b></div>
+            <div class="ctr n"><span>n<sub>p0</sub></span><b id="c4n"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: reading the barrier">
+          <h3>Key points</h3>
+          <ul>
+            <li>Electrons climb up the E<sub>c</sub> hill; holes climb "down" the E<sub>v</sub> hill: both barriers are qV<sub>bi</sub>.</li>
+            <li>Only a fraction ≈ exp(−qV<sub>bi</sub>/kT) of carriers can cross.</li>
+            <li>n<sub>p0</sub> = n<sub>n0</sub>·exp(−qV<sub>bi</sub>/kT) ≈ 2.25 × 10<sup>3</sup> cm<sup>−3</sup> here.</li>
+            <li>Drift down the slope balances diffusion over the top.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 5 ================= -->
+      <section id="s5" aria-labelledby="h5s">
+        <h2 id="h5s">What happens when a voltage is applied (preview)</h2>
+        <div class="prose">
+          <p>If an external voltage is applied, the junction is no longer in equilibrium, and the Fermi level is no longer flat.</p>
+          <ul>
+            <li><strong>FORWARD BIAS</strong> (p side made positive by V): the barrier is <strong>LOWERED</strong> to q(V<sub>bi</sub> − V). Many more carriers can cross, so current flows easily (topic 2.3).</li>
+            <li><strong>REVERSE BIAS</strong> (n side made positive by V<sub>R</sub>): the barrier is <strong>RAISED</strong> to q(V<sub>bi</sub> + V<sub>R</sub>). Almost no carriers can cross, so only a tiny current flows (topic 2.4).</li>
+          </ul>
+          <p>On the band diagram, the applied voltage separates the Fermi level on the n side from the one on the p side by qV. Near and inside the depletion region, two separate <strong>"quasi-Fermi levels"</strong> are used to describe electrons and holes. These details are covered in the next two topics.</p>
+        </div>
+
+        <figure class="anim" id="anim5">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s5v"><span>Applied voltage V (− reverse, + forward)</span><output id="o5v"></output></label><input type="range" id="s5v" min="-5" max="0.6" step="0.01" value="0"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv5" style="aspect-ratio:720/530" role="img" aria-label="The band diagram under bias with the junction bar above. Forward bias lowers the barrier to q(Vbi − V), narrows the depletion region and raises the n-side Fermi level by qV; reverse bias raises the barrier, widens the region and lowers the n-side Fermi level. A crossing-rate bar grows strongly in forward bias and drops to nearly zero in reverse."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr b"><span>Barrier</span><b id="c5b"></b></div>
+            <div class="ctr w"><span>W</span><b id="c5w"></b></div>
+            <div class="ctr v"><span>Crossing rate (× equilibrium)</span><b id="c5r"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: applied voltage">
+          <h3>Key points</h3>
+          <ul>
+            <li>Bias breaks equilibrium: the Fermi levels on the two sides split by qV.</li>
+            <li>Forward: barrier q(V<sub>bi</sub> − V), narrower region, many more carriers cross.</li>
+            <li>Reverse: barrier q(V<sub>bi</sub> + V<sub>R</sub>), wider region, almost none cross.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 6 ================= -->
+      <section id="s6" aria-labelledby="h6s">
+        <h2 id="h6s">Summary</h2>
+        <div class="prose">
+          <p>The fixed charges in the depletion region create a built-in potential <strong>V<sub>bi</sub> = (kT/q)·ln(N<sub>A</sub>·N<sub>D</sub>/n<sub>i</sub><sup>2</sup>)</strong>, about 0.754 V for the example silicon junction and smaller for germanium. It <strong>cannot be measured with a voltmeter</strong>. In equilibrium the <strong>Fermi level is flat</strong>, so the energy bands bend by qV<sub>bi</sub> across the depletion region, forming a barrier that electrons and holes must climb. <strong>Forward bias lowers</strong> the barrier to q(V<sub>bi</sub> − V); <strong>reverse bias raises</strong> it to q(V<sub>bi</sub> + V<sub>R</sub>).</p>
+        </div>
+
+        <figure class="anim" id="anim6">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s6a"><span>N<sub>A</sub></span><output id="o6a"></output></label><input type="range" id="s6a" min="14" max="19" step="0.05" value="17"></div>
+            <div class="slider"><label for="s6d"><span>N<sub>D</sub></span><output id="o6d"></output></label><input type="range" id="s6d" min="14" max="19" step="0.05" value="16"></div>
+            <div class="slider"><label for="s6t"><span>Temperature</span><output id="o6t"></output></label><input type="range" id="s6t" min="250" max="450" step="1" value="300"></div>
+            <div class="slider"><label for="s6v"><span>Applied voltage V</span><output id="o6v"></output></label><input type="range" id="s6v" min="-5" max="0.6" step="0.01" value="0"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv6" style="aspect-ratio:720/480" role="img" aria-label="Recap: the junction bar and its band diagram, following the NA, ND, temperature and applied-voltage sliders, with the barrier height labelled."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr v"><span>V<sub>bi</sub></span><b id="c6v"></b></div>
+            <div class="ctr b"><span>Barrier</span><b id="c6b"></b></div>
+            <div class="ctr w"><span>W</span><b id="c6w"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: summary">
+          <h3>Key points</h3>
+          <ul>
+            <li>V<sub>bi</sub> = (kT/q)·ln(N<sub>A</sub>N<sub>D</sub>/n<sub>i</sub><sup>2</sup>): 0.754 V (Si example), ≈ 0.37 V (Ge).</li>
+            <li>Not measurable with a voltmeter.</li>
+            <li>Flat E<sub>F</sub> in equilibrium; bands bend by qV<sub>bi</sub>.</li>
+            <li>Forward bias lowers the barrier; reverse bias raises it.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <aside class="further" aria-label="Further reading">
+        <h3>Further reading</h3>
+        <ul>
+          <li><em>Semiconductor Physics and Devices</em>, Donald A. Neamen. Chapter: “The pn Junction”.</li>
+          <li><em>Microelectronic Circuits</em> (6th ed.), Adel S. Sedra and Kenneth C. Smith. Chapter: “Semiconductors”.</li>
+          <li><em>Electronic Devices and Circuits</em>, Jacob Millman, Christos C. Halkias and Satyabrata Jit. Chapter: “Semiconductor-Diode Characteristics”.</li>
+          <li><em>Device Electronics for Integrated Circuits</em> (3rd ed.), Richard S. Muller, Theodore I. Kamins and Mansun Chan. Chapter: “pn Junctions”.</li>
+        </ul>
+      </aside>
+
+      <nav class="pager" aria-label="Topic navigation">
+        <a href="../2-1-pn-junction-formation/index.html"><small>← Previous</small>2.1 Formation of a PN Junction</a>
+        <a class="next" href="../2-3-forward-bias/index.html"><small>Next →</small>2.3 Forward Bias</a>
+      </nav>
+    </div>
+  </main>
+
+  <footer class="site-foot">© 2026 Naveen Bokka</footer>
+
+<script>
+(function () {
+  'use strict';
+  /* ---------- colours ---------- */
+  const C = {
+    text: '#e6e9ef', muted: '#9aa4b8', grid: 'rgba(255,255,255,.07)',
+    P: '#7d3a3a', N: '#2e4a7d', DEP: '#3a3f4f', SI: '#3d4558',
+    hole: '#ff8a65', elec: '#4fc3f7', acc: '#ef9a9a', don: '#90caf9',
+    field: '#ffd54f', diff: '#ce93d8', drift: '#81c784', rec: '#ef5350',
+    ok: '#81c784', bad: '#ef5350', axis: '#5a6478'
+  };
+  const FONT = 'Inter, system-ui, sans-serif';
+  const MONO = '"JetBrains Mono", Consolas, monospace';
+  const RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const TAU = Math.PI * 2;
+  const $ = id => document.getElementById(id);
+  if (RM) $('rmNote').hidden = false;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const lerp = (a, b, u) => a + (b - a) * u;
+  const ease = u => { u = clamp(u, 0, 1); return u * u * (3 - 2 * u); };
+  const hash = k => { const s = Math.sin(k * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+
+  /* ---------- number formatting ---------- */
+  const SUP = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '-': '⁻' };
+  const sup = n => String(n).split('').map(ch => SUP[ch] || ch).join('');
+  function sci(v, d) {
+    if (v === 0) return '0';
+    const neg = v < 0; v = Math.abs(v);
+    let e = Math.floor(Math.log10(v)), m = v / Math.pow(10, e);
+    if (+m.toFixed(d) >= 10) { m /= 10; e += 1; }
+    return (neg ? '−' : '') + m.toFixed(d) + ' × 10' + sup(e);
+  }
+  const fUm = v => { const a = Math.abs(v); return (v < 0 ? '−' : '') + (a >= 1 ? a.toFixed(2) : a >= 0.1 ? a.toFixed(3) : a.toFixed(4)) + ' µm'; };
+  const fNum = v => { const a = Math.abs(v); const s = a >= 10 ? a.toFixed(0) : a >= 1 ? a.toFixed(a % 1 ? 1 : 0) : a >= 0.1 ? String(+a.toFixed(2)) : String(+a.toFixed(3)); return (v < 0 ? '−' : '') + s; };
+
+  /* ---------- physics (step junction, depletion approximation, cm units) ---------- */
+  const Q = 1.602e-19, ES = 11.7 * 8.854e-14, VT = 0.0259, NI = 1.5e10;
+  function junction(lgA, lgD) {
+    const NA = Math.pow(10, lgA), ND = Math.pow(10, lgD);
+    const Vbi = VT * Math.log(NA * ND / (NI * NI));
+    const W = Math.sqrt(2 * ES * Vbi / Q * (NA + ND) / (NA * ND));
+    const xn = W * NA / (NA + ND), xp = W * ND / (NA + ND);
+    return { lgA, lgD, NA, ND, Vbi, W, xn, xp, Em: Q * ND * xn / ES };
+  }
+  // x in cm; returns rho (C/cm³), E (V/cm, negative inside), V (V, 0 at −xp)
+  function rhoAt(j, x) { return x < -j.xp || x > j.xn ? 0 : x < 0 ? -Q * j.NA : Q * j.ND; }
+  function eAt(j, x) {
+    if (x <= -j.xp || x >= j.xn) return 0;
+    return x < 0 ? -Q * j.NA / ES * (x + j.xp) : -Q * j.ND / ES * (j.xn - x);
+  }
+  function vAt(j, x) {
+    if (x <= -j.xp) return 0;
+    if (x >= j.xn) return j.Vbi;
+    return x < 0 ? Q * j.NA / (2 * ES) * (x + j.xp) * (x + j.xp) : j.Vbi - Q * j.ND / (2 * ES) * (j.xn - x) * (j.xn - x);
+  }
+  // Half-width of a to-scale window (µm), from a 1-2-5 ladder
+  function niceS(j) {
+    const need = 1.2 * Math.max(j.xn, j.xp) * 1e4;
+    const L = [0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10];
+    for (let k = 0; k < L.length; k++) if (L[k] >= need) return L[k];
+    return 10;
+  }
+
+  /* ---------- Canvas helpers ---------- */
+  let FS = 1;
+  function Cv(id, W, H, cap) { this.el = $(id); this.W = W; this.H = H; this.cap = cap || 2; this.ctx = this.el.getContext('2d'); }
+  Cv.prototype.begin = function () {
+    const w = this.el.clientWidth; if (!w) return null;
+    const dpr = window.devicePixelRatio || 1;
+    const pw = Math.round(w * dpr), ph = Math.round(w * dpr * this.H / this.W);
+    if (this.el.width !== pw || this.el.height !== ph) { this.el.width = pw; this.el.height = ph; }
+    const c = this.ctx, s = pw / this.W;
+    FS = Math.min(this.cap, Math.max(1, 1.15 * this.W / w));
+    c.setTransform(s, 0, 0, s, 0, 0); c.clearRect(0, 0, this.W, this.H);
+    c.textBaseline = 'middle'; c.textAlign = 'left'; c.globalAlpha = 1; c.setLineDash([]); c.lineCap = 'butt'; c.shadowBlur = 0;
+    return c;
+  };
+  // Watermark: drawn inside the canvas, bottom-right, 13 px on screen at any size.
+  Cv.prototype.wm = function (c) {
+    const k = this.W / this.el.clientWidth, s = 13 * k;
+    c.save(); c.setTransform(this.el.width / this.W, 0, 0, this.el.width / this.W, 0, 0);
+    c.globalAlpha = 1; c.shadowBlur = 0; c.font = '500 ' + s.toFixed(1) + 'px ' + FONT; c.fillStyle = 'rgba(255,255,255,.35)';
+    c.textAlign = 'right'; c.textBaseline = 'bottom'; c.fillText('© Naveen Bokka', this.W - 6 * k, this.H - 4 * k); c.restore();
+  };
+  Cv.prototype.pt = function (e) {
+    const r = this.el.getBoundingClientRect();
+    return { x: (e.clientX - r.left) * this.W / r.width, y: (e.clientY - r.top) * this.H / r.height };
+  };
+  function circ(c, x, y, r, fill, stroke, lw) {
+    c.beginPath(); c.arc(x, y, Math.max(0, r), 0, TAU);
+    if (fill) { c.fillStyle = fill; c.fill(); }
+    if (stroke) { c.strokeStyle = stroke; c.lineWidth = lw || 1.5; c.stroke(); }
+  }
+  function txt(c, s, x, y, col, size, weight, align, font) {
+    c.font = (weight || 600) + ' ' + ((size || 12) * FS).toFixed(1) + 'px ' + (font || FONT);
+    c.fillStyle = col || C.text; c.textAlign = align || 'left'; c.fillText(s, x, y);
+  }
+  // Label made of [main, subscript] parts, e.g. [['N','A'],['·x','p']]
+  function subs(c, parts, x, y, col, size, align) {
+    const z = (size || 13) * FS, zs = z * 0.72;
+    let w = 0;
+    const ws = parts.map(p => {
+      c.font = '700 ' + z.toFixed(1) + 'px ' + FONT; const a = c.measureText(p[0]).width;
+      c.font = '700 ' + zs.toFixed(1) + 'px ' + FONT; const b = p[1] ? c.measureText(p[1]).width : 0;
+      w += a + b; return [a, b];
+    });
+    let x0 = align === 'right' ? x - w : align === 'center' ? x - w / 2 : x;
+    c.fillStyle = col; c.textAlign = 'left';
+    parts.forEach((p, k) => {
+      c.font = '700 ' + z.toFixed(1) + 'px ' + FONT; c.fillText(p[0], x0, y); x0 += ws[k][0];
+      if (p[1]) { c.font = '700 ' + zs.toFixed(1) + 'px ' + FONT; c.fillText(p[1], x0, y + z * 0.3); x0 += ws[k][1]; }
+    });
+    return w;
+  }
+  function line(c, x0, y0, x1, y1, col, lw, dash) {
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []);
+    c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke(); c.setLineDash([]);
+  }
+  function pline(c, pts, col, lw, dash) {
+    if (pts.length < 2) return;
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []); c.lineJoin = 'round';
+    c.beginPath(); pts.forEach((p, k) => k ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); c.stroke(); c.setLineDash([]);
+  }
+  function arrow(c, x0, y0, x1, y1, col, lw, head) {
+    const dx = x1 - x0, dy = y1 - y0, L = Math.hypot(dx, dy); if (L < 2) return;
+    lw = lw || 3;
+    const ux = dx / L, uy = dy / L, hs = Math.min(head || 10, L * 0.8), hw = Math.max(hs * 0.55, lw * 0.9);
+    line(c, x0, y0, x1 - ux * hs * 0.9, y1 - uy * hs * 0.9, col, lw);
+    c.fillStyle = col; c.beginPath(); c.moveTo(x1, y1);
+    c.lineTo(x1 - ux * hs - uy * hw, y1 - uy * hs + ux * hw);
+    c.lineTo(x1 - ux * hs + uy * hw, y1 - uy * hs - ux * hw); c.closePath(); c.fill();
+  }
+  function darrow(c, x0, x1, y, col) {   // dimension arrow with end ticks
+    line(c, x0, y - 5, x0, y + 5, col, 1.3); line(c, x1, y - 5, x1, y + 5, col, 1.3);
+    if (x1 - x0 > 14) { arrow(c, (x0 + x1) / 2, y, x0 + 1, y, col, 1.4, 6); arrow(c, (x0 + x1) / 2, y, x1 - 1, y, col, 1.4, 6); }
+    else line(c, x0, y, x1, y, col, 1.4);
+  }
+  function rect(c, x, y, w, h, fill) { c.fillStyle = fill; c.fillRect(x, y, w, h); }
+  function hatch(c, x0, y0, x1, y1) {
+    if (x1 - x0 < 0.5) return;
+    rect(c, x0, y0, x1 - x0, y1 - y0, C.DEP);
+    c.save(); c.beginPath(); c.rect(x0, y0, x1 - x0, y1 - y0); c.clip();
+    c.strokeStyle = 'rgba(255,255,255,.10)'; c.lineWidth = 1; c.beginPath();
+    for (let x = x0 - (y1 - y0); x < x1; x += 9) { c.moveTo(x, y1); c.lineTo(x + (y1 - y0), y0); }
+    c.stroke(); c.restore();
+  }
+  // Fixed ion: circled − (acceptor) or circled + (donor)
+  function ion(c, x, y, r, kind, a) {
+    const col = kind === 'a' ? C.acc : C.don;
+    c.globalAlpha = a; circ(c, x, y, r, null, col, Math.max(1, r * 0.22));
+    c.strokeStyle = col; c.lineWidth = Math.max(1, r * 0.24); c.beginPath();
+    c.moveTo(x - r * 0.5, y); c.lineTo(x + r * 0.5, y);
+    if (kind === 'd') { c.moveTo(x, y - r * 0.5); c.lineTo(x, y + r * 0.5); }
+    c.stroke(); c.globalAlpha = 1;
+  }
+  function carrier(c, x, y, kind, a, r) {
+    c.globalAlpha = a; circ(c, x, y, r || (kind === 'h' ? 3.6 : 3.2), kind === 'h' ? C.hole : C.elec); c.globalAlpha = 1;
+  }
+  const jig = (k, ph, amp) => [amp * Math.sin(ph * 1.7 + k * 1.31), amp * Math.cos(ph * 1.3 + k * 2.07)];
+  function regionLabels(c, B, jx) {
+    const s = 11 * FS;
+    c.fillStyle = 'rgba(15,20,32,.75)';
+    c.fillRect(B.x + 2, B.y + 2, s + 6, s + 8); c.fillRect(B.x + B.w - s - 8, B.y + 2, s + 6, s + 8);
+    txt(c, 'p', B.x + 5 + s / 2, B.y + 6 + s / 2, '#fff', 14, 700, 'center');
+    txt(c, 'n', B.x + B.w - 5 - s / 2, B.y + 6 + s / 2, '#fff', 14, 700, 'center');
+  }
+
+  /* ---------- Animation registry ---------- */
+  const anims = [];
+  function Anim(rootId, o) {
+    this.root = $(rootId); this.o = o; this.playing = !RM; this.visible = true; this.dirty = true;
+    this.pb = this.root.querySelector('[data-act="play"]');
+    this.pb.addEventListener('click', () => this.setPlaying(!this.playing));
+    this.root.querySelector('[data-act="reset"]').addEventListener('click', () => { o.reset(); this.setPlaying(!RM); });
+    o.reset(); this.sync(); anims.push(this);
+    if ('IntersectionObserver' in window) {
+      this.visible = false;
+      new IntersectionObserver(es => es.forEach(e => { this.visible = e.isIntersecting; if (this.visible) this.dirty = true; }))
+        .observe(this.root);
+    }
+  }
+  Anim.prototype.setPlaying = function (p) { this.playing = p; this.sync(); this.dirty = true; };
+  Anim.prototype.sync = function () { this.pb.textContent = this.playing ? 'Pause' : 'Play'; };
+  Object.assign(C, { band: '#e6e9ef', ei: '#9aa4b8', ef: '#ffd54f', bar: '#ce93d8', metal: '#b0bec5' });
+
+  /* =========================================================
+     Physics (cm, eV, V). Energies on band diagrams are measured
+     from the p-side Fermi level (EFp = 0), positive upward.
+       ni(T) = ni300·(T/300)^1.5·exp(−Eg/2k·(1/T − 1/300))   (Eg held constant)
+       majority carriers pp, nn from charge neutrality (→ NA, ND when N ≫ ni)
+       Ei − EF (p) = kT·ln(pp/ni),  EF − Ei (n) = kT·ln(nn/ni),  Vbi = sum
+       Total barrier Vt = Vbi − V; depletion widths from Vt.
+     ========================================================= */
+  const KB = 8.617e-5, EPS0 = 8.854e-14;
+  const MAT = { Si: { ni: 1.5e10, Eg: 1.12, er: 11.7 }, Ge: { ni: 2.4e13, Eg: 0.66, er: 16.0 } };
+  const niT = (m, T) => MAT[m].ni * Math.pow(T / 300, 1.5) * Math.exp(-MAT[m].Eg / (2 * KB) * (1 / T - 1 / 300));
+  function jn(lgA, lgD, m, T, V) {
+    m = m || 'Si'; T = T || 300; V = V || 0;
+    const NA = Math.pow(10, lgA), ND = Math.pow(10, lgD), ni = niT(m, T), vt = 0.0259 * T / 300;
+    const pp = NA / 2 + Math.sqrt(NA * NA / 4 + ni * ni), nn = ND / 2 + Math.sqrt(ND * ND / 4 + ni * ni);
+    const dp = vt * Math.log(pp / ni), dn = vt * Math.log(nn / ni), Vbi = dp + dn;
+    const Vt = Math.max(0.03, Vbi - V), es = MAT[m].er * EPS0;
+    const W = Math.sqrt(2 * es * Vt / Q * (NA + ND) / (NA * ND));
+    return { lgA, lgD, NA, ND, m, T, V, ni, vt, dp, dn, Vbi, Vt, es, Eg: MAT[m].Eg, W, xn: W * NA / (NA + ND), xp: W * ND / (NA + ND) };
+  }
+  // Potential rise φ(x) from the p-side edge (V), x in cm
+  function phi(j, x) {
+    if (x <= -j.xp) return 0;
+    if (x >= j.xn) return j.Vt;
+    return x < 0 ? Q * j.NA / (2 * j.es) * (x + j.xp) * (x + j.xp) : j.Vt - Q * j.ND / (2 * j.es) * (j.xn - x) * (j.xn - x);
+  }
+  const Ei = (j, x) => j.dp - phi(j, x);
+  const niceW = j => { const need = 1.25 * Math.max(j.xn, j.xp) * 1e4, L = [0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10]; for (let k = 0; k < L.length; k++) if (L[k] >= need) return L[k]; return 10; };
+  const tweenLog = (cur, target, dt) => { const a = Math.log(cur), b = Math.log(target); return Math.abs(a - b) < 0.003 ? target : Math.exp(a + (b - a) * Math.min(1, dt * 6)); };
+  const tweenLin = (cur, target, dt, eps) => Math.abs(cur - target) < (eps || 0.002) ? target : cur + (target - cur) * Math.min(1, dt * 6);
+  const fNd = lg => sci(Math.pow(10, lg), 1) + ' cm⁻³';
+  const fV = (v, d) => (v > 1e-9 ? '+' : v < -1e-9 ? '−' : '') + Math.abs(v).toFixed(d == null ? 2 : d) + ' V';
+  const fE = v => v.toFixed(3) + ' eV';
+
+  /* ---------- junction bar drawn to scale (window ±Sw µm) ---------- */
+  const spOf = lg => clamp(40 - 5.5 * (lg - 14), 10, 40);
+  function jbar(c, B, j, Sw, ph) {
+    const jx = B.x + B.w / 2, k = (B.w / 2) / Sw;
+    const eL = Math.max(B.x, jx - j.xp * 1e4 * k), eR = Math.min(B.x + B.w, jx + j.xn * 1e4 * k);
+    rect(c, B.x, B.y, jx - B.x, B.h, C.P); rect(c, jx, B.y, B.x + B.w - jx, B.h, C.N);
+    hatch(c, eL, B.y, eR, B.y + B.h);
+    [['a', j.lgA, -1], ['d', j.lgD, 1]].forEach(s => {
+      const sp = spOf(s[1]), nr = Math.max(2, Math.floor(B.h / sp)), dy = B.h / nr, r = Math.min(6, sp * 0.36);
+      for (let i = 0; ; i++) {
+        const x = jx + s[2] * (sp / 2 + i * sp);
+        if (s[2] < 0 ? x < B.x + 3 : x > B.x + B.w - 3) break;
+        const inDep = s[2] < 0 ? x > eL : x < eR;
+        for (let rr = 0; rr < nr; rr++) {
+          const y = B.y + dy * (rr + 0.5), key = i * 31 + rr * 7 + (s[2] > 0 ? 900 : 0);
+          if (inDep) ion(c, x, y, r, s[0], 1);
+          else if ((i + rr) % 2 === 0) { const d = jig(key, ph, Math.min(2.2, sp * 0.12)); carrier(c, x + d[0], y + d[1], s[0] === 'a' ? 'h' : 'e', 0.95, Math.min(3.4, sp * 0.22)); }
+        }
+      }
+    });
+    line(c, jx, B.y, jx, B.y + B.h, 'rgba(255,255,255,.55)', 1.2, [4, 4]);
+    regionLabels(c, B, jx);
+    return { jx, k, eL, eR };
+  }
+
+  /* ---------- band diagram (to scale in x, EFp = 0) ----------
+     L: { x, w, bar: [y, h] | null, band: [y, h] }, sc: { top, bot } (eV) */
+  function scTarget(j) { return { top: j.dp + j.Eg / 2 + 0.14, bot: j.dp - j.Eg / 2 - j.Vt - 0.14 }; }
+  function bandPlot(c, L, j, Sw, sc, ph, o) {
+    o = o || {};
+    const jx = L.x + L.w / 2, k = (L.w / 2) / Sw;
+    let g = { jx, k, eL: Math.max(L.x, jx - j.xp * 1e4 * k), eR: Math.min(L.x + L.w, jx + j.xn * 1e4 * k) };
+    if (L.bar) g = jbar(c, { x: L.x, y: L.bar[0], w: L.w, h: L.bar[1] }, j, Sw, ph);
+    const y0 = L.band[0], h = L.band[1], Y = E => y0 + (sc.top - E) / (sc.top - sc.bot) * h;
+    const top = L.bar ? L.bar[0] + L.bar[1] : y0;
+    [g.eL, g.eR].forEach(x => line(c, x, top, x, y0 + h, 'rgba(255,255,255,.22)', 1, [3, 4]));
+    c.save(); c.beginPath(); c.rect(0, y0 - 4, 2000, h + 8); c.clip();
+    const xs = []; for (let px = L.x; px <= L.x + L.w + 0.1; px += 2) xs.push(px);
+    const xcm = px => (px - jx) / k * 1e-4;
+    const curve = off => xs.map(px => [px, Y(Ei(j, xcm(px)) + off)]);
+    pline(c, curve(0), C.ei, 1.3, [5, 4]);
+    pline(c, curve(j.Eg / 2), C.band, 2.6);
+    pline(c, curve(-j.Eg / 2), C.band, 2.6);
+    // Fermi level(s)
+    const eq = Math.abs(j.V) < 0.005;
+    if (eq) pline(c, [[L.x, Y(0)], [L.x + L.w, Y(0)]], C.ef, 2, [7, 5]);
+    else {
+      pline(c, [[L.x, Y(0)], [g.eR, Y(0)]], C.ef, 2, [7, 5]);
+      pline(c, [[g.eL, Y(j.V)], [L.x + L.w, Y(j.V)]], C.ef, 2, [7, 5]);
+      pline(c, [[g.eR, Y(0)], [L.x + L.w, Y(0)]], 'rgba(255,213,79,.3)', 1, [2, 4]);
+    }
+    // carriers in the neutral regions (thermal clouds)
+    if (o.carriers !== false) {
+      for (let i = 0; i < 14; i++) {
+        const u = hash(i + 3), e = -Math.log(1 - 0.95 * hash(i + 40)) * 0.022, d = jig(i, ph, 1.6);
+        const xe = g.eR + 6 + u * (L.x + L.w - g.eR - 52), xh = L.x + 6 + u * (g.eL - L.x - 12);
+        if (L.x + L.w - g.eR > 60) carrier(c, xe + d[0], Y(Ei(j, xcm(xe)) + j.Eg / 2) - 5 - e * h / (sc.top - sc.bot) + d[1] * 0.5, 'e', 0.9, 3);
+        if (g.eL - L.x > 16) carrier(c, xh + d[0], Y(Ei(j, xcm(xh)) - j.Eg / 2) + 5 + e * h / (sc.top - sc.bot) + d[1] * 0.5, 'h', 0.9, 3);
+      }
+    }
+    // labels on the p side
+    const lx = L.x - 6;
+    subs(c, [['E', 'c']], lx, Y(j.dp + j.Eg / 2), C.band, 12, 'right');
+    subs(c, [['E', 'v']], lx, Y(j.dp - j.Eg / 2), C.band, 12, 'right');
+    subs(c, [['E', 'i']], lx, Y(j.dp), C.ei, 12, 'right');
+    subs(c, eq ? [['E', 'F']] : [['E', 'Fp']], lx, Y(0) + (Math.abs(Y(0) - Y(j.dp)) < 16 ? 9 : 0), C.ef, 12, 'right');
+    if (!eq) subs(c, [['E', 'Fn']], L.x + L.w - 4, Y(j.V) - 10, C.ef, 11, 'right');
+    // barrier arrow
+    const ax = L.x + L.w - 22, yTop = Y(j.dp + j.Eg / 2), yBot = Y(j.dp + j.Eg / 2 - j.Vt);
+    line(c, g.eR - 4, yTop, ax + 8, yTop, 'rgba(206,147,216,.6)', 1, [4, 3]);
+    arrow(c, ax, (yTop + yBot) / 2, ax, yTop + 1, C.bar, 2, 7); arrow(c, ax, (yTop + yBot) / 2, ax, yBot - 1, C.bar, 2, 7);
+    const lab = eq ? [['qV', 'bi']] : j.V > 0 ? [['q(V', 'bi'], [' − V)', '']] : [['q(V', 'bi'], [' + V', 'R'], [')', '']];
+    subs(c, lab, ax - 8, yTop + (yBot - yTop) * 0.3, C.bar, 12, 'right');
+    // Fermi-level split marker
+    if (!eq && Math.abs(Y(j.V) - Y(0)) > 6) {
+      const sx = L.x + L.w - 70;
+      line(c, sx - 6, Y(0), sx + 6, Y(0), C.ef, 1.2); line(c, sx - 6, Y(j.V), sx + 6, Y(j.V), C.ef, 1.2);
+      line(c, sx, Y(0), sx, Y(j.V), C.ef, 1.2);
+      subs(c, j.V > 0 ? [['qV', '']] : [['qV', 'R']], sx - 8, (Y(0) + Y(j.V)) / 2, C.ef, 11, 'right');
+    }
+    c.restore();
+    return Object.assign(g, { Y });
+  }
+
+  /* =========================================================
+     0. Built-in potential: voltmeter loop, V(x), carriers on the hills.
+        Carriers get a random energy E (barrier units); a few are given
+        E > 1 and cross. (Visual: real barrier ≈ 29 kT, so crossing is
+        far rarer than shown.)
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv0', 720, 650);
+    const j = jn(17, 16), Sw = 0.5;
+    const B = { x: 62, y: 104, w: 596, h: 60 }, JX = B.x + B.w / 2, K = (B.w / 2) / Sw;
+    const eL = JX - j.xp * 1e4 * K, eR = JX + j.xn * 1e4 * K;
+    const Vfrac = px => phi(j, (px - JX) / K * 1e-4) / j.Vbi;   // 0 (p) … 1 (n)
+    let ph, P, nSpawn;
+    function spawn(kind) {
+      nSpawn++;
+      const fast = nSpawn % 5 === 0;
+      return { kind, x: kind === 'e' ? B.x + B.w - 10 - 40 * Math.random() : B.x + 10 + 40 * Math.random(), dir: kind === 'e' ? -1 : 1, E: fast ? 1.3 : 0.15 + 0.7 * Math.random(), fast, fade: 0 };
+    }
+    const U = p => p.kind === 'e' ? 1 - Vfrac(p.x) : Vfrac(p.x);
+    function step(dt) {
+      ph += dt;
+      P = P.map(p => {
+        if (p.fade > 0) { p.fade += dt; return p.fade > 0.6 ? spawn(p.kind) : p; }
+        const room = p.E - U(p);
+        if (room <= 0.004 && ((p.kind === 'e' && p.dir < 0) || (p.kind === 'h' && p.dir > 0))) p.dir = -p.dir;
+        p.x += p.dir * 150 * Math.sqrt(Math.max(0.03, room / p.E)) * dt;
+        if (p.kind === 'e') { if (p.x > B.x + B.w - 4) return spawn('e'); if (p.x < B.x + 30) p.fade = 0.001; }
+        else { if (p.x < B.x + 4) return spawn('h'); if (p.x > B.x + B.w - 30) p.fade = 0.001; }
+        return p;
+      });
+    }
+    function hill(c, y0, h, kind) {
+      const Yu = u => y0 + 10 + (1 - u) * (h - 20), pts = [];
+      for (let px = B.x; px <= B.x + B.w; px += 2) pts.push([px, Yu(kind === 'e' ? 1 - Vfrac(px) : Vfrac(px))]);
+      pline(c, pts, C.band, 2.4);
+      if (kind === 'e') subs(c, [['E', 'c']], B.x - 6, Yu(1), C.band, 12, 'right'); else subs(c, [['E', 'v']], B.x - 6, Yu(0), C.band, 12, 'right');
+      txt(c, kind === 'e' ? 'e⁻' : 'h⁺', B.x - 6, kind === 'e' ? y0 + h - 4 : y0 + 12, kind === 'e' ? C.elec : C.hole, 12, 700, 'right');
+      // barrier height arrow
+      const ax = kind === 'e' ? B.x + 22 : B.x + B.w - 22;
+      arrow(c, ax, (Yu(0) + Yu(1)) / 2, ax, Yu(1) + 1, C.bar, 2, 7); arrow(c, ax, (Yu(0) + Yu(1)) / 2, ax, Yu(0) - 1, C.bar, 2, 7);
+      line(c, kind === 'e' ? ax - 8 : eR, Yu(1), kind === 'e' ? eL : ax + 8, Yu(1), 'rgba(206,147,216,.5)', 1, [3, 3]);
+      subs(c, [['qV', 'bi']], kind === 'e' ? ax + 8 : ax - 8, (Yu(0) + Yu(1)) / 2 + 12, C.bar, 11, kind === 'e' ? 'left' : 'right');
+      P.filter(p => p.kind === kind).forEach(p => {
+        const y = Yu(U(p)) - 6, a = p.fade > 0 ? 1 - p.fade / 0.6 : 1;
+        if (p.fast && p.fade === 0) { c.globalAlpha = 0.5; line(c, p.x - p.dir * 26, Yu(kind === 'e' ? 1 - Vfrac(p.x - p.dir * 26) : Vfrac(p.x - p.dir * 26)) - 6, p.x, y, kind === 'e' ? C.elec : C.hole, 3); c.globalAlpha = 1; }
+        c.save(); if (p.fast) { c.shadowColor = kind === 'e' ? C.elec : C.hole; c.shadowBlur = 8; }
+        carrier(c, p.x, y, kind, a, 4.2); c.restore();
+      });
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      // voltmeter and wires
+      const mx = 300, mw = 120, my = 12, mh = 48;
+      c.fillStyle = '#0f1420'; c.fillRect(mx, my, mw, mh); c.strokeStyle = C.muted; c.lineWidth = 1.5; c.strokeRect(mx, my, mw, mh);
+      txt(c, '0.00 V', mx + mw / 2, my + mh / 2, C.ef, 16, 600, 'center', MONO);
+      pline(c, [[mx, my + mh / 2], [51, my + mh / 2], [51, B.y]], C.metal, 1.6);
+      pline(c, [[mx + mw, my + mh / 2], [669, my + mh / 2], [669, B.y]], C.metal, 1.6);
+      rect(c, 40, B.y, 22, B.h, C.metal); rect(c, 658, B.y, 22, B.h, C.metal);
+      jbar(c, B, j, Sw, ph);
+      subs(c, [['V', '1'], [' + V', '2'], [' = V', 'bi']], 360, my + mh + 18, C.muted, 12, 'center');
+      // potential steps around the loop
+      const ay = B.y + B.h + 18;
+      arrow(c, eL, ay, eR, ay, C.bar, 2.4, 8); subs(c, [['V', 'bi']], (eL + eR) / 2, ay + 14, C.bar, 12, 'center');
+      arrow(c, 76, ay, 30, ay, C.metal, 2, 7); subs(c, [['V', '1']], 53, ay + 14, C.metal, 12, 'center');
+      arrow(c, 690, ay, 644, ay, C.metal, 2, 7); subs(c, [['V', '2']], 667, ay + 14, C.metal, 12, 'center');
+      // V(x)
+      const gy = 222, gh = 100, Yv = v => gy + gh - 8 - v / j.Vbi * (gh - 24);
+      rect(c, B.x, gy, B.w, gh, 'rgba(255,255,255,.02)');
+      line(c, B.x, Yv(0), B.x + B.w, Yv(0), C.axis, 1);
+      const pts = []; for (let px = B.x; px <= B.x + B.w; px += 2) pts.push([px, Yv(Vfrac(px) * j.Vbi)]);
+      pline(c, pts, C.drift, 2.4);
+      txt(c, 'V', B.x - 6, gy + 12, C.text, 13, 700, 'right');
+      const ax = B.x + B.w - 22;
+      arrow(c, ax, (Yv(0) + Yv(j.Vbi)) / 2, ax, Yv(j.Vbi) + 1, C.bar, 2, 7); arrow(c, ax, (Yv(0) + Yv(j.Vbi)) / 2, ax, Yv(0) - 1, C.bar, 2, 7);
+      subs(c, [['V', 'bi'], [' = 0.754 V', '']], ax - 8, (Yv(0) + Yv(j.Vbi)) / 2, C.bar, 11, 'right');
+      [eL, eR].forEach(x => line(c, x, B.y + B.h, x, 600, 'rgba(255,255,255,.14)', 1, [3, 4]));
+      hill(c, 340, 125, 'e');
+      hill(c, 478, 125, 'h');
+      cv.wm(c);
+    }
+    const o = {
+      reset() { ph = 0; nSpawn = 0; P = []; for (let i = 0; i < 5; i++) { const e = spawn('e'), h = spawn('h'); e.x -= i * 50; h.x += i * 50; P.push(e, h); } },
+      step, draw
+    };
+    new Anim('anim0', o);
+  })();
+
+  /* =========================================================
+     1. Calculator: NA, ND, material, T → Vbi; bar + Vbi(ND) plot
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv1', 720, 360);
+    let st, ph, shown;
+    const btns = Array.from(document.querySelectorAll('#anim1 [data-mat]'));
+    function sync() {
+      $('s1a').value = st.a; $('s1d').value = st.d; $('s1t').value = st.T;
+      $('o1a').textContent = fNd(st.a); $('o1d').textContent = fNd(st.d); $('o1t').textContent = st.T.toFixed(0) + ' K';
+      btns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mat === st.m)));
+      const j = jn(st.a, st.d, st.m, st.T);
+      $('c1v').textContent = j.Vbi.toFixed(3) + ' V'; $('c1n').textContent = sci(j.ni, 2) + ' cm⁻³'; $('c1t').textContent = (j.vt * 1000).toFixed(1) + ' mV';
+      if (A) A.dirty = true;
+    }
+    let A = null;
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const j = jn(st.a, st.d, st.m, st.T), VMAX = 1.2;
+      // barrier bar
+      const bx = 80, bw = 56, by0 = 36, by1 = 300, Yb = v => by1 - v / VMAX * (by1 - by0);
+      rect(c, bx, by0, bw, by1 - by0, '#0f1420');
+      [0, 0.4, 0.8, 1.2].forEach(v => { line(c, bx - 5, Yb(v), bx, Yb(v), C.axis, 1); txt(c, v.toFixed(1), bx - 8, Yb(v), C.muted, 10, 500, 'right', MONO); });
+      txt(c, 'V', bx - 8, by0 - 18, C.muted, 11, 600, 'right');
+      rect(c, bx, Yb(shown), bw, by1 - Yb(shown), C.bar);
+      txt(c, shown.toFixed(3) + ' V', bx + bw / 2, Yb(shown) - 12, C.bar, 12, 700, 'center', MONO);
+      ['Si', 'Ge'].forEach(m => {
+        const v = jn(17, 16, m, st.T).Vbi, y = Yb(v);
+        line(c, bx + bw, y, bx + bw + 12, y, m === 'Si' ? C.text : C.hole, 2);
+        txt(c, m, bx + bw + 16, y, m === 'Si' ? C.text : C.hole, 11, 700);
+      });
+      // Vbi vs ND
+      const G = { x: 240, y: 36, w: 440, h: 264 }, X = lg => G.x + (lg - 14) / 5 * G.w, Y = v => G.y + G.h - v / VMAX * G.h;
+      rect(c, G.x, G.y, G.w, G.h, 'rgba(255,255,255,.02)');
+      [0.4, 0.8].forEach(v => line(c, G.x, Y(v), G.x + G.w, Y(v), C.grid, 1));
+      line(c, G.x, G.y + G.h, G.x + G.w, G.y + G.h, C.axis, 1.2); line(c, G.x, G.y, G.x, G.y + G.h, C.axis, 1.2);
+      for (let lg = 14; lg <= 19; lg++) { line(c, X(lg), G.y + G.h, X(lg), G.y + G.h + 4, C.axis, 1); txt(c, '10' + sup(lg), X(lg), G.y + G.h + 15, C.muted, 10, 500, 'center', MONO); }
+      subs(c, [['N', 'D']], G.x + G.w, G.y + G.h + 32, C.muted, 12, 'right');
+      subs(c, [['V', 'bi']], G.x + 6, G.y + 10, C.muted, 12, 'left');
+      const other = st.m === 'Si' ? 'Ge' : 'Si', cv1 = [], cv2 = [];
+      for (let lg = 14; lg <= 19.001; lg += 0.05) { cv1.push([X(lg), Y(jn(st.a, lg, st.m, st.T).Vbi)]); cv2.push([X(lg), Y(jn(st.a, lg, other, st.T).Vbi)]); }
+      pline(c, cv2, 'rgba(154,164,184,.45)', 1.6, [5, 4]);
+      pline(c, cv1, C.bar, 2.6);
+      txt(c, st.m, cv1[cv1.length - 1][0] - 4, cv1[cv1.length - 1][1] - 12, C.bar, 11, 700, 'right');
+      txt(c, other, cv2[cv2.length - 1][0] - 4, cv2[cv2.length - 1][1] - 12, C.muted, 11, 600, 'right');
+      circ(c, X(st.d), Y(j.Vbi), 6, C.ef, '#0f1420', 2);
+      subs(c, [['N', 'A'], [' = ' + sci(Math.pow(10, st.a), 1), '']], G.x + G.w - 6, G.y + G.h - 14, C.muted, 11, 'right');
+      cv.wm(c);
+    }
+    const tween = dt => { const v = jn(st.a, st.d, st.m, st.T).Vbi; if (shown === v) return false; shown = tweenLin(shown, v, dt, 0.0005); return true; };
+    const o = {
+      reset() { st = { a: 17, d: 16, T: 300, m: 'Si' }; ph = 0; shown = jn(17, 16).Vbi; sync(); },
+      step(dt) { ph += dt; st.d = +(16.5 - 2.5 * Math.cos(ph * 0.5)).toFixed(2); sync(); tween(dt); }, tween, draw
+    };
+    A = new Anim('anim1', o);
+    [['s1a', 'a'], ['s1d', 'd'], ['s1t', 'T']].forEach(q => $(q[0]).addEventListener('input', e => { st[q[1]] = +e.target.value; if (q[1] === 'd') A.setPlaying(false); sync(); }));
+    btns.forEach(b => b.addEventListener('click', () => { st.m = b.dataset.mat; sync(); }));
+  })();
+
+  /* =========================================================
+     2. Separate p and n band diagrams, EF difference
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv2', 720, 380);
+    let st, ph, yp, yn;
+    const E2Y = e => 190 - e * 230;   // Ei at y=190, 230 px per eV
+    const P = { x0: 70, x1: 300 }, N = { x0: 420, x1: 650 };
+    function off() { const j = jn(st.a, st.d); return { p: j.dp, n: j.dn, sum: j.Vbi }; }
+    function sync() {
+      $('s2a').value = st.a; $('s2d').value = st.d; $('o2a').textContent = fNd(st.a); $('o2d').textContent = fNd(st.d);
+      const o = off(); $('c2p').textContent = fE(o.p); $('c2n').textContent = fE(o.n); $('c2d').textContent = fE(o.sum);
+      if (A) A.dirty = true;
+    }
+    let A = null;
+    function panel(c, R, kind, yEF, ph) {
+      c.globalAlpha = 0.35; rect(c, R.x0, 34, R.x1 - R.x0, 316, kind === 'p' ? C.P : C.N); c.globalAlpha = 1;
+      line(c, R.x0, E2Y(0.56), R.x1, E2Y(0.56), C.band, 2.6);
+      line(c, R.x0, E2Y(-0.56), R.x1, E2Y(-0.56), C.band, 2.6);
+      line(c, R.x0, E2Y(0), R.x1, E2Y(0), C.ei, 1.3, [5, 4]);
+      line(c, R.x0, yEF, R.x1, yEF, C.ef, 2.2, [7, 5]);
+      txt(c, kind, (R.x0 + R.x1) / 2, 22, '#fff', 15, 700, 'center');
+      const L = kind === 'p', lx = L ? R.x0 - 6 : R.x1 + 6, al = L ? 'right' : 'left';
+      subs(c, [['E', 'c']], lx, E2Y(0.56), C.band, 12, al); subs(c, [['E', 'v']], lx, E2Y(-0.56), C.band, 12, al);
+      subs(c, [['E', 'i']], lx, E2Y(0) + (Math.abs(yEF - E2Y(0)) < 14 ? (L ? -8 : -8) : 0), C.ei, 12, al);
+      subs(c, [['E', 'F']], lx, yEF + (Math.abs(yEF - E2Y(0)) < 14 ? 8 : 0), C.ef, 12, al);
+      // offset marker Ei ↔ EF
+      const mx = L ? R.x0 + 30 : R.x1 - 30;
+      if (Math.abs(yEF - E2Y(0)) > 10) { arrow(c, mx, E2Y(0), mx, yEF, C.ef, 1.4, 6); }
+      // carriers
+      for (let i = 0; i < 12; i++) {
+        const d = jig(i + (L ? 0 : 50), ph, 1.8), x = R.x0 + 50 + hash(i + (L ? 7 : 70)) * (R.x1 - R.x0 - 70);
+        const e = -Math.log(1 - 0.9 * hash(i + (L ? 20 : 90))) * 9;
+        if (L) carrier(c, x + d[0], E2Y(-0.56) + 6 + e + d[1] * 0.4, 'h', 0.9, 3.4);
+        else carrier(c, x + d[0], E2Y(0.56) - 6 - e + d[1] * 0.4, 'e', 0.9, 3.2);
+      }
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      panel(c, P, 'p', yp, ph); panel(c, N, 'n', yn, ph);
+      // EF difference
+      const mx = 360;
+      line(c, P.x1, yp, mx + 8, yp, 'rgba(255,213,79,.45)', 1, [3, 3]);
+      line(c, mx - 8, yn, N.x0, yn, 'rgba(255,213,79,.45)', 1, [3, 3]);
+      arrow(c, mx, (yp + yn) / 2, mx, yn + 1, C.bar, 2.2, 8); arrow(c, mx, (yp + yn) / 2, mx, yp - 1, C.bar, 2.2, 8);
+      txt(c, off().sum.toFixed(3) + ' eV', mx, Math.min(yn, yp) - 14, C.bar, 12, 700, 'center', MONO);
+      cv.wm(c);
+    }
+    const tween = dt => { const o = off(), tp = E2Y(-o.p), tn = E2Y(o.n); if (yp === tp && yn === tn) return false; yp = tweenLin(yp, tp, dt, 0.3); yn = tweenLin(yn, tn, dt, 0.3); return true; };
+    const o = { reset() { st = { a: 17, d: 16 }; ph = 0; const q = off(); yp = E2Y(-q.p); yn = E2Y(q.n); sync(); }, step(dt) { ph += dt; tween(dt); }, tween, draw };
+    A = new Anim('anim2', o);
+    [['s2a', 'a'], ['s2d', 'd']].forEach(q => $(q[0]).addEventListener('input', e => { st[q[1]] = +e.target.value; sync(); }));
+  })();
+
+  /* =========================================================
+     3. Join: pieces slide together (u 0→0.4), then the n side drops
+        by s·qVbi and the bands bend (u 0.4→1). Widths scale with s.
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv3', 720, 510);
+    const j = jn(17, 16), Sw = 0.5, L = { x: 64, w: 610 }, BAR = [16, 56], BAND = [100, 380];
+    const JX = L.x + L.w / 2, K = (L.w / 2) / Sw;
+    const sc = { top: j.dp + 0.56 + 0.14, bot: j.dp - 0.56 - j.Vbi - 0.14 };
+    const Y = E => BAND[0] + (sc.top - E) / (sc.top - sc.bot) * BAND[1];
+    let u, joining, t, ph;
+    $('b3join').addEventListener('click', () => { if (u < 1) { joining = true; $('b3join').disabled = true; A.dirty = true; } });
+    let A = null;
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const gap = 80 * (1 - ease(u / 0.4)), s = ease((u - 0.4) / 0.6);
+      const js = Object.assign({}, j, { xp: j.xp * Math.max(s, 1e-4), xn: j.xn * Math.max(s, 1e-4), Vt: j.Vbi });
+      // bar
+      if (gap > 0.5) {
+        const B = { x: L.x, y: BAR[0], w: L.w, h: BAR[1] };
+        rect(c, L.x, B.y, JX - gap / 2 - L.x, B.h, C.P); rect(c, JX + gap / 2, B.y, L.x + L.w - JX - gap / 2, B.h, C.N);
+        for (let i = 0; i < 30; i++) { const d = jig(i, ph, 1.8), x = L.x + 26 + (i % 15) * 19; if (x < JX - gap / 2 - 6) carrier(c, x + d[0], B.y + 16 + Math.floor(i / 15) * 24 + d[1], 'h', 0.9, 3); }
+        for (let i = 0; i < 16; i++) { const d = jig(i + 50, ph, 1.8), x = JX + gap / 2 + 14 + (i % 8) * 34; if (x < L.x + L.w - 26) carrier(c, x + d[0], B.y + 16 + Math.floor(i / 8) * 24 + d[1], 'e', 0.9, 3); }
+        regionLabels(c, B, JX);
+      } else jbar(c, { x: L.x, y: BAR[0], w: L.w, h: BAR[1] }, js, Sw, ph);
+      const eL = JX - js.xp * 1e4 * K, eR = JX + js.xn * 1e4 * K;
+      if (s > 0.02) [eL, eR].forEach(x => { c.globalAlpha = s; line(c, x, BAR[0] + BAR[1], x, BAND[0] + BAND[1], 'rgba(255,255,255,.25)', 1, [3, 4]); c.globalAlpha = 1; });
+      // bands, piecewise (gap) or continuous
+      const Eis = px => j.dp - s * j.Vbi * phi(js, (px - JX) / K * 1e-4) / j.Vbi;
+      const seg = (x0, x1, f) => { const p = []; for (let px = x0; px <= x1 + 0.1; px += 2) p.push([px, Y(f(px))]); return p; };
+      const pieces = gap > 0.5 ? [[L.x, JX - gap / 2], [JX + gap / 2, L.x + L.w]] : [[L.x, L.x + L.w]];
+      pieces.forEach(pc => {
+        pline(c, seg(pc[0], pc[1], px => Eis(px)), C.ei, 1.3, [5, 4]);
+        pline(c, seg(pc[0], pc[1], px => Eis(px) + j.Eg / 2), C.band, 2.6);
+        pline(c, seg(pc[0], pc[1], px => Eis(px) - j.Eg / 2), C.band, 2.6);
+      });
+      const EFn = j.Vbi * (1 - s);
+      if (s > 0.999) pline(c, [[L.x, Y(0)], [L.x + L.w, Y(0)]], C.ef, 2.2, [7, 5]);
+      else { pline(c, [[L.x, Y(0)], [JX - gap / 2, Y(0)]], C.ef, 2.2, [7, 5]); pline(c, [[JX + gap / 2, Y(EFn)], [L.x + L.w, Y(EFn)]], C.ef, 2.2, [7, 5]); }
+      // labels
+      const lx = L.x - 6;
+      subs(c, [['E', 'c']], lx, Y(j.dp + 0.56), C.band, 12, 'right'); subs(c, [['E', 'v']], lx, Y(j.dp - 0.56), C.band, 12, 'right');
+      subs(c, [['E', 'i']], lx, Y(j.dp), C.ei, 12, 'right'); subs(c, [['E', 'F']], lx, Y(0), C.ef, 12, 'right');
+      if (s < 0.05) {   // EF difference before joining
+        const mx = gap > 20 ? JX : L.x + L.w - 60;
+        arrow(c, mx, Y(j.Vbi / 2), mx, Y(j.Vbi) + 1, C.bar, 2.2, 8); arrow(c, mx, Y(j.Vbi / 2), mx, Y(0) - 1, C.bar, 2.2, 8);
+        txt(c, j.Vbi.toFixed(3) + ' eV', mx, Y(j.Vbi) - 14, C.bar, 12, 700, 'center', MONO);
+      } else {
+        const ax = L.x + L.w - 24, yT = Y(j.dp + 0.56), yB = Y(j.dp + 0.56 - s * j.Vbi);
+        line(c, eR - 4, yT, ax + 8, yT, 'rgba(206,147,216,.6)', 1, [4, 3]);
+        arrow(c, ax, (yT + yB) / 2, ax, yT + 1, C.bar, 2.2, 8); arrow(c, ax, (yT + yB) / 2, ax, yB - 1, C.bar, 2.2, 8);
+        c.globalAlpha = s; subs(c, [['qV', 'bi']], ax - 8, (yT + yB) / 2, C.bar, 13, 'right'); c.globalAlpha = 1;
+      }
+      cv.wm(c);
+    }
+    const adv = dt => { if (!joining) return false; u = Math.min(1, u + dt / 3); if (u >= 1) joining = false; return true; };
+    const o = {
+      reset() { u = 0; joining = false; t = 0; ph = 0; $('b3join').disabled = false; },
+      step(dt) { t += dt; ph += dt; if (!joining && u === 0 && t > 1.2) { joining = true; $('b3join').disabled = true; } adv(dt); },
+      tween: adv, draw
+    };
+    A = new Anim('anim3', o);
+  })();
+
+  /* =========================================================
+     4. Thermal clouds and crossings in equilibrium.
+        Cloud energies are drawn with kT exaggerated ×4 so the tail is
+        visible; both crossing processes are spawned at the same rate.
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv4', 720, 470);
+    const L = { x: 64, w: 610, bar: null, band: [24, 410] };
+    let T, ph, sc, Sw, movers, acc, nA, nB;
+    const AMP = 4;
+    function sync() {
+      $('s4t').value = T; $('o4t').textContent = T.toFixed(0) + ' K';
+      const j = jn(17, 16, 'Si', T);
+      $('c4v').textContent = j.Vbi.toFixed(3) + ' V';
+      $('c4n').textContent = sci(j.ND * Math.exp(-j.Vbi / j.vt), 2) + ' cm⁻³';
+      $('c4a').textContent = nA; $('c4b').textContent = nB;
+      if (A) A.dirty = true;
+    }
+    let A = null;
+    function step(dt) {
+      ph += dt;
+      const j = jn(17, 16, 'Si', T);
+      tween(dt);
+      acc += dt * (0.35 + 1.1 * (T - 250) / 200);
+      if (acc >= 1) {
+        acc -= 1;
+        movers.push({ kind: 'over', x: L.x + L.w - 40 - 110 * Math.random(), t: 0, counted: false });
+        movers.push({ kind: 'drift', x: L.x + 40 + 140 * Math.random(), t: 0, counted: false });
+      }
+      const jx = L.x + L.w / 2;
+      movers.forEach(m => {
+        m.t += dt;
+        if (m.kind === 'over') { if (m.t > 0.5) m.x -= 170 * dt; if (!m.counted && m.x < jx) { m.counted = true; nA++; sync(); } }
+        else { m.x += 170 * dt; if (!m.counted && m.x > jx) { m.counted = true; nB++; sync(); } }
+      });
+      movers = movers.filter(m => m.kind === 'over' ? m.x > L.x + 20 : m.x < L.x + L.w - 30);
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const j = jn(17, 16, 'Si', T);
+      const g = bandPlot(c, L, j, Sw, sc, ph, { carriers: false });
+      const Yy = g.Y, h = L.band[1], pxPerEv = h / (sc.top - sc.bot);
+      const xcm = px => (px - g.jx) / g.k * 1e-4, Ec = px => Ei(j, xcm(px)) + j.Eg / 2, Ev = px => Ei(j, xcm(px)) - j.Eg / 2;
+      const kTpx = j.vt * AMP * pxPerEv;
+      for (let i = 0; i < 40; i++) {
+        const d = jig(i, ph, 2), e = -Math.log(1 - 0.97 * hash(i + 11)) * kTpx;
+        const xe = g.eR + 8 + hash(i + 2) * (L.x + L.w - g.eR - 56), xh = L.x + 8 + hash(i + 5) * (g.eL - L.x - 16);
+        carrier(c, xe + d[0], Yy(Ec(xe)) - 4 - e + d[1] * 0.4, 'e', 0.9, 3);
+        carrier(c, xh + d[0], Yy(Ev(xh)) + 4 + e + d[1] * 0.4, 'h', 0.9, 3);
+      }
+      const yTop = Yy(Ec(L.x)) - 5;
+      movers.forEach(m => {
+        let y;
+        if (m.kind === 'over') { const y0 = Yy(Ec(m.x)) - 4; y = m.t < 0.5 ? lerp(y0, yTop, ease(m.t / 0.5)) : yTop; }
+        else y = Yy(Ec(m.x)) - 4;
+        const a = m.kind === 'over' ? clamp((m.x - L.x - 20) / 40, 0, 1) : clamp((L.x + L.w - 30 - m.x) / 40, 0, 1);
+        c.save(); c.shadowColor = m.kind === 'over' ? C.diff : C.drift; c.shadowBlur = 10; carrier(c, m.x, y, 'e', a, 4.4); c.restore();
+      });
+      cv.wm(c);
+    }
+    function tween(dt) {
+      const j = jn(17, 16, 'Si', T), t = scTarget(j), w = niceW(j);
+      if (sc.top === t.top && sc.bot === t.bot && Sw === w) return false;
+      sc.top = tweenLin(sc.top, t.top, dt, 0.001); sc.bot = tweenLin(sc.bot, t.bot, dt, 0.001); Sw = tweenLog(Sw, w, dt); return true;
+    }
+    const o = {
+      reset() { T = 300; ph = 0; movers = []; acc = 0.6; nA = 0; nB = 0; const j = jn(17, 16); sc = scTarget(j); Sw = niceW(j); sync(); },
+      step, tween, draw
+    };
+    A = new Anim('anim4', o);
+    $('s4t').addEventListener('input', e => { T = +e.target.value; sync(); });
+  })();
+
+  /* =========================================================
+     5. Applied bias
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv5', 720, 530);
+    const L = { x: 64, w: 610, bar: [16, 56], band: [96, 370] };
+    let V, ph, sc, Sw, sweep;
+    function sync() {
+      $('s5v').value = V; $('o5v').textContent = fV(V);
+      const j = jn(17, 16, 'Si', 300, V);
+      $('c5b').textContent = j.Vt.toFixed(3) + ' eV'; $('c5w').textContent = fUm(j.W * 1e4);
+      $('c5r').textContent = V >= 0 ? sci(Math.exp(V / j.vt), 1) : '≈ 0';
+      if (A) A.dirty = true;
+    }
+    let A = null;
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const j = jn(17, 16, 'Si', 300, V);
+      bandPlot(c, L, j, Sw, sc, ph);
+      // crossing-rate indicator (log scale: 10⁻² … 10¹⁰ × equilibrium)
+      const y = 492, x0 = 150, x1 = 520;
+      txt(c, 'rate', x0 - 10, y, C.text, 12, 600, 'right');
+      rect(c, x0, y - 8, x1 - x0, 16, '#0f1420'); c.strokeStyle = '#2a3448'; c.lineWidth = 1; c.strokeRect(x0, y - 8, x1 - x0, 16);
+      const lg = V >= 0 ? V / j.vt / Math.LN10 : -2 + 2 * Math.exp(V / j.vt);
+      const f = clamp((lg + 2) / 12, 0, 1);
+      rect(c, x0, y - 8, (x1 - x0) * f, 16, C.drift);
+      const z = x0 + (x1 - x0) * (2 / 12); line(c, z, y - 12, z, y + 12, C.text, 1.4); txt(c, '1', z, y + 20, C.muted, 10, 500, 'center', MONO);
+      cv.wm(c);
+    }
+    function tween(dt) {
+      const j = jn(17, 16, 'Si', 300, V), t = scTarget(j), w = niceW(j);
+      if (sc.top === t.top && sc.bot === t.bot && Sw === w) return false;
+      sc.top = tweenLin(sc.top, t.top, dt, 0.001); sc.bot = tweenLin(sc.bot, t.bot, dt, 0.001); Sw = tweenLog(Sw, w, dt); return true;
+    }
+    const o = {
+      reset() { V = 0; ph = 0; sweep = 0; const j = jn(17, 16); sc = scTarget(j); Sw = niceW(j); sync(); },
+      step(dt) { ph += dt; sweep += dt; V = +(-2.2 + 2.8 * (0.5 - 0.5 * Math.cos(sweep * 0.5))).toFixed(2); sync(); tween(dt); },
+      tween, draw
+    };
+    A = new Anim('anim5', o);
+    $('s5v').addEventListener('input', e => { V = +e.target.value; A.setPlaying(false); sync(); });
+  })();
+
+  /* =========================================================
+     6. Summary recap
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv6', 720, 480);
+    const L = { x: 64, w: 610, bar: [14, 52], band: [86, 360] };
+    let st, ph, sc, Sw;
+    const J = () => jn(st.a, st.d, 'Si', st.T, st.V);
+    function sync() {
+      [['s6a', 'o6a', 'a', fNd], ['s6d', 'o6d', 'd', fNd], ['s6t', 'o6t', 'T', v => v.toFixed(0) + ' K'], ['s6v', 'o6v', 'V', v => fV(v)]].forEach(q => { $(q[0]).value = st[q[2]]; $(q[1]).textContent = q[3](st[q[2]]); });
+      const j = J();
+      $('c6v').textContent = j.Vbi.toFixed(3) + ' V'; $('c6b').textContent = j.Vt.toFixed(3) + ' eV'; $('c6w').textContent = fUm(j.W * 1e4);
+      if (A) A.dirty = true;
+    }
+    let A = null;
+    function draw() { const c = cv.begin(); if (!c) return; bandPlot(c, L, J(), Sw, sc, ph); cv.wm(c); }
+    function tween(dt) {
+      const j = J(), t = scTarget(j), w = niceW(j);
+      if (sc.top === t.top && sc.bot === t.bot && Sw === w) return false;
+      sc.top = tweenLin(sc.top, t.top, dt, 0.001); sc.bot = tweenLin(sc.bot, t.bot, dt, 0.001); Sw = tweenLog(Sw, w, dt); return true;
+    }
+    const o = {
+      reset() { st = { a: 17, d: 16, T: 300, V: 0 }; ph = 0; const j = J(); sc = scTarget(j); Sw = niceW(j); sync(); },
+      step(dt) { ph += dt; tween(dt); }, tween, draw
+    };
+    A = new Anim('anim6', o);
+    [['s6a', 'a'], ['s6d', 'd'], ['s6t', 'T'], ['s6v', 'V']].forEach(q => $(q[0]).addEventListener('input', e => { st[q[1]] = +e.target.value; sync(); }));
+  })();
+
+  /* ---------- sticky mini-nav highlight ---------- */
+  (function () {
+    const links = Array.from(document.querySelectorAll('.toc a'));
+    const secs = links.map(l => document.querySelector(l.getAttribute('href')));
+    function upd() {
+      let cur = 0;
+      secs.forEach((s, i) => { if (s.getBoundingClientRect().top < 120) cur = i; });
+      links.forEach((l, i) => l.classList.toggle('active', i === cur));
+    }
+    window.addEventListener('scroll', upd, { passive: true }); upd();
+  })();
+
+  let last = performance.now();
+  function frameLoop(ts) {
+    const dt = Math.min(0.05, Math.max(0, (ts - last) / 1000)); last = ts;
+    anims.forEach(a => {
+      if (!a.visible) return;
+      if (a.playing) { a.o.step(dt); a.o.draw(); }
+      else if (a.o.tween && a.o.tween(dt)) a.o.draw();
+      else if (a.dirty) a.o.draw();
+      a.dirty = false;
+    });
+    requestAnimationFrame(frameLoop);
+  }
+  function onResize() { anims.forEach(a => { a.dirty = true; }); }
+  window.addEventListener('resize', onResize);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(onResize);
+  requestAnimationFrame(frameLoop);
+})();
+</script>
+</body>
+</html>
