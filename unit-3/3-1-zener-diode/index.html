@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>3.1 Zener Diode: Construction and V-I Characteristics</title>
+  <meta name="description" content="The Zener diode: a heavily doped junction built to work in reverse breakdown. How doping sets the Zener voltage, the Zener (tunnelling) and avalanche mechanisms, the V-I characteristic with VZ, IZK, IZT, IZM and rZ, and the temperature coefficient. An interactive lesson.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1420;
+      --panel: #1a2132;
+      --panel-hover: #212a3f;
+      --border: #2a3448;
+      --text: #e6e9ef;
+      --muted: #9aa4b8;
+      --electron: #4fc3f7;
+      --hole: #ff8a65;
+      --energy: #ffd54f;
+      --success: #81c784;
+      --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+      --max: 960px;
+      --radius: 12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: var(--font); font-size: 16px; line-height: 1.65;
+      overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column;
+    }
+    a { color: var(--electron); }
+    .wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 16px; }
+
+    /* Sticky mini-nav */
+    .toc {
+      position: sticky; top: 0; z-index: 10; background: rgba(15, 20, 32, .95);
+      border-bottom: 1px solid var(--border); backdrop-filter: blur(6px);
+    }
+    .toc ul { display: flex; gap: 4px; list-style: none; margin: 0 auto; padding: 8px 16px; max-width: var(--max); overflow-x: auto; scrollbar-width: none; }
+    .toc ul::-webkit-scrollbar { display: none; }
+    .toc a {
+      display: block; white-space: nowrap; text-decoration: none; color: var(--muted);
+      font-size: 0.85rem; font-weight: 500; padding: 6px 10px; border-radius: 999px;
+    }
+    .toc a:hover { color: var(--text); background: var(--panel); }
+    .toc a.active { color: var(--bg); background: var(--electron); }
+
+    main { flex: 1; padding: 24px 0 48px; }
+    .crumbs { font-size: 0.875rem; color: var(--muted); margin: 0 0 16px; }
+    .crumbs a { color: var(--muted); }
+    .crumbs a:hover { color: var(--electron); }
+    .eyebrow { font-family: var(--mono); font-size: 0.8rem; color: var(--electron); letter-spacing: .04em; margin: 0; }
+    h1 { font-size: clamp(1.5rem, 6vw, 2.2rem); line-height: 1.2; margin: 4px 0 6px; }
+    .subtitle { color: var(--muted); margin: 0 0 8px; }
+    section { scroll-margin-top: 64px; padding-top: 28px; }
+    h2 { font-size: clamp(1.3rem, 5vw, 1.6rem); line-height: 1.25; margin: 0 0 14px; }
+    h3 { font-size: 1.05rem; margin: 0 0 8px; }
+    .prose { font-size: 17px; line-height: 1.7; max-width: 70ch; }
+    .prose p, .prose ul, .prose ol { margin: 0 0 14px; }
+    .prose ul, .prose ol { padding-left: 22px; }
+    .prose li { margin: 4px 0; }
+    .prose strong { color: #fff; }
+    .prose p.eq { text-align: center; font-family: var(--mono); font-size: 16px; background: #141b2b; border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; overflow-wrap: anywhere; }
+    hr.sep { border: 0; border-top: 1px solid var(--border); margin: 40px 0 0; }
+    .rm-note { font-size: 0.78rem; color: var(--muted); margin: 0 0 8px; }
+
+    .tbl-wrap { overflow-x: auto; margin: 0 0 14px; }
+    table.cmp { border-collapse: collapse; width: 100%; font-size: 0.92rem; min-width: 520px; }
+    table.cmp th, table.cmp td { border: 1px solid var(--border); padding: 7px 10px; text-align: left; vertical-align: top; }
+    table.cmp thead th { background: #141b2b; color: var(--muted); font-weight: 600; }
+    table.cmp th[scope="row"] { color: var(--muted); font-weight: 600; white-space: nowrap; }
+    table.cmp .zc { color: var(--electron); } table.cmp .ac { color: var(--hole); }
+
+    /* Buttons & controls */
+    .btn {
+      font: inherit; font-size: 0.88rem; font-weight: 600; color: var(--text);
+      background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+      padding: 7px 12px; cursor: pointer; min-height: 38px;
+    }
+    .btn:hover:not(:disabled) { background: var(--panel-hover); border-color: var(--electron); }
+    .btn:disabled { opacity: .45; cursor: default; }
+    .btn:focus-visible, input:focus-visible, canvas:focus-visible { outline: 2px solid var(--electron); outline-offset: 2px; }
+    .btn[aria-pressed="true"] { background: rgba(255,213,79,.14); border-color: var(--energy); color: var(--energy); }
+    .seg { display: inline-flex; gap: 0; flex-wrap: nowrap; }
+    .seg .btn { border-radius: 0; padding: 7px 10px; }
+    .seg .btn:first-child { border-radius: 8px 0 0 8px; }
+    .seg .btn:last-child { border-radius: 0 8px 8px 0; }
+    .seg .btn + .btn { margin-left: -1px; }
+
+    figure.anim {
+      margin: 18px 0 0; background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 12px; min-width: 0;
+    }
+    .ctrls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-bottom: 12px; }
+    .sliders { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-bottom: 12px; }
+    .slider { flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; }
+    .slider label { display: flex; justify-content: space-between; gap: 8px; font-size: 0.8rem; color: var(--muted); }
+    .slider output { font-family: var(--mono); color: var(--energy); white-space: nowrap; }
+    input[type="range"] { width: 100%; accent-color: var(--energy); margin: 4px 0 0; }
+    canvas { display: block; width: 100%; border-radius: 8px; background: #141b2b; }
+    .narrow { max-width: 820px; margin-left: auto; margin-right: auto; }
+
+    .counters { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px auto 0; }
+    .ctr {
+      flex: 1 1 110px; background: #141b2b; border: 1px solid var(--border); border-radius: 8px;
+      padding: 6px 10px; font-size: 0.78rem; color: var(--muted); min-width: 0;
+    }
+    .ctr b { display: block; font-family: var(--mono); font-size: 1rem; font-weight: 500; color: var(--text); overflow-wrap: anywhere; }
+    .ctr.v b { color: var(--energy); } .ctr.p b { color: #ef9a9a; } .ctr.n b { color: #90caf9; } .ctr.w b { color: var(--success); }
+    .ctr.b b { color: #ce93d8; } .ctr.q b { color: #ff8a65; }
+
+    .keypoints {
+      margin-top: 16px; padding: 14px 16px; border-radius: var(--radius);
+      background: rgba(129,199,132,.07); border: 1px solid rgba(129,199,132,.35);
+    }
+    .keypoints h3 { color: var(--success); font-size: 0.95rem; text-transform: uppercase; letter-spacing: .05em; }
+    .keypoints ul { margin: 0; padding-left: 20px; }
+    .keypoints li { margin: 4px 0; }
+
+    .further { margin-top: 48px; color: var(--muted); font-size: 0.85rem; }
+    .further h3 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 0 0 6px; }
+    .further ul { margin: 0; padding-left: 18px; }
+    .further li { margin: 3px 0; }
+
+    .pager { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 32px; }
+    .pager a {
+      display: block; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 12px 14px; text-decoration: none; color: var(--text); min-width: 0;
+    }
+    .pager a:hover { border-color: var(--electron); }
+    .pager small { display: block; color: var(--muted); font-size: 0.75rem; }
+    .pager .next { text-align: right; }
+    .site-foot { border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; text-align: center; padding: 18px 16px; }
+
+    /* Justified paragraphs on desktop; phones stay left-aligned to avoid wide word gaps. */
+    @media (min-width: 768px) {
+      .prose p, .prose li, .keypoints li { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+      .prose p.eq { text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="toc" aria-label="Sections">
+    <ul>
+      <li><a href="#s0">Construction</a></li>
+      <li><a href="#s1">Zener effect</a></li>
+      <li><a href="#s2">Avalanche</a></li>
+      <li><a href="#s3">V–I curve</a></li>
+      <li><a href="#s4">Temperature</a></li>
+      <li><a href="#s5">Summary</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="wrap">
+      <header>
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="../../index.html">Home</a> / <a href="../index.html">Unit 3</a> / 3.1
+        </nav>
+        <p class="eyebrow">TOPIC 3.1</p>
+        <h1>Zener Diode: Construction and V-I Characteristics</h1>
+        <p class="subtitle">A diode built to live in breakdown: how doping sets V<sub>Z</sub>, and what the curve tells you</p>
+        <p class="rm-note" id="rmNote" hidden>Your device asks for reduced motion, so every animation starts paused. Press Play on any animation to run it. Sliders and buttons still update the picture.</p>
+      </header>
+
+      <!-- ================= SECTION 0 ================= -->
+      <section id="s0" aria-labelledby="h0">
+        <h2 id="h0">What a Zener diode is, and how it is built</h2>
+        <div class="prose">
+          <p>An ordinary rectifier diode is never meant to reach reverse breakdown. A <strong>ZENER DIODE</strong> is a silicon pn junction designed to work there. In reverse breakdown its voltage stays almost constant over a wide range of current. That makes it a <strong>voltage reference</strong>, and it is the basis of the simple voltage regulator in topic 3.2.</p>
+          <p>Breakdown itself does not damage a junction. A diode fails when the power V·I heats it too much, or when breakdown concentrates at one weak spot. A Zener diode avoids both. Its junction is uniform, so breakdown spreads evenly over the whole area. The external circuit limits the current so that V<sub>Z</sub>·I<sub>Z</sub> stays below the rated power.</p>
+          <p>In use, a Zener is <strong>reverse biased</strong>: the cathode (K) is held more positive than the anode (A). Its symbol is a diode with the cathode bar bent at the ends, like a letter Z. In forward bias it behaves like any silicon diode, with a drop of about 0.7 V.</p>
+          <p>The breakdown voltage V<sub>Z</sub> is set during manufacture by the <strong>DOPING</strong>. Zener diodes are made with an abrupt junction and heavy doping. Take a one-sided p⁺n junction, where the lightly doped side has doping N. The depletion width and the peak electric field at a reverse voltage V<sub>R</sub> are:</p>
+          <p class="eq">W = √[ 2ε<sub>s</sub>(V<sub>bi</sub> + V<sub>R</sub>) / (qN) ] &nbsp; and &nbsp; E<sub>max</sub> = √[ 2qN(V<sub>bi</sub> + V<sub>R</sub>) / ε<sub>s</sub> ]</p>
+          <p>Heavier doping makes the depletion region <strong>NARROWER</strong>, so the same voltage produces a <strong>STRONGER</strong> field. Breakdown starts when the field reaches a critical value, so heavier doping means a <strong>LOWER</strong> V<sub>Z</sub>. For an abrupt silicon junction, a widely used empirical fit is:</p>
+          <p class="eq">V<sub>Z</sub> ≈ 60 V × (N / 10<sup>16</sup> cm<sup>−3</sup>)<sup>−3/4</sup></p>
+          <p>For example, N = 10<sup>17</sup> cm<sup>−3</sup> gives V<sub>Z</sub> ≈ 10.7 V, and N = 10<sup>18</sup> cm<sup>−3</sup> gives about 1.9 V. Commercial Zener diodes cover roughly <strong>2.4 V to 200 V</strong>, with power ratings from about 250 mW to 50 W.</p>
+        </div>
+
+        <figure class="anim" id="anim0">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s0n"><span>Doping N of the n side</span><output id="o0n"></output></label><input type="range" id="s0n" min="16.5" max="18.2" step="0.01" value="17.6"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv0" style="aspect-ratio:720/420" role="img" aria-label="The Zener diode symbol, a p-plus n junction drawn to scale and its electric field. As the doping slider increases, the depletion region at breakdown becomes narrower, the peak field rises towards 10 to the 6 volts per centimetre, and the Zener voltage falls. A dashed line marks the depletion edge at zero bias."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr v"><span>V<sub>Z</sub></span><b id="c0z"></b></div>
+            <div class="ctr w"><span>W at breakdown</span><b id="c0w"></b></div>
+            <div class="ctr q"><span>E<sub>max</sub> at breakdown</span><b id="c0e"></b></div>
+            <div class="ctr b"><span>Mechanism</span><b id="c0m"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: construction">
+          <h3>Key points</h3>
+          <ul>
+            <li>A Zener diode is a heavily doped, abrupt silicon junction designed to work in reverse breakdown.</li>
+            <li>Breakdown is not destructive if the current, and so the power, is limited by the circuit.</li>
+            <li>Heavier doping gives a narrower W and a stronger field, so a lower V<sub>Z</sub>: V<sub>Z</sub> ≈ 60 V·(N/10<sup>16</sup>)<sup>−3/4</sup>.</li>
+            <li>In use the cathode is positive (reverse bias). In forward bias it acts as an ordinary diode.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 1 ================= -->
+      <section id="s1" aria-labelledby="h1s">
+        <h2 id="h1s">Zener breakdown: tunnelling through a thin barrier</h2>
+        <div class="prose">
+          <p>When <strong>both sides are very heavily doped</strong> (around 10<sup>18</sup> cm<sup>−3</sup> or more), the depletion region is only a few tens of nanometres wide. A reverse bias of a volt or two then produces a field near <strong>10<sup>6</sup> V/cm</strong>.</p>
+          <p>Look at the band diagram. Reverse bias lowers the n side, and soon the <strong>filled valence band on the p side lines up with the empty conduction band on the n side</strong>. Only the forbidden gap separates them, and the gap is now very thin. Its horizontal width is roughly:</p>
+          <p class="eq">d ≈ E<sub>g</sub> / (qE)</p>
+          <p>Electrons can then cross from the p-side valence band to the n-side conduction band by quantum-mechanical <strong>TUNNELLING</strong>, without having to climb over the gap. This is <strong>ZENER BREAKDOWN</strong>. It is sometimes called field emission, because the strong field pulls electrons straight out of their covalent bonds. No carrier multiplication is involved.</p>
+          <p>The tunnelling probability depends on the field roughly as exp(−constant/E). As the field increases, the current rises steeply but not abruptly, so Zener breakdown gives a fairly <strong>SOFT KNEE</strong>. It dominates in diodes with V<sub>Z</sub> below about <strong>4E<sub>g</sub>/q ≈ 4.5 V</strong>.</p>
+        </div>
+
+        <figure class="anim" id="anim1">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s1v"><span>Reverse voltage V<sub>R</sub></span><output id="o1v"></output></label><input type="range" id="s1v" min="0" max="2.4" step="0.01" value="1.9"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv1" style="aspect-ratio:720/460" role="img" aria-label="Band diagram of a heavily doped p-plus n-plus junction under reverse bias, drawn to scale in nanometres. As the reverse voltage rises, the n side drops until the filled p-side valence band faces the empty n-side conduction band. A horizontal arrow marks the tunnelling distance d, which shrinks with voltage, and electrons tunnel across it at a rate that grows steeply."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr v"><span>V<sub>R</sub></span><b id="c1v"></b></div>
+            <div class="ctr q"><span>E<sub>max</sub></span><b id="c1e"></b></div>
+            <div class="ctr b"><span>Tunnel distance d</span><b id="c1d"></b></div>
+            <div class="ctr w"><span>Tunnel current</span><b id="c1i"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: Zener breakdown">
+          <h3>Key points</h3>
+          <ul>
+            <li>Very heavy doping on both sides gives a W of tens of nm and a field near 10<sup>6</sup> V/cm.</li>
+            <li>The filled p-side valence band faces the empty n-side conduction band across a thin gap, d ≈ E<sub>g</sub>/qE.</li>
+            <li>Electrons tunnel straight through the gap. There is no multiplication.</li>
+            <li>The knee is soft. This mechanism dominates for V<sub>Z</sub> below about 4.5 V.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 2 ================= -->
+      <section id="s2" aria-labelledby="h2s">
+        <h2 id="h2s">Avalanche breakdown: carriers that multiply</h2>
+        <div class="prose">
+          <p>With <strong>lighter doping</strong>, the depletion region is wider, around a micrometre. The field never becomes strong enough for tunnelling. Instead, a carrier crossing the depletion region is <strong>accelerated</strong> by the field and gains kinetic energy between collisions with the lattice.</p>
+          <p>Near breakdown, a carrier can gain more than about E<sub>g</sub> of energy before a collision. It can then break a covalent bond and create a new <strong>electron-hole pair</strong>. This is called <strong>IMPACT IONISATION</strong>. The new electron and hole are accelerated in turn and can ionise again, so one carrier sets off a chain reaction: an <strong>AVALANCHE</strong>.</p>
+          <p>The growth is described by the <strong>multiplication factor</strong> M, the number of carriers that leave the depletion region for each one that enters. An empirical form is:</p>
+          <p class="eq">M = 1 / [ 1 − (V<sub>R</sub> / V<sub>BR</sub>)<sup>n</sup> ] &nbsp; with n ≈ 3 to 6 for silicon</p>
+          <p>M stays close to 1 at low voltage and then shoots towards infinity as V<sub>R</sub> approaches V<sub>BR</sub>. The current is then limited only by the external resistor. The knee is therefore <strong>SHARP</strong>. Avalanche dominates for V<sub>Z</sub> above about <strong>6E<sub>g</sub>/q ≈ 6.7 V</strong>. Between about 4.5 V and 6.7 V, both mechanisms contribute.</p>
+          <p>Despite the name, most "Zener diodes" above about 6 V actually break down by avalanche. The name is kept for the whole family.</p>
+        </div>
+
+        <figure class="anim" id="anim2">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s2v"><span>Reverse voltage V<sub>R</sub> (V<sub>BR</sub> = 10.7 V, N = 10<sup>17</sup> cm<sup>−3</sup>)</span><output id="o2v"></output></label><input type="range" id="s2v" min="0" max="10.67" step="0.01" value="10.2"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv2" style="aspect-ratio:720/430" role="img" aria-label="A wide depletion region with the field pointing from the n side to the p side. Single electrons enter from the p side and drift right while holes drift left; each carrier sometimes ionises, flashing yellow and creating a new electron-hole pair, so cascades grow as the reverse voltage nears breakdown. Below, the multiplication factor M is plotted on a log scale against reverse voltage, shooting up at V_BR."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr v"><span>V<sub>R</sub></span><b id="c2v"></b></div>
+            <div class="ctr q"><span>Multiplication M</span><b id="c2m"></b></div>
+            <div class="ctr w"><span>Pairs created</span><b id="c2p"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: avalanche breakdown">
+          <h3>Key points</h3>
+          <ul>
+            <li>Lighter doping gives a wide W, about 1 µm. Carriers gain energy as the field accelerates them.</li>
+            <li>Impact ionisation creates new electron-hole pairs, which ionise in turn: an avalanche.</li>
+            <li>M = 1/[1 − (V<sub>R</sub>/V<sub>BR</sub>)<sup>n</sup>] blows up at V<sub>BR</sub>, so the knee is sharp.</li>
+            <li>Avalanche dominates above about 6.7 V. Between 4.5 V and 6.7 V both mechanisms act.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 3 ================= -->
+      <section id="s3" aria-labelledby="h3s">
+        <h2 id="h3s">The V-I characteristic</h2>
+        <div class="prose">
+          <p>In the <strong>forward</strong> direction the Zener diode behaves like an ordinary silicon diode, conducting from about 0.6 to 0.7 V. In the <strong>reverse</strong> direction only a tiny leakage current I<sub>R</sub> flows, typically under a microampere, until the voltage reaches the <strong>knee</strong>. Beyond the knee the current rises sharply while the voltage barely changes. This near-vertical part is the Zener's working region.</p>
+          <p>A Zener datasheet describes this region with a few numbers:</p>
+          <ul>
+            <li><strong>V<sub>Z</sub></strong>: the Zener voltage, measured at a stated test current <strong>I<sub>ZT</sub></strong>.</li>
+            <li><strong>I<sub>ZK</sub></strong>: the knee current, the minimum current that keeps the diode in breakdown. Below it, regulation is lost.</li>
+            <li><strong>I<sub>ZM</sub></strong>: the maximum current, set by the power rating: <strong>I<sub>ZM</sub> = P<sub>ZM</sub> / V<sub>Z</sub></strong>.</li>
+            <li><strong>r<sub>Z</sub></strong>: the dynamic (Zener) resistance, the inverse slope of the curve in breakdown. It is a few ohms to a few tens of ohms at I<sub>ZT</sub>, and much larger near the knee.</li>
+          </ul>
+          <p class="eq">r<sub>Z</sub> = ΔV<sub>Z</sub> / ΔI<sub>Z</sub> &nbsp; and &nbsp; V<sub>Z</sub>(I<sub>Z</sub>) ≈ V<sub>Z0</sub> + r<sub>Z</sub>·I<sub>Z</sub></p>
+          <p>Example: a 5.1 V, 500 mW Zener has I<sub>ZM</sub> = 0.5 / 5.1 ≈ <strong>98 mA</strong>. If r<sub>Z</sub> = 10 Ω, a change in current from 10 mA to 30 mA changes V<sub>Z</sub> by only 10 × 0.02 = <strong>0.2 V</strong>.</p>
+          <p>Notice in the plot how the knee changes with V<sub>Z</sub>. The 3.3 V diode (Zener effect) has a soft, rounded knee. The 12 V diode (avalanche) has a sharp one. In the plot, the forward and reverse halves are drawn to <strong>different scales</strong> so that both can be seen.</p>
+        </div>
+
+        <figure class="anim" id="anim3">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="seg" role="group" aria-label="Zener voltage">
+              <button class="btn" type="button" data-vz="3.3" aria-pressed="false">3.3 V</button>
+              <button class="btn" type="button" data-vz="5.1" aria-pressed="true">5.1 V</button>
+              <button class="btn" type="button" data-vz="12" aria-pressed="false">12 V</button>
+            </div>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s3v"><span>Diode voltage V (negative = reverse)</span><output id="o3v"></output></label><input type="range" id="s3v" min="-6" max="0.85" step="0.005" value="-5.1"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv3" style="aspect-ratio:720/470" role="img" aria-label="The full V-I characteristic of a 500 milliwatt Zener diode. The forward branch on the right rises near 0.7 volts. The reverse branch on the left stays near zero, apart from leakage, until the knee, then drops almost vertically at V_Z. Dashed lines mark the knee current I_ZK, the test current I_ZT and the maximum current I_ZM, and the regulating range between I_ZK and I_ZM is shaded. A dot follows the voltage slider."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr v"><span>V</span><b id="c3v"></b></div>
+            <div class="ctr w"><span>I</span><b id="c3i"></b></div>
+            <div class="ctr b"><span>Region</span><b id="c3r"></b></div>
+            <div class="ctr q"><span>Dynamic resistance</span><b id="c3z"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: V-I characteristic">
+          <h3>Key points</h3>
+          <ul>
+            <li>Forward: like an ordinary diode, about 0.7 V. Reverse: tiny leakage until the knee.</li>
+            <li>In breakdown the voltage stays near V<sub>Z</sub> while the current changes a lot.</li>
+            <li>Stay between I<sub>ZK</sub> (keeps regulating) and I<sub>ZM</sub> = P<sub>ZM</sub>/V<sub>Z</sub> (keeps cool).</li>
+            <li>r<sub>Z</sub> = ΔV<sub>Z</sub>/ΔI<sub>Z</sub>: small at I<sub>ZT</sub>, large near the knee.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 4 ================= -->
+      <section id="s4" aria-labelledby="h4s">
+        <h2 id="h4s">Temperature coefficient</h2>
+        <div class="prose">
+          <p>V<sub>Z</sub> drifts with temperature. The drift is given by the <strong>temperature coefficient</strong>, quoted either in mV/°C or as a percentage per °C:</p>
+          <p class="eq">TC = ΔV<sub>Z</sub> / ΔT &nbsp; or &nbsp; TC(%) = ΔV<sub>Z</sub> / (V<sub>Z</sub>·ΔT) × 100</p>
+          <p>The two breakdown mechanisms drift in <strong>opposite directions</strong>:</p>
+          <ul>
+            <li><strong>Zener (tunnelling), low V<sub>Z</sub>: NEGATIVE TC.</strong> A higher temperature slightly reduces the band gap and gives the valence electrons more energy, so tunnelling starts at a lower voltage and V<sub>Z</sub> falls.</li>
+            <li><strong>Avalanche, high V<sub>Z</sub>: POSITIVE TC.</strong> A higher temperature makes the lattice vibrate more, so carriers collide more often and travel a shorter distance between collisions. They need a stronger field, and so a higher voltage, to gain the ionisation energy. V<sub>Z</sub> rises.</li>
+          </ul>
+          <p>Near <strong>5 to 6 V</strong> the two effects cancel and the TC is close to zero. Precision references use this. They also add a forward-biased diode, which has a TC of about −2 mV/°C, in series with a slightly higher-voltage Zener to cancel its positive drift.</p>
+          <p>Example: a 12 V Zener with TC ≈ +0.085 %/°C drifts by about 12 × 0.00085 ≈ <strong>+10 mV/°C</strong>. Heating it from 25 °C to 100 °C raises V<sub>Z</sub> by about <strong>0.77 V</strong>. The values in the plot are typical. Always check the datasheet of the actual part.</p>
+        </div>
+
+        <figure class="anim" id="anim4">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s4z"><span>Zener voltage V<sub>Z</sub> (at 25 °C)</span><output id="o4z"></output></label><input type="range" id="s4z" min="2.4" max="18" step="0.1" value="12"></div>
+            <div class="slider"><label for="s4t"><span>Junction temperature T</span><output id="o4t"></output></label><input type="range" id="s4t" min="-25" max="125" step="1" value="100"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv4" style="aspect-ratio:720/440" role="img" aria-label="Top: the typical temperature coefficient of Zener diodes plotted against V_Z, negative below about 5 volts in the Zener-effect zone, crossing zero near 5 to 6 volts, and positive in the avalanche zone. Bottom: the reverse knee of the chosen diode at 25 degrees Celsius and at the chosen temperature, shifted left or right by the change in V_Z."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr q"><span>TC</span><b id="c4t"></b></div>
+            <div class="ctr b"><span>TC (%)</span><b id="c4p"></b></div>
+            <div class="ctr v"><span>ΔV<sub>Z</sub> from 25 °C</span><b id="c4d"></b></div>
+            <div class="ctr w"><span>V<sub>Z</sub> at T</span><b id="c4z"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: temperature coefficient">
+          <h3>Key points</h3>
+          <ul>
+            <li>Zener effect (below about 4.5 V): negative TC. V<sub>Z</sub> falls when hot.</li>
+            <li>Avalanche (above about 6.7 V): positive TC. V<sub>Z</sub> rises when hot.</li>
+            <li>Around 5 to 6 V the TC is near zero. A series forward diode (−2 mV/°C) can cancel the rest.</li>
+            <li>ΔV<sub>Z</sub> = TC × ΔT. A 12 V part gains about 0.77 V from 25 °C to 100 °C.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 5 ================= -->
+      <section id="s5" aria-labelledby="h5s">
+        <h2 id="h5s">Summary</h2>
+        <div class="prose">
+          <p>A Zener diode is a <strong>heavily doped, abrupt pn junction made to work in reverse breakdown</strong>. The doping sets V<sub>Z</sub>: heavier doping gives a narrower depletion region, a stronger field and a lower V<sub>Z</sub>. Two mechanisms cause the breakdown:</p>
+          <div class="tbl-wrap">
+            <table class="cmp">
+              <thead>
+                <tr><th scope="col"></th><th scope="col" class="zc">Zener breakdown</th><th scope="col" class="ac">Avalanche breakdown</th></tr>
+              </thead>
+              <tbody>
+                <tr><th scope="row">Doping</th><td>Very heavy (≳ 10<sup>18</sup> cm<sup>−3</sup>)</td><td>Moderate</td></tr>
+                <tr><th scope="row">Depletion width</th><td>Tens of nm</td><td>Around 1 µm</td></tr>
+                <tr><th scope="row">Process</th><td>Tunnelling through the gap (field emission)</td><td>Impact ionisation and multiplication</td></tr>
+                <tr><th scope="row">Typical V<sub>Z</sub></th><td>Below about 4.5 V</td><td>Above about 6.7 V</td></tr>
+                <tr><th scope="row">Knee</th><td>Soft, rounded</td><td>Sharp</td></tr>
+                <tr><th scope="row">Temperature coefficient</th><td>Negative</td><td>Positive</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>On the V-I curve, the diode is used between <strong>I<sub>ZK</sub></strong> and <strong>I<sub>ZM</sub> = P<sub>ZM</sub>/V<sub>Z</sub></strong>, where the voltage stays near V<sub>Z</sub> and changes only by r<sub>Z</sub>·ΔI<sub>Z</sub>. Topic 3.2 puts it to work as a voltage regulator.</p>
+        </div>
+
+        <figure class="anim" id="anim5">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s5z"><span>Zener voltage V<sub>Z</sub></span><output id="o5z"></output></label><input type="range" id="s5z" min="2.4" max="18" step="0.1" value="5.1"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv5" style="aspect-ratio:720/470" role="img" aria-label="Recap for any Zener voltage: the symbol coloured by breakdown mechanism, blue for Zener, purple for both and orange for avalanche, and the full V-I characteristic with V_Z, I_ZK, I_ZT and I_ZM marked. The knee is soft at low V_Z and sharp at high V_Z."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr v"><span>V<sub>Z</sub></span><b id="c5z"></b></div>
+            <div class="ctr n"><span>Doping needed</span><b id="c5n"></b></div>
+            <div class="ctr b"><span>Mechanism</span><b id="c5m"></b></div>
+            <div class="ctr q"><span>TC</span><b id="c5t"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: summary">
+          <h3>Key points</h3>
+          <ul>
+            <li>A Zener is a heavily doped junction used in reverse breakdown, with V<sub>Z</sub> set by the doping.</li>
+            <li>Below about 4.5 V: Zener effect (tunnelling), soft knee, negative TC.</li>
+            <li>Above about 6.7 V: avalanche (multiplication), sharp knee, positive TC.</li>
+            <li>Work between I<sub>ZK</sub> and I<sub>ZM</sub>. The voltage changes by only r<sub>Z</sub>·ΔI<sub>Z</sub>.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <aside class="further" aria-label="Further reading">
+        <h3>Further reading</h3>
+        <ul>
+          <li><em>Semiconductor Physics and Devices</em>, Donald A. Neamen. Chapter: “The pn Junction”, section on junction breakdown.</li>
+          <li><em>Microelectronic Circuits</em> (6th ed.), Adel S. Sedra and Kenneth C. Smith. Chapter: “Diodes”, section on Zener diodes.</li>
+          <li><em>Electronic Devices and Circuits</em>, Jacob Millman, Christos C. Halkias and Satyabrata Jit. Chapter: “Semiconductor-Diode Characteristics”.</li>
+          <li><em>Electronic Devices and Circuits</em>, S. Salivahanan and N. Suresh Kumar. Section on Zener diodes.</li>
+        </ul>
+      </aside>
+
+      <nav class="pager" aria-label="Topic navigation">
+        <a href="../../unit-2/2-9-breakdown-mechanisms/index.html"><small>← Previous</small>2.9 Breakdown Mechanisms</a>
+        <a class="next" href="../3-2-zener-voltage-regulator/index.html"><small>Next →</small>3.2 Zener Voltage Regulator</a>
+      </nav>
+    </div>
+  </main>
+
+  <footer class="site-foot">© 2026 Naveen Bokka</footer>
+
+<script>
+(function () {
+  'use strict';
+  /* ---------- colours ---------- */
+  const C = {
+    text: '#e6e9ef', muted: '#9aa4b8', grid: 'rgba(255,255,255,.07)',
+    P: '#7d3a3a', N: '#2e4a7d', DEP: '#3a3f4f',
+    hole: '#ff8a65', elec: '#4fc3f7', acc: '#ef9a9a', don: '#90caf9',
+    field: '#ffd54f', diff: '#ce93d8', drift: '#81c784', rec: '#ef5350',
+    ok: '#81c784', bad: '#ef5350', axis: '#5a6478',
+    band: '#e6e9ef', volt: '#ffd54f', cur: '#81c784', metal: '#b0bec5', hot: '#ef5350'
+  };
+  const FONT = 'Inter, system-ui, sans-serif';
+  const MONO = '"JetBrains Mono", Consolas, monospace';
+  const RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const TAU = Math.PI * 2;
+  const $ = id => document.getElementById(id);
+  if (RM) $('rmNote').hidden = false;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const lerp = (a, b, u) => a + (b - a) * u;
+  const hash = k => { const s = Math.sin(k * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+
+  /* ---------- number formatting ---------- */
+  const SUP = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '-': '⁻' };
+  const sup = n => String(n).split('').map(ch => SUP[ch] || ch).join('');
+  function sci(v, d) {
+    if (v === 0) return '0';
+    const neg = v < 0; v = Math.abs(v);
+    let e = Math.floor(Math.log10(v)), m = v / Math.pow(10, e);
+    if (+m.toFixed(d) >= 10) { m /= 10; e += 1; }
+    return (neg ? '−' : '') + m.toFixed(d) + ' × 10' + sup(e);
+  }
+  const fUm = v => { const a = Math.abs(v); return (a >= 1 ? a.toFixed(2) : a >= 0.1 ? a.toFixed(3) : a.toFixed(4)) + ' µm'; };
+  const fNum = v => { const a = Math.abs(v); const s = a >= 10 ? a.toFixed(0) : a >= 1 ? String(+a.toFixed(1)) : a >= 0.1 ? String(+a.toFixed(2)) : String(+a.toFixed(3)); return (v < 0 ? '−' : '') + s; };
+  const fI = i => {
+    const a = Math.abs(i), s = i < 0 ? '−' : '';
+    if (a < 1e-15) return '0';
+    if (a >= 1e-3) return s + (a * 1e3).toFixed(a >= 1e-2 ? 1 : 2) + ' mA';
+    if (a >= 1e-6) return s + (a * 1e6).toFixed(a >= 1e-5 ? 1 : 2) + ' µA';
+    if (a >= 1e-9) return s + (a * 1e9).toFixed(a >= 1e-8 ? 1 : 2) + ' nA';
+    return s + sci(a, 2).replace('−', '') + ' A';
+  };
+  const fR = r => !isFinite(r) || r > 1e8 ? '> 100 MΩ' : r >= 1e6 ? (r / 1e6).toFixed(1) + ' MΩ' : r >= 1e3 ? (r / 1e3).toFixed(1) + ' kΩ' : r.toFixed(1) + ' Ω';
+  const fV = v => (v < 0 ? '−' : '') + Math.abs(v).toFixed(2) + ' V';
+  function niceStep(x) { const p = Math.pow(10, Math.floor(Math.log10(x))), m = x / p; return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 5 ? 5 : 10) * p; }
+
+  /* ---------- physics: one-sided p⁺n silicon junction (cm units) ----------
+     VZ ≈ 60 V·(N/1e16)^(−3/4)   (empirical fit for abrupt Si junctions)
+     W  = √(2εs(Vbi+VR)/(qN)),  Emax = √(2qN(Vbi+VR)/εs)
+     Mechanism: VZ < 4Eg/q → Zener; VZ > 6Eg/q → avalanche; between → both   */
+  const Q = 1.602e-19, ES = 11.7 * 8.854e-14, VT = 0.0259, NI = 1.5e10, EG = 1.12, NAP = 1e19;
+  const vzOf = lg => 60 * Math.pow(10, -0.75 * (lg - 16));
+  const lgOfVz = vz => 16 - Math.log10(vz / 60) / 0.75;
+  const vbiOf = lg => VT * Math.log(NAP * Math.pow(10, lg) / (NI * NI));
+  const wOf = (lg, VR) => Math.sqrt(2 * ES * (vbiOf(lg) + VR) / (Q * Math.pow(10, lg)));
+  const emOf = (lg, VR) => Math.sqrt(2 * Q * Math.pow(10, lg) * (vbiOf(lg) + VR) / ES);
+  const mechOf = vz => vz < 4.5 ? 'Zener (tunnelling)' : vz > 6.7 ? 'Avalanche' : 'Both';
+  const mechCol = vz => vz < 4.5 ? C.elec : vz > 6.7 ? C.hole : C.diff;
+  // Typical temperature coefficient (%/°C): ≈ −0.08 at low VZ, ≈ 0 near 5.2 V, ≈ +0.085 at high VZ
+  const tcPct = vz => 0.085 * (1 - 2 / (1 + Math.exp((vz - 5.2) / 0.9)));
+  const tcmV = vz => tcPct(vz) / 100 * vz * 1000;
+
+  /* ---------- 500 mW Zener diode model ----------
+     Forward:  I = IS·(exp(V/VT) − 1)
+     Reverse breakdown, by current:  |V| = VB + Vk·ln(I/I0) + rz·I   (soft knee for low VZ)
+     plus a ≈ 1 µA leakage                                                                */
+  const IS = 2e-15;
+  function zd(vz) {
+    // knee softness: 0.2 V at 3.3 V (tunnelling) down to 0.04 V from 7 V (avalanche), log-interpolated
+    const Vk = vz <= 3.3 ? 0.2 : vz >= 7 ? 0.04 : 0.2 * Math.pow(0.04 / 0.2, (vz - 3.3) / 3.7);
+    const rz = 6, IZT = 0.02, IZK = vz > 7 ? 0.0005 : 0.001, IZM = 0.5 / vz, I0 = 1e-3;
+    return { vz, Vk, rz, IZT, IZK, IZM, I0, VB: vz - Vk * Math.log(IZT / I0) - rz * IZT };
+  }
+  const iF = V => IS * (Math.exp(Math.min(V, 1.2) / VT) - 1);
+  const vRev = (z, I) => z.VB + z.Vk * Math.log(I / z.I0) + z.rz * I;
+  function iBd(z, Vm) {   // breakdown current at reverse voltage magnitude Vm (bisection in log I)
+    let lo = -18, hi = 0.6;
+    for (let k = 0; k < 64; k++) { const m = (lo + hi) / 2; if (vRev(z, Math.pow(10, m)) < Vm) lo = m; else hi = m; }
+    return Math.pow(10, (lo + hi) / 2);
+  }
+  const iLeak = Vm => 1e-6 * (1 - Math.exp(-Vm / 0.1));
+  const iOf = (z, V) => V >= 0 ? iF(V) : -(iBd(z, -V) + iLeak(-V));
+  const rDyn = (z, V) => { const d = 1e-4, di = iOf(z, V + d) - iOf(z, V - d); return di > 0 ? 2 * d / di : Infinity; };
+  function regionOf(z, V) {
+    if (V >= 0) return iF(V) < 1e-4 ? 'Forward, below cut-in' : 'Forward conduction';
+    const I = -iOf(z, V);
+    if (I < 0.1 * z.IZK) return 'Reverse leakage';
+    if (I < z.IZK) return 'Knee (not yet regulating)';
+    if (I <= z.IZM) return 'Breakdown: regulating';
+    return 'Above IZM: overheating';
+  }
+
+  /* ---------- Canvas helpers ---------- */
+  let FS = 1;
+  function Cv(id, W, H, cap) { this.el = $(id); this.W = W; this.H = H; this.cap = cap || 2; this.ctx = this.el.getContext('2d'); }
+  Cv.prototype.begin = function () {
+    const w = this.el.clientWidth; if (!w) return null;
+    const dpr = window.devicePixelRatio || 1;
+    const pw = Math.round(w * dpr), ph = Math.round(w * dpr * this.H / this.W);
+    if (this.el.width !== pw || this.el.height !== ph) { this.el.width = pw; this.el.height = ph; }
+    const c = this.ctx, s = pw / this.W;
+    FS = Math.min(this.cap, Math.max(1, 1.15 * this.W / w));
+    c.setTransform(s, 0, 0, s, 0, 0); c.clearRect(0, 0, this.W, this.H);
+    c.textBaseline = 'middle'; c.textAlign = 'left'; c.globalAlpha = 1; c.setLineDash([]); c.lineCap = 'butt'; c.shadowBlur = 0;
+    return c;
+  };
+  // Watermark: drawn inside the canvas, bottom-right, 13 px on screen at any size.
+  Cv.prototype.wm = function (c) {
+    const k = this.W / this.el.clientWidth, s = 13 * k;
+    c.save(); c.setTransform(this.el.width / this.W, 0, 0, this.el.width / this.W, 0, 0);
+    c.globalAlpha = 1; c.shadowBlur = 0; c.font = '500 ' + s.toFixed(1) + 'px ' + FONT; c.fillStyle = 'rgba(255,255,255,.35)';
+    c.textAlign = 'right'; c.textBaseline = 'bottom'; c.fillText('© Naveen Bokka', this.W - 6 * k, this.H - 4 * k); c.restore();
+  };
+  function circ(c, x, y, r, fill, stroke, lw) {
+    c.beginPath(); c.arc(x, y, Math.max(0, r), 0, TAU);
+    if (fill) { c.fillStyle = fill; c.fill(); }
+    if (stroke) { c.strokeStyle = stroke; c.lineWidth = lw || 1.5; c.stroke(); }
+  }
+  function txt(c, s, x, y, col, size, weight, align, font) {
+    c.font = (weight || 600) + ' ' + ((size || 12) * FS).toFixed(1) + 'px ' + (font || FONT);
+    c.fillStyle = col || C.text; c.textAlign = align || 'left'; c.fillText(s, x, y);
+  }
+  // Label made of [main, subscript] parts, e.g. [['V','Z'],[' = 5.1 V','']]
+  function subs(c, parts, x, y, col, size, align) {
+    const z = (size || 13) * FS, zs = z * 0.72;
+    let w = 0;
+    const ws = parts.map(p => {
+      c.font = '700 ' + z.toFixed(1) + 'px ' + FONT; const a = c.measureText(p[0]).width;
+      c.font = '700 ' + zs.toFixed(1) + 'px ' + FONT; const b = p[1] ? c.measureText(p[1]).width : 0;
+      w += a + b; return [a, b];
+    });
+    let x0 = align === 'right' ? x - w : align === 'center' ? x - w / 2 : x;
+    c.fillStyle = col; c.textAlign = 'left';
+    parts.forEach((p, k) => {
+      c.font = '700 ' + z.toFixed(1) + 'px ' + FONT; c.fillText(p[0], x0, y); x0 += ws[k][0];
+      if (p[1]) { c.font = '700 ' + zs.toFixed(1) + 'px ' + FONT; c.fillText(p[1], x0, y + z * 0.3); x0 += ws[k][1]; }
+    });
+    return w;
+  }
+  function line(c, x0, y0, x1, y1, col, lw, dash) {
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []);
+    c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke(); c.setLineDash([]);
+  }
+  function pline(c, pts, col, lw, dash) {
+    if (pts.length < 2) return;
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []); c.lineJoin = 'round';
+    c.beginPath(); pts.forEach((p, k) => k ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); c.stroke(); c.setLineDash([]);
+  }
+  function arrow(c, x0, y0, x1, y1, col, lw, head) {
+    const dx = x1 - x0, dy = y1 - y0, L = Math.hypot(dx, dy); if (L < 2) return;
+    lw = lw || 3;
+    const ux = dx / L, uy = dy / L, hs = Math.min(head || 10, L * 0.8), hw = Math.max(hs * 0.55, lw * 0.9);
+    line(c, x0, y0, x1 - ux * hs * 0.9, y1 - uy * hs * 0.9, col, lw);
+    c.fillStyle = col; c.beginPath(); c.moveTo(x1, y1);
+    c.lineTo(x1 - ux * hs - uy * hw, y1 - uy * hs + ux * hw);
+    c.lineTo(x1 - ux * hs + uy * hw, y1 - uy * hs - ux * hw); c.closePath(); c.fill();
+  }
+  function darrow(c, x0, x1, y, col) {   // dimension arrow with end ticks
+    line(c, x0, y - 5, x0, y + 5, col, 1.3); line(c, x1, y - 5, x1, y + 5, col, 1.3);
+    if (x1 - x0 > 14) { arrow(c, (x0 + x1) / 2, y, x0 + 1, y, col, 1.4, 6); arrow(c, (x0 + x1) / 2, y, x1 - 1, y, col, 1.4, 6); }
+    else line(c, x0, y, x1, y, col, 1.4);
+  }
+  function rect(c, x, y, w, h, fill) { c.fillStyle = fill; c.fillRect(x, y, w, h); }
+  function hatch(c, x0, y0, x1, y1) {
+    if (x1 - x0 < 0.5) return;
+    rect(c, x0, y0, x1 - x0, y1 - y0, C.DEP);
+    c.save(); c.beginPath(); c.rect(x0, y0, x1 - x0, y1 - y0); c.clip();
+    c.strokeStyle = 'rgba(255,255,255,.10)'; c.lineWidth = 1; c.beginPath();
+    for (let x = x0 - (y1 - y0); x < x1; x += 9) { c.moveTo(x, y1); c.lineTo(x + (y1 - y0), y0); }
+    c.stroke(); c.restore();
+  }
+  // Fixed ion: circled − (acceptor) or circled + (donor)
+  function ion(c, x, y, r, kind, a) {
+    const col = kind === 'a' ? C.acc : C.don;
+    c.globalAlpha = a; circ(c, x, y, r, null, col, Math.max(1, r * 0.22));
+    c.strokeStyle = col; c.lineWidth = Math.max(1, r * 0.24); c.beginPath();
+    c.moveTo(x - r * 0.5, y); c.lineTo(x + r * 0.5, y);
+    if (kind === 'd') { c.moveTo(x, y - r * 0.5); c.lineTo(x, y + r * 0.5); }
+    c.stroke(); c.globalAlpha = 1;
+  }
+  function carrier(c, x, y, kind, a, r) {
+    c.globalAlpha = a; circ(c, x, y, r || (kind === 'h' ? 3.6 : 3.2), kind === 'h' ? C.hole : C.elec); c.globalAlpha = 1;
+  }
+  const jig = (k, ph, amp) => [amp * Math.sin(ph * 1.7 + k * 1.31), amp * Math.cos(ph * 1.3 + k * 2.07)];
+  function tag(c, s, x, y, align) {   // region label on a dark chip
+    c.font = '700 ' + (14 * FS).toFixed(1) + 'px ' + FONT;
+    const w = c.measureText(s).width + 10, h = 14 * FS + 8, x0 = align === 'right' ? x - w : x;
+    c.fillStyle = 'rgba(15,20,32,.75)'; c.fillRect(x0, y, w, h);
+    txt(c, s, x0 + w / 2, y + h / 2, '#fff', 14, 700, 'center');
+  }
+  // Zener diode symbol, horizontal, anode on the left, centred at (x, y)
+  function zsym(c, x, y, col, lab) {
+    const h = 13;
+    line(c, x - 58, y, x - 13, y, col, 2.2); line(c, x + 12, y, x + 58, y, col, 2.2);
+    c.fillStyle = col; c.beginPath(); c.moveTo(x - 13, y - h); c.lineTo(x - 13, y + h); c.lineTo(x + 12, y); c.closePath(); c.fill();
+    pline(c, [[x + 5, y - h - 6], [x + 12, y - h], [x + 12, y + h], [x + 19, y + h + 6]], col, 2.8);
+    if (lab !== false) {
+      txt(c, 'A', x - 58, y - 13, C.muted, 12, 700, 'left'); txt(c, 'K', x + 58, y - 13, C.muted, 12, 700, 'right');
+    }
+  }
+
+  /* ---------- Animation registry ---------- */
+  const anims = [];
+  function Anim(rootId, o) {
+    this.root = $(rootId); this.o = o; this.playing = !RM; this.visible = true; this.dirty = true;
+    this.pb = this.root.querySelector('[data-act="play"]');
+    this.pb.addEventListener('click', () => this.setPlaying(!this.playing));
+    this.root.querySelector('[data-act="reset"]').addEventListener('click', () => { o.reset(); this.setPlaying(!RM); });
+    o.reset(); this.sync(); anims.push(this);
+    if ('IntersectionObserver' in window) {
+      this.visible = false;
+      new IntersectionObserver(es => es.forEach(e => { this.visible = e.isIntersecting; if (this.visible) this.dirty = true; }))
+        .observe(this.root);
+    }
+  }
+  Anim.prototype.setPlaying = function (p) { this.playing = p; this.sync(); this.dirty = true; };
+  Anim.prototype.sync = function () { this.pb.textContent = this.playing ? 'Pause' : 'Play'; };
+  const segBtns = (root, key, cb) => {
+    const bs = Array.from(document.querySelectorAll(root + ' [data-' + key + ']'));
+    const set = v => { bs.forEach(b => b.setAttribute('aria-pressed', String(b.dataset[key] === v))); cb(v); };
+    bs.forEach(b => b.addEventListener('click', () => set(b.dataset[key])));
+    return set;
+  };
+
+  /* ---------- full V-I plot (Sections 3 and 5) ----------
+     Forward and reverse halves use different scales. */
+  function ivZ(c, G, z, V, ph) {
+    const Vr = vRev(z, 1.15 * z.IZM) + 0.4, Ir = 1.15 * z.IZM, IFm = 0.05, VFm = 1.0;
+    const ox = G.x + 0.76 * G.w, oy = G.y + 0.34 * G.h;
+    const X = v => v >= 0 ? ox + v / VFm * (G.x + G.w - ox) : ox + v / Vr * (ox - G.x);
+    const Y = i => i >= 0 ? oy - i / IFm * (oy - G.y) : oy - i / Ir * (G.y + G.h - oy);
+    const mc = mechCol(z.vz);
+    rect(c, G.x, G.y, G.w, G.h, 'rgba(255,255,255,.02)');
+    // regulating range IZK…IZM
+    rect(c, G.x, Y(-z.IZK), ox - G.x, Y(-z.IZM) - Y(-z.IZK), 'rgba(129,199,132,.07)');
+    // axes and ticks
+    line(c, G.x, oy, G.x + G.w, oy, C.axis, 1.2); line(c, ox, G.y, ox, G.y + G.h, C.axis, 1.2);
+    const vs = niceStep(Vr / 5);
+    for (let v = vs; v < Vr - vs * 0.4; v += vs) { line(c, X(-v), oy - 3, X(-v), oy + 3, C.axis, 1); txt(c, '−' + fNum(+v.toFixed(2)), X(-v), oy - 11, C.muted, 10, 500, 'center', MONO); }
+    [0.5, 1].forEach(v => { line(c, X(v), oy - 3, X(v), oy + 3, C.axis, 1); txt(c, v === 1 ? '1 V' : '0.5', X(v) - (v === 1 ? 2 : 0), oy + 13, C.muted, 10, 500, v === 1 ? 'right' : 'center', MONO); });
+    [20, 40].forEach(m => { line(c, ox - 3, Y(m / 1000), ox + 3, Y(m / 1000), C.axis, 1); txt(c, String(m), ox - 7, Y(m / 1000), C.muted, 10, 500, 'right', MONO); });
+    const is = niceStep(Ir * 1000 / 4);
+    for (let m = is; m <= Ir * 1000 + 1e-9; m += is) { line(c, ox - 3, Y(-m / 1000), ox + 3, Y(-m / 1000), C.axis, 1); txt(c, '−' + fNum(m), ox + 7, Y(-m / 1000), C.muted, 10, 500, 'left', MONO); }
+    txt(c, 'I (mA)', ox - 7, G.y + 7, C.muted, 11, 600, 'right');
+    txt(c, 'V', G.x + 6, oy - 11, C.muted, 11, 600, 'left');
+    // curves
+    c.save(); c.beginPath(); c.rect(G.x, G.y, G.w, G.h); c.clip();
+    const fw = [];
+    for (let v = 0; v <= VFm; v += 0.003) { const i = iF(v); fw.push([X(v), Y(Math.min(i, IFm * 1.1))]); if (i > IFm * 1.1) break; }
+    pline(c, fw, C.cur, 2.6);
+    const rv = [];
+    for (let px = ox; px >= G.x; px -= 1) { const v = (px - ox) / (ox - G.x) * Vr, i = iOf(z, v); rv.push([px, Y(Math.max(i, -Ir * 1.1))]); if (i < -Ir * 1.1) break; }
+    pline(c, rv, mc, 2.6);
+    c.restore();
+    // annotations
+    const vzx = X(-z.vz), yzt = Y(-z.IZT), yzm = Y(-z.IZM), vzm = X(-vRev(z, z.IZM));
+    line(c, vzx, oy, vzx, yzt, 'rgba(255,213,79,.6)', 1, [4, 3]);
+    subs(c, [['V', 'Z']], vzx - 5, oy + 12, C.volt, 11, 'right');
+    const vzt = X(-vRev(z, z.IZT));
+    line(c, G.x, yzt, vzt, yzt, 'rgba(255,255,255,.3)', 1, [4, 3]); subs(c, [['I', 'ZT']], vzt + 14, yzt, C.text, 10, 'left');
+    line(c, G.x, yzm, vzm, yzm, 'rgba(239,83,80,.6)', 1, [4, 3]); subs(c, [['I', 'ZM'], [' (max)', '']], vzm + 10, yzm, C.bad, 10, 'left');
+    subs(c, [['regulating range I', 'ZK'], [' to I', 'ZM']], ox - 10, yzm - 12, C.ok, 10, 'right');
+    const kx = X(-vRev(z, z.IZK)), ky = Y(-z.IZK);
+    circ(c, kx, ky, 3.5, null, C.text, 1.4);
+    subs(c, [['knee, I', 'ZK']], kx + 8, ky + 14, C.text, 10, 'left');
+    txt(c, 'leakage ≈ 1 µA', (kx + ox) / 2, oy - 28, C.muted, 10, 600, 'center');
+    const ml = z.vz < 4.5 ? 'Zener breakdown' : z.vz > 6.7 ? 'avalanche breakdown' : 'Zener + avalanche';
+    const im = (z.IZT + z.IZM) / 2, mx = X(-vRev(z, im)) + 14, my = Y(-im);
+    txt(c, ml, mx, my, mc, 11, 700, 'left');
+    subs(c, [['slope = 1/r', 'Z']], mx, my + 16, C.muted, 10, 'left');
+    txt(c, 'forward ≈ 0.7 V', X(0.42), Y(0.012), C.cur, 10, 700, 'center');
+    // operating point
+    if (V != null) {
+      const i = iOf(z, V), yi = Y(clamp(i, -Ir * 1.1, IFm * 1.1)), inside = i <= IFm && i >= -Ir;
+      line(c, X(V), oy, X(V), clamp(yi, G.y, G.y + G.h), 'rgba(255,213,79,.35)', 1, [2, 3]);
+      if (inside) { c.save(); c.shadowColor = C.volt; c.shadowBlur = 8 + 6 * Math.sin(ph * 4); circ(c, X(V), yi, 6, C.volt, '#0f1420', 2); c.restore(); }
+      else if (i > 0) arrow(c, X(V), G.y + 16, X(V), G.y + 1, C.volt, 2, 7);
+      else arrow(c, X(V), G.y + G.h - 16, X(V), G.y + G.h - 1, C.volt, 2, 7);
+    }
+    return { ox, oy, X, Y };
+  }
+
+  /* =========================================================
+     0. Construction: doping → W, Emax and VZ
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv0', 720, 420);
+    const B = { x: 96, y: 96, w: 584, h: 90 }, G = { x: 96, y: 262, w: 584, h: 120 };
+    const jx = B.x + 100, nW = B.x + B.w - jx;
+    const LAD = [0.05, 0.1, 0.2, 0.5, 1, 2, 5];
+    const ladder = w => { for (let k = 0; k < LAD.length; k++) if (LAD[k] >= 1.2 * w) return LAD[k]; return 5; };
+    let ph, lg, S, Sd, A = null;
+    function sync() {
+      $('s0n').value = lg;
+      const vz = vzOf(lg), W = wOf(lg, vz) * 1e4;
+      $('o0n').textContent = sci(Math.pow(10, lg), 1) + ' cm⁻³';
+      $('c0z').textContent = fV(vz); $('c0w').textContent = fUm(W);
+      $('c0e').textContent = sci(emOf(lg, vz), 2) + ' V/cm'; $('c0m').textContent = mechOf(vz);
+      S = ladder(W);
+      if (A) A.dirty = true;
+    }
+    function tween(dt) {
+      if (Sd === S) return false;
+      const a = Math.log(Sd), b = Math.log(S);
+      Sd = Math.abs(a - b) < 0.004 ? S : Math.exp(a + (b - a) * Math.min(1, dt * 6));
+      return true;
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const vz = vzOf(lg), W = wOf(lg, vz) * 1e4, W0 = wOf(lg, 0) * 1e4, Em = emOf(lg, vz), k = nW / Sd;
+      // symbol and readout
+      zsym(c, 160, 46, mechCol(vz));
+      txt(c, 'Zener symbol', 160, 76, C.muted, 11, 600, 'center');
+      subs(c, [['V', 'Z'], [' ≈ ' + vz.toFixed(2) + ' V', '']], 680, 36, C.volt, 18, 'right');
+      txt(c, mechOf(vz), 680, 64, mechCol(vz), 13, 700, 'right');
+      // bar
+      const eR = Math.min(B.x + B.w, jx + W * k);
+      rect(c, B.x, B.y, jx - B.x, B.h, C.P); rect(c, jx, B.y, nW, B.h, C.N);
+      hatch(c, jx - 2, B.y, eR, B.y + B.h);
+      const nr = Math.floor(B.h / 11);
+      for (let x = B.x + 6, i = 0; x < jx - 4; x += 11, i++) for (let r = 0; r < nr; r++) {
+        const d = jig(i * 13 + r, ph, 1.2); carrier(c, x + d[0], B.y + 6 + r * 11 + d[1], 'h', 0.9, 2.5);
+      }
+      const sp = clamp(40 - 5.5 * (lg - 14), 10, 40), nrr = Math.max(2, Math.floor(B.h / sp)), dy = B.h / nrr, rr = Math.min(6, sp * 0.36);
+      for (let i = 0; ; i++) {
+        const x = jx + sp / 2 + i * sp; if (x > B.x + B.w - 3) break;
+        for (let r = 0; r < nrr; r++) {
+          const y = B.y + dy * (r + 0.5);
+          if (x < eR) ion(c, x, y, rr, 'd', 1);
+          else if ((i + r) % 2 === 0) { const d = jig(i * 31 + r * 7, ph, 1.8); carrier(c, x + d[0], y + d[1], 'e', 0.95, Math.min(3.4, sp * 0.22)); }
+        }
+      }
+      line(c, jx, B.y, jx, B.y + B.h, 'rgba(255,255,255,.55)', 1.2, [4, 4]);
+      const e0 = jx + W0 * k;
+      if (e0 < B.x + B.w) { line(c, e0, B.y - 8, e0, B.y + B.h, 'rgba(255,255,255,.6)', 1.3, [3, 3]); txt(c, 'V = 0', e0, B.y - 14, C.muted, 10, 600, 'center'); }
+      tag(c, 'p⁺', B.x + 2, B.y + 2); tag(c, 'n', B.x + B.w - 2, B.y + 2, 'right');
+      // width at breakdown
+      const yw = B.y + B.h + 14;
+      darrow(c, jx, eR, yw, C.drift);
+      subs(c, [['W at V', 'Z']], Math.min(eR + 8, B.x + B.w - 70), yw, C.drift, 11, 'left');
+      // scale
+      const ys = B.y + B.h + 36;
+      line(c, jx, ys, B.x + B.w, ys, C.axis, 1);
+      for (let q = 0; q <= 4; q++) {
+        const x = jx + q / 4 * nW;
+        line(c, x, ys - 3, x, ys + 3, C.axis, 1.2);
+        txt(c, fNum(q * Sd / 4) + (q === 4 ? ' µm' : ''), x, ys + 12, C.muted, 10, 500, q === 4 ? 'right' : q === 0 ? 'left' : 'center', MONO);
+      }
+      // field plot
+      const Ye = e => G.y + G.h - e / 1.2e6 * G.h;
+      rect(c, G.x, G.y, G.w, G.h, 'rgba(255,255,255,.02)');
+      [[4e5, '4 × 10⁵'], [8e5, '8 × 10⁵'], [1.2e6, '1.2 × 10⁶']].forEach(e => { line(c, G.x, Ye(e[0]), G.x + G.w, Ye(e[0]), C.grid, 1); txt(c, e[1], G.x - 6, Ye(e[0]), C.muted, 10, 500, 'right', MONO); });
+      txt(c, '|E| (V/cm)', G.x - 6, G.y - 22, C.muted, 11, 600, 'right');
+      line(c, G.x, G.y + G.h, G.x + G.w, G.y + G.h, C.axis, 1.2);
+      line(c, G.x, Ye(1e6), G.x + G.w, Ye(1e6), 'rgba(79,195,247,.55)', 1, [5, 4]);
+      txt(c, 'tunnelling needs ≈ 10⁶ V/cm', G.x + G.w - 4, Ye(1e6) - 9, C.elec, 10, 600, 'right');
+      c.save(); c.beginPath(); c.rect(G.x, G.y, G.w, G.h); c.clip();
+      c.fillStyle = 'rgba(255,213,79,.16)'; c.beginPath(); c.moveTo(jx, Ye(0)); c.lineTo(jx, Ye(Em)); c.lineTo(eR, Ye(0)); c.closePath(); c.fill();
+      pline(c, [[B.x, Ye(0)], [jx, Ye(0)], [jx, Ye(Em)], [eR, Ye(0)]], C.field, 2.4);
+      c.restore();
+      line(c, jx, B.y + B.h, jx, G.y + G.h, 'rgba(255,255,255,.18)', 1, [3, 4]);
+      subs(c, [['E', 'max'], [' = ' + sci(Em, 1) + ' V/cm', '']], jx + 8, Ye(Em) - 10, C.field, 11, 'left');
+      cv.wm(c);
+    }
+    const o = {
+      reset() { ph = 0; lg = 17.6; sync(); Sd = S; },
+      step(dt) { ph += dt; tween(dt); }, tween, draw
+    };
+    A = new Anim('anim0', o);
+    $('s0n').addEventListener('input', e => { lg = +e.target.value; sync(); });
+  })();
+
+  /* =========================================================
+     1. Zener breakdown: band diagram and tunnelling (N = 1e18)
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv1', 720, 460);
+    const G = { x: 70, y: 52, w: 610, h: 330 };
+    const LG = 18, VBI1 = vbiOf(LG), VZ1 = vzOf(LG), EZ1 = emOf(LG, VZ1), ET = 1.9e7;
+    const NMp = 40, NMn = 100, k = G.w / (NMp + NMn), jx = G.x + NMp * k;
+    const Etop = 1.45, Ebot = -3.6, Y = E => G.y + (Etop - E) / (Etop - Ebot) * G.h;
+    const EF = 0.06;
+    let ph, VR, P, acc, A = null;
+    const bandOf = vr => { const Vt = VBI1 + vr, W = wOf(LG, vr) * 1e7; return { Vt, W, ec: xn => xn <= 0 ? EG : xn >= W ? EG - Vt : EG - Vt * (1 - Math.pow(1 - xn / W, 2)) }; };
+    function tun(vr) {
+      const b = bandOf(vr), ov = b.Vt - EG; if (ov <= 0) return null;
+      const Et = -Math.min(0.12, ov / 2), r = 1 - (EG - Et) / b.Vt;
+      return { Et, d: b.W * (1 - Math.sqrt(Math.max(0, r))), ov };
+    }
+    function iTun(vr) {
+      const t = tun(vr); if (!t) return 0;
+      const E = emOf(LG, vr);
+      return 0.02 * Math.pow(E / EZ1, 2) * Math.exp(-ET * (1 / E - 1 / EZ1)) * (1 - Math.exp(-t.ov / 0.03));
+    }
+    function sync() {
+      $('s1v').value = VR; $('o1v').textContent = VR.toFixed(2) + ' V';
+      const t = tun(VR);
+      $('c1v').textContent = VR.toFixed(2) + ' V'; $('c1e').textContent = sci(emOf(LG, VR), 2) + ' V/cm';
+      $('c1d').textContent = t ? t.d.toFixed(1) + ' nm' : 'no overlap'; $('c1i').textContent = fI(iTun(VR));
+      if (A) A.dirty = true;
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const b = bandOf(VR), t = tun(VR), Wpx = b.W * k, far = EG - b.Vt;
+      const xs = []; for (let px = G.x; px <= G.x + G.w + 0.1; px += 2) xs.push(px);
+      const xn = px => (px - jx) / k;
+      // depletion column
+      rect(c, jx, G.y, Math.min(Wpx, G.x + G.w - jx), G.h, 'rgba(255,255,255,.035)');
+      txt(c, 'depletion region', jx + Math.min(Wpx, G.x + G.w - jx) / 2, G.y + G.h - 10, C.muted, 10, 600, 'center');
+      line(c, jx, G.y, jx, G.y + G.h, 'rgba(255,255,255,.25)', 1, [3, 4]);
+      txt(c, 'p⁺ (≈ 10¹⁹ cm⁻³)', jx - 8, 22, '#fff', 12, 700, 'right');
+      txt(c, 'n⁺ (10¹⁸ cm⁻³)', jx + 10, 22, '#fff', 12, 700, 'left');
+      // filled valence band
+      c.fillStyle = 'rgba(79,195,247,.12)'; c.beginPath(); c.moveTo(G.x, G.y + G.h);
+      xs.forEach(px => c.lineTo(px, Y(b.ec(xn(px)) - EG))); c.lineTo(G.x + G.w, G.y + G.h); c.closePath(); c.fill();
+      // electrons sitting in the n-side conduction band
+      for (let i = 0; i < 16; i++) {
+        const x0 = jx + Wpx + 8 + hash(i + 3) * Math.max(10, G.x + G.w - jx - Wpx - 24), d = jig(i, ph, 1.4);
+        carrier(c, x0 + d[0], Y(far) - 4 - hash(i + 9) * 8 + d[1] * 0.4, 'e', 0.8, 3);
+      }
+      pline(c, xs.map(px => [px, Y(b.ec(xn(px)))]), C.band, 2.6);
+      pline(c, xs.map(px => [px, Y(b.ec(xn(px)) - EG)]), C.band, 2.6);
+      // Fermi levels
+      pline(c, [[G.x, Y(EF)], [jx, Y(EF)]], C.volt, 2, [7, 5]);
+      pline(c, [[Math.min(jx + Wpx, G.x + G.w), Y(EF - VR)], [G.x + G.w, Y(EF - VR)]], C.volt, 2, [7, 5]);
+      if (VR > 0.08) {
+        pline(c, [[jx, Y(EF)], [G.x + G.w, Y(EF)]], 'rgba(255,213,79,.25)', 1, [3, 4]);
+        const ax = G.x + G.w - 14, ym = (Y(EF) + Y(EF - VR)) / 2;
+        arrow(c, ax, ym, ax, Y(EF) + 1, C.volt, 1.6, 6); arrow(c, ax, ym, ax, Y(EF - VR) - 1, C.volt, 1.6, 6);
+        subs(c, [['qV', 'R']], ax - 6, ym, C.volt, 11, 'right');
+      }
+      // labels
+      subs(c, [['E', 'c']], G.x - 6, Y(EG), C.band, 12, 'right');
+      subs(c, [['E', 'v']], G.x - 6, Y(0), C.band, 12, 'right');
+      subs(c, [['E', 'F']], G.x + 4, Y(EF) - 10, C.volt, 11, 'left');
+      txt(c, 'filled valence band', G.x + 8, Y(-0.45), C.elec, 10, 600, 'left');
+      // tunnelling path
+      if (t) {
+        const x1 = jx + t.d * k, yt = Y(t.Et);
+        c.fillStyle = 'rgba(206,147,216,.14)'; c.fillRect(jx, yt - 7, x1 - jx, 14);
+        line(c, jx, yt, x1, yt, C.diff, 1.6, [4, 3]);
+        txt(c, 'd = ' + t.d.toFixed(1) + ' nm', jx - 8, yt + 16, C.diff, 11, 700, 'right');
+        P.forEach(p => {
+          const x = jx - 40 + p.t * 150, xe = x1;
+          let y = yt, a = 1;
+          if (x > jx && x < xe) a = 0.35;
+          else if (x >= xe) { const u = clamp((x - xe) / 120, 0, 1); y = Y(lerp(t.Et, far + 0.04, u)); a = x > G.x + G.w - 30 ? Math.max(0, (G.x + G.w - x) / 30) : 1; }
+          c.save(); c.shadowColor = C.elec; c.shadowBlur = 8; carrier(c, x, y, 'e', a, 4); c.restore();
+        });
+      } else {
+        txt(c, 'No overlap yet: the filled p-side states still face the n-side band gap', G.x + G.w / 2, G.y + 26, C.muted, 11, 600, 'center');
+      }
+      cv.wm(c);
+    }
+    const o = {
+      reset() { ph = 0; VR = 1.9; P = []; acc = 0; sync(); },
+      step(dt) {
+        ph += dt;
+        const I = iTun(VR), rate = I > 0 ? Math.min(18, Math.pow(10, (Math.log10(I) + 3) / 1.5)) : 0;
+        acc += rate * dt;
+        while (acc >= 1) { acc -= 1; if (P.length < 60) P.push({ t: 0 }); }
+        P.forEach(p => { p.t += dt; });
+        P = P.filter(p => jx - 40 + p.t * 150 < G.x + G.w);
+      },
+      draw
+    };
+    A = new Anim('anim1', o);
+    $('s1v').addEventListener('input', e => { VR = +e.target.value; if (!tun(VR)) P = []; sync(); });
+  })();
+
+  /* =========================================================
+     2. Avalanche: impact ionisation cascade and M(V)
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv2', 720, 430);
+    const B = { x: 40, y: 50, w: 640, h: 160 }, dL = 170, dR = 560;
+    const G = { x: 96, y: 262, w: 584, h: 130 };
+    const VB2 = vzOf(17), NEXP = 4;
+    const mOf = v => Math.min(1000, 1 / Math.max(1e-3, 1 - Math.pow(v / VB2, NEXP)));
+    let ph, VR, P, F, acc, pairs, A = null;
+    function sync() {
+      $('s2v').value = VR; $('o2v').textContent = VR.toFixed(2) + ' V';
+      const M = mOf(VR);
+      $('c2v').textContent = VR.toFixed(2) + ' V'; $('c2m').textContent = M >= 999 ? '≥ 1000' : M < 10 ? M.toFixed(2) : M.toFixed(0);
+      if (A) A.dirty = true;
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      rect(c, B.x, B.y, dL - B.x, B.h, C.P); rect(c, dR, B.y, B.x + B.w - dR, B.h, C.N);
+      hatch(c, dL, B.y, dR, B.y + B.h);
+      for (let i = 0; i < 14; i++) {
+        const d = jig(i, ph, 1.6);
+        carrier(c, B.x + 10 + hash(i + 1) * (dL - B.x - 20) + d[0], B.y + 10 + hash(i + 2) * (B.h - 20) + d[1], 'h', 0.45, 3);
+        carrier(c, dR + 10 + hash(i + 5) * (B.x + B.w - dR - 20) + d[0], B.y + 10 + hash(i + 6) * (B.h - 20) + d[1], 'e', 0.45, 3);
+      }
+      tag(c, 'p⁺', B.x + 2, B.y + 2); tag(c, 'n', B.x + B.w - 2, B.y + 2, 'right');
+      txt(c, 'depletion region (≈ 1 µm, not to scale)', (dL + dR) / 2, B.y + B.h + 14, C.muted, 10, 600, 'center');
+      arrow(c, dR - 20, 28, dL + 20, 28, C.field, 2, 9);
+      txt(c, 'E', (dL + dR) / 2, 16, C.field, 13, 700, 'center');
+      P.forEach(p => { c.save(); c.shadowColor = p.k === 'h' ? C.hole : C.elec; c.shadowBlur = 7; carrier(c, p.x, p.y, p.k, 1, 3.6); c.restore(); });
+      F.forEach(f => { const u = f.t / 0.5; c.globalAlpha = 1 - u; circ(c, f.x, f.y, 3 + 12 * u, 'rgba(255,213,79,.25)', C.field, 1.8); c.globalAlpha = 1; });
+      const M = mOf(VR);
+      if (M >= 50) txt(c, 'Runaway: only the external resistor now limits the current', (dL + dR) / 2, B.y + 14, C.bad, 11, 700, 'center');
+      // M(V) plot
+      const X = v => G.x + v / (1.05 * VB2) * G.w, Ym = m => G.y + G.h - Math.log10(m) / 3 * G.h;
+      rect(c, G.x, G.y, G.w, G.h, 'rgba(255,255,255,.02)');
+      [1, 10, 100, 1000].forEach(m => { line(c, G.x, Ym(m), G.x + G.w, Ym(m), C.grid, 1); txt(c, String(m), G.x - 6, Ym(m), C.muted, 10, 500, 'right', MONO); });
+      txt(c, 'M', G.x - 6, G.y - 16, C.muted, 11, 700, 'right');
+      line(c, G.x, G.y + G.h, G.x + G.w, G.y + G.h, C.axis, 1.2);
+      for (let v = 0; v <= 10; v += 2) { line(c, X(v), G.y + G.h, X(v), G.y + G.h + 4, C.axis, 1); txt(c, v + (v === 10 ? ' V' : ''), X(v), G.y + G.h + 13, C.muted, 10, 500, 'center', MONO); }
+      const pts = []; for (let v = 0; v < VB2; v += 0.02) pts.push([X(v), Ym(mOf(v))]);
+      pline(c, pts, C.hole, 2.6);
+      line(c, X(VB2), G.y, X(VB2), G.y + G.h, 'rgba(239,83,80,.6)', 1, [4, 3]);
+      subs(c, [['V', 'BR']], X(VB2) + 5, G.y + 10, C.bad, 11, 'left');
+      c.save(); c.shadowColor = C.volt; c.shadowBlur = 10; circ(c, X(VR), Ym(M), 6, C.volt, '#0f1420', 2); c.restore();
+      cv.wm(c);
+    }
+    const o = {
+      reset() { ph = 0; VR = 10.2; P = []; F = []; acc = 0.7; pairs = 0; $('c2p').textContent = '0'; sync(); },
+      step(dt) {
+        ph += dt; acc += dt;
+        if (acc > 0.8) { acc -= 0.8; if (P.length < 240) P.push({ k: 'e', x: dL - 24, y: B.y + 16 + Math.random() * (B.h - 32) }); }
+        const per = (1 - 1 / mOf(VR)) / (dR - dL), sp = 150, born = [];
+        P.forEach(p => {
+          const dx = (p.k === 'e' ? 1 : -1) * sp * dt, inside = p.x > dL && p.x < dR;
+          p.x += dx; p.y = clamp(p.y + (Math.random() - 0.5) * 50 * dt, B.y + 8, B.y + B.h - 8);
+          if (inside && P.length + born.length < 260 && Math.random() < per * Math.abs(dx)) {
+            born.push({ k: 'e', x: p.x, y: clamp(p.y + 7, B.y + 8, B.y + B.h - 8) }, { k: 'h', x: p.x, y: clamp(p.y - 7, B.y + 8, B.y + B.h - 8) });
+            F.push({ x: p.x, y: p.y, t: 0 }); pairs++;
+          }
+        });
+        P = P.concat(born).filter(p => p.x > B.x + 4 && p.x < B.x + B.w - 4);
+        F.forEach(f => { f.t += dt; }); F = F.filter(f => f.t < 0.5);
+        $('c2p').textContent = String(pairs);
+      },
+      draw
+    };
+    A = new Anim('anim2', o);
+    $('s2v').addEventListener('input', e => { VR = +e.target.value; sync(); });
+  })();
+
+  /* =========================================================
+     3. V-I characteristic with datasheet parameters
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv3', 720, 470);
+    const G = { x: 40, y: 24, w: 640, h: 420 };
+    let ph, z, V, A = null;
+    function sync() {
+      $('s3v').value = V; $('o3v').textContent = fV(V);
+      $('c3v').textContent = fV(V); $('c3i').textContent = fI(iOf(z, V));
+      $('c3r').textContent = regionOf(z, V); $('c3z').textContent = fR(rDyn(z, V));
+      if (A) A.dirty = true;
+    }
+    function setZ(v) {
+      z = zd(+v);
+      const s = $('s3v'); s.min = (-(vRev(z, 1.15 * z.IZM) + 0.3)).toFixed(2);
+      V = -z.vz; sync();
+    }
+    const setSeg = segBtns('#anim3', 'vz', setZ);
+    const o = {
+      reset() { ph = 0; setSeg('5.1'); },
+      step(dt) { ph += dt; },
+      draw() { const c = cv.begin(); if (!c) return; ivZ(c, G, z, V, ph); cv.wm(c); }
+    };
+    A = new Anim('anim3', o);
+    $('s3v').addEventListener('input', e => { V = +e.target.value; sync(); });
+  })();
+
+  /* =========================================================
+     4. Temperature coefficient
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv4', 720, 440);
+    const G1 = { x: 96, y: 34, w: 584, h: 170 }, G2 = { x: 96, y: 268, w: 584, h: 130 };
+    let ph, vz, T, A = null;
+    function sync() {
+      $('s4z').value = vz; $('s4t').value = T;
+      $('o4z').textContent = vz.toFixed(1) + ' V'; $('o4t').textContent = T + ' °C';
+      const tc = tcmV(vz), d = tc / 1000 * (T - 25);
+      $('c4t').textContent = (tc >= 0 ? '+' : '−') + Math.abs(tc).toFixed(2) + ' mV/°C';
+      $('c4p').textContent = (tc >= 0 ? '+' : '−') + Math.abs(tcPct(vz)).toFixed(3) + ' %/°C';
+      $('c4d').textContent = (d >= 0 ? '+' : '−') + Math.abs(d).toFixed(3) + ' V';
+      $('c4z').textContent = (vz + d).toFixed(2) + ' V';
+      if (A) A.dirty = true;
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      // TC vs VZ
+      const X1 = v => G1.x + (v - 2) / 18 * G1.w, Y1 = t => G1.y + (16 - t) / 20 * G1.h;
+      rect(c, X1(2), G1.y, X1(4.5) - X1(2), G1.h, 'rgba(79,195,247,.08)');
+      rect(c, X1(4.5), G1.y, X1(6.7) - X1(4.5), G1.h, 'rgba(206,147,216,.10)');
+      rect(c, X1(6.7), G1.y, X1(20) - X1(6.7), G1.h, 'rgba(255,138,101,.06)');
+      txt(c, 'Zener', (X1(2) + X1(4.5)) / 2, G1.y + 12, C.elec, 10, 700, 'center');
+      txt(c, 'both', (X1(4.5) + X1(6.7)) / 2, G1.y + 12, C.diff, 10, 700, 'center');
+      txt(c, 'avalanche', (X1(6.7) + X1(20)) / 2, G1.y + 12, C.hole, 10, 700, 'center');
+      [-4, 0, 4, 8, 12, 16].forEach(t => { line(c, G1.x, Y1(t), G1.x + G1.w, Y1(t), t === 0 ? 'rgba(255,255,255,.35)' : C.grid, 1); txt(c, (t > 0 ? '+' : t < 0 ? '−' : '') + Math.abs(t), G1.x - 6, Y1(t), C.muted, 10, 500, 'right', MONO); });
+      txt(c, 'TC (mV/°C)', G1.x - 6, G1.y - 20, C.muted, 11, 600, 'right');
+      [2, 5, 10, 15, 20].forEach(v => { line(c, X1(v), G1.y + G1.h, X1(v), G1.y + G1.h + 4, C.axis, 1); txt(c, v + (v === 20 ? ' V' : ''), X1(v), G1.y + G1.h + 13, C.muted, 10, 500, v === 20 ? 'right' : 'center', MONO); });
+      subs(c, [['V', 'Z']], G1.x + G1.w / 2, G1.y + G1.h + 28, C.muted, 11, 'center');
+      line(c, G1.x, G1.y + G1.h, G1.x + G1.w, G1.y + G1.h, C.axis, 1.2);
+      const pts = []; for (let v = 2; v <= 20; v += 0.05) pts.push([X1(v), Y1(tcmV(v))]);
+      pline(c, pts, C.text, 2.4);
+      const tc = tcmV(vz);
+      line(c, X1(vz), G1.y + G1.h, X1(vz), Y1(tc), 'rgba(255,213,79,.4)', 1, [2, 3]);
+      c.save(); c.shadowColor = C.volt; c.shadowBlur = 8 + 6 * Math.sin(ph * 4); circ(c, X1(vz), Y1(tc), 6, mechCol(vz), '#0f1420', 2); c.restore();
+      // knee shift
+      const z = zd(vz), sh = tc / 1000 * (T - 25);
+      const lo = vz - 1.2 - Math.max(0, -sh), hi = vz + 0.5 + Math.max(0, sh);
+      const X2 = v => G2.x + (v - lo) / (hi - lo) * G2.w, Y2 = i => G2.y + G2.h - i / 0.04 * G2.h;
+      rect(c, G2.x, G2.y, G2.w, G2.h, 'rgba(255,255,255,.02)');
+      [0, 20, 40].forEach(m => { line(c, G2.x, Y2(m / 1000), G2.x + G2.w, Y2(m / 1000), C.grid, 1); txt(c, String(m), G2.x - 6, Y2(m / 1000), C.muted, 10, 500, 'right', MONO); });
+      subs(c, [['I', 'Z'], [' (mA)', '']], G2.x - 6, G2.y - 12, C.muted, 11, 'right');
+      line(c, G2.x, G2.y + G2.h, G2.x + G2.w, G2.y + G2.h, C.axis, 1.2);
+      const vstep = niceStep((hi - lo) / 5);
+      const vdec = vstep >= 1 ? 0 : vstep >= 0.1 ? 1 : 2;
+      for (let v = Math.ceil(lo / vstep - 1e-9) * vstep; v <= hi + 1e-9; v += vstep) { line(c, X2(v), G2.y + G2.h, X2(v), G2.y + G2.h + 4, C.axis, 1); txt(c, v.toFixed(vdec), X2(v), G2.y + G2.h + 13, C.muted, 10, 500, 'center', MONO); }
+      txt(c, 'reverse voltage |V| (V)', G2.x + G2.w / 2, G2.y + G2.h + 28, C.muted, 10, 600, 'center');
+      c.save(); c.beginPath(); c.rect(G2.x, G2.y, G2.w, G2.h); c.clip();
+      const p25 = [], pT = [];
+      for (let px = G2.x; px <= G2.x + G2.w; px += 1.5) {
+        const v = lo + (px - G2.x) / G2.w * (hi - lo);
+        p25.push([px, Y2(Math.min(0.045, iBd(z, v)))]); pT.push([px, Y2(Math.min(0.045, iBd(z, v - sh)))]);
+      }
+      pline(c, p25, C.metal, 2.2, [6, 4]); pline(c, pT, C.hot, 2.6);
+      c.restore();
+      const yt = Y2(z.IZT);
+      circ(c, X2(vz), yt, 4, C.metal); circ(c, X2(vz + sh), yt, 4, C.hot);
+      if (Math.abs(X2(vz + sh) - X2(vz)) > 14) arrow(c, X2(vz), yt - 14, X2(vz + sh), yt - 14, C.volt, 1.8, 7);
+      subs(c, [['ΔV', 'Z'], [' = ' + (sh >= 0 ? '+' : '−') + Math.abs(sh).toFixed(2) + ' V', '']], (X2(vz) + X2(vz + sh)) / 2, yt - 28, C.volt, 11, 'center');
+      txt(c, '25 °C', G2.x + 8, G2.y + 12, C.metal, 11, 700, 'left');
+      txt(c, T + ' °C', G2.x + 8, G2.y + 28, C.hot, 11, 700, 'left');
+      cv.wm(c);
+    }
+    const o = { reset() { ph = 0; vz = 12; T = 100; sync(); }, step(dt) { ph += dt; }, draw };
+    A = new Anim('anim4', o);
+    $('s4z').addEventListener('input', e => { vz = +e.target.value; sync(); });
+    $('s4t').addEventListener('input', e => { T = +e.target.value; sync(); });
+  })();
+
+  /* =========================================================
+     5. Summary: any VZ
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv5', 720, 470);
+    const G = { x: 40, y: 84, w: 640, h: 360 };
+    let ph, vz, A = null;
+    function sync() {
+      $('s5z').value = vz; $('o5z').textContent = vz.toFixed(1) + ' V';
+      const tc = tcmV(vz);
+      $('c5z').textContent = vz.toFixed(1) + ' V'; $('c5n').textContent = sci(Math.pow(10, lgOfVz(vz)), 1) + ' cm⁻³';
+      $('c5m').textContent = mechOf(vz); $('c5t').textContent = (tc >= 0 ? '+' : '−') + Math.abs(tc).toFixed(1) + ' mV/°C';
+      if (A) A.dirty = true;
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const z = zd(vz), mc = mechCol(vz), tc = tcmV(vz);
+      zsym(c, 110, 38, mc);
+      subs(c, [['V', 'Z'], [' = ' + vz.toFixed(1) + ' V', '']], 220, 28, C.volt, 16, 'left');
+      txt(c, mechOf(vz) + ' · ' + (vz < 4.5 ? 'soft knee' : vz > 6.7 ? 'sharp knee' : 'medium knee') + ' · TC ' + (tc >= 0 ? '+' : '−') + Math.abs(tc).toFixed(1) + ' mV/°C', 220, 54, mc, 12, 700, 'left');
+      subs(c, [['I', 'ZM'], [' = 0.5 W / ' + vz.toFixed(1) + ' V = ' + (z.IZM * 1000).toFixed(0) + ' mA', '']], 680, 28, C.muted, 11, 'right');
+      ivZ(c, G, z, -vz, ph);
+      cv.wm(c);
+    }
+    const o = { reset() { ph = 0; vz = 5.1; sync(); }, step(dt) { ph += dt; }, draw };
+    A = new Anim('anim5', o);
+    $('s5z').addEventListener('input', e => { vz = +e.target.value; sync(); });
+  })();
+
+  /* ---------- sticky mini-nav highlight ---------- */
+  (function () {
+    const links = Array.from(document.querySelectorAll('.toc a'));
+    const secs = links.map(l => document.querySelector(l.getAttribute('href')));
+    function upd() {
+      let cur = 0;
+      secs.forEach((s, i) => { if (s.getBoundingClientRect().top < 120) cur = i; });
+      links.forEach((l, i) => l.classList.toggle('active', i === cur));
+    }
+    window.addEventListener('scroll', upd, { passive: true }); upd();
+  })();
+
+  let last = performance.now();
+  function frameLoop(ts) {
+    const dt = Math.min(0.05, Math.max(0, (ts - last) / 1000)); last = ts;
+    anims.forEach(a => {
+      if (!a.visible) return;
+      if (a.playing) { a.o.step(dt); a.o.draw(); }
+      else if (a.o.tween && a.o.tween(dt)) a.o.draw();
+      else if (a.dirty) a.o.draw();
+      a.dirty = false;
+    });
+    requestAnimationFrame(frameLoop);
+  }
+  function onResize() { anims.forEach(a => { a.dirty = true; }); }
+  window.addEventListener('resize', onResize);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(onResize);
+  requestAnimationFrame(frameLoop);
+})();
+</script>
+</body>
+</html>
