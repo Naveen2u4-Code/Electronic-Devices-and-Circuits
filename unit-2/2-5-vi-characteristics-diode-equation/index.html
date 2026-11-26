@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>2.5 V-I Characteristics and the Diode Equation</title>
+  <meta name="description" content="The pn junction diode's V-I characteristic and the Shockley diode equation: what each term means, why the forward current is a straight line on a log scale (60 mV per decade), the ideality factor and series resistance, and why the cut-in voltage depends on the scale you look at. An interactive lesson.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1420;
+      --panel: #1a2132;
+      --panel-hover: #212a3f;
+      --border: #2a3448;
+      --text: #e6e9ef;
+      --muted: #9aa4b8;
+      --electron: #4fc3f7;
+      --hole: #ff8a65;
+      --energy: #ffd54f;
+      --success: #81c784;
+      --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+      --max: 960px;
+      --radius: 12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: var(--font); font-size: 16px; line-height: 1.65;
+      overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column;
+    }
+    a { color: var(--electron); }
+    .wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 16px; }
+
+    /* Sticky mini-nav */
+    .toc {
+      position: sticky; top: 0; z-index: 10; background: rgba(15, 20, 32, .95);
+      border-bottom: 1px solid var(--border); backdrop-filter: blur(6px);
+    }
+    .toc ul { display: flex; gap: 4px; list-style: none; margin: 0 auto; padding: 8px 16px; max-width: var(--max); overflow-x: auto; scrollbar-width: none; }
+    .toc ul::-webkit-scrollbar { display: none; }
+    .toc a {
+      display: block; white-space: nowrap; text-decoration: none; color: var(--muted);
+      font-size: 0.85rem; font-weight: 500; padding: 6px 10px; border-radius: 999px;
+    }
+    .toc a:hover { color: var(--text); background: var(--panel); }
+    .toc a.active { color: var(--bg); background: var(--electron); }
+
+    main { flex: 1; padding: 24px 0 48px; }
+    .crumbs { font-size: 0.875rem; color: var(--muted); margin: 0 0 16px; }
+    .crumbs a { color: var(--muted); }
+    .crumbs a:hover { color: var(--electron); }
+    .eyebrow { font-family: var(--mono); font-size: 0.8rem; color: var(--electron); letter-spacing: .04em; margin: 0; }
+    h1 { font-size: clamp(1.5rem, 6vw, 2.2rem); line-height: 1.2; margin: 4px 0 6px; }
+    .subtitle { color: var(--muted); margin: 0 0 8px; }
+    section { scroll-margin-top: 64px; padding-top: 28px; }
+    h2 { font-size: clamp(1.3rem, 5vw, 1.6rem); line-height: 1.25; margin: 0 0 14px; }
+    h3 { font-size: 1.05rem; margin: 0 0 8px; }
+    .prose { font-size: 17px; line-height: 1.7; max-width: 70ch; }
+    .prose p, .prose ul, .prose ol { margin: 0 0 14px; }
+    .prose ul, .prose ol { padding-left: 22px; }
+    .prose li { margin: 4px 0; }
+    .prose strong { color: #fff; }
+    .prose p.eq { text-align: center; font-family: var(--mono); font-size: 16px; background: #141b2b; border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; overflow-wrap: anywhere; }
+    hr.sep { border: 0; border-top: 1px solid var(--border); margin: 40px 0 0; }
+    .rm-note { font-size: 0.78rem; color: var(--muted); margin: 0 0 8px; }
+
+    /* Buttons & controls */
+    .btn {
+      font: inherit; font-size: 0.88rem; font-weight: 600; color: var(--text);
+      background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+      padding: 7px 12px; cursor: pointer; min-height: 38px;
+    }
+    .btn:hover:not(:disabled) { background: var(--panel-hover); border-color: var(--electron); }
+    .btn:focus-visible, input:focus-visible, canvas:focus-visible { outline: 2px solid var(--electron); outline-offset: 2px; }
+    .btn[aria-pressed="true"] { background: rgba(255,213,79,.14); border-color: var(--energy); color: var(--energy); }
+    .seg { display: inline-flex; flex-wrap: nowrap; }
+    .seg .btn { border-radius: 0; padding: 7px 12px; }
+    .seg .btn:first-child { border-radius: 8px 0 0 8px; }
+    .seg .btn:last-child { border-radius: 0 8px 8px 0; }
+    .seg .btn + .btn { margin-left: -1px; }
+
+    figure.anim {
+      margin: 18px 0 0; background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 12px; min-width: 0;
+    }
+    .ctrls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-bottom: 12px; }
+    .sliders { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-bottom: 12px; }
+    .slider { flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; }
+    .slider label { display: flex; justify-content: space-between; gap: 8px; font-size: 0.8rem; color: var(--muted); }
+    .slider output { font-family: var(--mono); color: var(--energy); white-space: nowrap; }
+    input[type="range"] { width: 100%; accent-color: var(--energy); margin: 4px 0 0; }
+    canvas { display: block; width: 100%; border-radius: 8px; background: #141b2b; }
+    .narrow { max-width: 820px; margin-left: auto; margin-right: auto; }
+
+    .counters { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px auto 0; }
+    .ctr {
+      flex: 1 1 110px; background: #141b2b; border: 1px solid var(--border); border-radius: 8px;
+      padding: 6px 10px; font-size: 0.78rem; color: var(--muted); min-width: 0;
+    }
+    .ctr b { display: block; font-family: var(--mono); font-size: 1rem; font-weight: 500; color: var(--text); overflow-wrap: anywhere; }
+    .ctr.v b { color: var(--energy); } .ctr.p b { color: #ef9a9a; } .ctr.n b { color: #90caf9; } .ctr.w b { color: var(--success); }
+    .ctr.b b { color: #ce93d8; } .ctr.q b { color: #ff8a65; } .ctr.e b { color: #4fc3f7; } .ctr.g b { color: #fff59d; }
+
+    .keypoints {
+      margin-top: 16px; padding: 14px 16px; border-radius: var(--radius);
+      background: rgba(129,199,132,.07); border: 1px solid rgba(129,199,132,.35);
+    }
+    .keypoints h3 { color: var(--success); font-size: 0.95rem; text-transform: uppercase; letter-spacing: .05em; }
+    .keypoints ul { margin: 0; padding-left: 20px; }
+    .keypoints li { margin: 4px 0; }
+
+    .further { margin-top: 48px; color: var(--muted); font-size: 0.85rem; }
+    .further h3 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 0 0 6px; }
+    .further ul { margin: 0; padding-left: 18px; }
+    .further li { margin: 3px 0; }
+
+    .pager { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 32px; }
+    .pager a {
+      display: block; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 12px 14px; text-decoration: none; color: var(--text); min-width: 0;
+    }
+    .pager a:hover { border-color: var(--electron); }
+    .pager small { display: block; color: var(--muted); font-size: 0.75rem; }
+    .pager .next { text-align: right; }
+    .site-foot { border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; text-align: center; padding: 18px 16px; }
+
+    /* Justified paragraphs on desktop; phones stay left-aligned to avoid wide word gaps. */
+    @media (min-width: 768px) {
+      .prose p, .prose li, .keypoints li { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+      .prose p.eq { text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="toc" aria-label="Sections">
+    <ul>
+      <li><a href="#s0">The V-I curve</a></li>
+      <li><a href="#s1">Diode equation</a></li>
+      <li><a href="#s2">Log scale</a></li>
+      <li><a href="#s3">Ideality factor</a></li>
+      <li><a href="#s4">Cut-in voltage</a></li>
+      <li><a href="#s5">Summary</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="wrap">
+      <header>
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="../../index.html">Home</a> / <a href="../index.html">Unit 2</a> / 2.5
+        </nav>
+        <p class="eyebrow">TOPIC 2.5</p>
+        <h1>V-I Characteristics and the Diode Equation</h1>
+        <p class="subtitle">One exponential law for both directions, and what it really says</p>
+        <p class="rm-note" id="rmNote" hidden>Your device asks for reduced motion, so every animation starts paused. Press Play on any animation to run it. Sliders and buttons still update the picture.</p>
+      </header>
+
+      <!-- ================= SECTION 0 ================= -->
+      <section id="s0" aria-labelledby="h0">
+        <h2 id="h0">The V-I characteristic</h2>
+        <div class="prose">
+          <p>The <strong>V-I CHARACTERISTIC</strong> of a diode is the graph of the current I through it against the voltage V across it. The usual sign convention: V is positive when the p side (the <strong>ANODE</strong>) is positive, and I is positive when it flows from p to n, anode to cathode.</p>
+          <p>Topics 2.3 and 2.4 gave the two halves. Put together, the curve has three regions:</p>
+          <ul>
+            <li><strong>FORWARD</strong> (V &gt; 0): almost nothing flows until a few tenths of a volt, then the current rises very steeply. For the example silicon diode used throughout this unit, I is about <strong>1 µA at 0.52 V</strong> and <strong>1 mA at 0.70 V</strong>.</li>
+            <li><strong>REVERSE</strong> (V &lt; 0): only a tiny current flows, a few picoamperes here, rising slowly as the depletion region widens (topic 2.4).</li>
+            <li><strong>BREAKDOWN</strong>: at a large enough reverse voltage, about 60 V for this doping, the reverse current shoots up (topic 2.9).</li>
+          </ul>
+          <p>The forward current is measured in milliamperes and the reverse current in picoamperes, so textbook plots use <strong>DIFFERENT SCALES</strong> in the four directions. The plot below does the same. Read the axis labels: a picoampere is a thousand million times smaller than a milliampere.</p>
+        </div>
+
+        <figure class="anim" id="anim0">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s0u"><span>Applied voltage V</span><output id="o0u"></output></label><input type="range" id="s0u" min="-1" max="1" step="0.001" value="0.875" aria-describedby="s0hint"></div>
+          </div>
+          <p class="rm-note" id="s0hint">Left of centre: reverse, 0 to −70 V. Right of centre: forward, 0 to 0.8 V.</p>
+          <div class="narrow">
+            <canvas id="cv0" style="aspect-ratio:720/560" role="img" aria-label="Top: a circuit with a variable battery and a diode; dots showing conventional current flow quickly around the loop in forward bias, barely move in reverse bias, and race the other way in breakdown. Bottom: the full V-I characteristic with forward current in milliamperes upward, reverse current in picoamperes downward, forward voltage to 0.8 V on the right and reverse voltage to minus 70 V on the left. A dot marks the present operating point, and a dashed line marks the breakdown voltage near minus 60 V."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr v"><span>V</span><b id="c0v"></b></div>
+            <div class="ctr w"><span>I</span><b id="c0i"></b></div>
+            <div class="ctr b"><span>Region</span><b id="c0r"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: the V-I characteristic">
+          <h3>Key points</h3>
+          <ul>
+            <li>V positive when the anode (p) is positive; I positive from anode to cathode.</li>
+            <li>Forward: tiny current, then a steep rise (1 mA at about 0.70 V for the silicon example).</li>
+            <li>Reverse: picoamperes, nearly flat; breakdown near 60 V here.</li>
+            <li>Forward and reverse are drawn on very different scales.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 1 ================= -->
+      <section id="s1" aria-labelledby="h1s">
+        <h2 id="h1s">The diode equation</h2>
+        <div class="prose">
+          <p>The ideal pn junction theory gives one formula for both directions, the <strong>DIODE EQUATION</strong> (also called the Shockley equation):</p>
+          <p class="eq">I = I<sub>S</sub> · [ exp(V / ηV<sub>T</sub>) − 1 ]</p>
+          <ul>
+            <li>I<sub>S</sub> is the <strong>reverse saturation current</strong> from topic 2.4, about 1.7 fA for the example silicon diode.</li>
+            <li>V<sub>T</sub> = kT/q is the <strong>THERMAL VOLTAGE</strong>: <strong>25.9 mV at 300 K</strong>, often rounded to 26 mV or 25 mV.</li>
+            <li>η (some books write n) is the <strong>IDEALITY FACTOR</strong>, between 1 and 2. For the ideal diode η = 1; section 4 explains where 2 comes from.</li>
+          </ul>
+          <p>Each term has a physical meaning. Lowering the barrier by V multiplies the number of majority carriers that can climb over it by the Boltzmann factor exp(V/V<sub>T</sub>): that is the <strong>I<sub>S</sub>·exp(V/V<sub>T</sub>)</strong> term, the injected carriers of topic 2.3. Minority carriers that reach the junction are swept back across whatever the barrier height: that is the <strong>−I<sub>S</sub></strong> term, independent of V. At V = 0 the two flows are equal and I = 0.</p>
+          <p>Two useful limits follow (with η = 1):</p>
+          <p class="eq">V &gt; 4V<sub>T</sub> (≈ 0.1 V): &nbsp; I ≈ I<sub>S</sub> · exp(V/V<sub>T</sub>) &nbsp;&nbsp;|&nbsp;&nbsp; V &lt; −4V<sub>T</sub>: &nbsp; I ≈ −I<sub>S</sub></p>
+          <p>At ±0.1 V each approximation is already within about 2%. Turning the equation round gives the voltage needed for a given current:</p>
+          <p class="eq">V = ηV<sub>T</sub> · ln(1 + I/I<sub>S</sub>)</p>
+        </div>
+
+        <figure class="anim" id="anim1">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s1v"><span>Applied voltage V</span><output id="o1v"></output></label><input type="range" id="s1v" min="-0.15" max="0.1" step="0.001" value="0.05"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv1" style="aspect-ratio:720/600" role="img" aria-label="Top: an energy hill for holes between the p side, crowded with holes, and the n side, with only a few minority holes. Holes from the p side occasionally climb over the hill, at a rate that grows exponentially as the applied voltage lowers the hill; minority holes on the n side roll down at a steady rate. Middle: two bars on a log scale compare the climbing flow, IS times exp of V over VT, with the steady swept-back flow IS. Bottom: I divided by IS against V near zero, rising steeply for positive V and flattening at minus 1 for negative V."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr b"><span>V / V<sub>T</sub></span><b id="c1x"></b></div>
+            <div class="ctr q"><span>exp(V/V<sub>T</sub>)</span><b id="c1e"></b></div>
+            <div class="ctr w"><span>I / I<sub>S</sub></span><b id="c1r"></b></div>
+            <div class="ctr v"><span>I (Si example)</span><b id="c1i"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: diode equation">
+          <h3>Key points</h3>
+          <ul>
+            <li>I = I<sub>S</sub>[exp(V/ηV<sub>T</sub>) − 1], with V<sub>T</sub> = kT/q = 25.9 mV at 300 K.</li>
+            <li>exp(V/V<sub>T</sub>): carriers injected over the lowered barrier. −1: minority carriers swept back.</li>
+            <li>V &gt; 0.1 V: I ≈ I<sub>S</sub>·exp(V/V<sub>T</sub>). V &lt; −0.1 V: I ≈ −I<sub>S</sub>.</li>
+            <li>Inverse form: V = ηV<sub>T</sub>·ln(1 + I/I<sub>S</sub>).</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 2 ================= -->
+      <section id="s2" aria-labelledby="h2s">
+        <h2 id="h2s">A straight line on a log scale</h2>
+        <div class="prose">
+          <p>In forward bias, taking the logarithm of I ≈ I<sub>S</sub>·exp(V/ηV<sub>T</sub>) gives</p>
+          <p class="eq">ln I = ln I<sub>S</sub> + V / ηV<sub>T</sub></p>
+          <p>So if the current is plotted on a <strong>LOG SCALE</strong>, the forward characteristic is a <strong>STRAIGHT LINE</strong>. Extended back to V = 0, it meets the current axis at I<sub>S</sub>. The slope gives the rule every circuit designer uses:</p>
+          <p class="eq">ΔV = ηV<sub>T</sub> · ln(I<sub>2</sub>/I<sub>1</sub>) = 2.3·ηV<sub>T</sub> · log<sub>10</sub>(I<sub>2</sub>/I<sub>1</sub>)</p>
+          <p>For η = 1, each <strong>×10 in current needs only 59.6 mV more</strong> (often rounded to 60 mV), and doubling the current needs 18 mV. For the example silicon diode: 1 µA at 0.523 V, 1 mA at 0.702 V, 10 mA at 0.761 V. Six decades of current over only 0.18 V.</p>
+          <p>Germanium has the same slope, but its I<sub>S</sub> is about 2.6 million times larger (topic 2.4). Its line is shifted left by V<sub>T</sub>·ln(2.6 × 10<sup>6</sup>) ≈ <strong>0.38 V</strong>, so the same 1 mA flows at about <strong>0.32 V</strong>.</p>
+        </div>
+
+        <figure class="anim" id="anim2">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <span class="seg" role="group" aria-label="Material">
+              <button class="btn" type="button" data-mat="si" aria-pressed="true">Si</button>
+              <button class="btn" type="button" data-mat="ge" aria-pressed="false">Ge</button>
+            </span>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s2v"><span>Forward voltage V</span><output id="o2v"></output></label><input type="range" id="s2v" min="0" max="0.9" step="0.001" value="0.7"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv2" style="aspect-ratio:720/460" role="img" aria-label="Forward current on a logarithmic axis from 1 femtoampere to 100 milliamperes against forward voltage from 0 to 0.9 V. The ideal silicon and germanium characteristics are parallel straight lines, germanium about 0.38 V to the left. A dot marks the operating point on the selected material, with a step showing that 59.6 mV more voltage gives ten times the current. Pressing Play sweeps the dot along the line."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr w"><span>I</span><b id="c2i"></b></div>
+            <div class="ctr q"><span>I<sub>S</sub></span><b id="c2s"></b></div>
+            <div class="ctr v"><span>V for 10 × I</span><b id="c2t"></b></div>
+            <div class="ctr b"><span>V for 2 × I</span><b id="c2d"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: log scale">
+          <h3>Key points</h3>
+          <ul>
+            <li>On a log current scale the forward characteristic is a straight line that meets V = 0 at I<sub>S</sub>.</li>
+            <li>ΔV = ηV<sub>T</sub>·ln(I<sub>2</sub>/I<sub>1</sub>): 59.6 mV per decade and 18 mV per doubling for η = 1.</li>
+            <li>Silicon example: 1 µA at 0.52 V, 1 mA at 0.70 V, 10 mA at 0.76 V.</li>
+            <li>Germanium: same slope, about 0.38 V to the left (1 mA at about 0.32 V).</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 3 ================= -->
+      <section id="s3" aria-labelledby="h3s">
+        <h2 id="h3s">The ideality factor and series resistance</h2>
+        <div class="prose">
+          <p>A real silicon diode follows the ideal line only over its middle range. Two effects bend it:</p>
+          <ul>
+            <li><strong>RECOMBINATION IN THE DEPLETION REGION.</strong> Some injected electrons and holes recombine while crossing the depletion region. This adds a current I<sub>rec</sub> = I<sub>R0</sub>·[exp(V/2V<sub>T</sub>) − 1] with η = 2. It is the forward-bias partner of the generation current of topic 2.4, and I<sub>R0</sub> is the same few picoamperes (about 4 pA here). I<sub>R0</sub> is much larger than I<sub>S</sub> but grows only half as fast, so it dominates at low current: below about <strong>0.4 V (20 nA)</strong> for the example diode, where the line has a slope of 119 mV per decade.</li>
+            <li><strong>SERIES RESISTANCE.</strong> The neutral regions and contacts have a resistance R<sub>S</sub>, typically a few ohms. The junction sees only V<sub>j</sub> = V − I·R<sub>S</sub>. At high current, the I·R<sub>S</sub> drop takes over: with R<sub>S</sub> = 5 Ω, 20 mA needs an extra 0.1 V and the log plot bends over.</li>
+          </ul>
+          <p>At very high currents, <strong>high-level injection</strong> (minority carriers as many as the majority doping) also pushes the slope toward η = 2.</p>
+          <p>In practice, η is a number fitted to the measured curve. The local value is η = (1/V<sub>T</sub>)·dV/d(ln I). Books differ: Millman takes η = 1 for germanium and η ≈ 2 for silicon at small currents; Sedra and Smith write n and use values between 1 and 2.</p>
+        </div>
+
+        <figure class="anim" id="anim3">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s3v"><span>Applied voltage V</span><output id="o3v"></output></label><input type="range" id="s3v" min="0.05" max="1" step="0.005" value="0.3"></div>
+            <div class="slider"><label for="s3r"><span>Series resistance R<sub>S</sub></span><output id="o3r"></output></label><input type="range" id="s3r" min="0" max="20" step="0.5" value="5"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv3" style="aspect-ratio:720/480" role="img" aria-label="Forward current on a logarithmic axis against applied voltage from 0 to 1 V for a realistic silicon diode. A dashed straight line with slope 59.6 mV per decade shows the ideal diffusion current, a shallower dashed line with slope 119 mV per decade shows the recombination current, and the solid total follows the recombination line at low voltage, the diffusion line in the middle, and bends over at high current because of series resistance. A dot marks the operating point; pressing Play sweeps it along the curve."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr w"><span>I</span><b id="c3i"></b></div>
+            <div class="ctr b"><span>Local η</span><b id="c3n"></b></div>
+            <div class="ctr e"><span>Junction V<sub>j</sub></span><b id="c3j"></b></div>
+            <div class="ctr v"><span>I·R<sub>S</sub></span><b id="c3d"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: ideality factor">
+          <h3>Key points</h3>
+          <ul>
+            <li>Recombination in the depletion region: η = 2, dominates at low current (below about 0.4 V here).</li>
+            <li>Diffusion (ideal): η = 1, dominates in the middle range.</li>
+            <li>Series resistance R<sub>S</sub>: V = V<sub>j</sub> + I·R<sub>S</sub>, bends the curve at high current.</li>
+            <li>η is fitted to measurements; books use 1 to 2 (Millman: 1 for Ge, ≈ 2 for Si at small currents).</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 4 ================= -->
+      <section id="s4" aria-labelledby="h4s">
+        <h2 id="h4s">The cut-in voltage</h2>
+        <div class="prose">
+          <p>On a linear scale, the exponential looks like zero followed by a sharp “knee”. The voltage at which the current starts to become noticeable is called the <strong>CUT-IN VOLTAGE</strong> V<sub>γ</sub> (also threshold, offset or turn-on voltage). A common definition is the voltage at which the current reaches about <strong>1% of the rated (full-scale) current</strong>. Textbooks quote about 0.5 to 0.7 V for silicon and 0.1 to 0.3 V for germanium.</p>
+          <p>But the knee is <strong>NOT</strong> a property of the diode alone. The exponential has no corner: it only seems to have one because of the scale used. Zoom out by ×100 and the knee moves right by 2 × 59.6 ≈ 119 mV. For the example diodes, with the 1% definition:</p>
+          <ul>
+            <li>full scale 10 µA: Si about <strong>0.46 V</strong>, Ge about <strong>0.08 V</strong></li>
+            <li>full scale 1 mA: Si about <strong>0.58 V</strong>, Ge about <strong>0.20 V</strong></li>
+            <li>full scale 100 mA: Si about <strong>0.70 V</strong>, Ge about <strong>0.32 V</strong></li>
+          </ul>
+          <p>Germanium turns on about 0.38 V earlier at every scale because of its larger I<sub>S</sub>. In circuit analysis (Unit 4), a conducting diode is often replaced by a constant drop of <strong>0.7 V for silicon</strong> and <strong>0.3 V for germanium</strong>, which matches the milliampere-to-100 mA range where most diodes work.</p>
+        </div>
+
+        <figure class="anim" id="anim4">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <span class="seg" role="group" aria-label="Full-scale current">
+              <button class="btn" type="button" data-fs="-5" aria-pressed="false">10 µA</button>
+              <button class="btn" type="button" data-fs="-3" aria-pressed="false">1 mA</button>
+              <button class="btn" type="button" data-fs="-1" aria-pressed="false">100 mA</button>
+            </span>
+          </div>
+          <div class="narrow">
+            <canvas id="cv4" style="aspect-ratio:720/430" role="img" aria-label="Forward current on a linear axis against voltage from 0 to 1 V for the silicon and germanium example diodes. The full-scale current changes, either with the buttons or, when playing, smoothly between 10 microamperes and 100 milliamperes. Both curves keep the same knee shape but slide to the right as the scale grows, and dashed markers show the cut-in voltage of each, where the current reaches 1% of full scale."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr v"><span>Full scale</span><b id="c4f"></b></div>
+            <div class="ctr e"><span>V<sub>γ</sub> (Si)</span><b id="c4s"></b></div>
+            <div class="ctr q"><span>V<sub>γ</sub> (Ge)</span><b id="c4g"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: cut-in voltage">
+          <h3>Key points</h3>
+          <ul>
+            <li>Cut-in voltage V<sub>γ</sub>: where the current reaches about 1% of rated current.</li>
+            <li>Typical: 0.5–0.7 V for Si, 0.1–0.3 V for Ge.</li>
+            <li>The knee depends on the current scale: ×100 in scale moves it by about 0.12 V.</li>
+            <li>Constant-drop model for circuits: 0.7 V (Si), 0.3 V (Ge).</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 5 ================= -->
+      <section id="s5" aria-labelledby="h5s">
+        <h2 id="h5s">Summary</h2>
+        <div class="prose">
+          <p>The diode's V-I characteristic follows <strong>I = I<sub>S</sub>[exp(V/ηV<sub>T</sub>) − 1]</strong>. In forward bias the current grows exponentially, so it looks like a knee on a linear plot and a <strong>straight line on a log plot</strong>, with <strong>59.6 mV per decade</strong> for η = 1 (1 mA at about 0.70 V for the silicon example). In reverse bias it saturates at <strong>−I<sub>S</sub></strong> (plus generation current) until breakdown. Real silicon diodes show <strong>η ≈ 2</strong> at low currents from recombination and bend over at high currents from <strong>series resistance</strong>. The cut-in voltage, about <strong>0.7 V for Si and 0.3 V for Ge</strong> at normal currents, depends on the current scale chosen.</p>
+        </div>
+
+        <figure class="anim" id="anim5">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s5v"><span>Forward voltage V</span><output id="o5v"></output></label><input type="range" id="s5v" min="0" max="0.85" step="0.001" value="0.7"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv5" style="aspect-ratio:720/640" role="img" aria-label="Recap for the ideal silicon diode linked to one voltage slider: the diode equation with the present numbers, the forward characteristic on a linear milliampere scale showing a knee near 0.7 V, and the same characteristic on a logarithmic scale as a straight line with 59.6 mV per decade. A dot marks the same operating point on both; pressing Play sweeps it."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr v"><span>V</span><b id="c5v"></b></div>
+            <div class="ctr w"><span>I</span><b id="c5i"></b></div>
+            <div class="ctr b"><span>V / V<sub>T</sub></span><b id="c5x"></b></div>
+            <div class="ctr g"><span>Per decade</span><b>59.6 mV</b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: summary">
+          <h3>Key points</h3>
+          <ul>
+            <li>I = I<sub>S</sub>[exp(V/ηV<sub>T</sub>) − 1]; V<sub>T</sub> = 25.9 mV at 300 K.</li>
+            <li>Forward: exponential, 59.6 mV per decade (η = 1). Reverse: −I<sub>S</sub> until breakdown.</li>
+            <li>Real Si: η ≈ 2 at low current, series resistance at high current.</li>
+            <li>Cut-in: about 0.7 V (Si), 0.3 V (Ge), and it depends on the scale.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <aside class="further" aria-label="Further reading">
+        <h3>Further reading</h3>
+        <ul>
+          <li><em>Semiconductor Physics and Devices</em>, Donald A. Neamen. Chapter: “The pn Junction Diode”.</li>
+          <li><em>Microelectronic Circuits</em> (6th ed.), Adel S. Sedra and Kenneth C. Smith. Chapter: “Diodes”.</li>
+          <li><em>Electronic Devices and Circuits</em>, Jacob Millman, Christos C. Halkias and Satyabrata Jit. Chapter: “Semiconductor-Diode Characteristics”.</li>
+          <li><em>Device Electronics for Integrated Circuits</em> (3rd ed.), Richard S. Muller, Theodore I. Kamins and Mansun Chan. Chapter: “Currents in pn Junctions”.</li>
+        </ul>
+      </aside>
+
+      <nav class="pager" aria-label="Topic navigation">
+        <a href="../2-4-reverse-bias/index.html"><small>← Previous</small>2.4 Reverse Bias</a>
+        <a class="next" href="../2-6-temperature-effects/index.html"><small>Next →</small>2.6 Temperature Effects on the Diode</a>
+      </nav>
+    </div>
+  </main>
+
+  <footer class="site-foot">© 2026 Naveen Bokka</footer>
+
+<script>
+(function () {
+  'use strict';
+  /* ---------- colours ---------- */
+  const C = {
+    text: '#e6e9ef', muted: '#9aa4b8', grid: 'rgba(255,255,255,.07)',
+    P: '#7d3a3a', N: '#2e4a7d', DEP: '#3a3f4f',
+    hole: '#ff8a65', elec: '#4fc3f7', volt: '#ffd54f', cur: '#81c784', gen: '#fff59d',
+    bar: '#ce93d8', metal: '#b0bec5', axis: '#5a6478', si: '#4fc3f7', ge: '#ff8a65'
+  };
+  const FONT = 'Inter, system-ui, sans-serif';
+  const MONO = '"JetBrains Mono", Consolas, monospace';
+  const RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const TAU = Math.PI * 2;
+  const $ = id => document.getElementById(id);
+  if (RM) $('rmNote').hidden = false;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const lerp = (a, b, u) => a + (b - a) * u;
+  const hash = k => { const s = Math.sin(k * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+  const smooth = u => { u = clamp(u, 0, 1); return u * u * (3 - 2 * u); };
+
+  /* ---------- number formatting ---------- */
+  const SUP = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '-': '⁻' };
+  const sup = n => String(n).split('').map(ch => SUP[ch] || ch).join('');
+  function sci(v, d) {
+    if (v === 0) return '0';
+    const neg = v < 0; v = Math.abs(v);
+    let e = Math.floor(Math.log10(v)), m = v / Math.pow(10, e);
+    if (+m.toFixed(d) >= 10) { m /= 10; e += 1; }
+    return (neg ? '−' : '') + m.toFixed(d) + ' × 10' + sup(e);
+  }
+  function fA(i) {
+    if (i < 0) return '−' + fA(-i);
+    const P = [[1, 'A'], [1e-3, 'mA'], [1e-6, 'µA'], [1e-9, 'nA'], [1e-12, 'pA'], [1e-15, 'fA'], [1e-18, 'aA']];
+    for (let k = 0; k < P.length; k++) if (i >= P[k][0] * 0.9995) { const v = i / P[k][0]; return (v >= 100 ? v.toFixed(0) : v >= 10 ? v.toFixed(1) : v.toFixed(2)) + ' ' + P[k][1]; }
+    return i === 0 ? '0 A' : sci(i, 2) + ' A';
+  }
+  const fV = v => (Math.abs(v) >= 1 ? v.toFixed(1) : v.toFixed(3)).replace('-', '−') + ' V';
+  const fmV = v => (v * 1000).toFixed(1) + ' mV';
+  const fNum = x => { const a = Math.abs(x); return a >= 1e4 || (a < 1e-3 && a > 0) ? sci(x, 2) : (a >= 100 ? x.toFixed(0) : a >= 10 ? x.toFixed(1) : x.toFixed(3)).replace('-', '−'); };
+
+  /* ---------- physics: the example junction of topics 2.1–2.4 ----------
+       NA = 10¹⁷, ND = 10¹⁶ cm⁻³, A = 10⁻⁴ cm², Dp = 10, Dn = 25 cm²/s, τp = 1 µs, τn = 0.1 µs, τ0 = 1 µs
+       IS  = A·q·ni²·[Dp/(Lp·ND) + Dn/(Ln·NA)]   (diffusion, η = 1)
+       IR0 = q·ni·W·A/(2τ0)                        (depletion-region recombination, η = 2)
+       I(Vj) = IS·[exp(Vj/VT) − 1] + IR0·[exp(Vj/2VT) − 1],  V = Vj + I·RS                       */
+  const Q = 1.602e-19, ES = 11.7 * 8.854e-14, VT = 0.0259, NI = 1.5e10, NI_GE = 2.4e13, LN10 = Math.log(10);
+  const NA0 = 1e17, ND0 = 1e16, DEV = { A: 1e-4, Dp: 10, tp: 1e-6, Dn: 25, tn: 1e-7, t0: 1e-6 };
+  const VBI = VT * Math.log(NA0 * ND0 / (NI * NI));
+  const Wof = V => Math.sqrt(2 * ES * Math.max(VBI - V, 0.02) / Q * (NA0 + ND0) / (NA0 * ND0));
+  const W0 = Wof(0);
+  function isOf(ni) {
+    const Lp = Math.sqrt(DEV.Dp * DEV.tp), Ln = Math.sqrt(DEV.Dn * DEV.tn);
+    return DEV.A * Q * ni * ni * (DEV.Dp / (Lp * ND0) + DEV.Dn / (Ln * NA0));
+  }
+  const IS_SI = isOf(NI), IS_GE = isOf(NI_GE);
+  const IR0 = Q * NI * W0 * DEV.A / (2 * DEV.t0);
+  const MSI = { is: IS_SI, ir0: IR0, rs: 2 }, MGE = { is: IS_GE, ir0: 0, rs: 2 };
+  const iJ = (vj, M) => M.is * (Math.exp(vj / VT) - 1) + M.ir0 * (Math.exp(vj / (2 * VT)) - 1);
+  const ideal = (v, is) => is * (Math.exp(v / VT) - 1);
+  function iV(V, M) {   // current at applied voltage V, including the series-resistance drop
+    if (!M.rs) return { vj: V, i: iJ(V, M) };
+    let lo = Math.min(V, 0) - 0.05, hi = V + 0.001;
+    for (let k = 0; k < 60; k++) { const m = (lo + hi) / 2; if (m + iJ(m, M) * M.rs > V) hi = m; else lo = m; }
+    const vj = (lo + hi) / 2; return { vj, i: iJ(vj, M) };
+  }
+  function vAt(I, M) {  // applied voltage that gives current I
+    let lo = -0.5, hi = 1.6;
+    for (let k = 0; k < 60; k++) { const m = (lo + hi) / 2; if (iJ(m, M) > I) hi = m; else lo = m; }
+    return (lo + hi) / 2 + I * M.rs;
+  }
+  // Reverse side for the full characteristic: diffusion + generation (∝ W) with avalanche
+  // multiplication M = 1/[1 − (VR/VBR)⁴]; past VBR the external circuit (1 kΩ) limits the current.
+  const VBR = 60, RL = 1000;
+  function iRevMag(VR) {
+    const base = IS_SI * (1 - Math.exp(-VR / VT)) + IR0 * (Wof(-VR) / W0) * (1 - Math.exp(-VR / (2 * VT)));
+    const r = VR / VBR, mul = r < 1 ? Math.min(1 / (1 - r * r * r * r), 1e3) : 1e3;
+    return base * mul + Math.max(0, VR - VBR) / RL;
+  }
+  const iFull = V => V >= 0 ? iV(V, MSI).i : -iRevMag(-V);
+
+  /* ---------- Canvas helpers ---------- */
+  let FS = 1;
+  function Cv(id, W, H, cap) { this.el = $(id); this.W = W; this.H = H; this.cap = cap || 2; this.ctx = this.el.getContext('2d'); }
+  Cv.prototype.begin = function () {
+    const w = this.el.clientWidth; if (!w) return null;
+    const dpr = window.devicePixelRatio || 1;
+    const pw = Math.round(w * dpr), ph = Math.round(w * dpr * this.H / this.W);
+    if (this.el.width !== pw || this.el.height !== ph) { this.el.width = pw; this.el.height = ph; }
+    const c = this.ctx, s = pw / this.W;
+    FS = Math.min(this.cap, Math.max(1, 1.15 * this.W / w));
+    c.setTransform(s, 0, 0, s, 0, 0); c.clearRect(0, 0, this.W, this.H);
+    c.textBaseline = 'middle'; c.textAlign = 'left'; c.globalAlpha = 1; c.setLineDash([]); c.lineCap = 'butt'; c.shadowBlur = 0;
+    return c;
+  };
+  // Watermark: drawn inside the canvas, bottom-right, 13 px on screen at any size, never interactive.
+  Cv.prototype.wm = function (c) {
+    const k = this.W / this.el.clientWidth, s = 13 * k;
+    c.save(); c.setTransform(this.el.width / this.W, 0, 0, this.el.width / this.W, 0, 0);
+    c.globalAlpha = 1; c.shadowBlur = 0; c.font = '500 ' + s.toFixed(1) + 'px ' + FONT; c.fillStyle = 'rgba(255,255,255,.35)';
+    c.textAlign = 'right'; c.textBaseline = 'bottom'; c.fillText('© Naveen Bokka', this.W - 6 * k, this.H - 4 * k); c.restore();
+  };
+  function circ(c, x, y, r, fill, stroke, lw) {
+    c.beginPath(); c.arc(x, y, Math.max(0, r), 0, TAU);
+    if (fill) { c.fillStyle = fill; c.fill(); }
+    if (stroke) { c.strokeStyle = stroke; c.lineWidth = lw || 1.5; c.stroke(); }
+  }
+  function txt(c, s, x, y, col, size, weight, align, font) {
+    c.font = (weight || 600) + ' ' + ((size || 12) * FS).toFixed(1) + 'px ' + (font || FONT);
+    c.fillStyle = col || C.text; c.textAlign = align || 'left'; c.fillText(s, x, y);
+  }
+  // Label made of [main, subscript] parts, e.g. [['V','bi'],[' + V','R']]
+  function subs(c, parts, x, y, col, size, align) {
+    const z = (size || 13) * FS, zs = z * 0.72;
+    let w = 0;
+    const ws = parts.map(p => {
+      c.font = '700 ' + z.toFixed(1) + 'px ' + FONT; const a = c.measureText(p[0]).width;
+      c.font = '700 ' + zs.toFixed(1) + 'px ' + FONT; const b = p[1] ? c.measureText(p[1]).width : 0;
+      w += a + b; return [a, b];
+    });
+    let x0 = align === 'right' ? x - w : align === 'center' ? x - w / 2 : x;
+    c.fillStyle = col; c.textAlign = 'left';
+    parts.forEach((p, k) => {
+      c.font = '700 ' + z.toFixed(1) + 'px ' + FONT; c.fillText(p[0], x0, y); x0 += ws[k][0];
+      if (p[1]) { c.font = '700 ' + zs.toFixed(1) + 'px ' + FONT; c.fillText(p[1], x0, y + z * 0.3); x0 += ws[k][1]; }
+    });
+    return w;
+  }
+  function line(c, x0, y0, x1, y1, col, lw, dash) {
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []);
+    c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke(); c.setLineDash([]);
+  }
+  function pline(c, pts, col, lw, dash) {
+    if (pts.length < 2) return;
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []); c.lineJoin = 'round';
+    c.beginPath(); pts.forEach((p, k) => k ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); c.stroke(); c.setLineDash([]);
+  }
+  function arrow(c, x0, y0, x1, y1, col, lw, head) {
+    const dx = x1 - x0, dy = y1 - y0, L = Math.hypot(dx, dy); if (L < 2) return;
+    lw = lw || 3;
+    const ux = dx / L, uy = dy / L, hs = Math.min(head || 10, L * 0.8), hw = Math.max(hs * 0.55, lw * 0.9);
+    line(c, x0, y0, x1 - ux * hs * 0.9, y1 - uy * hs * 0.9, col, lw);
+    c.fillStyle = col; c.beginPath(); c.moveTo(x1, y1);
+    c.lineTo(x1 - ux * hs - uy * hw, y1 - uy * hs + ux * hw);
+    c.lineTo(x1 - ux * hs + uy * hw, y1 - uy * hs - ux * hw); c.closePath(); c.fill();
+  }
+  function rect(c, x, y, w, h, fill) { c.fillStyle = fill; c.fillRect(x, y, w, h); }
+  function carrier(c, x, y, kind, a, r) {
+    c.globalAlpha = a; circ(c, x, y, r || (kind === 'h' ? 3.6 : 3.2), kind === 'h' ? C.hole : C.elec); c.globalAlpha = 1;
+  }
+  function glowCarrier(c, x, y, kind, a, r) { c.save(); c.shadowColor = kind === 'h' ? C.hole : C.elec; c.shadowBlur = 8; carrier(c, x, y, kind, a, r); c.restore(); }
+  const jig = (k, ph, amp) => [amp * Math.sin(ph * 1.7 + k * 1.31), amp * Math.cos(ph * 1.3 + k * 2.07)];
+  const tweenTo = (cur, target, dt, rate) => Math.abs(cur - target) < 1e-3 ? target : cur + (target - cur) * Math.min(1, dt * (rate || 5));
+  function clipTo(c, G) { c.save(); c.beginPath(); c.rect(G.x, G.y - 1, G.w, G.h + 2); c.clip(); }
+  function dot(c, x, y) { circ(c, x, y, 6, C.volt, '#0f1420', 2); }
+
+  /* ---------- semilog forward plot ---------- */
+  const DEC = { '-15': '1 fA', '-12': '1 pA', '-9': '1 nA', '-6': '1 µA', '-3': '1 mA', '0': '1 A' };
+  function semilog(c, G, v1, vstep, L0, L1) {
+    const X = v => G.x + v / v1 * G.w;
+    const Y = i => G.y + G.h - (Math.log10(Math.max(i, 1e-30)) - L0) / (L1 - L0) * G.h;
+    rect(c, G.x, G.y, G.w, G.h, 'rgba(255,255,255,.02)');
+    for (let e = L0; e <= L1; e++) {
+      const y = G.y + G.h - (e - L0) / (L1 - L0) * G.h, lab = DEC[String(e)];
+      line(c, G.x, y, G.x + G.w, y, lab ? 'rgba(255,255,255,.13)' : C.grid, 1);
+      if (lab) txt(c, lab, G.x - 6, y, C.muted, 10, 500, 'right', MONO);
+    }
+    for (let v = 0; v <= v1 + 1e-9; v += vstep) {
+      const x = X(v), last = v + vstep > v1 + 1e-9;
+      line(c, x, G.y + G.h, x, G.y + G.h + 4, C.axis, 1);
+      txt(c, v.toFixed(1) + (last ? ' V' : ''), x, G.y + G.h + 14, C.muted, 10, 500, last ? 'right' : 'center', MONO);
+    }
+    line(c, G.x, G.y + G.h, G.x + G.w, G.y + G.h, C.axis, 1.2); line(c, G.x, G.y, G.x, G.y + G.h, C.axis, 1.2);
+    txt(c, 'I (log scale)', G.x + 6, G.y + 10, C.muted, 11, 600, 'left');
+    return { X, Y };
+  }
+  // Forward curve of model M, parameterised by the junction voltage so series resistance is exact
+  function modelPts(M, X, Y, vmax, imax, v0) {
+    const pts = [];
+    for (let vj = v0 || 0; vj <= 1.4; vj += 0.002) {
+      const i = iJ(vj, M), v = vj + i * M.rs;
+      pts.push([X(v), Y(i)]);
+      if (v > vmax || i > imax) break;
+    }
+    return pts;
+  }
+
+  /* ---------- automatic voltage sweep used while an animation plays ---------- */
+  function Sweep(lo, hi, T) { this.lo = lo; this.hi = hi; this.T = T; this.t = 0; }
+  Sweep.prototype.val = function () { return this.lo + (this.hi - this.lo) * (0.5 - 0.5 * Math.cos(TAU * this.t / this.T)); };
+  Sweep.prototype.from = function (v) {   // continue from the present value, heading upward
+    const u = clamp((v - this.lo) / (this.hi - this.lo), 0, 1);
+    this.t = Math.acos(1 - 2 * u) / TAU * this.T;
+  };
+
+  /* ---------- Animation registry ---------- */
+  const anims = [];
+  function Anim(rootId, o) {
+    this.root = $(rootId); this.o = o; this.playing = !RM; this.visible = true; this.dirty = true;
+    this.pb = this.root.querySelector('[data-act="play"]');
+    this.pb.addEventListener('click', () => this.setPlaying(!this.playing));
+    this.root.querySelector('[data-act="reset"]').addEventListener('click', () => { o.reset(); this.setPlaying(!RM); });
+    o.reset(); this.sync(); anims.push(this);
+    if ('IntersectionObserver' in window) {
+      this.visible = false;
+      new IntersectionObserver(es => es.forEach(e => { this.visible = e.isIntersecting; if (this.visible) this.dirty = true; }))
+        .observe(this.root);
+    }
+  }
+  Anim.prototype.setPlaying = function (p) {
+    if (p && !this.playing && this.o.onPlay) this.o.onPlay();
+    this.playing = p; this.sync(); this.dirty = true;
+  };
+  Anim.prototype.sync = function () { this.pb.textContent = this.playing ? 'Pause' : 'Play'; };
+
+  /* =========================================================
+     0. Circuit with flowing current + full V-I characteristic
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv0', 720, 560);
+    const L = 200, R = 520, T = 40, Bt = 150, CY = (T + Bt) / 2, PER = 2 * ((R - L) + (Bt - T));
+    const ox = 420, oy = 360, kF = 260 / 0.8, kR = 340 / 70, hF = 150, hR = 150, IF = 20e-3, IRV = 100e-12;
+    const PG = { x: ox - 340, y: oy - hF - 6, w: 340 + 260 + 4, h: hF + hR + 12 };
+    let u, off, A = null;
+    const volt = () => u >= 0 ? 0.8 * u : 70 * u;
+    function perim(s) {   // clockwise from the top-left corner
+      let d = ((s % 1) + 1) % 1 * PER;
+      if (d < R - L) return [L + d, T]; d -= R - L;
+      if (d < Bt - T) return [R, T + d]; d -= Bt - T;
+      if (d < R - L) return [R - d, Bt]; d -= R - L;
+      return [L, Bt - d];
+    }
+    function region(V, I) {
+      if (V < -VBR) return 'Breakdown';
+      if (V < -0.05) return V < -0.95 * VBR ? 'Near breakdown' : 'Reverse: blocking';
+      if (V <= 0.05) return 'Near zero';
+      return I < 0.01 * IF ? 'Forward: below knee' : 'Forward: conducting';
+    }
+    function sync() {
+      $('s0u').value = u;
+      const V = volt(), I = iFull(V);
+      $('o0u').textContent = fV(V); $('c0v').textContent = fV(V); $('c0i').textContent = fA(I); $('c0r').textContent = region(V, I);
+      if (A) A.dirty = true;
+    }
+    const XF = v => ox + v * kF, XR = vr => ox - vr * kR, YF = i => oy - i / IF * hF, YR = i => oy + i / IRV * hR;
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const V = volt(), I = iFull(V), fwd = V >= 0;
+      // ---- circuit ----
+      line(c, L, T, R, T, C.metal, 2); line(c, R, T, R, Bt, C.metal, 2); line(c, R, Bt, L, Bt, C.metal, 2);
+      line(c, L, Bt, L, CY + 9, C.metal, 2); line(c, L, CY - 9, L, T, C.metal, 2);
+      const top = fwd ? 'long' : 'short';
+      const plate = (y, kind) => line(c, L - (kind === 'long' ? 20 : 11), y, L + (kind === 'long' ? 20 : 11), y, C.volt, kind === 'long' ? 3 : 5);
+      plate(CY - 9, top); plate(CY + 9, top === 'long' ? 'short' : 'long');
+      txt(c, '+', L + 28, fwd ? CY - 12 : CY + 12, C.volt, 14, 700, 'center'); txt(c, '−', L + 28, fwd ? CY + 12 : CY - 12, C.volt, 14, 700, 'center');
+      txt(c, 'V = ' + fV(V), L - 28, CY, C.volt, 12, 700, 'right', MONO);
+      // diode symbol on the top wire, anode (p) on the left
+      const dx = 360;
+      c.fillStyle = '#141b2b'; c.fillRect(dx - 16, T - 15, 34, 30);
+      c.fillStyle = C.text; c.beginPath(); c.moveTo(dx - 13, T - 13); c.lineTo(dx - 13, T + 13); c.lineTo(dx + 11, T); c.closePath(); c.fill();
+      line(c, dx + 12, T - 14, dx + 12, T + 14, C.text, 3);
+      txt(c, 'anode (p)', dx - 22, T - 20, C.muted, 10, 600, 'right'); txt(c, 'cathode (n)', dx + 22, T - 20, C.muted, 10, 600, 'left');
+      // flowing conventional current: speed from the log of |I|
+      const f = clamp((Math.log10(Math.abs(I) + 1e-30) + 12) / 10, 0, 1), alpha = 0.25 + 0.75 * f;
+      c.save(); c.shadowColor = C.cur; c.shadowBlur = 6 * f;
+      for (let k = 0; k < 30; k++) { const p = perim(k / 30 + off); c.globalAlpha = alpha; circ(c, p[0], p[1], 3.2, C.cur); }
+      c.restore(); c.globalAlpha = 1;
+      txt(c, 'I = ' + fA(I), R + 14, CY, C.cur, 13, 700, 'left', MONO);
+      txt(c, region(V, I), (L + R) / 2, Bt + 22, V < -VBR ? C.hole : fwd ? C.cur : C.muted, 12, 700, 'center');
+      txt(c, 'dots: conventional current', (L + R) / 2, Bt + 40, C.muted, 10, 500, 'center');
+      // ---- characteristic ----
+      rect(c, PG.x, PG.y, PG.w, PG.h, 'rgba(255,255,255,.02)');
+      [5, 10, 15, 20].forEach(m => { line(c, ox, YF(m * 1e-3), XF(0.8), YF(m * 1e-3), C.grid, 1); if (m < 20) txt(c, String(m), ox - 6, YF(m * 1e-3), C.muted, 10, 500, 'right', MONO); });
+      [25, 50, 75, 100].forEach(p => { line(c, XR(70), YR(p * 1e-12), ox, YR(p * 1e-12), C.grid, 1); txt(c, '−' + p, ox + 6, YR(p * 1e-12), C.muted, 10, 500, 'left', MONO); });
+      [0.2, 0.4, 0.6, 0.8].forEach(v => { line(c, XF(v), oy, XF(v), oy + 4, C.axis, 1); txt(c, v.toFixed(1), XF(v), oy + 13, C.muted, 10, 500, 'center', MONO); });
+      [10, 20, 30, 40, 50, 60, 70].forEach(v => { line(c, XR(v), oy - 4, XR(v), oy, C.axis, 1); txt(c, '−' + v, XR(v), oy - 13, C.muted, 10, 500, 'center', MONO); });
+      line(c, PG.x, oy, PG.x + PG.w, oy, C.axis, 1.4); line(c, ox, PG.y, ox, PG.y + PG.h, C.axis, 1.4);
+      txt(c, 'I (mA)', ox - 8, PG.y + 4, C.text, 11, 700, 'right');
+      txt(c, 'I (pA)', ox - 8, PG.y + PG.h - 6, C.text, 11, 700, 'right');
+      txt(c, 'V (volts)', XF(0.8), oy + 28, C.text, 11, 700, 'right');
+      txt(c, 'V (volts)', XR(70), oy - 28, C.text, 11, 700, 'left');
+      txt(c, 'note: different scales on each side', PG.x + 4, PG.y + PG.h + 16, C.muted, 10, 500, 'left');
+      // breakdown marker
+      line(c, XR(VBR), PG.y + 30, XR(VBR), PG.y + PG.h, 'rgba(255,138,101,.5)', 1.2, [4, 4]);
+      subs(c, [['V', 'BR'], [' ≈ −60 V', '']], XR(VBR) + 6, PG.y + 40, C.hole, 11, 'left');
+      clipTo(c, PG);
+      pline(c, modelPts(MSI, XF, YF, 0.8, IF * 1.1), C.cur, 2.6);
+      const rp = []; for (let vr = 0; vr <= 70; vr += vr > 55 ? 0.02 : 0.25) rp.push([XR(vr), YR(iRevMag(vr))]);
+      pline(c, rp, C.cur, 2.6);
+      c.restore();
+      txt(c, 'forward', XF(0.58), YF(15e-3), C.cur, 11, 700, 'center');
+      txt(c, 'reverse leakage', XR(30), YR(52e-12), C.muted, 11, 700, 'center');
+      txt(c, 'breakdown', XR(VBR) - 8, YR(85e-12), C.hole, 11, 700, 'right');
+      // operating point
+      let x = fwd ? XF(V) : XR(-V), y = fwd ? YF(I) : YR(-I);
+      const yc = clamp(y, PG.y + 4, PG.y + PG.h - 4);
+      if (yc !== y) arrow(c, x, yc + (y < yc ? 14 : -14), x, yc + (y < yc ? -4 : 4), C.volt, 2, 7);
+      line(c, x, oy, x, yc, 'rgba(255,213,79,.35)', 1, [2, 3]);
+      dot(c, x, yc);
+      cv.wm(c);
+    }
+    const o = {
+      reset() { u = 0.875; off = 0; sync(); },
+      step(dt) {
+        const I = iFull(volt()), f = clamp((Math.log10(Math.abs(I) + 1e-30) + 12) / 10, 0, 1);
+        off += Math.sign(I) * (f <= 0 ? 0.003 : 0.01 + 0.2 * f) * dt;
+      },
+      draw
+    };
+    A = new Anim('anim0', o);
+    $('s0u').addEventListener('input', e => { u = +e.target.value; sync(); });
+  })();
+
+  /* =========================================================
+     1. The two terms: carriers over the barrier vs. swept back
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv1', 720, 600);
+    const H = { x: 40, y: 30, w: 640, h: 190 }, yF = H.y + H.h - 14, hk = 150 / 0.95, j0 = 300, j1 = 420;
+    const PG = { x: 110, y: 410, w: 560, h: 148 }, V0 = -0.15, V1 = 0.1, Y0 = -10, Y1 = 50;
+    let V, ph, EV, accF, accR, A = null;
+    const hillPx = v => hk * (VBI - v);
+    const prof = (x, v) => yF - hillPx(v) * smooth((x - j0) / (j1 - j0));
+    function sync() {
+      $('s1v').value = V; $('o1v').textContent = (V * 1000).toFixed(0).replace('-', '−') + ' mV';
+      const e = Math.exp(V / VT);
+      $('c1x').textContent = (V / VT).toFixed(2).replace('-', '−'); $('c1e').textContent = fNum(e);
+      $('c1r').textContent = fNum(e - 1); $('c1i').textContent = fA(IS_SI * (e - 1));
+      if (A) A.dirty = true;
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      // ---- energy hill for holes ----
+      txt(c, 'Energy hill for holes', H.x, 14, C.muted, 11, 600, 'left');
+      const top = prof(H.x + H.w, V), top0 = prof(H.x + H.w, 0);
+      c.fillStyle = 'rgba(206,147,216,.10)'; c.beginPath(); c.moveTo(H.x, yF + 8);
+      for (let x = H.x; x <= H.x + H.w; x += 3) c.lineTo(x, prof(x, V));
+      c.lineTo(H.x + H.w, yF + 8); c.closePath(); c.fill();
+      const pts0 = [], pts = []; for (let x = H.x; x <= H.x + H.w; x += 3) { pts0.push([x, prof(x, 0)]); pts.push([x, prof(x, V)]); }
+      if (Math.abs(V) > 0.003) pline(c, pts0, 'rgba(154,164,184,.45)', 1.2, [5, 4]);
+      pline(c, pts, C.bar, 2.6);
+      line(c, j1 - 10, yF, H.x + H.w, yF, 'rgba(255,255,255,.15)', 1, [3, 4]);
+      const ax = 470;
+      arrow(c, ax, (yF + top) / 2, ax, top + 1, C.bar, 1.8, 7); arrow(c, ax, (yF + top) / 2, ax, yF - 1, C.bar, 1.8, 7);
+      subs(c, [['q(V', 'bi'], [' − V)', '']], ax + 8, (yF + top) / 2, C.bar, 11, 'left');
+      txt(c, 'p side: many holes', H.x + 6, yF + 4 - 112, C.text, 11, 700, 'left');
+      txt(c, 'n side: few holes', H.x + H.w - 6, top - 20, C.text, 11, 700, 'right');
+      for (let i = 0; i < 26; i++) {   // majority holes crowd the p-side floor
+        const d = jig(i, ph, 1.6);
+        carrier(c, H.x + 12 + hash(i + 1) * 240 + d[0], yF - 6 - hash(i + 4) * 70 + d[1], 'h', 0.8, 3.4);
+      }
+      for (let i = 0; i < 3; i++) { const d = jig(i + 40, ph, 1.6); carrier(c, 540 + i * 45 + d[0], top - 6 + d[1], 'h', 0.8, 3.4); }
+      EV.forEach(m => {
+        const u = clamp(m.t / m.d, 0, 1), x = lerp(m.x0, m.x1, u), y = prof(x, V) - 6;
+        const a = u > 0.85 ? (1 - u) / 0.15 : Math.min(1, m.t / 0.15);
+        glowCarrier(c, x, y, 'h', clamp(a, 0, 1), 4);
+      });
+      // ---- flux bars, in units of IS, log scale 10⁻³ … 10² ----
+      const FB = { x: 40, w: 640 }, L0 = -3, L1 = 2, XB = r => FB.x + clamp((Math.log10(r) - L0) / (L1 - L0), 0, 1) * FB.w;
+      subs(c, [['Hole flow across the junction (log scale, units of I', 'S'], [')', '']], 40, 244, C.muted, 11, 'left');
+      for (let e = L0; e <= L1; e++) { const x = XB(Math.pow(10, e)); line(c, x, 272, x, 350, C.grid, 1); txt(c, '10' + sup(e), x, 361, C.muted, 9, 500, e === L0 ? 'left' : e === L1 ? 'right' : 'center', MONO); }
+      const ef = Math.exp(V / VT);
+      [[ef, C.hole, [['→ over the barrier: I', 'S'], ['·exp(V/V', 'T'], [')', '']], 276], [1, C.elec, [['← swept back: I', 'S']], 324]].forEach(r => {
+        subs(c, r[2], FB.x, r[3] - 10, r[1], 11, 'left');
+        rect(c, FB.x, r[3], FB.w, 22, '#0f1420'); rect(c, FB.x, r[3], XB(r[0]) - FB.x, 22, r[1]);
+      });
+      // ---- I / IS against V ----
+      const X = v => PG.x + (v - V0) / (V1 - V0) * PG.w, Y = r => PG.y + PG.h - (r - Y0) / (Y1 - Y0) * PG.h;
+      rect(c, PG.x, PG.y, PG.w, PG.h, 'rgba(255,255,255,.02)');
+      [-10, 0, 10, 20, 30, 40, 50].forEach(r => { line(c, PG.x, Y(r), PG.x + PG.w, Y(r), r === 0 ? C.axis : C.grid, r === 0 ? 1.2 : 1); txt(c, String(r).replace('-', '−'), PG.x - 6, Y(r), C.muted, 10, 500, 'right', MONO); });
+      [-0.15, -0.1, -0.05, 0, 0.05, 0.1].forEach(v => { line(c, X(v), PG.y, X(v), PG.y + PG.h, v === 0 ? C.axis : C.grid, v === 0 ? 1.2 : 1); txt(c, (v * 1000).toFixed(0).replace('-', '−') + (v === 0.1 ? ' mV' : ''), X(v), PG.y + PG.h + 13, C.muted, 10, 500, v === 0.1 ? 'right' : 'center', MONO); });
+      subs(c, [['I / I', 'S']], PG.x - 6, PG.y - 14, C.text, 11, 'right');
+      line(c, PG.x, Y(-1), PG.x + PG.w, Y(-1), 'rgba(79,195,247,.6)', 1.2, [5, 4]);
+      txt(c, '−1  (I = −I', PG.x + 8, Y(-1) + 12, C.elec, 10, 600, 'left');
+      c.font = '600 ' + (10 * FS).toFixed(1) + 'px ' + FONT;
+      subs(c, [['', 'S'], [')', '']], PG.x + 8 + c.measureText('−1  (I = −I').width, Y(-1) + 12, C.elec, 10, 'left');
+      clipTo(c, PG);
+      const cp = []; for (let v = V0; v <= V1 + 1e-9; v += 0.001) cp.push([X(v), Y(Math.exp(v / VT) - 1)]);
+      pline(c, cp, C.cur, 2.6); c.restore();
+      line(c, X(V), Y(0), X(V), Y(ef - 1), 'rgba(255,213,79,.35)', 1, [2, 3]);
+      dot(c, X(V), Y(ef - 1));
+      cv.wm(c);
+    }
+    function step(dt) {
+      ph += dt;
+      const rf = Math.min(40, 1.4 * Math.exp(V / VT)), rr = 1.4;
+      accF += dt * rf; accR += dt * rr;
+      while (accF >= 1) { accF -= 1; EV.push({ k: 'f', x0: 200 + Math.random() * 90, x1: 560 + Math.random() * 100, t: 0, d: 1.3 }); }
+      while (accR >= 1) { accR -= 1; EV.push({ k: 'r', x0: 450 + Math.random() * 120, x1: 160 + Math.random() * 80, t: 0, d: 1.1 }); }
+      EV.forEach(m => { m.t += dt; }); EV = EV.filter(m => m.t < m.d);
+    }
+    const o = { reset() { V = 0.05; ph = 0; EV = []; accF = 0; accR = 0; sync(); }, step, draw };
+    A = new Anim('anim1', o);
+    $('s1v').addEventListener('input', e => { V = +e.target.value; sync(); });
+  })();
+
+  /* =========================================================
+     2. Semilog plot: straight line, 59.6 mV per decade, Si vs Ge
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv2', 720, 460), G = { x: 112, y: 24, w: 568, h: 360 }, L0 = -15, L1 = -1;
+    const RANGE = { si: [0.15, 0.8], ge: [0.02, 0.42] }, DEF = { si: 0.7, ge: 0.3 };
+    let V, mat, sw, A = null;
+    const isM = () => mat === 'si' ? IS_SI : IS_GE;
+    function sync() {
+      $('s2v').value = V; $('o2v').textContent = fV(V);
+      const i = ideal(V, isM());
+      $('c2i').textContent = fA(i); $('c2s').textContent = fA(isM());
+      $('c2t').textContent = fV(VT * Math.log(10 * i / isM() + 1)); $('c2d').textContent = fV(VT * Math.log(2 * i / isM() + 1));
+      if (A) A.dirty = true;
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const ax = semilog(c, G, 0.9, 0.1, L0, L1), X = ax.X, Y = ax.Y;
+      clipTo(c, G);
+      [['si', IS_SI, C.si], ['ge', IS_GE, C.ge]].forEach(m => {
+        const pts = []; for (let v = 0.001; v <= 0.9; v += 0.003) pts.push([X(v), Y(ideal(v, m[1]))]);
+        c.globalAlpha = m[0] === mat ? 1 : 0.35; pline(c, pts, m[2], 2.6);
+        // extrapolation of the straight line back to V = 0
+        line(c, X(0), Y(m[1]), X(0.15), Y(m[1] * Math.exp(0.15 / VT)), m[2], 1.2, [4, 4]);
+        c.globalAlpha = 1;
+      });
+      c.restore();
+      [['Si', IS_SI, C.si], ['Ge', IS_GE, C.ge]].forEach(m => {
+        circ(c, X(0), Y(m[1]), 4, m[2]);
+        subs(c, [['← I', 'S'], [' (' + m[0] + ') = ' + fA(m[1]), '']], X(0.065), Y(m[1]), m[2], 10, 'left');
+      });
+      const lab = (m, v, col) => { const i = ideal(v, m === 'si' ? IS_SI : IS_GE); txt(c, m === 'si' ? 'Si' : 'Ge', X(v) + 10, Y(i) + 6, col, 13, 700, 'left'); };
+      lab('si', 0.42, C.si); lab('ge', 0.25, C.ge);
+      // operating point and a ×10 step
+      const is = isM(), i = ideal(V, is), dV = VT * LN10;
+      if (i > 0) {
+        const fwd = V + dV <= 0.9 && Y(10 * i) > G.y + 4;
+        const va = fwd ? V : V - dV, ia = fwd ? i : i / 10;
+        if (Y(ia) < G.y + G.h - 4 && va > 0) {
+          line(c, X(va), Y(ia), X(va + dV), Y(ia), C.volt, 1.8); line(c, X(va + dV), Y(ia), X(va + dV), Y(ia * 10), C.volt, 1.8);
+          txt(c, '59.6 mV', (X(va) + X(va + dV)) / 2, Y(ia) + 12, C.volt, 10, 700, 'center', MONO);
+          txt(c, '×10', X(va + dV) + 6, (Y(ia) + Y(ia * 10)) / 2, C.volt, 11, 700, 'left', MONO);
+        }
+        const y = Y(i);
+        if (y >= G.y && y <= G.y + G.h) { line(c, X(V), G.y + G.h, X(V), y, 'rgba(255,213,79,.35)', 1, [2, 3]); dot(c, X(V), y); }
+      }
+      cv.wm(c);
+    }
+    const o = {
+      reset() { setMat('si'); },
+      onPlay() { sw.from(V); },
+      step(dt) { sw.t += dt; V = sw.val(); sync(); },
+      draw
+    };
+    let setMat = m => { mat = m; V = DEF[m]; sw = new Sweep(RANGE[m][0], RANGE[m][1], 9); sw.from(V); };
+    A = new Anim('anim2', o);
+    const bs = Array.from(document.querySelectorAll('#anim2 [data-mat]'));
+    setMat = m => { mat = m; V = DEF[m]; sw = new Sweep(RANGE[m][0], RANGE[m][1], 9); sw.from(V); bs.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mat === m))); sync(); };
+    bs.forEach(b => b.addEventListener('click', () => setMat(b.dataset.mat)));
+    setMat('si');
+    $('s2v').addEventListener('input', e => { V = +e.target.value; A.setPlaying(false); sync(); });
+  })();
+
+  /* =========================================================
+     3. Ideality factor: recombination (η = 2), diffusion (η = 1), series R
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv3', 720, 480), G = { x: 112, y: 24, w: 568, h: 384 }, L0 = -14, L1 = 0;
+    let V, RS, sw, A = null;
+    const M = () => ({ is: IS_SI, ir0: IR0, rs: RS });
+    function sync() {
+      $('s3v').value = V; $('s3r').value = RS; $('o3v').textContent = fV(V); $('o3r').textContent = RS.toFixed(1) + ' Ω';
+      const m = M(), r = iV(V, m), d = 0.002, a = iV(V - d, m).i, b = iV(V + d, m).i;
+      $('c3i').textContent = fA(r.i); $('c3n').textContent = (2 * d / (VT * Math.log(b / a))).toFixed(2);
+      $('c3j').textContent = fV(r.vj); $('c3d').textContent = fmV(r.i * RS);
+      if (A) A.dirty = true;
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const ax = semilog(c, G, 1.0, 0.1, L0, L1), X = ax.X, Y = ax.Y, m = M();
+      clipTo(c, G);
+      const pd = [], pr = []; for (let v = 0.002; v <= 1.0; v += 0.004) { pd.push([X(v), Y(ideal(v, IS_SI))]); pr.push([X(v), Y(IR0 * (Math.exp(v / (2 * VT)) - 1))]); }
+      pline(c, pd, C.elec, 1.8, [7, 5]); pline(c, pr, C.hole, 1.8, [7, 5]);
+      if (RS > 0) pline(c, modelPts({ is: IS_SI, ir0: IR0, rs: 0 }, X, Y, 1.05, 10, 0.002), 'rgba(255,255,255,.35)', 1.4, [2, 3]);
+      pline(c, modelPts(m, X, Y, 1.05, 10, 0.002), C.cur, 2.8);
+      c.restore();
+      // region labels
+      const yr = Y(IR0 * Math.exp(0.2 / (2 * VT))), yd = Y(ideal(0.6, IS_SI));
+      txt(c, 'recombination, η = 2', X(0.04), yr - 44, C.hole, 11, 700, 'left');
+      txt(c, '119 mV/decade', X(0.04), yr - 30, C.hole, 10, 500, 'left', MONO);
+      txt(c, 'diffusion, η = 1', X(0.5) - 6, yd, C.elec, 11, 700, 'right');
+      txt(c, '59.6 mV/decade', X(0.5) - 6, yd + 14, C.elec, 10, 500, 'right', MONO);
+      if (RS > 0.4) txt(c, 'series R bends it over', X(1.0) - 4, Y(iV(0.95, m).i) + 22, C.cur, 11, 700, 'right');
+      const r = iV(V, m), y = Y(r.i);
+      if (y >= G.y && y <= G.y + G.h) { line(c, X(V), G.y + G.h, X(V), y, 'rgba(255,213,79,.35)', 1, [2, 3]); dot(c, X(V), y); }
+      cv.wm(c);
+    }
+    const o = {
+      reset() { V = 0.3; RS = 5; sw = new Sweep(0.1, 0.98, 12); sw.from(V); sync(); },
+      onPlay() { sw.from(V); },
+      step(dt) { sw.t += dt; V = Math.round(sw.val() / 0.005) * 0.005; sync(); },
+      draw
+    };
+    A = new Anim('anim3', o);
+    $('s3v').addEventListener('input', e => { V = +e.target.value; A.setPlaying(false); sync(); });
+    $('s3r').addEventListener('input', e => { RS = +e.target.value; sync(); });
+  })();
+
+  /* =========================================================
+     4. Cut-in voltage depends on the full-scale current
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv4', 720, 430), G = { x: 112, y: 30, w: 568, h: 330 };
+    let lf, target, t, A = null;
+    const bs = Array.from(document.querySelectorAll('#anim4 [data-fs]'));
+    function sync() {
+      const F = Math.pow(10, lf);
+      $('c4f').textContent = fA(F); $('c4s').textContent = fV(vAt(0.01 * F, MSI)); $('c4g').textContent = fV(vAt(0.01 * F, MGE));
+      bs.forEach(b => b.setAttribute('aria-pressed', String(!A || !A.playing ? +b.dataset.fs === target : false)));
+      if (A) A.dirty = true;
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const F = Math.pow(10, lf), X = v => G.x + v * G.w, Y = i => G.y + G.h - i / F * G.h;
+      rect(c, G.x, G.y, G.w, G.h, 'rgba(255,255,255,.02)');
+      [0, 0.25, 0.5, 0.75, 1].forEach(k => { line(c, G.x, Y(k * F), G.x + G.w, Y(k * F), C.grid, 1); txt(c, k === 0 ? '0' : fA(k * F), G.x - 6, Y(k * F), C.muted, 10, 500, 'right', MONO); });
+      for (let v = 0; v <= 1.0001; v += 0.1) { const last = v > 0.95; line(c, X(v), G.y + G.h, X(v), G.y + G.h + 4, C.axis, 1); txt(c, v.toFixed(1) + (last ? ' V' : ''), X(v), G.y + G.h + 14, C.muted, 10, 500, last ? 'right' : 'center', MONO); }
+      line(c, G.x, G.y + G.h, G.x + G.w, G.y + G.h, C.axis, 1.2); line(c, G.x, G.y, G.x, G.y + G.h, C.axis, 1.2);
+      txt(c, 'I (linear)', G.x + 6, G.y + 10, C.muted, 11, 600, 'left');
+      clipTo(c, G);
+      pline(c, modelPts(MGE, X, Y, 1.05, F * 1.1), C.ge, 2.6);
+      pline(c, modelPts(MSI, X, Y, 1.05, F * 1.1), C.si, 2.6);
+      c.restore();
+      [['Si', MSI, C.si, 0], ['Ge', MGE, C.ge, 1]].forEach(m => {
+        const vg = vAt(0.01 * F, m[1]), x = X(vg);
+        line(c, x, G.y - 8, x, G.y + G.h, m[2], 1.2, [4, 4]);
+        circ(c, x, Y(0.01 * F), 4, m[2]);
+        subs(c, [['V', 'γ'], ['(' + m[0] + ') ≈ ' + vg.toFixed(2) + ' V', '']], x + 5, G.y - 14, m[2], 11, 'left');
+        const v9 = vAt(0.8 * F, m[1]);
+        txt(c, m[0], X(v9) + 10, Y(0.8 * F), m[2], 13, 700, 'left');
+      });
+      txt(c, 'dashed markers: current reaches 1% of full scale', G.x + G.w, G.y + G.h + 32, C.muted, 10, 500, 'right');
+      cv.wm(c);
+    }
+    function tween(dt) { if (lf === target) return false; lf = tweenTo(lf, target, dt, 4); sync(); return true; }
+    const o = {
+      reset() { t = 0; target = -3; lf = -3; sync(); },
+      onPlay() { t = Math.acos(clamp(-(lf + 3) / 2, -1, 1)) / TAU * 12; },
+      step(dt) { t += dt; lf = -3 - 2 * Math.cos(TAU * t / 12); target = lf; sync(); },
+      tween, draw
+    };
+    A = new Anim('anim4', o);
+    const origSync = A.sync.bind(A);
+    A.sync = function () { origSync(); if (!this.playing) target = [-5, -3, -1].reduce((b, k) => Math.abs(k - lf) < Math.abs(b - lf) ? k : b, -3); sync(); };
+    bs.forEach(b => b.addEventListener('click', () => { target = +b.dataset.fs; A.setPlaying(false); sync(); }));
+    sync();
+  })();
+
+  /* =========================================================
+     5. Summary: equation, linear plot and log plot on one slider
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv5', 720, 640);
+    const LG = { x: 112, y: 76, w: 568, h: 210 }, SG = { x: 112, y: 350, w: 568, h: 236 }, IF = 20e-3;
+    let V, sw, A = null;
+    function sync() {
+      $('s5v').value = V; $('o5v').textContent = fV(V);
+      $('c5v').textContent = fV(V); $('c5i').textContent = fA(ideal(V, IS_SI)); $('c5x').textContent = (V / VT).toFixed(2);
+      if (A) A.dirty = true;
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const i = ideal(V, IS_SI);
+      let x = 40;
+      x += subs(c, [['I = I', 'S'], ['·[exp(V/V', 'T'], [') − 1]', '']], x, 24, C.text, 14, 'left') + 10;
+      txt(c, '= ' + fA(i), x, 24, C.volt, 14, 700, 'left', MONO);
+      // linear
+      const X = v => LG.x + v / 0.9 * LG.w, Y = j => LG.y + LG.h - j / IF * LG.h;
+      rect(c, LG.x, LG.y, LG.w, LG.h, 'rgba(255,255,255,.02)');
+      [0, 5, 10, 15, 20].forEach(m => { line(c, LG.x, Y(m * 1e-3), LG.x + LG.w, Y(m * 1e-3), C.grid, 1); txt(c, m + (m === 20 ? ' mA' : ''), LG.x - 6, Y(m * 1e-3), C.muted, 10, 500, 'right', MONO); });
+      for (let v = 0; v <= 0.9001; v += 0.1) { const last = v > 0.85; line(c, X(v), LG.y + LG.h, X(v), LG.y + LG.h + 4, C.axis, 1); txt(c, v.toFixed(1) + (last ? ' V' : ''), X(v), LG.y + LG.h + 14, C.muted, 10, 500, last ? 'right' : 'center', MONO); }
+      line(c, LG.x, LG.y + LG.h, LG.x + LG.w, LG.y + LG.h, C.axis, 1.2); line(c, LG.x, LG.y, LG.x, LG.y + LG.h, C.axis, 1.2);
+      txt(c, 'I (linear)', LG.x + 6, LG.y + 10, C.muted, 11, 600, 'left');
+      clipTo(c, LG);
+      const pl = []; for (let v = 0; v <= 0.9; v += 0.002) pl.push([X(v), Y(ideal(v, IS_SI))]);
+      pline(c, pl, C.cur, 2.6); c.restore();
+      const yl = Y(i);
+      if (yl >= LG.y) { line(c, X(V), LG.y + LG.h, X(V), yl, 'rgba(255,213,79,.35)', 1, [2, 3]); dot(c, X(V), yl); }
+      else arrow(c, X(V), LG.y + 16, X(V), LG.y + 2, C.volt, 2, 7);
+      // semilog
+      const ax = semilog(c, SG, 0.9, 0.1, -15, -1), Xs = ax.X, Ys = ax.Y;
+      clipTo(c, SG);
+      const ps = []; for (let v = 0.001; v <= 0.9; v += 0.003) ps.push([Xs(v), Ys(ideal(v, IS_SI))]);
+      pline(c, ps, C.cur, 2.6); c.restore();
+      const ys = Ys(i);
+      if (ys >= SG.y && ys <= SG.y + SG.h) { line(c, Xs(V), SG.y + SG.h, Xs(V), ys, 'rgba(255,213,79,.35)', 1, [2, 3]); dot(c, Xs(V), ys); }
+      const v1 = 0.3, dV = VT * LN10;
+      line(c, Xs(v1), Ys(ideal(v1, IS_SI)), Xs(v1 + dV), Ys(ideal(v1, IS_SI)), C.volt, 1.6); line(c, Xs(v1 + dV), Ys(ideal(v1, IS_SI)), Xs(v1 + dV), Ys(ideal(v1 + dV, IS_SI)), C.volt, 1.6);
+      txt(c, '59.6 mV → ×10', Xs(v1 + dV) + 8, Ys(ideal(v1 + dV / 2, IS_SI)) + 4, C.volt, 10, 700, 'left', MONO);
+      cv.wm(c);
+    }
+    const o = {
+      reset() { V = 0.7; sw = new Sweep(0.2, 0.8, 10); sw.from(V); sync(); },
+      onPlay() { sw.from(V); },
+      step(dt) { sw.t += dt; V = sw.val(); sync(); },
+      draw
+    };
+    A = new Anim('anim5', o);
+    $('s5v').addEventListener('input', e => { V = +e.target.value; A.setPlaying(false); sync(); });
+  })();
+
+  /* ---------- sticky mini-nav highlight ---------- */
+  (function () {
+    const links = Array.from(document.querySelectorAll('.toc a'));
+    const secs = links.map(l => document.querySelector(l.getAttribute('href')));
+    function upd() {
+      let cur = 0;
+      secs.forEach((s, i) => { if (s.getBoundingClientRect().top < 120) cur = i; });
+      links.forEach((l, i) => l.classList.toggle('active', i === cur));
+    }
+    window.addEventListener('scroll', upd, { passive: true }); upd();
+  })();
+
+  let last = performance.now();
+  function frameLoop(ts) {
+    const dt = Math.min(0.05, Math.max(0, (ts - last) / 1000)); last = ts;
+    anims.forEach(a => {
+      if (!a.visible) return;
+      if (a.playing) { a.o.step(dt); a.o.draw(); }
+      else if (a.o.tween && a.o.tween(dt)) a.o.draw();
+      else if (a.dirty) a.o.draw();
+      a.dirty = false;
+    });
+    requestAnimationFrame(frameLoop);
+  }
+  function onResize() { anims.forEach(a => { a.dirty = true; }); }
+  window.addEventListener('resize', onResize);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(onResize);
+  requestAnimationFrame(frameLoop);
+})();
+</script>
+</body>
+</html>
