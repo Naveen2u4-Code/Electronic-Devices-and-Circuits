@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>2.4 Reverse Bias</title>
+  <meta name="description" content="The reverse-biased pn junction: a higher barrier and wider depletion region, why only a tiny reverse saturation current flows, how large IS is, the generation current that dominates in silicon, the band diagram under reverse bias and what reverse bias is used for. An interactive lesson.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1420;
+      --panel: #1a2132;
+      --panel-hover: #212a3f;
+      --border: #2a3448;
+      --text: #e6e9ef;
+      --muted: #9aa4b8;
+      --electron: #4fc3f7;
+      --hole: #ff8a65;
+      --energy: #ffd54f;
+      --success: #81c784;
+      --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+      --max: 960px;
+      --radius: 12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: var(--font); font-size: 16px; line-height: 1.65;
+      overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column;
+    }
+    a { color: var(--electron); }
+    .wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 16px; }
+
+    /* Sticky mini-nav */
+    .toc {
+      position: sticky; top: 0; z-index: 10; background: rgba(15, 20, 32, .95);
+      border-bottom: 1px solid var(--border); backdrop-filter: blur(6px);
+    }
+    .toc ul { display: flex; gap: 4px; list-style: none; margin: 0 auto; padding: 8px 16px; max-width: var(--max); overflow-x: auto; scrollbar-width: none; }
+    .toc ul::-webkit-scrollbar { display: none; }
+    .toc a {
+      display: block; white-space: nowrap; text-decoration: none; color: var(--muted);
+      font-size: 0.85rem; font-weight: 500; padding: 6px 10px; border-radius: 999px;
+    }
+    .toc a:hover { color: var(--text); background: var(--panel); }
+    .toc a.active { color: var(--bg); background: var(--electron); }
+
+    main { flex: 1; padding: 24px 0 48px; }
+    .crumbs { font-size: 0.875rem; color: var(--muted); margin: 0 0 16px; }
+    .crumbs a { color: var(--muted); }
+    .crumbs a:hover { color: var(--electron); }
+    .eyebrow { font-family: var(--mono); font-size: 0.8rem; color: var(--electron); letter-spacing: .04em; margin: 0; }
+    h1 { font-size: clamp(1.5rem, 6vw, 2.2rem); line-height: 1.2; margin: 4px 0 6px; }
+    .subtitle { color: var(--muted); margin: 0 0 8px; }
+    section { scroll-margin-top: 64px; padding-top: 28px; }
+    h2 { font-size: clamp(1.3rem, 5vw, 1.6rem); line-height: 1.25; margin: 0 0 14px; }
+    h3 { font-size: 1.05rem; margin: 0 0 8px; }
+    .prose { font-size: 17px; line-height: 1.7; max-width: 70ch; }
+    .prose p, .prose ul, .prose ol { margin: 0 0 14px; }
+    .prose ul, .prose ol { padding-left: 22px; }
+    .prose li { margin: 4px 0; }
+    .prose strong { color: #fff; }
+    .prose p.eq { text-align: center; font-family: var(--mono); font-size: 16px; background: #141b2b; border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; overflow-wrap: anywhere; }
+    hr.sep { border: 0; border-top: 1px solid var(--border); margin: 40px 0 0; }
+    .rm-note { font-size: 0.78rem; color: var(--muted); margin: 0 0 8px; }
+
+    /* Buttons & controls */
+    .btn {
+      font: inherit; font-size: 0.88rem; font-weight: 600; color: var(--text);
+      background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+      padding: 7px 12px; cursor: pointer; min-height: 38px;
+    }
+    .btn:hover:not(:disabled) { background: var(--panel-hover); border-color: var(--electron); }
+    .btn:focus-visible, input:focus-visible, canvas:focus-visible { outline: 2px solid var(--electron); outline-offset: 2px; }
+    .btn[aria-pressed="true"] { background: rgba(255,213,79,.14); border-color: var(--energy); color: var(--energy); }
+    .seg { display: inline-flex; flex-wrap: nowrap; }
+    .seg .btn { border-radius: 0; padding: 7px 12px; }
+    .seg .btn:first-child { border-radius: 8px 0 0 8px; }
+    .seg .btn:last-child { border-radius: 0 8px 8px 0; }
+    .seg .btn + .btn { margin-left: -1px; }
+
+    figure.anim {
+      margin: 18px 0 0; background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 12px; min-width: 0;
+    }
+    .ctrls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-bottom: 12px; }
+    .sliders { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-bottom: 12px; }
+    .slider { flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; }
+    .slider label { display: flex; justify-content: space-between; gap: 8px; font-size: 0.8rem; color: var(--muted); }
+    .slider output { font-family: var(--mono); color: var(--energy); white-space: nowrap; }
+    input[type="range"] { width: 100%; accent-color: var(--energy); margin: 4px 0 0; }
+    canvas { display: block; width: 100%; border-radius: 8px; background: #141b2b; }
+    .narrow { max-width: 820px; margin-left: auto; margin-right: auto; }
+
+    .counters { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px auto 0; }
+    .ctr {
+      flex: 1 1 110px; background: #141b2b; border: 1px solid var(--border); border-radius: 8px;
+      padding: 6px 10px; font-size: 0.78rem; color: var(--muted); min-width: 0;
+    }
+    .ctr b { display: block; font-family: var(--mono); font-size: 1rem; font-weight: 500; color: var(--text); overflow-wrap: anywhere; }
+    .ctr.v b { color: var(--energy); } .ctr.p b { color: #ef9a9a; } .ctr.n b { color: #90caf9; } .ctr.w b { color: var(--success); }
+    .ctr.b b { color: #ce93d8; } .ctr.q b { color: #ff8a65; } .ctr.e b { color: #4fc3f7; } .ctr.g b { color: #fff59d; }
+
+    /* Section 5 tiles */
+    .tiles { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 18px; }
+    .tiles figure.anim { margin: 0; }
+    .tiles h3 { font-size: 0.95rem; margin: 0 0 8px; color: var(--text); }
+    @media (min-width: 680px) { .tiles { grid-template-columns: 1fr 1fr; } }
+
+    .keypoints {
+      margin-top: 16px; padding: 14px 16px; border-radius: var(--radius);
+      background: rgba(129,199,132,.07); border: 1px solid rgba(129,199,132,.35);
+    }
+    .keypoints h3 { color: var(--success); font-size: 0.95rem; text-transform: uppercase; letter-spacing: .05em; }
+    .keypoints ul { margin: 0; padding-left: 20px; }
+    .keypoints li { margin: 4px 0; }
+
+    .further { margin-top: 48px; color: var(--muted); font-size: 0.85rem; }
+    .further h3 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 0 0 6px; }
+    .further ul { margin: 0; padding-left: 18px; }
+    .further li { margin: 3px 0; }
+
+    .pager { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 32px; }
+    .pager a {
+      display: block; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 12px 14px; text-decoration: none; color: var(--text); min-width: 0;
+    }
+    .pager a:hover { border-color: var(--electron); }
+    .pager small { display: block; color: var(--muted); font-size: 0.75rem; }
+    .pager .next { text-align: right; }
+    .site-foot { border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; text-align: center; padding: 18px 16px; }
+
+    /* Justified paragraphs on desktop; phones stay left-aligned to avoid wide word gaps. */
+    @media (min-width: 768px) {
+      .prose p, .prose li, .keypoints li { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+      .prose p.eq { text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="toc" aria-label="Sections">
+    <ul>
+      <li><a href="#s0">Connecting</a></li>
+      <li><a href="#s1">Almost no current</a></li>
+      <li><a href="#s2">Size of I<sub>S</sub></a></li>
+      <li><a href="#s3">Generation current</a></li>
+      <li><a href="#s4">Band diagram</a></li>
+      <li><a href="#s5">Uses</a></li>
+      <li><a href="#s6">Summary</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="wrap">
+      <header>
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="../../index.html">Home</a> / <a href="../index.html">Unit 2</a> / 2.4
+        </nav>
+        <p class="eyebrow">TOPIC 2.4</p>
+        <h1>Reverse Bias and Reverse Saturation Current</h1>
+        <p class="subtitle">Raising the barrier: why only a tiny, nearly constant current flows</p>
+        <p class="rm-note" id="rmNote" hidden>Your device asks for reduced motion, so every animation starts paused. Press Play on any animation to run it. Sliders and buttons still update the picture.</p>
+      </header>
+
+      <!-- ================= SECTION 0 ================= -->
+      <section id="s0" aria-labelledby="h0">
+        <h2 id="h0">Connecting a reverse bias</h2>
+        <div class="prose">
+          <p>A pn junction is <strong>REVERSE BIASED</strong> when the p side is connected to the <strong>NEGATIVE</strong> terminal of a battery and the n side to the <strong>POSITIVE</strong> terminal. The reverse voltage is written V<sub>R</sub> (a positive number), so the applied voltage is V = −V<sub>R</sub>.</p>
+          <p>The applied voltage adds to the built-in potential, so the barrier becomes <strong>HIGHER</strong>:</p>
+          <p class="eq">barrier = V<sub>bi</sub> + V<sub>R</sub></p>
+          <p>(Some books write the built-in potential as V<sub>0</sub> or φ<sub>i</sub> instead of V<sub>bi</sub>.)</p>
+          <p>The battery pulls holes in the p region toward the negative terminal and electrons in the n region toward the positive terminal, away from the junction. More fixed ions are uncovered, and the depletion region becomes <strong>WIDER</strong>:</p>
+          <p class="eq">W = √[ (2ε<sub>s</sub>·(V<sub>bi</sub> + V<sub>R</sub>) / q) · (N<sub>A</sub> + N<sub>D</sub>)/(N<sub>A</sub>·N<sub>D</sub>) ]</p>
+          <p>For the example junction, W grows from about <strong>0.33 µm at V<sub>R</sub> = 0</strong> to about <strong>0.90 µm at V<sub>R</sub> = 5 V</strong>. The maximum electric field at the junction also increases, from about <strong>4.6 × 10<sup>4</sup> V/cm</strong> to about <strong>1.3 × 10<sup>5</sup> V/cm</strong>. Because the field falls linearly to zero at both edges, its peak is simply |E<sub>max</sub>| = 2(V<sub>bi</sub> + V<sub>R</sub>)/W.</p>
+          <p>This movement of majority carriers happens only for a brief moment when the voltage is applied. It is not a steady current.</p>
+        </div>
+
+        <figure class="anim" id="anim0">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s0v"><span>Reverse voltage V<sub>R</sub></span><output id="o0v"></output></label><input type="range" id="s0v" min="0" max="20" step="0.1" value="5"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv0" style="aspect-ratio:720/470" role="img" aria-label="A pn junction drawn to scale with a battery connected p side to the negative terminal and n side to the positive terminal. As the reverse voltage slider rises, holes and electrons retreat from the junction, the hatched depletion region widens, the triangular electric-field plot below grows taller and wider, and the potential step grows to Vbi plus VR."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr b"><span>Barrier V<sub>bi</sub> + V<sub>R</sub></span><b id="c0b"></b></div>
+            <div class="ctr w"><span>W</span><b id="c0w"></b></div>
+            <div class="ctr p"><span>x<sub>p</sub></span><b id="c0p"></b></div>
+            <div class="ctr n"><span>x<sub>n</sub></span><b id="c0n"></b></div>
+            <div class="ctr v"><span>|E<sub>max</sub>|</span><b id="c0e"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: reverse bias connection">
+          <h3>Key points</h3>
+          <ul>
+            <li>Reverse bias: p to −, n to +; V = −V<sub>R</sub>.</li>
+            <li>The barrier rises to V<sub>bi</sub> + V<sub>R</sub>.</li>
+            <li>W widens as √(V<sub>bi</sub> + V<sub>R</sub>): 0.33 µm → 0.90 µm at 5 V; |E<sub>max</sub>| grows too.</li>
+            <li>Majority carriers move away only briefly; there is no steady current from this.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 1 ================= -->
+      <section id="s1" aria-labelledby="h1s">
+        <h2 id="h1s">Why almost no current flows</h2>
+        <div class="prose">
+          <p>With the higher barrier, majority carriers can no longer cross the junction by diffusion. Almost no holes from the p side reach the n side, and almost no electrons from the n side reach the p side.</p>
+          <p>But the strong field in the depletion region <strong>HELPS</strong> minority carriers. Any electron (a minority carrier in the p region) that wanders to the edge of the depletion region is swept across into the n region, and any hole in the n region that reaches the edge is swept into the p region. Near the depletion edges, the minority concentration drops almost to zero:</p>
+          <p class="eq">p<sub>n</sub>(x<sub>n</sub>) = p<sub>n0</sub> · exp(−V<sub>R</sub>/V<sub>T</sub>) ≈ 0 &nbsp; for V<sub>R</sub> above a few tenths of a volt</p>
+          <p>Minority carriers within about one diffusion length of the junction diffuse toward it and are collected. This flow forms a small, steady current called the <strong>REVERSE SATURATION CURRENT, I<sub>S</sub></strong> (some books call it I<sub>0</sub>). It is the same I<sub>S</sub> that appears in the diode equation: with V = −V<sub>R</sub>,</p>
+          <p class="eq">I = I<sub>S</sub>·[exp(−V<sub>R</sub>/V<sub>T</sub>) − 1] ≈ −I<sub>S</sub></p>
+          <p>It is called “saturation” current because, once V<sub>R</sub> is more than about 0.1 V (a few V<sub>T</sub>), the current stops depending on V<sub>R</sub>: the supply of minority carriers, not the voltage, sets it. At V<sub>R</sub> = 0.1 V the current is already within 2% of I<sub>S</sub>.</p>
+        </div>
+
+        <figure class="anim" id="anim1">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s1v"><span>Reverse voltage V<sub>R</sub></span><output id="o1v"></output></label><input type="range" id="s1v" min="0" max="5" step="0.01" value="1"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv1" style="aspect-ratio:720/640" role="img" aria-label="Top: the reverse-biased junction. A few thermally generated minority carriers, electrons on the p side and holes on the n side, wander randomly; when one reaches the depletion edge it is swept quickly across. Majority carriers that approach the junction bounce back. Middle: minority carrier profiles on both sides falling from their equilibrium values to nearly zero at the depletion edges, with the diffusion lengths Ln and Lp marked. Bottom: reverse current against reverse voltage on a log scale, rising quickly to a flat value IS."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr q"><span>p<sub>n</sub>(x<sub>n</sub>)/p<sub>n0</sub></span><b id="c1r"></b></div>
+            <div class="ctr w"><span>|I| / I<sub>S</sub></span><b id="c1f"></b></div>
+            <div class="ctr v"><span>|I|</span><b id="c1i"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: reverse saturation current">
+          <h3>Key points</h3>
+          <ul>
+            <li>Majority carriers are blocked by the higher barrier.</li>
+            <li>The field sweeps minority carriers across; edge concentrations fall to almost zero.</li>
+            <li>Minority carriers within about a diffusion length are collected: this is I<sub>S</sub>.</li>
+            <li>Beyond about 0.1 V the current is flat at −I<sub>S</sub>: “saturation”.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 2 ================= -->
+      <section id="s2" aria-labelledby="h2s">
+        <h2 id="h2s">How large is I<sub>S</sub>?</h2>
+        <div class="prose">
+          <p>From the diode theory:</p>
+          <p class="eq">I<sub>S</sub> = A · q · n<sub>i</sub><sup>2</sup> · [ D<sub>p</sub>/(L<sub>p</sub>·N<sub>D</sub>) + D<sub>n</sub>/(L<sub>n</sub>·N<sub>A</sub>) ]</p>
+          <p>The key factor is <strong>n<sub>i</sub><sup>2</sup></strong>. For silicon at room temperature, n<sub>i</sub><sup>2</sup> is very small, so I<sub>S</sub> is tiny: for the example diode (L<sub>p</sub> = √(D<sub>p</sub>τ<sub>p</sub>) ≈ 32 µm, L<sub>n</sub> ≈ 16 µm), it is about <strong>1.7 × 10<sup>−15</sup> A (1.7 fA)</strong>. For germanium, n<sub>i</sub> is about <strong>1,600 times</strong> larger, so n<sub>i</sub><sup>2</sup> is about <strong>2.6 million times</strong> larger. With the same other values, I<sub>S</sub> rises to about <strong>4.4 nA</strong> for our small diode; practical germanium diodes, with larger junctions, have I<sub>S</sub> in the <strong>microampere</strong> range.</p>
+          <p>I<sub>S</sub> is also proportional to the junction <strong>AREA A</strong>: a bigger diode has a bigger I<sub>S</sub>.</p>
+          <p>Because n<sub>i</sub> rises very rapidly with temperature, I<sub>S</sub> is extremely temperature-sensitive (topic 2.6).</p>
+        </div>
+
+        <figure class="anim" id="anim2">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <span class="seg" role="group" aria-label="Material">
+              <button class="btn" type="button" data-mat="si" aria-pressed="true">Si</button>
+              <button class="btn" type="button" data-mat="ge" aria-pressed="false">Ge</button>
+            </span>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s2a"><span>N<sub>A</sub></span><output id="o2a"></output></label><input type="range" id="s2a" min="14" max="19" step="0.1" value="17"></div>
+            <div class="slider"><label for="s2d"><span>N<sub>D</sub></span><output id="o2d"></output></label><input type="range" id="s2d" min="14" max="19" step="0.1" value="16"></div>
+            <div class="slider"><label for="s2x"><span>Area A</span><output id="o2x"></output></label><input type="range" id="s2x" min="-6" max="-1" step="0.1" value="-4"></div>
+            <div class="slider"><label for="s2p"><span>τ<sub>p</sub></span><output id="o2p"></output></label><input type="range" id="s2p" min="-2" max="2" step="0.1" value="0"></div>
+            <div class="slider"><label for="s2n"><span>τ<sub>n</sub></span><output id="o2n"></output></label><input type="range" id="s2n" min="-2" max="2" step="0.1" value="-1"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv2" style="aspect-ratio:720/370" role="img" aria-label="A large readout of the reverse saturation current IS for the chosen material, and two horizontal bars on a logarithmic current axis comparing IS for silicon and for germanium with the same doping, area and lifetimes. Small dots flow along each bar."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr v"><span>I<sub>S</sub> (selected)</span><b id="c2i"></b></div>
+            <div class="ctr q"><span>L<sub>p</sub></span><b id="c2lp"></b></div>
+            <div class="ctr e"><span>L<sub>n</sub></span><b id="c2ln"></b></div>
+            <div class="ctr w"><span>I<sub>S</sub>(Ge) / I<sub>S</sub>(Si)</span><b id="c2r"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: size of IS">
+          <h3>Key points</h3>
+          <ul>
+            <li>I<sub>S</sub> ∝ n<sub>i</sub><sup>2</sup>: about 1.7 fA for the silicon example.</li>
+            <li>Germanium: n<sub>i</sub> ×1,600, so I<sub>S</sub> × 2.6 million (≈ 4.4 nA here; µA in practical diodes).</li>
+            <li>I<sub>S</sub> ∝ junction area A.</li>
+            <li>n<sub>i</sub> rises fast with temperature, so I<sub>S</sub> does too.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 3 ================= -->
+      <section id="s3" aria-labelledby="h3s">
+        <h2 id="h3s">Generation current: the real reverse current in silicon</h2>
+        <div class="prose">
+          <p>In real silicon diodes, the measured reverse current is usually much larger than the ideal I<sub>S</sub>, typically in the picoampere to nanoampere range. For our small example diode it is about <strong>4 pA at V<sub>R</sub> = 0</strong> and about <strong>11 pA at V<sub>R</sub> = 5 V</strong>, some <strong>2,000 to 6,000 times</strong> its ideal I<sub>S</sub>. The main reason is <strong>GENERATION</strong> inside the depletion region.</p>
+          <p>The depletion region has no free carriers, so the normal balance between generation and recombination is broken. Thermal generation of electron-hole pairs continues there, and each pair is immediately separated by the field: the electron is swept to the n side and the hole to the p side. This produces a <strong>GENERATION CURRENT</strong>:</p>
+          <p class="eq">I<sub>gen</sub> = q · n<sub>i</sub> · W · A / (2τ<sub>0</sub>)</p>
+          <p>where τ<sub>0</sub> is a generation lifetime. Two important differences from I<sub>S</sub>:</p>
+          <ul>
+            <li>I<sub>gen</sub> is proportional to <strong>n<sub>i</sub></strong>, not n<sub>i</sub><sup>2</sup>. In silicon at room temperature, n<sub>i</sub> (1.5 × 10<sup>10</sup> cm<sup>−3</sup>) is about 700,000 times larger than n<sub>i</sub><sup>2</sup>/N<sub>D</sub> (2.25 × 10<sup>4</sup> cm<sup>−3</sup>). That far outweighs the other factors, so I<sub>gen</sub> dominates.</li>
+            <li>I<sub>gen</sub> is proportional to the depletion width <strong>W</strong>, which grows with V<sub>R</sub>. So the real reverse current is not perfectly flat: it rises slowly, roughly as √(V<sub>bi</sub> + V<sub>R</sub>).</li>
+          </ul>
+          <p>Some treatments use a generation width slightly smaller than W, but the difference is small at large V<sub>R</sub>. Surface leakage at the edges of the junction can add further current. In germanium, n<sub>i</sub> is 1,600 times larger, so I<sub>S</sub> (∝ n<sub>i</sub><sup>2</sup>) catches up with I<sub>gen</sub> (∝ n<sub>i</sub>); in practical germanium diodes the ideal I<sub>S</sub> is usually the larger part.</p>
+        </div>
+
+        <figure class="anim" id="anim3">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s3v"><span>Reverse voltage V<sub>R</sub></span><output id="o3v"></output></label><input type="range" id="s3v" min="0" max="20" step="0.1" value="5"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv3" style="aspect-ratio:720/600" role="img" aria-label="Top: the reverse-biased junction to scale, with small flashes inside the depletion region where electron-hole pairs are generated; each electron is swept to the n side and each hole to the p side. Middle: bars on a logarithmic scale for the ideal diffusion current IS, the generation current Igen and their sum. Bottom: total reverse current in picoamperes against reverse voltage, rising slowly, with IS nearly zero on this scale."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr w"><span>W</span><b id="c3w"></b></div>
+            <div class="ctr q"><span>I<sub>S</sub></span><b id="c3s"></b></div>
+            <div class="ctr g"><span>I<sub>gen</sub></span><b id="c3g"></b></div>
+            <div class="ctr v"><span>I<sub>gen</sub> / I<sub>S</sub></span><b id="c3r"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: generation current">
+          <h3>Key points</h3>
+          <ul>
+            <li>Pairs generated inside the depletion region are split by the field: I<sub>gen</sub> = q·n<sub>i</sub>·W·A/(2τ<sub>0</sub>).</li>
+            <li>I<sub>gen</sub> ∝ n<sub>i</sub>, I<sub>S</sub> ∝ n<sub>i</sub><sup>2</sup>: in silicon I<sub>gen</sub> wins (≈ 4–11 pA vs 1.7 fA here).</li>
+            <li>I<sub>gen</sub> ∝ W, so the real reverse current rises slowly, about as √(V<sub>bi</sub> + V<sub>R</sub>).</li>
+            <li>Surface leakage adds more; in germanium the ideal I<sub>S</sub> usually dominates.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 4 ================= -->
+      <section id="s4" aria-labelledby="h4s">
+        <h2 id="h4s">The band diagram under reverse bias</h2>
+        <div class="prose">
+          <p>Under reverse bias, the band bending increases from qV<sub>bi</sub> to <strong>q(V<sub>bi</sub> + V<sub>R</sub>)</strong>. The n-side Fermi level is now <strong>LOWER</strong> than the p-side Fermi level by <strong>qV<sub>R</sub></strong>. The barrier for majority carriers is much higher, so almost none can cross.</p>
+          <p>Minority carriers that reach the depletion region simply “fall” down the steep slope: electrons from the p side roll down into the n side's conduction band, and holes from the n side “float up” into the p side's valence band. This is the reverse current.</p>
+        </div>
+
+        <figure class="anim" id="anim4">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s4v"><span>Reverse voltage V<sub>R</sub></span><output id="o4v"></output></label><input type="range" id="s4v" min="0" max="20" step="0.1" value="5"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv4" style="aspect-ratio:720/550" role="img" aria-label="A strip of the junction above its energy-band diagram. As the reverse voltage rises, the depletion region widens in the strip and in the band diagram together, and the bands bend more, by q times Vbi plus VR. The electron quasi-Fermi level on the n side sits qVR below the hole quasi-Fermi level on the p side, and the two are separated by qVR across the depletion region. Occasional electrons on the p side roll down the conduction-band slope to the n side, and holes on the n side move up the valence-band slope to the p side."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr b"><span>Band bending q(V<sub>bi</sub> + V<sub>R</sub>)</span><b id="c4b"></b></div>
+            <div class="ctr v"><span>E<sub>Fp</sub> − E<sub>Fn</sub> = qV<sub>R</sub></span><b id="c4f"></b></div>
+            <div class="ctr w"><span>W</span><b id="c4w"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: band diagram">
+          <h3>Key points</h3>
+          <ul>
+            <li>Band bending grows to q(V<sub>bi</sub> + V<sub>R</sub>).</li>
+            <li>The n-side Fermi level sits qV<sub>R</sub> below the p side.</li>
+            <li>Majority carriers face a much higher hill; minority carriers roll down it: that is the reverse current.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 5 ================= -->
+      <section id="s5" aria-labelledby="h5s">
+        <h2 id="h5s">What reverse bias is used for</h2>
+        <div class="prose">
+          <p>The reverse-biased junction is not just an “off” state; it is useful in its own right:</p>
+          <ul>
+            <li>As an almost perfect <strong>ONE-WAY VALVE</strong> for rectifiers (Unit 4): a reverse-biased diode blocks current.</li>
+            <li>The depletion region acts like the dielectric of a capacitor whose width depends on V<sub>R</sub>. This gives a <strong>VOLTAGE-CONTROLLED CAPACITOR</strong> (the varactor diode, topic 3.4; capacitance in topic 2.8).</li>
+            <li>Light that creates electron-hole pairs in or near the depletion region adds to the reverse current. This is the <strong>PHOTODIODE</strong> (topic 3.3).</li>
+            <li>If V<sub>R</sub> becomes large enough, the junction <strong>BREAKS DOWN</strong> and a large reverse current flows (topic 2.9). The Zener diode uses this deliberately.</li>
+          </ul>
+        </div>
+
+        <div class="tiles">
+          <figure class="anim" id="anim5a">
+            <h3>Rectifier</h3>
+            <div class="ctrls">
+              <button class="btn" type="button" data-act="play">Pause</button>
+              <button class="btn" type="button" data-act="reset">Reset</button>
+            </div>
+            <canvas id="cv5a" style="aspect-ratio:360/250" role="img" aria-label="An alternating source drives a diode. In the positive half-cycle the depletion region narrows and current arrows flow; in the negative half-cycle it widens and no current flows. Small traces show the voltage and the current, which exists only for positive half-cycles."></canvas>
+          </figure>
+          <figure class="anim" id="anim5b">
+            <h3>Varactor</h3>
+            <div class="ctrls">
+              <button class="btn" type="button" data-act="play">Pause</button>
+              <button class="btn" type="button" data-act="reset">Reset</button>
+            </div>
+            <canvas id="cv5b" style="aspect-ratio:360/250" role="img" aria-label="A voltage knob turns back and forth. As VR rises the depletion region, acting as the dielectric between two plates, widens and the capacitance bar falls; as VR falls the region narrows and the capacitance rises."></canvas>
+          </figure>
+          <figure class="anim" id="anim5c">
+            <h3>Photodiode</h3>
+            <div class="ctrls">
+              <button class="btn" type="button" data-act="play">Pause</button>
+              <button class="btn" type="button" data-act="reset">Reset</button>
+            </div>
+            <canvas id="cv5c" style="aspect-ratio:360/250" role="img" aria-label="Pulses of light fall on a reverse-biased junction. Each photon absorbed in the depletion region creates an electron-hole pair that is swept apart, and the reverse current bar rises while the light is on and drops back when it is off."></canvas>
+          </figure>
+          <figure class="anim" id="anim5d">
+            <h3>Breakdown</h3>
+            <div class="ctrls">
+              <button class="btn" type="button" data-act="play">Pause</button>
+              <button class="btn" type="button" data-act="reset">Reset</button>
+            </div>
+            <canvas id="cv5d" style="aspect-ratio:360/250" role="img" aria-label="The reverse voltage ramps up. A dot moves along the reverse characteristic: the current stays tiny until the voltage reaches VZ, then shoots up while the voltage stays almost constant. The junction above fills with many generated carriers at breakdown."></canvas>
+          </figure>
+        </div>
+
+        <aside class="keypoints" aria-label="Key points: uses of reverse bias">
+          <h3>Key points</h3>
+          <ul>
+            <li>Rectifiers: a reverse-biased diode blocks current.</li>
+            <li>Varactor: W, and so the capacitance, is set by V<sub>R</sub>.</li>
+            <li>Photodiode: light-generated pairs in the depletion region add reverse current.</li>
+            <li>Breakdown: at a large enough V<sub>R</sub> the current shoots up; Zener diodes use this.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 6 ================= -->
+      <section id="s6" aria-labelledby="h6s">
+        <h2 id="h6s">Summary</h2>
+        <div class="prose">
+          <p>In reverse bias, the <strong>n side is positive</strong>. The barrier rises to <strong>V<sub>bi</sub> + V<sub>R</sub></strong>, the depletion region widens and the field grows. Majority carriers cannot cross, but minority carriers near the junction are swept across, giving a tiny <strong>reverse saturation current I<sub>S</sub></strong> (about 1.7 fA for the silicon example), independent of V<sub>R</sub> beyond about 0.1 V and proportional to <strong>n<sub>i</sub><sup>2</sup></strong>. In real silicon diodes, thermal generation in the depletion region gives a larger current (about 4–11 pA here), proportional to <strong>n<sub>i</sub></strong> and to <strong>W</strong>, that rises slowly with V<sub>R</sub>. Reverse bias is used for blocking, variable capacitance and photodetection, until breakdown.</p>
+        </div>
+
+        <figure class="anim" id="anim6">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s6v"><span>Reverse voltage V<sub>R</sub></span><output id="o6v"></output></label><input type="range" id="s6v" min="0" max="20" step="0.1" value="5"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv6" style="aspect-ratio:720/840" role="img" aria-label="Recap linked to one reverse-voltage slider: the junction to scale with generation flashes in the depletion region, the band diagram with its growing band bending and Fermi-level split, and the reverse I-V curve of total current against reverse voltage with a dot at the present voltage."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr b"><span>Barrier</span><b id="c6b"></b></div>
+            <div class="ctr q"><span>I<sub>S</sub></span><b id="c6s"></b></div>
+            <div class="ctr g"><span>I<sub>gen</sub></span><b id="c6g"></b></div>
+            <div class="ctr v"><span>Total |I|</span><b id="c6t"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: summary">
+          <h3>Key points</h3>
+          <ul>
+            <li>n side positive: barrier V<sub>bi</sub> + V<sub>R</sub>, wider W, stronger field.</li>
+            <li>Ideal reverse current: −I<sub>S</sub>, flat beyond ≈ 0.1 V, ∝ n<sub>i</sub><sup>2</sup>.</li>
+            <li>Real silicon: generation current ∝ n<sub>i</sub>·W dominates and rises slowly with V<sub>R</sub>.</li>
+            <li>Uses: blocking, varactors, photodiodes; limit: breakdown.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <aside class="further" aria-label="Further reading">
+        <h3>Further reading</h3>
+        <ul>
+          <li><em>Semiconductor Physics and Devices</em>, Donald A. Neamen. Chapters: “The pn Junction” and “The pn Junction Diode”.</li>
+          <li><em>Microelectronic Circuits</em> (6th ed.), Adel S. Sedra and Kenneth C. Smith. Chapter: “Semiconductors”.</li>
+          <li><em>Electronic Devices and Circuits</em>, Jacob Millman, Christos C. Halkias and Satyabrata Jit. Chapter: “Semiconductor-Diode Characteristics”.</li>
+          <li><em>Device Electronics for Integrated Circuits</em> (3rd ed.), Richard S. Muller, Theodore I. Kamins and Mansun Chan. Chapters: “pn Junctions” and “Currents in pn Junctions”.</li>
+        </ul>
+      </aside>
+
+      <nav class="pager" aria-label="Topic navigation">
+        <a href="../2-3-forward-bias/index.html"><small>← Previous</small>2.3 Forward Bias</a>
+        <a class="next" href="../2-5-vi-characteristics-diode-equation/index.html"><small>Next →</small>2.5 V-I Characteristics and the Diode Equation</a>
+      </nav>
+    </div>
+  </main>
+
+  <footer class="site-foot">© 2026 Naveen Bokka</footer>
+
+<script>
+(function () {
+  'use strict';
+  /* ---------- colours ---------- */
+  const C = {
+    text: '#e6e9ef', muted: '#9aa4b8', grid: 'rgba(255,255,255,.07)',
+    P: '#7d3a3a', N: '#2e4a7d', DEP: '#3a3f4f',
+    hole: '#ff8a65', elec: '#4fc3f7', acc: '#ef9a9a', don: '#90caf9',
+    field: '#ffd54f', volt: '#ffd54f', cur: '#81c784', gen: '#fff59d',
+    band: '#e6e9ef', efn: '#4fc3f7', efp: '#ff8a65', bar: '#ce93d8', metal: '#b0bec5', axis: '#5a6478'
+  };
+  const FONT = 'Inter, system-ui, sans-serif';
+  const MONO = '"JetBrains Mono", Consolas, monospace';
+  const RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const TAU = Math.PI * 2;
+  const $ = id => document.getElementById(id);
+  if (RM) $('rmNote').hidden = false;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const lerp = (a, b, u) => a + (b - a) * u;
+  const hash = k => { const s = Math.sin(k * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+
+  /* ---------- number formatting ---------- */
+  const SUP = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '-': '⁻' };
+  const sup = n => String(n).split('').map(ch => SUP[ch] || ch).join('');
+  function sci(v, d) {
+    if (v === 0) return '0';
+    const neg = v < 0; v = Math.abs(v);
+    let e = Math.floor(Math.log10(v)), m = v / Math.pow(10, e);
+    if (+m.toFixed(d) >= 10) { m /= 10; e += 1; }
+    return (neg ? '−' : '') + m.toFixed(d) + ' × 10' + sup(e);
+  }
+  const fUm = v => (v >= 1 ? v.toFixed(2) : v >= 0.1 ? v.toFixed(3) : v.toFixed(4)) + ' µm';
+  // Engineering prefixes for currents
+  function fA(i) {
+    const P = [[1e-3, 'mA'], [1e-6, 'µA'], [1e-9, 'nA'], [1e-12, 'pA'], [1e-15, 'fA'], [1e-18, 'aA']];
+    for (let k = 0; k < P.length; k++) if (i >= P[k][0] * 0.9995) { const v = i / P[k][0]; return (v >= 100 ? v.toFixed(0) : v >= 10 ? v.toFixed(1) : v.toFixed(2)) + ' ' + P[k][1]; }
+    return sci(i, 2) + ' A';
+  }
+  const fRatio = r => r >= 1e4 ? sci(r, 2) : r >= 100 ? Math.round(r).toLocaleString('en-US') : r.toFixed(r >= 10 ? 1 : 3);
+
+  /* ---------- physics: example junction (step junction, depletion approximation, cm units) ----------
+       Vbi = VT·ln(NA·ND/ni²); W = √[2εs(Vbi+VR)/q · (NA+ND)/(NA·ND)]; |Emax| = 2(Vbi+VR)/W
+       IS  = A·q·ni²·[Dp/(Lp·ND) + Dn/(Ln·NA)];  Igen = q·ni·W·A/(2τ0)                     */
+  const Q = 1.602e-19, ES = 11.7 * 8.854e-14, VT = 0.0259, NI = 1.5e10, NI_GE = 2.4e13;
+  const NA0 = 1e17, ND0 = 1e16, DEV = { A: 1e-4, Dp: 10, tp: 1e-6, Dn: 25, tn: 1e-7, t0: 1e-6 };
+  const PN0 = NI * NI / ND0, NP0 = NI * NI / NA0;
+  const LP0 = Math.sqrt(DEV.Dp * DEV.tp) * 1e4, LN0 = Math.sqrt(DEV.Dn * DEV.tn) * 1e4;   // µm
+  const VBI = VT * Math.log(NA0 * ND0 / (NI * NI));
+  function jr(VR) {
+    const Vt = VBI + VR, W = Math.sqrt(2 * ES * Vt / Q * (NA0 + ND0) / (NA0 * ND0));
+    return { VR, Vt, W, xn: W * NA0 / (NA0 + ND0), xp: W * ND0 / (NA0 + ND0), Em: 2 * Vt / W };
+  }
+  function isOf(o) {
+    o = Object.assign({ ni: NI, NA: NA0, ND: ND0, A: DEV.A, Dp: DEV.Dp, Dn: DEV.Dn, tp: DEV.tp, tn: DEV.tn }, o || {});
+    const Lp = Math.sqrt(o.Dp * o.tp), Ln = Math.sqrt(o.Dn * o.tn);
+    return o.A * Q * o.ni * o.ni * (o.Dp / (Lp * o.ND) + o.Dn / (Ln * o.NA));
+  }
+  const IS0 = isOf();
+  const igen = VR => Q * NI * jr(VR).W * DEV.A / (2 * DEV.t0);
+  const iIdeal = VR => IS0 * (1 - Math.exp(-VR / VT));        // magnitude of the ideal reverse current
+  const iTot = VR => iIdeal(VR) + igen(VR);
+  const W0 = jr(0).W, W5 = jr(5).W;
+
+  /* ---------- Canvas helpers ---------- */
+  let FS = 1;
+  function Cv(id, W, H, cap) { this.el = $(id); this.W = W; this.H = H; this.cap = cap || 2; this.ctx = this.el.getContext('2d'); }
+  Cv.prototype.begin = function () {
+    const w = this.el.clientWidth; if (!w) return null;
+    const dpr = window.devicePixelRatio || 1;
+    const pw = Math.round(w * dpr), ph = Math.round(w * dpr * this.H / this.W);
+    if (this.el.width !== pw || this.el.height !== ph) { this.el.width = pw; this.el.height = ph; }
+    const c = this.ctx, s = pw / this.W;
+    FS = Math.min(this.cap, Math.max(1, 1.15 * this.W / w));
+    c.setTransform(s, 0, 0, s, 0, 0); c.clearRect(0, 0, this.W, this.H);
+    c.textBaseline = 'middle'; c.textAlign = 'left'; c.globalAlpha = 1; c.setLineDash([]); c.lineCap = 'butt'; c.shadowBlur = 0;
+    return c;
+  };
+  // Watermark: drawn inside the canvas, bottom-right, 13 px on screen at any size, never interactive.
+  Cv.prototype.wm = function (c) {
+    const k = this.W / this.el.clientWidth, s = 13 * k;
+    c.save(); c.setTransform(this.el.width / this.W, 0, 0, this.el.width / this.W, 0, 0);
+    c.globalAlpha = 1; c.shadowBlur = 0; c.font = '500 ' + s.toFixed(1) + 'px ' + FONT; c.fillStyle = 'rgba(255,255,255,.35)';
+    c.textAlign = 'right'; c.textBaseline = 'bottom'; c.fillText('© Naveen Bokka', this.W - 6 * k, this.H - 4 * k); c.restore();
+  };
+  function circ(c, x, y, r, fill, stroke, lw) {
+    c.beginPath(); c.arc(x, y, Math.max(0, r), 0, TAU);
+    if (fill) { c.fillStyle = fill; c.fill(); }
+    if (stroke) { c.strokeStyle = stroke; c.lineWidth = lw || 1.5; c.stroke(); }
+  }
+  function txt(c, s, x, y, col, size, weight, align, font) {
+    c.font = (weight || 600) + ' ' + ((size || 12) * FS).toFixed(1) + 'px ' + (font || FONT);
+    c.fillStyle = col || C.text; c.textAlign = align || 'left'; c.fillText(s, x, y);
+  }
+  // Label made of [main, subscript] parts, e.g. [['V','bi'],[' + V','R']]
+  function subs(c, parts, x, y, col, size, align) {
+    const z = (size || 13) * FS, zs = z * 0.72;
+    let w = 0;
+    const ws = parts.map(p => {
+      c.font = '700 ' + z.toFixed(1) + 'px ' + FONT; const a = c.measureText(p[0]).width;
+      c.font = '700 ' + zs.toFixed(1) + 'px ' + FONT; const b = p[1] ? c.measureText(p[1]).width : 0;
+      w += a + b; return [a, b];
+    });
+    let x0 = align === 'right' ? x - w : align === 'center' ? x - w / 2 : x;
+    c.fillStyle = col; c.textAlign = 'left';
+    parts.forEach((p, k) => {
+      c.font = '700 ' + z.toFixed(1) + 'px ' + FONT; c.fillText(p[0], x0, y); x0 += ws[k][0];
+      if (p[1]) { c.font = '700 ' + zs.toFixed(1) + 'px ' + FONT; c.fillText(p[1], x0, y + z * 0.3); x0 += ws[k][1]; }
+    });
+    return w;
+  }
+  function line(c, x0, y0, x1, y1, col, lw, dash) {
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []);
+    c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke(); c.setLineDash([]);
+  }
+  function pline(c, pts, col, lw, dash) {
+    if (pts.length < 2) return;
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []); c.lineJoin = 'round';
+    c.beginPath(); pts.forEach((p, k) => k ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); c.stroke(); c.setLineDash([]);
+  }
+  function arrow(c, x0, y0, x1, y1, col, lw, head) {
+    const dx = x1 - x0, dy = y1 - y0, L = Math.hypot(dx, dy); if (L < 2) return;
+    lw = lw || 3;
+    const ux = dx / L, uy = dy / L, hs = Math.min(head || 10, L * 0.8), hw = Math.max(hs * 0.55, lw * 0.9);
+    line(c, x0, y0, x1 - ux * hs * 0.9, y1 - uy * hs * 0.9, col, lw);
+    c.fillStyle = col; c.beginPath(); c.moveTo(x1, y1);
+    c.lineTo(x1 - ux * hs - uy * hw, y1 - uy * hs + ux * hw);
+    c.lineTo(x1 - ux * hs + uy * hw, y1 - uy * hs - ux * hw); c.closePath(); c.fill();
+  }
+  function darrow(c, x0, x1, y, col) {   // dimension arrow with end ticks
+    line(c, x0, y - 5, x0, y + 5, col, 1.3); line(c, x1, y - 5, x1, y + 5, col, 1.3);
+    if (x1 - x0 > 14) { arrow(c, (x0 + x1) / 2, y, x0 + 1, y, col, 1.4, 6); arrow(c, (x0 + x1) / 2, y, x1 - 1, y, col, 1.4, 6); }
+    else line(c, x0, y, x1, y, col, 1.4);
+  }
+  function rect(c, x, y, w, h, fill) { c.fillStyle = fill; c.fillRect(x, y, w, h); }
+  function hatch(c, x0, y0, x1, y1) {
+    if (x1 - x0 < 0.5) return;
+    rect(c, x0, y0, x1 - x0, y1 - y0, C.DEP);
+    c.save(); c.beginPath(); c.rect(x0, y0, x1 - x0, y1 - y0); c.clip();
+    c.strokeStyle = 'rgba(255,255,255,.10)'; c.lineWidth = 1; c.beginPath();
+    for (let x = x0 - (y1 - y0); x < x1; x += 9) { c.moveTo(x, y1); c.lineTo(x + (y1 - y0), y0); }
+    c.stroke(); c.restore();
+  }
+  function ion(c, x, y, r, kind, a) {   // circled − (acceptor) or circled + (donor)
+    const col = kind === 'a' ? C.acc : C.don;
+    c.globalAlpha = a; circ(c, x, y, r, null, col, Math.max(1, r * 0.22));
+    c.strokeStyle = col; c.lineWidth = Math.max(1, r * 0.24); c.beginPath();
+    c.moveTo(x - r * 0.5, y); c.lineTo(x + r * 0.5, y);
+    if (kind === 'd') { c.moveTo(x, y - r * 0.5); c.lineTo(x, y + r * 0.5); }
+    c.stroke(); c.globalAlpha = 1;
+  }
+  function carrier(c, x, y, kind, a, r) {
+    c.globalAlpha = a; circ(c, x, y, r || (kind === 'h' ? 3.6 : 3.2), kind === 'h' ? C.hole : C.elec); c.globalAlpha = 1;
+  }
+  function glowCarrier(c, x, y, kind, a, r) { c.save(); c.shadowColor = kind === 'h' ? C.hole : C.elec; c.shadowBlur = 8; carrier(c, x, y, kind, a, r); c.restore(); }
+  function flash(c, x, y, u) {   // generation flash, u: 0 → 1
+    c.save(); c.globalAlpha = 1 - u; c.shadowColor = C.gen; c.shadowBlur = 14;
+    circ(c, x, y, 3 + 10 * u, null, C.gen, 2); circ(c, x, y, 3 * (1 - u), C.gen); c.restore();
+  }
+  const jig = (k, ph, amp) => [amp * Math.sin(ph * 1.7 + k * 1.31), amp * Math.cos(ph * 1.3 + k * 2.07)];
+  function regionLabels(c, B) {
+    const s = 11 * FS;
+    c.fillStyle = 'rgba(15,20,32,.75)';
+    c.fillRect(B.x + 2, B.y + 2, s + 6, s + 8); c.fillRect(B.x + B.w - s - 8, B.y + 2, s + 6, s + 8);
+    txt(c, 'p', B.x + 5 + s / 2, B.y + 6 + s / 2, '#fff', 14, 700, 'center');
+    txt(c, 'n', B.x + B.w - 5 - s / 2, B.y + 6 + s / 2, '#fff', 14, 700, 'center');
+  }
+  const tweenTo = (cur, target, dt, rate) => Math.abs(cur - target) < 1e-3 ? target : cur + (target - cur) * Math.min(1, dt * (rate || 5));
+  const tweenLog = (cur, target, dt) => { const a = Math.log(cur), b = Math.log(target); return Math.abs(a - b) < 0.003 ? target : Math.exp(a + (b - a) * Math.min(1, dt * 5)); };
+  const ladder = (need, L) => { for (let k = 0; k < L.length; k++) if (L[k] >= need) return L[k]; return L[L.length - 1]; };
+
+  /* ---------- Animation registry ---------- */
+  const anims = [];
+  function Anim(rootId, o) {
+    this.root = $(rootId); this.o = o; this.playing = !RM; this.visible = true; this.dirty = true;
+    this.pb = this.root.querySelector('[data-act="play"]');
+    this.pb.addEventListener('click', () => this.setPlaying(!this.playing));
+    this.root.querySelector('[data-act="reset"]').addEventListener('click', () => { o.reset(); this.setPlaying(!RM); });
+    o.reset(); this.sync(); anims.push(this);
+    if ('IntersectionObserver' in window) {
+      this.visible = false;
+      new IntersectionObserver(es => es.forEach(e => { this.visible = e.isIntersecting; if (this.visible) this.dirty = true; }))
+        .observe(this.root);
+    }
+  }
+  Anim.prototype.setPlaying = function (p) { this.playing = p; this.sync(); this.dirty = true; };
+  Anim.prototype.sync = function () { this.pb.textContent = this.playing ? 'Pause' : 'Play'; };
+
+  /* ---------- shared reverse voltage (Sections 0, 3, 4, 6) ---------- */
+  const SV = { VR: 5, subs: [] };
+  const VSL = ['s0v', 's3v', 's4v', 's6v'];
+  const fV = v => v.toFixed(v < 10 ? 2 : 1) + ' V';
+  function setVR(v) {
+    SV.VR = clamp(+v, 0, 20);
+    VSL.forEach(id => { $(id).value = SV.VR; $(id.replace('s', 'o')).textContent = fV(SV.VR); });
+    SV.subs.forEach(f => f());
+  }
+  VSL.forEach(id => $(id).addEventListener('input', e => setVR(e.target.value)));
+
+  /* ---------- junction bar drawn to scale: window from −0.42 µm to +1.68 µm ----------
+     The junction sits 20% from the left so the wide n-side depletion fits at 20 V.   */
+  const SPAN = 2.1, JF = 0.2;
+  const spA = 22, spD = 30;        // visual lattice spacing (heavier doping → denser)
+  function barGeom(B, j) {
+    const k = B.w / SPAN, jx = B.x + JF * B.w;
+    return { k, jx, eL: Math.max(B.x, jx - j.xp * 1e4 * k), eR: Math.min(B.x + B.w, jx + j.xn * 1e4 * k) };
+  }
+  // Majority carriers stay uniformly spread between the depletion edge and the contact, so
+  // as the edge moves out they visibly retreat toward the contacts.
+  function jbarR(c, B, j, ph) {
+    const g = barGeom(B, j);
+    rect(c, B.x, B.y, g.jx - B.x, B.h, C.P); rect(c, g.jx, B.y, B.x + B.w - g.jx, B.h, C.N);
+    hatch(c, g.eL, B.y, g.eR, B.y + B.h);
+    [['a', spA, -1], ['d', spD, 1]].forEach(s => {
+      const nr = Math.max(2, Math.floor(B.h / s[1])), dy = B.h / nr, r = Math.min(6, s[1] * 0.3);
+      const edge = s[2] < 0 ? g.eL : g.eR, end = s[2] < 0 ? B.x + 2 : B.x + B.w - 2;
+      for (let i = 0; ; i++) {          // fixed ions inside the depletion region
+        const x = g.jx + s[2] * (s[1] / 2 + i * s[1]);
+        if (s[2] < 0 ? x < edge + 2 : x > edge - 2) break;
+        for (let rr = 0; rr < nr; rr++) ion(c, x, B.y + dy * (rr + 0.5), r, s[0], 1);
+      }
+      const n0 = Math.max(3, Math.round(Math.abs(end - g.jx) / s[1]) - 1);
+      const len = Math.abs(end - edge);
+      const n = Math.max(1, Math.min(n0, Math.floor(len / (s[1] * 0.55))));
+      for (let i = 0; i < n; i++) for (let rr = 0; rr < nr; rr++) {
+        if ((i + rr) % 2) continue;
+        const key = i * 31 + rr * 7 + (s[2] > 0 ? 900 : 0), d = jig(key, ph, 2);
+        const x = edge + s[2] * (i + 0.5) * len / n;
+        carrier(c, x + d[0], B.y + dy * (rr + 0.5) + d[1], s[0] === 'a' ? 'h' : 'e', 0.95, 3.2);
+      }
+    });
+    line(c, g.jx, B.y, g.jx, B.y + B.h, 'rgba(255,255,255,.55)', 1.2, [4, 4]);
+    regionLabels(c, B);
+    return g;
+  }
+  function umTicks(c, B, y) {
+    const k = B.w / SPAN, jx = B.x + JF * B.w;
+    [-0.4, 0, 0.4, 0.8, 1.2, 1.6].forEach(u => {
+      const x = jx + u * k; line(c, x, y - 3, x, y + 3, C.axis, 1);
+      txt(c, (u === 0 ? '0' : u.toFixed(1)) + (u === 1.6 ? ' µm' : ''), x, y + 11, C.muted, 9, 500, 'center', MONO);
+    });
+  }
+
+  /* ---------- generation events in the depletion region (Sections 3 and 6) ---------- */
+  function GenEvents() { this.P = []; this.acc = 0; }
+  GenEvents.prototype.step = function (dt, B, g, rateScale) {
+    const wpx = g.eR - g.eL;
+    this.acc += dt * wpx * (rateScale || 0.05);
+    while (this.acc >= 1) {
+      this.acc -= 1;
+      this.P.push({ x: g.eL + Math.random() * wpx, y: B.y + 8 + Math.random() * (B.h - 16), t: 0, xe: null, xh: null });
+    }
+    const v = 260 * B.w / 640;
+    this.P.forEach(p => {
+      p.t += dt;
+      if (p.t > 0.25) {
+        if (p.xe === null) { p.xe = p.x; p.xh = p.x; }
+        p.xe += v * dt; p.xh -= v * dt;
+      }
+    });
+    this.P = this.P.filter(p => p.t < 0.25 || p.xe < g.eR + 30 || p.xh > g.eL - 30);
+  };
+  GenEvents.prototype.draw = function (c, g) {
+    this.P.forEach(p => {
+      if (p.t < 0.3) flash(c, p.x, p.y, p.t / 0.3);
+      if (p.xe !== null) {
+        const ae = p.xe > g.eR ? clamp(1 - (p.xe - g.eR) / 30, 0, 1) : 1;
+        const ah = p.xh < g.eL ? clamp(1 - (g.eL - p.xh) / 30, 0, 1) : 1;
+        if (ae > 0) glowCarrier(c, p.xe, p.y - 4, 'e', ae, 3.4);
+        if (ah > 0) glowCarrier(c, p.xh, p.y + 4, 'h', ah, 3.6);
+      }
+    });
+  };
+
+  /* ---------- reverse-bias band diagram (Sections 4 and 6) ----------
+     Schematic x axis: depletion region drawn with width ∝ W (to the same relative scale as
+     W changes), neutral regions represent 3 diffusion lengths each. Energies in eV with the
+     p-side Fermi level at 0, upward positive. n side: EFn = −VR.                        */
+  const DP = VT * Math.log(NA0 / NI), EG = 1.12;
+  function bandLayoutR(G, VR) {
+    const j = jr(VR), jx = G.x + G.w * 0.38, Wpx = 130 * (G.w / 616) * j.W / W5;
+    const eL = jx - Wpx * j.xp / j.W, eR = jx + Wpx * j.xn / j.W;
+    return { j, jx, eL, eR, pLn: (eL - G.x) / 3, pLp: (G.x + G.w - eR) / 3 };
+  }
+  function eiAtR(Lg, px) {   // intrinsic level at pixel px
+    const { j, jx, eL, eR } = Lg, a = j.xp / j.W;
+    let s;
+    if (px <= eL) s = 0; else if (px >= eR) s = 1;
+    else if (px < jx) { const u = (px - eL) / (jx - eL); s = a * u * u; }
+    else { const u = (eR - px) / (eR - jx); s = 1 - (1 - a) * u * u; }
+    return DP - s * j.Vt;
+  }
+  // Quasi-Fermi levels: minority carriers are depleted near the edges, so each minority
+  // quasi-Fermi level bends from the far-side value toward the majority level over a diffusion length.
+  function efnAtR(Lg, px, VR) {
+    if (px >= Lg.eL) return -VR;
+    const d = (Lg.eL - px) / Lg.pLn, r = 1 + (Math.exp(-VR / VT) - 1) * Math.exp(-d);
+    return Math.max(-VR, VT * Math.log(Math.max(r, 1e-300)));
+  }
+  function efpAtR(Lg, px, VR) {
+    if (px <= Lg.eR) return 0;
+    const d = (px - Lg.eR) / Lg.pLp, r = 1 + (Math.exp(-VR / VT) - 1) * Math.exp(-d);
+    return Math.min(0, -VR - VT * Math.log(Math.max(r, 1e-300)));
+  }
+  function bandRev(c, G, VR, span, ph, movers, o) {
+    o = o || {};
+    const Lg = bandLayoutR(G, VR);
+    const top = DP + EG / 2 + 0.25 * span / 2.5, bot = top - span;
+    const Y = E => G.y + (top - E) / (top - bot) * G.h;
+    if (G.bar) {   // schematic strip, same x layout as the band diagram
+      const by = G.bar[0], bh = G.bar[1];
+      rect(c, G.x, by, Lg.jx - G.x, bh, C.P); rect(c, Lg.jx, by, G.x + G.w - Lg.jx, bh, C.N);
+      hatch(c, Lg.eL, by, Lg.eR, by + bh);
+      for (let i = 0; i < 14; i++) {
+        const d = jig(i, ph, 1.6);
+        const xh = G.x + 10 + hash(i + 3) * (Lg.eL - G.x - 20), xe = Lg.eR + 10 + hash(i + 9) * (G.x + G.w - Lg.eR - 20);
+        carrier(c, xh + d[0], by + 7 + hash(i + 5) * (bh - 14) + d[1], 'h', 0.9, 3);
+        carrier(c, xe + d[0], by + 7 + hash(i + 7) * (bh - 14) + d[1], 'e', 0.9, 3);
+      }
+      regionLabels(c, { x: G.x, y: by, w: G.w, h: bh });
+      [Lg.eL, Lg.eR].forEach(x => line(c, x, by + bh, x, G.y + G.h, 'rgba(255,255,255,.16)', 1, [3, 4]));
+    }
+    const xs = []; for (let px = G.x; px <= G.x + G.w + 0.1; px += 2) xs.push(px);
+    pline(c, xs.map(px => [px, Y(eiAtR(Lg, px) + EG / 2)]), C.band, 2.6);
+    pline(c, xs.map(px => [px, Y(eiAtR(Lg, px) - EG / 2)]), C.band, 2.6);
+    pline(c, xs.map(px => [px, Y(efnAtR(Lg, px, VR))]), C.efn, 2, [7, 5]);
+    pline(c, xs.map(px => [px, Y(efpAtR(Lg, px, VR))]), C.efp, 2, [3, 4]);
+    // labels
+    const lx = G.x - 6;
+    subs(c, [['E', 'c']], lx, Y(DP + EG / 2), C.band, 12, 'right');
+    subs(c, [['E', 'v']], lx, Y(DP - EG / 2) + 9 * FS, C.band, 12, 'right');
+    subs(c, [['E', 'Fp']], lx, Y(0) - 9 * FS, C.efp, 12, 'right');
+    subs(c, [['E', 'Fn']], G.x + G.w - 4, Y(-VR) + 12, C.efn, 12, 'right');
+    subs(c, [['E', 'c']], G.x + G.w - 4, Y(DP + EG / 2 - Lg.j.Vt) - 11, C.band, 11, 'right');
+    // qVR between the Fermi levels, across the depletion region
+    if (VR > 0.05) {
+      const qx = (Lg.eL + Lg.eR) / 2 + 8;
+      line(c, Lg.eL - 30, Y(0), Lg.eR + 30, Y(0), 'rgba(255,138,101,.35)', 1, [2, 3]);
+      arrow(c, qx, (Y(0) + Y(-VR)) / 2, qx, Y(0) + 1, C.volt, 1.6, 6); arrow(c, qx, (Y(0) + Y(-VR)) / 2, qx, Y(-VR) - 1, C.volt, 1.6, 6);
+      subs(c, [['qV', 'R']], qx + 7, (Y(0) + Y(-VR)) / 2, C.volt, 11, 'left');
+    }
+    // barrier q(Vbi + VR) between the conduction-band edges
+    const yT = Y(DP + EG / 2), yB = Y(DP + EG / 2 - Lg.j.Vt), ax = Lg.eL - 26;
+    line(c, ax - 8, yB, Lg.eR + 4, yB, 'rgba(206,147,216,.55)', 1, [4, 3]);
+    arrow(c, ax, (yT + yB) / 2, ax, yT + 1, C.bar, 2, 7); arrow(c, ax, (yT + yB) / 2, ax, yB - 1, C.bar, 2, 7);
+    subs(c, [['q(V', 'bi'], [' + V', 'R'], [')', '']], ax - 6, (yT + yB) / 2, C.bar, 11, 'right');
+    // majority carriers sitting at their band edges
+    for (let i = 0; i < (o.mini ? 9 : 16); i++) {
+      const d = jig(i + 30, ph, 1.6), e = -Math.log(1 - 0.95 * hash(i + 11)) * 6;
+      const xe = Lg.eR + 10 + hash(i + 2) * (G.x + G.w - Lg.eR - 24);
+      carrier(c, xe + d[0], yB - 4 - e + d[1] * 0.4, 'e', 0.8, 3);
+      const xh = G.x + 10 + hash(i + 4) * (Lg.eL - G.x - 20);
+      carrier(c, xh + d[0], Y(DP - EG / 2) + 4 + e + d[1] * 0.4, 'h', 0.8, 3);
+    }
+    // minority carriers rolling across: electrons p → n down Ec, holes n → p up Ev
+    if (movers) movers.forEach(m => {
+      let x, E;
+      if (m.k === 'e') {
+        const start = G.x + 8 + m.x0 * (Lg.eL - G.x - 16);
+        x = m.t < 0.6 ? lerp(start, Lg.eL, m.t / 0.6) : lerp(Lg.eL, Lg.eR + 40, Math.min(1, (m.t - 0.6) / 0.5));
+        E = eiAtR(Lg, x) + EG / 2 + 0.03 * span;
+      } else {
+        const start = Lg.eR + 8 + m.x0 * (G.x + G.w - Lg.eR - 16);
+        x = m.t < 0.6 ? lerp(start, Lg.eR, m.t / 0.6) : lerp(Lg.eR, Lg.eL - 40, Math.min(1, (m.t - 0.6) / 0.5));
+        E = eiAtR(Lg, x) - EG / 2 - 0.03 * span;
+      }
+      const a = m.t > 1.1 ? clamp(1 - (m.t - 1.1) / 0.3, 0, 1) : 1;
+      m.done = m.t > 1.4;
+      glowCarrier(c, x, Y(E), m.k, a, 4);
+    });
+    return Lg;
+  }
+  function moverStepR(list, acc, dt) {
+    acc.v += dt * 1.6;
+    while (acc.v >= 1) { acc.v -= 1; list.push({ t: 0, x0: Math.random(), k: Math.random() < 0.5 ? 'e' : 'h', done: false }); }
+    list.forEach(m => { m.t += dt * 0.8; });
+    return list.filter(m => !m.done);
+  }
+  const SPANS = [2.5, 5, 10, 25];
+  const spanFor = VR => ladder(VBI + VR + EG + 0.5, SPANS);
+
+  /* ---------- reverse I–V: total current (pA, linear) against VR (Sections 3 and 6) ---------- */
+  function ivRev(c, G, VR, o) {
+    o = o || {};
+    const Imax = 25e-12, X = v => G.x + v / 20 * G.w, Y = i => G.y + G.h - i / Imax * G.h;
+    rect(c, G.x, G.y, G.w, G.h, 'rgba(255,255,255,.02)');
+    [0, 5, 10, 15, 20, 25].forEach(p => { line(c, G.x, Y(p * 1e-12), G.x + G.w, Y(p * 1e-12), C.grid, 1); txt(c, String(p), G.x - 6, Y(p * 1e-12), C.muted, 10, 500, 'right', MONO); });
+    txt(c, '|I| (pA)', G.x - 6, G.y - 12 - 4 * FS, C.muted, 11, 600, 'right');
+    line(c, G.x, G.y + G.h, G.x + G.w, G.y + G.h, C.axis, 1.2); line(c, G.x, G.y, G.x, G.y + G.h, C.axis, 1.2);
+    [0, 5, 10, 15, 20].forEach(v => { line(c, X(v), G.y + G.h, X(v), G.y + G.h + 4, C.axis, 1); txt(c, String(v) + (v === 20 ? ' V' : ''), X(v), G.y + G.h + 14, C.muted, 10, 500, v === 20 ? 'right' : 'center', MONO); });
+    subs(c, [['V', 'R']], G.x + G.w / 2, G.y + G.h + 28, C.muted, 11, 'center');
+    const pts = []; for (let v = 0; v <= 20.001; v += 0.1) pts.push([X(v), Y(iTot(v))]);
+    pline(c, pts, C.cur, 2.6);
+    line(c, G.x, Y(IS0) - 1, G.x + G.w, Y(IS0) - 1, C.hole, 1.6, [5, 4]);
+    subs(c, [['I', 'S']], G.x + G.w - 4, Y(IS0) - 10, C.hole, 11, 'right');
+    subs(c, [['I', 'gen'], [' + I', 'S']], X(13), Y(iTot(13)) - 14, C.cur, 11, 'center');
+    const yv = Y(iTot(VR));
+    line(c, X(VR), G.y + G.h, X(VR), yv, 'rgba(255,213,79,.35)', 1, [2, 3]);
+    circ(c, X(VR), yv, 6, C.volt, '#0f1420', 2);
+  }
+
+  /* =========================================================
+     0. Battery, widening depletion region, field triangle and potential step
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv0', 720, 470);
+    const B = { x: 72, y: 90, w: 576, h: 66 };
+    const EG0 = { x: 72, y: 208, w: 576, h: 100 }, PG = { x: 72, y: 334, w: 576, h: 96 };
+    let ph, VRd, pScale, pulse;
+    function counters() {
+      const j = jr(SV.VR);
+      $('c0b').textContent = j.Vt.toFixed(3) + ' V'; $('c0w').textContent = fUm(j.W * 1e4);
+      $('c0p').textContent = fUm(j.xp * 1e4); $('c0n').textContent = fUm(j.xn * 1e4);
+      $('c0e').textContent = sci(j.Em, 2) + ' V/cm';
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const j = jr(VRd);
+      // wires and battery (p to −, n to +)
+      const wy = 52, lx = 61, rx = 659, bx = 360;
+      pline(c, [[lx, B.y], [lx, wy], [bx - 9, wy]], C.metal, 1.8);
+      pline(c, [[bx + 9, wy], [rx, wy], [rx, B.y]], C.metal, 1.8);
+      line(c, bx - 9, wy - 9, bx - 9, wy + 9, C.volt, 5);      // short plate (−) on the p side
+      line(c, bx + 9, wy - 16, bx + 9, wy + 16, C.volt, 3);    // long plate (+) on the n side
+      txt(c, '−', bx - 22, wy - 12, C.volt, 14, 700, 'center'); txt(c, '+', bx + 22, wy - 12, C.volt, 14, 700, 'center');
+      subs(c, [['V', 'R'], [' = ' + VRd.toFixed(1) + ' V', '']], bx, 14, C.volt, 12, 'center');
+      rect(c, 50, B.y, 22, B.h, C.metal); rect(c, 648, B.y, 22, B.h, C.metal);
+      // brief charging current while the depletion region is still widening
+      if (pulse > 0.02) {
+        c.globalAlpha = clamp(pulse, 0, 1);
+        arrow(c, lx, B.y - 4, lx, wy + 10, C.cur, 2.6, 9); arrow(c, rx, wy + 10, rx, B.y - 4, C.cur, 2.6, 9);
+        txt(c, 'i', lx + 10, (wy + B.y) / 2, C.cur, 13, 700);
+        c.globalAlpha = 1;
+      }
+      const g = jbarR(c, B, j, ph);
+      const yw = B.y + B.h + 14;
+      darrow(c, g.eL, g.eR, yw, C.cur); txt(c, 'W', g.eR + 8, yw, C.cur, 13, 700);
+      umTicks(c, B, yw + 16);
+      // electric field magnitude (fixed scale, 2.5 × 10⁵ V/cm full height)
+      const Emx = 2.5e5, Ye = e => EG0.y + EG0.h - e / Emx * EG0.h;
+      rect(c, EG0.x, EG0.y, EG0.w, EG0.h, 'rgba(255,255,255,.02)');
+      line(c, EG0.x, EG0.y + EG0.h, EG0.x + EG0.w, EG0.y + EG0.h, C.axis, 1.2);
+      txt(c, '|E|', EG0.x - 8, EG0.y + 8, C.text, 12, 700, 'right');
+      const j0 = jr(0), g0 = barGeom(B, j0);
+      pline(c, [[g0.eL, Ye(0)], [g0.jx, Ye(j0.Em)], [g0.eR, Ye(0)]], 'rgba(154,164,184,.55)', 1.4, [5, 4]);
+      c.fillStyle = 'rgba(255,213,79,.18)'; c.beginPath(); c.moveTo(g.eL, Ye(0)); c.lineTo(g.jx, Ye(j.Em)); c.lineTo(g.eR, Ye(0)); c.closePath(); c.fill();
+      pline(c, [[g.eL, Ye(0)], [g.jx, Ye(j.Em)], [g.eR, Ye(0)]], C.field, 2.6);
+      subs(c, [['E', 'max']], g.jx + 8, Ye(j.Em) - 2, C.field, 12, 'left');
+      // potential step (auto-scaled 1-2-5 ladder)
+      const Yv = v => PG.y + PG.h - 6 - v / pScale * (PG.h - 14);
+      rect(c, PG.x, PG.y, PG.w, PG.h, 'rgba(255,255,255,.02)');
+      txt(c, 'V(x)', PG.x - 8, PG.y + 8, C.text, 12, 700, 'right');
+      line(c, PG.x, Yv(0), PG.x + PG.w, Yv(0), C.axis, 1);
+      const xs = []; for (let px = PG.x; px <= PG.x + PG.w; px += 2) xs.push(px);
+      const phiAt = (jj, gg, px) => {
+        const x = (px - gg.jx) / gg.k * 1e-4;
+        if (x <= -jj.xp) return 0; if (x >= jj.xn) return jj.Vt;
+        return x < 0 ? Q * NA0 / (2 * ES) * (x + jj.xp) * (x + jj.xp) : jj.Vt - Q * ND0 / (2 * ES) * (jj.xn - x) * (jj.xn - x);
+      };
+      pline(c, xs.map(px => [px, Yv(phiAt(j0, g0, px))]), 'rgba(154,164,184,.55)', 1.4, [5, 4]);
+      pline(c, xs.map(px => [px, Yv(phiAt(j, g, px))]), C.volt, 2.6);
+      const ax = PG.x + PG.w - 16;
+      arrow(c, ax, (Yv(0) + Yv(j.Vt)) / 2, ax, Yv(j.Vt) + 1, C.volt, 2, 7); arrow(c, ax, (Yv(0) + Yv(j.Vt)) / 2, ax, Yv(0) - 1, C.volt, 2, 7);
+      subs(c, [['V', 'bi'], [' + V', 'R']], ax - 8, Math.max(PG.y + 10, Yv(j.Vt) + 12), C.volt, 11, 'right');
+      txt(c, pScale + ' V', PG.x + 4, Yv(pScale), C.muted, 9, 500, 'left', MONO);
+      cv.wm(c);
+    }
+    function tween(dt) {
+      let moved = false;
+      if (VRd !== SV.VR) { const before = VRd; VRd = tweenTo(VRd, SV.VR, dt, 3); if (VRd > before) pulse = 1; moved = true; }
+      const t = ladder(VBI + VRd, [1, 2, 5, 10, 25]);
+      if (pScale !== t) { pScale = tweenLog(pScale, t, dt); moved = true; }
+      if (pulse > 0) { pulse = Math.max(0, pulse - dt * 2.5); moved = true; }
+      return moved;
+    }
+    const o = {
+      reset() { ph = 0; pulse = 0; setVR(5); VRd = 5; pScale = ladder(VBI + 5, [1, 2, 5, 10, 25]); },
+      step(dt) { ph += dt; tween(dt); }, tween, draw
+    };
+    const A = new Anim('anim0', o);
+    SV.subs.push(() => { A.dirty = true; counters(); });
+    counters();
+  })();
+
+  /* =========================================================
+     1. Minority carriers collected, majority carriers turned back;
+        minority profiles; reverse I–V on a log axis (0–5 V)
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv1', 720, 640);
+    const B = { x: 40, y: 22, w: 640, h: 120 }, G = { x: 40, y: 190, w: 640, h: 170 }, IG = { x: 104, y: 416, w: 560, h: 130 };
+    const SX = 60;                              // half-window, µm (schematic bar and profile share it)
+    const jx = B.x + B.w / 2, k = (B.w / 2) / SX;
+    let ph, VR, M, J, acc;
+    function depPx() { const j = jr(VR), w = 10 + 30 * j.W / W5; return { eL: jx - w * j.xp / j.W - 2, eR: jx + w * j.xn / j.W }; }
+    function counters() {
+      $('o1v').textContent = fV(VR);
+      const r = Math.exp(-VR / VT), f = 1 - r;
+      $('c1r').textContent = r > 1e-3 ? r.toFixed(3) : sci(r, 1); $('c1f').textContent = f.toFixed(4); $('c1i').textContent = f > 0 ? fA(IS0 * f) : '0';
+    }
+    function spawnMinority() {   // thermally generated minority carriers, uniformly in the neutral regions
+      const d = depPx();
+      if (Math.random() < 0.5) M.push({ k: 'e', x: B.x + 6 + Math.random() * (d.eL - B.x - 12), y: B.y + 8 + Math.random() * (B.h - 16), s: 0, life: 4 + Math.random() * 6, age: 0 });
+      else M.push({ k: 'h', x: d.eR + 6 + Math.random() * (B.x + B.w - d.eR - 12), y: B.y + 8 + Math.random() * (B.h - 16), s: 0, life: 4 + Math.random() * 6, age: 0 });
+    }
+    function step(dt) {
+      ph += dt;
+      const d = depPx();
+      acc += dt * 5;
+      while (acc >= 1) { acc -= 1; spawnMinority(); }
+      const D = 34 * B.w / 640;                 // random-walk step scale
+      const sweep = VR > 0.05;
+      M.forEach(p => {
+        p.age += dt;
+        if (p.s === 0) {
+          p.x += (Math.random() - 0.5) * D * 2.2 * Math.sqrt(dt) * 6; p.y = clamp(p.y + (Math.random() - 0.5) * D * Math.sqrt(dt) * 6, B.y + 5, B.y + B.h - 5);
+          p.x = clamp(p.x, B.x + 4, B.x + B.w - 4);
+          if (p.k === 'e' && p.x >= d.eL) p.s = sweep ? 1 : 0;
+          if (p.k === 'h' && p.x <= d.eR) p.s = sweep ? 1 : 0;
+          if (!sweep) { if (p.k === 'e') p.x = Math.min(p.x, d.eL - 1); else p.x = Math.max(p.x, d.eR + 1); }
+        } else {
+          p.x += (p.k === 'e' ? 1 : -1) * 420 * dt; p.s += dt;
+        }
+      });
+      M = M.filter(p => (p.s === 0 && p.age < p.life) || (p.s > 0 && p.s < 0.45));
+      // majority carriers that try the barrier and are turned back
+      if (Math.random() < dt * 1.4) {
+        const left = Math.random() < 0.5;
+        J.push(left ? { k: 'h', x0: d.eL - 70, dir: 1, y: B.y + 10 + Math.random() * (B.h - 20), t: 0 } : { k: 'e', x0: d.eR + 70, dir: -1, y: B.y + 10 + Math.random() * (B.h - 20), t: 0 });
+      }
+      J.forEach(m => { m.t += dt; });
+      J = J.filter(m => m.t < 1.6);
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const d = depPx();
+      rect(c, B.x, B.y, jx - B.x, B.h, C.P); rect(c, jx, B.y, B.x + B.w - jx, B.h, C.N);
+      hatch(c, d.eL, B.y, d.eR, B.y + B.h);
+      for (let i = 0; i < 26; i++) {           // dense majority background
+        const g = jig(i, ph, 1.8);
+        carrier(c, B.x + 8 + hash(i + 1) * (d.eL - B.x - 20) + g[0], B.y + 8 + hash(i + 2) * (B.h - 16) + g[1], 'h', 0.35, 3);
+        carrier(c, d.eR + 12 + hash(i + 5) * (B.x + B.w - d.eR - 20) + g[0], B.y + 8 + hash(i + 6) * (B.h - 16) + g[1], 'e', 0.35, 3);
+      }
+      J.forEach(m => {                          // approach the edge, bounce back
+        const edge = m.dir > 0 ? d.eL - 4 : d.eR + 4, u = m.t / 1.6, s = u < 0.5 ? u / 0.5 : (1 - u) / 0.5;
+        const x = lerp(m.x0, edge, s), a = u > 0.85 ? (1 - u) / 0.15 : 1;
+        carrier(c, x, m.y, m.k, 0.95 * a, 3.6);
+      });
+      M.forEach(p => {
+        let a = p.s === 0 ? Math.min(1, p.age / 0.3, (p.life - p.age) / 0.4) : clamp(1 - p.s / 0.45, 0, 1);
+        glowCarrier(c, p.x, p.y, p.k, clamp(a, 0, 1), 3.8);
+      });
+      regionLabels(c, B);
+      // profiles, normalised to the equilibrium minority concentration on each side
+      const Y = r => G.y + G.h - r * (G.h - 22);
+      rect(c, G.x, G.y, G.w, G.h, 'rgba(255,255,255,.02)');
+      line(c, G.x, Y(0), G.x + G.w, Y(0), C.axis, 1.2);
+      line(c, G.x, Y(1), G.x + G.w, Y(1), 'rgba(255,255,255,.2)', 1, [4, 4]);
+      subs(c, [['n', 'p0']], G.x + 4, Y(1) - 10, C.elec, 11, 'left');
+      subs(c, [['p', 'n0']], G.x + G.w - 4, Y(1) - 10, C.hole, 11, 'right');
+      hatch(c, d.eL, G.y, d.eR, G.y + G.h);
+      const e = Math.exp(-VR / VT), pp = [], nn = [];
+      for (let px = d.eR; px <= G.x + G.w; px += 2) pp.push([px, Y(1 + (e - 1) * Math.exp(-(px - d.eR) / k / LP0))]);
+      for (let px = d.eL; px >= G.x; px -= 2) nn.push([px, Y(1 + (e - 1) * Math.exp(-(d.eL - px) / k / LN0))]);
+      pline(c, pp, C.hole, 2.6); pline(c, nn, C.elec, 2.6);
+      const xLp = d.eR + LP0 * k, xLn = d.eL - LN0 * k;
+      line(c, xLp, G.y + 4, xLp, G.y + G.h, 'rgba(255,138,101,.5)', 1, [3, 3]); subs(c, [['L', 'p']], xLp + 4, G.y + 14, C.hole, 11, 'left');
+      line(c, xLn, G.y + 4, xLn, G.y + G.h, 'rgba(79,195,247,.5)', 1, [3, 3]); subs(c, [['L', 'n']], xLn - 4, G.y + 14, C.elec, 11, 'right');
+      subs(c, [['n', 'p'], ['(x)', '']], G.x + 120, Y(1 + (e - 1) * Math.exp(-(d.eL - G.x - 120) / k / LN0)) + 14, C.elec, 11, 'center');
+      subs(c, [['p', 'n'], ['(x)', '']], G.x + G.w - 140, Y(1 + (e - 1) * Math.exp(-(G.x + G.w - 140 - d.eR) / k / LP0)) + 14, C.hole, 11, 'center');
+      [-60, -30, 0, 30, 60].forEach(u => { const x = jx + u * k; line(c, x, G.y + G.h, x, G.y + G.h + 4, C.axis, 1); txt(c, String(u) + (u === 60 ? ' µm' : ''), x, G.y + G.h + 13, C.muted, 9, 500, u === 60 ? 'right' : u === -60 ? 'left' : 'center', MONO); });
+      // I–V on a log axis, 10⁻¹⁷ to 10⁻¹⁴ A
+      const X = v => IG.x + v / 5 * IG.w, Yi = i => IG.y + IG.h - (Math.log10(Math.max(i, 1e-18)) + 17) / 3 * IG.h;
+      rect(c, IG.x, IG.y, IG.w, IG.h, 'rgba(255,255,255,.02)');
+      [-17, -16, -15, -14].forEach(ex => { line(c, IG.x, Yi(Math.pow(10, ex)), IG.x + IG.w, Yi(Math.pow(10, ex)), C.grid, 1); txt(c, '10' + sup(ex), IG.x - 6, Yi(Math.pow(10, ex)), C.muted, 10, 500, 'right', MONO); });
+      txt(c, '|I| (A)', IG.x - 6, IG.y - 12 - 6 * FS, C.muted, 11, 600, 'right');
+      line(c, IG.x, IG.y + IG.h, IG.x + IG.w, IG.y + IG.h, C.axis, 1.2); line(c, IG.x, IG.y, IG.x, IG.y + IG.h, C.axis, 1.2);
+      [0, 1, 2, 3, 4, 5].forEach(v => { line(c, X(v), IG.y + IG.h, X(v), IG.y + IG.h + 4, C.axis, 1); txt(c, String(v) + (v === 5 ? ' V' : ''), X(v), IG.y + IG.h + 14, C.muted, 10, 500, v === 5 ? 'right' : 'center', MONO); });
+      subs(c, [['V', 'R']], IG.x + IG.w / 2, IG.y + IG.h + 28, C.muted, 11, 'center');
+      line(c, IG.x, Yi(IS0), IG.x + IG.w, Yi(IS0), 'rgba(255,138,101,.55)', 1.2, [5, 4]);
+      subs(c, [['I', 'S']], IG.x + IG.w - 4, Yi(IS0) - 11, C.hole, 11, 'right');
+      c.save(); c.beginPath(); c.rect(IG.x, IG.y - 2, IG.w, IG.h + 2); c.clip();
+      const pts = []; for (let v = 0.0005; v <= 5; v += v < 0.2 ? 0.002 : 0.02) pts.push([X(v), Yi(iIdeal(v))]);
+      pline(c, pts, C.cur, 2.6); c.restore();
+      if (VR > 0.0005) { const yv = Yi(iIdeal(VR)); line(c, X(VR), IG.y + IG.h, X(VR), yv, 'rgba(255,213,79,.35)', 1, [2, 3]); circ(c, X(VR), yv, 6, C.volt, '#0f1420', 2); }
+      cv.wm(c);
+    }
+    let A = null;
+    const o = { reset() { ph = 0; M = []; J = []; acc = 0; VR = 1; $('s1v').value = 1; for (let i = 0; i < 14; i++) spawnMinority(); counters(); }, step, draw };
+    A = new Anim('anim1', o);
+    $('s1v').addEventListener('input', e => { VR = +e.target.value; counters(); A.dirty = true; });
+  })();
+
+  /* =========================================================
+     2. IS calculator: Si / Ge on a log scale
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv2', 720, 370);
+    let ph, st, mat, bw;   // bw: displayed bar lengths (tweened)
+    const val = () => {
+      const o = { NA: Math.pow(10, st.a), ND: Math.pow(10, st.d), A: Math.pow(10, st.x), tp: Math.pow(10, st.p) * 1e-6, tn: Math.pow(10, st.n) * 1e-6 };
+      return { si: isOf(Object.assign({ ni: NI }, o)), ge: isOf(Object.assign({ ni: NI_GE }, o)), Lp: Math.sqrt(DEV.Dp * o.tp) * 1e4, Ln: Math.sqrt(DEV.Dn * o.tn) * 1e4 };
+    };
+    const LMIN = -21, LMAX = -1;
+    const frac = i => clamp((Math.log10(i) - LMIN) / (LMAX - LMIN), 0, 1);
+    const fCm = lg => sci(Math.pow(10, lg), 1) + ' cm⁻³';
+    const fT = lg => { const v = Math.pow(10, lg); return (v >= 10 ? v.toFixed(0) : v >= 1 ? v.toFixed(1) : v.toFixed(2)) + ' µs'; };
+    function sync() {
+      ['a', 'd', 'x', 'p', 'n'].forEach(k => { $('s2' + k).value = st[k]; });
+      $('o2a').textContent = fCm(st.a); $('o2d').textContent = fCm(st.d);
+      $('o2x').textContent = sci(Math.pow(10, st.x), 1) + ' cm²';
+      $('o2p').textContent = fT(st.p); $('o2n').textContent = fT(st.n);
+      const v = val();
+      $('c2i').textContent = fA(mat === 'si' ? v.si : v.ge);
+      $('c2lp').textContent = v.Lp.toFixed(v.Lp >= 10 ? 1 : 2) + ' µm'; $('c2ln').textContent = v.Ln.toFixed(v.Ln >= 10 ? 1 : 2) + ' µm';
+      $('c2r').textContent = sci(v.ge / v.si, 2);
+      if (A) A.dirty = true;
+    }
+    let A = null;
+    function tween(dt) {
+      const v = val(), t = [frac(v.si), frac(v.ge)];
+      if (bw[0] === t[0] && bw[1] === t[1]) return false;
+      bw = bw.map((b, i) => tweenTo(b, t[i], dt, 6)); return true;
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const v = val(), G = { x: 80, w: 600 };
+      // big readout
+      txt(c, mat === 'si' ? 'Si' : 'Ge', 40, 40, mat === 'si' ? C.elec : C.hole, 16, 700, 'left');
+      let rx = 40 + c.measureText(mat === 'si' ? 'Si' : 'Ge').width + 10 * FS;
+      rx += subs(c, [['I', 'S']], rx, 40, C.text, 16, 'left') + 8 * FS;
+      txt(c, '= ' + fA(mat === 'si' ? v.si : v.ge), rx, 40, C.volt, 22, 700, 'left', MONO);
+      // log axis
+      const X = lg => G.x + (lg - LMIN) / (LMAX - LMIN) * G.w, ay = 266;
+      line(c, G.x, ay, G.x + G.w, ay, C.axis, 1.2);
+      for (let lg = LMIN; lg <= LMAX; lg++) {
+        const big = (lg + 21) % 3 === 0;
+        line(c, X(lg), ay, X(lg), ay + (big ? 6 : 3), C.axis, 1);
+        if (big) {
+          const lab = { '-18': 'aA', '-15': 'fA', '-12': 'pA', '-9': 'nA', '-6': 'µA', '-3': 'mA' }[String(lg)] || '';
+          txt(c, '10' + sup(lg), X(lg), ay + 16, C.muted, 10, 500, 'center', MONO);
+          if (lab) txt(c, lab, X(lg), ay + 30, C.muted, 10, 600, 'center');
+          line(c, X(lg), 86, X(lg), ay, C.grid, 1);
+        }
+      }
+      txt(c, 'A', G.x + G.w + 4, ay + 16, C.muted, 10, 600, 'left', MONO);
+      // bars
+      [['Si', 0, C.elec, v.si, 104], ['Ge', 1, C.hole, v.ge, 176]].forEach(b => {
+        const y = b[4], h = 44, len = bw[b[1]] * G.w, sel = (mat === 'si') === (b[1] === 0);
+        txt(c, b[0], G.x - 10, y + h / 2, b[2], 14, 700, 'right');
+        rect(c, G.x, y, G.w, h, '#0f1420');
+        c.globalAlpha = sel ? 0.9 : 0.45; rect(c, G.x, y, len, h, b[2]); c.globalAlpha = 1;
+        if (sel) { c.strokeStyle = C.volt; c.lineWidth = 2; c.strokeRect(G.x + 1, y + 1, Math.max(0, len - 2), h - 2); }
+        // flowing dots: speed grows with log current
+        const n = 9, sp = 30 + 70 * bw[b[1]];
+        for (let i = 0; i < n; i++) {
+          const x = G.x + ((ph * sp + i * len / n) % Math.max(1, len));
+          if (len > 10) circ(c, x, y + h / 2 + (i % 2 ? 7 : -7), 2.6, 'rgba(15,20,32,.55)');
+        }
+        const lbl = fA(b[3]), lx = G.x + len + 8;
+        if (lx + 70 < G.x + G.w) txt(c, lbl, lx, y + h / 2, b[2], 12, 700, 'left', MONO);
+        else txt(c, lbl, G.x + len - 8, y + h / 2, '#0f1420', 12, 700, 'right', MONO);
+      });
+      cv.wm(c);
+    }
+    const o = {
+      reset() { ph = 0; st = { a: 17, d: 16, x: -4, p: 0, n: -1 }; setMat('si'); const v = val(); bw = [frac(v.si), frac(v.ge)]; sync(); },
+      step(dt) { ph += dt; tween(dt); }, tween, draw
+    };
+    let setMat = m => { mat = m; };
+    A = new Anim('anim2', o);
+    ['a', 'd', 'x', 'p', 'n'].forEach(k => $('s2' + k).addEventListener('input', e => { st[k] = +e.target.value; sync(); }));
+    const bs = Array.from(document.querySelectorAll('#anim2 [data-mat]'));
+    setMat = m => { mat = m; bs.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mat === m))); sync(); };
+    bs.forEach(b => b.addEventListener('click', () => setMat(b.dataset.mat)));
+    setMat('si');
+  })();
+
+  /* =========================================================
+     3. Generation current: events in the depletion region,
+        IS / Igen / total bars, slowly rising reverse I–V
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv3', 720, 600);
+    const B = { x: 72, y: 24, w: 576, h: 84 }, IG = { x: 104, y: 336, w: 560, h: 160 };
+    let ph, E, VRd;
+    function counters() {
+      const VR = SV.VR, ig = igen(VR), is = iIdeal(Math.max(VR, 1e-9));
+      $('c3w').textContent = fUm(jr(VR).W * 1e4); $('c3s').textContent = fA(IS0); $('c3g').textContent = fA(ig);
+      $('c3r').textContent = fRatio(ig / IS0);
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const j = jr(VRd), g = jbarR(c, B, j, ph);
+      E.draw(c, g);
+      const yw = B.y + B.h + 14; darrow(c, g.eL, g.eR, yw, C.cur); txt(c, 'W', g.eR + 8, yw, C.cur, 13, 700);
+      // log bars: 10⁻¹⁶ … 10⁻¹⁰ A
+      const LX = { x: 140, w: 520 }, L0 = -16, L1 = -10, X = i => LX.x + clamp((Math.log10(i) - L0) / (L1 - L0), 0, 1) * LX.w;
+      const ig = igen(VRd), rows = [[['I', 'S']], [['I', 'gen']], [['I', 'S'], [' + I', 'gen']]];
+      const vals = [IS0, ig, IS0 + ig], cols = [C.hole, C.gen, C.cur];
+      for (let ex = L0; ex <= L1; ex++) { line(c, X(Math.pow(10, ex)), 150, X(Math.pow(10, ex)), 286, C.grid, 1); txt(c, '10' + sup(ex), X(Math.pow(10, ex)), 298, C.muted, 10, 500, 'center', MONO); }
+      txt(c, '(A)', LX.x + LX.w, 314, C.muted, 10, 600, 'right', MONO);
+      vals.forEach((v, i) => {
+        const y = 156 + i * 44, h = 30;
+        subs(c, rows[i], LX.x - 10, y + h / 2, cols[i], 12, 'right');
+        rect(c, LX.x, y, LX.w, h, '#0f1420'); rect(c, LX.x, y, X(v) - LX.x, h, cols[i]);
+        const s = fA(v), tx = X(v) + 8;
+        if (tx + 64 < LX.x + LX.w) txt(c, s, tx, y + h / 2, cols[i], 12, 700, 'left', MONO); else txt(c, s, X(v) - 8, y + h / 2, '#0f1420', 12, 700, 'right', MONO);
+      });
+      ivRev(c, IG, VRd);
+      cv.wm(c);
+    }
+    function tween(dt) { if (VRd === SV.VR) return false; VRd = tweenTo(VRd, SV.VR, dt, 3); return true; }
+    const o = {
+      reset() { ph = 0; E = new GenEvents(); setVR(5); VRd = 5; },
+      step(dt) { ph += dt; tween(dt); const j = jr(VRd); E.step(dt, B, barGeom(B, j), 0.035); },
+      tween, draw
+    };
+    const A = new Anim('anim3', o);
+    SV.subs.push(() => { A.dirty = true; counters(); });
+    counters();
+  })();
+
+  /* =========================================================
+     4. Band diagram under reverse bias
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv4', 720, 550);
+    const G = { x: 64, w: 616, y: 86, h: 400, bar: [14, 50] };
+    let ph, Mv, acc, VRd, span;
+    function counters() {
+      const VR = SV.VR;
+      $('c4b').textContent = (VBI + VR).toFixed(3) + ' eV'; $('c4f').textContent = VR.toFixed(2) + ' eV'; $('c4w').textContent = fUm(jr(VR).W * 1e4);
+    }
+    function tween(dt) {
+      let m = false;
+      if (VRd !== SV.VR) { VRd = tweenTo(VRd, SV.VR, dt, 3); m = true; }
+      const t = spanFor(VRd); if (span !== t) { span = tweenLog(span, t, dt); m = true; }
+      return m;
+    }
+    const o = {
+      reset() { ph = 0; Mv = []; acc = { v: 0 }; setVR(5); VRd = 5; span = spanFor(5); },
+      step(dt) { ph += dt; tween(dt); Mv = moverStepR(Mv, acc, dt); },
+      tween,
+      draw() { const c = cv.begin(); if (!c) return; bandRev(c, G, VRd, span, ph, Mv); cv.wm(c); }
+    };
+    const A = new Anim('anim4', o);
+    SV.subs.push(() => { A.dirty = true; counters(); });
+    counters();
+  })();
+
+  /* =========================================================
+     5. Uses: four small tiles
+     ========================================================= */
+  const TB = { x: 24, y: 40, w: 312, h: 50 };   // tile junction bar
+  function tileBar(c, wFrac, ph, light) {
+    const jx = TB.x + TB.w / 2, half = 8 + 70 * wFrac, eL = jx - half * 0.35, eR = jx + half;
+    rect(c, TB.x, TB.y, jx - TB.x, TB.h, C.P); rect(c, jx, TB.y, TB.x + TB.w - jx, TB.h, C.N);
+    hatch(c, eL, TB.y, eR, TB.y + TB.h);
+    for (let i = 0; i < 8; i++) {
+      const d = jig(i, ph, 1.4);
+      carrier(c, TB.x + 6 + hash(i + 1) * (eL - TB.x - 12) + d[0], TB.y + 8 + hash(i + 2) * (TB.h - 16) + d[1], 'h', 0.8, 2.8);
+      carrier(c, eR + 6 + hash(i + 5) * (TB.x + TB.w - eR - 12) + d[0], TB.y + 8 + hash(i + 6) * (TB.h - 16) + d[1], 'e', 0.8, 2.8);
+    }
+    txt(c, 'p', TB.x + 8, TB.y + 10, '#fff', 12, 700, 'center'); txt(c, 'n', TB.x + TB.w - 8, TB.y + 10, '#fff', 12, 700, 'center');
+    return { jx, eL, eR };
+  }
+
+  // 5a: rectifier
+  (function () {
+    const cv = new Cv('cv5a', 360, 250);
+    let ph;
+    const o = {
+      reset() { ph = 0; }, step(dt) { ph += dt; },
+      draw() {
+        const c = cv.begin(); if (!c) return;
+        const w = 2 * Math.PI * 0.35, v = Math.sin(w * ph), fwd = v > 0;
+        const g = tileBar(c, fwd ? 0.05 * (1 - v) : 0.15 + 0.5 * (-v), ph);
+        txt(c, fwd ? 'forward' : 'reverse', 180, 22, fwd ? C.cur : C.volt, 12, 700, 'center');
+        if (fwd && v > 0.25) { const off = (ph * 60) % 30; for (let x = TB.x + 6 - 30 + off; x < TB.x + TB.w - 20; x += 30) if (x > TB.x) arrow(c, x, TB.y + TB.h + 12, x + 18, TB.y + TB.h + 12, C.cur, 2.4, 7); }
+        else if (!fwd) { line(c, g.jx - 10, TB.y + TB.h + 6, g.jx + 10, TB.y + TB.h + 18, C.hole, 2.4); line(c, g.jx + 10, TB.y + TB.h + 6, g.jx - 10, TB.y + TB.h + 18, C.hole, 2.4); }
+        // traces
+        const T = { x: 40, y: 128, w: 296, h: 92 }, mid = T.y + T.h / 2;
+        line(c, T.x, mid, T.x + T.w, mid, C.axis, 1);
+        const pv = [], pi = [];
+        for (let px = 0; px <= T.w; px += 2) {
+          const t = ph - (T.w - px) / T.w * 4.5, s = Math.sin(w * t);
+          pv.push([T.x + px, mid - s * 38]); pi.push([T.x + px, mid - Math.max(0, s) * 38]);
+        }
+        pline(c, pv, C.volt, 1.6, [4, 3]); pline(c, pi, C.cur, 2.4);
+        txt(c, 'v', T.x - 8, mid - 30, C.volt, 12, 700, 'right'); txt(c, 'i', T.x - 8, mid + 2, C.cur, 12, 700, 'right');
+        cv.wm(c);
+      }
+    };
+    new Anim('anim5a', o);
+  })();
+
+  // 5b: varactor
+  (function () {
+    const cv = new Cv('cv5b', 360, 250);
+    let ph;
+    const o = {
+      reset() { ph = 0; }, step(dt) { ph += dt; },
+      draw() {
+        const c = cv.begin(); if (!c) return;
+        const u = 0.5 - 0.5 * Math.cos(ph * 0.9), VR = u * 20, j = jr(VR), wf = (j.W - W0) / (jr(20).W - W0);
+        const g = tileBar(c, wf, ph);
+        // plates at the depletion edges
+        line(c, g.eL, TB.y - 6, g.eL, TB.y + TB.h + 6, C.metal, 3); line(c, g.eR, TB.y - 6, g.eR, TB.y + TB.h + 6, C.metal, 3);
+        txt(c, 'W', (g.eL + g.eR) / 2, TB.y - 12, C.cur, 12, 700, 'center');
+        // knob
+        const kx = 70, ky = 172, r = 30, a = -Math.PI * 1.25 + u * Math.PI * 1.5;
+        circ(c, kx, ky, r, '#0f1420', C.volt, 2);
+        line(c, kx, ky, kx + Math.cos(a) * (r - 6), ky + Math.sin(a) * (r - 6), C.volt, 3);
+        subs(c, [['V', 'R'], [' = ' + VR.toFixed(1) + ' V', '']], kx, ky + r + 16, C.volt, 11, 'center');
+        // capacitance bar (C ∝ 1/W), relative to its value at VR = 0
+        const cr = W0 / j.W, bx = 150, by = 150, bw = 180, bh = 22;
+        rect(c, bx, by, bw, bh, '#0f1420'); rect(c, bx, by, bw * cr, bh, '#ce93d8');
+        txt(c, 'C', bx - 8, by + bh / 2, '#ce93d8', 13, 700, 'right');
+        txt(c, (cr * 100).toFixed(0) + '%', bx + bw * cr + 6 < bx + bw - 30 ? bx + bw * cr + 6 : bx + bw * cr - 6, by + bh / 2, cr > 0.8 ? '#0f1420' : '#ce93d8', 11, 700, bx + bw * cr + 6 < bx + bw - 30 ? 'left' : 'right', MONO);
+        txt(c, 'C ∝ 1/W', bx, by + bh + 18, C.muted, 11, 600, 'left', MONO);
+        cv.wm(c);
+      }
+    };
+    new Anim('anim5b', o);
+  })();
+
+  // 5c: photodiode
+  (function () {
+    const cv = new Cv('cv5c', 360, 250);
+    let ph, P, acc, ibar;
+    const o = {
+      reset() { ph = 0; P = []; acc = 0; ibar = 0.03; },
+      step(dt) {
+        ph += dt;
+        const on = (ph % 4) < 2.2;
+        if (on) { acc += dt * 7; while (acc >= 1) { acc -= 1; P.push({ x: 0, y: 0, t: 0, xe: 0, xh: 0, r: Math.random() }); } }
+        P.forEach(p => { p.t += dt; });
+        P = P.filter(p => p.t < 1.4);
+        ibar = tweenTo(ibar, on ? 0.85 : 0.03, dt, 3);
+      },
+      draw() {
+        const c = cv.begin(); if (!c) return;
+        const g = tileBar(c, 0.45, ph), on = (ph % 4) < 2.2;
+        // light source
+        circ(c, 180, 14, 7, on ? C.volt : '#3a3f4f');
+        P.forEach(p => {
+          const xt = g.eL + 4 + p.r * (g.eR - g.eL - 8), yt = TB.y + TB.h / 2;
+          if (p.t < 0.45) {   // photon: wavy line from the source
+            const u = p.t / 0.45, x = lerp(180, xt, u), y = lerp(20, yt, u);
+            c.strokeStyle = C.volt; c.lineWidth = 1.6; c.beginPath();
+            for (let s = 0; s <= 1; s += 0.1) { const xx = lerp(180, x, s), yy = lerp(20, y, s) + Math.sin(s * 18 - ph * 20) * 3; s ? c.lineTo(xx, yy) : c.moveTo(xx, yy); }
+            c.stroke();
+          } else {
+            const u = (p.t - 0.45);
+            if (u < 0.3) flash(c, xt, yt, u / 0.3);
+            const xe = xt + u * 140, xh = xt - u * 140;
+            if (xe < g.eR + 24) glowCarrier(c, xe, yt - 5, 'e', clamp(1 - (xe - g.eR) / 24, 0, 1), 3);
+            if (xh > g.eL - 24) glowCarrier(c, xh, yt + 5, 'h', clamp(1 - (g.eL - xh) / 24, 0, 1), 3.2);
+          }
+        });
+        // reverse current bar
+        const bx = 60, by = 160, bw = 260, bh = 22;
+        rect(c, bx, by, bw, bh, '#0f1420'); rect(c, bx, by, bw * ibar, bh, C.cur);
+        subs(c, [['I', 'R']], bx - 8, by + bh / 2, C.cur, 13, 'right');
+        txt(c, on ? 'light' : 'dark', bx + bw, by + bh + 16, on ? C.volt : C.muted, 11, 700, 'right');
+        cv.wm(c);
+      }
+    };
+    new Anim('anim5c', o);
+  })();
+
+  // 5d: breakdown
+  (function () {
+    const cv = new Cv('cv5d', 360, 250);
+    let ph, P, acc;
+    const VZ = 0.78;   // breakdown at 78% of the drawn voltage axis (schematic)
+    const curve = u => u < VZ ? 0.02 * u / VZ : 0.02 + Math.pow((u - VZ) / 0.06, 2);
+    const o = {
+      reset() { ph = 0; P = []; acc = 0; },
+      step(dt) {
+        ph += dt;
+        const u = Math.min(1, (ph % 6) / 4.2) * 0.84;
+        if (u >= VZ) { acc += dt * 30; while (acc >= 1) { acc -= 1; P.push({ r: Math.random(), y: Math.random(), t: 0 }); } }
+        P.forEach(p => { p.t += dt; }); P = P.filter(p => p.t < 0.9);
+      },
+      draw() {
+        const c = cv.begin(); if (!c) return;
+        const u = Math.min(1, (ph % 6) / 4.2) * 0.84, wf = clamp(u / VZ, 0, 1) * 0.8;
+        const g = tileBar(c, wf, ph);
+        P.forEach(p => {
+          const x = g.eL + 4 + p.r * (g.eR - g.eL - 8), y = TB.y + 8 + p.y * (TB.h - 16);
+          if (p.t < 0.3) flash(c, x, y, p.t / 0.3);
+          glowCarrier(c, x + p.t * 120, y - 4, 'e', clamp(1 - p.t / 0.9, 0, 1), 2.6);
+          glowCarrier(c, x - p.t * 120, y + 4, 'h', clamp(1 - p.t / 0.9, 0, 1), 2.8);
+        });
+        // reverse characteristic: VR to the left, reverse current downward
+        const T = { x: 40, y: 110, w: 296, h: 112 }, ox = T.x + T.w, oy = T.y + 4;
+        line(c, T.x, oy, ox, oy, C.axis, 1.2); line(c, ox, oy, ox, T.y + T.h, C.axis, 1.2);
+        subs(c, [['V', 'R']], T.x, oy - 10, C.muted, 11, 'left');
+        subs(c, [['I', 'R']], ox - 6, T.y + T.h - 8, C.muted, 11, 'right');
+        const X = s => ox - s * T.w, Y = i => oy + clamp(i, 0, 1) * (T.h - 6);
+        const pts = []; for (let s = 0; s <= 0.84; s += 0.004) pts.push([X(s), Y(curve(s))]);
+        pline(c, pts, C.cur, 2.4);
+        line(c, X(VZ), oy - 4, X(VZ), T.y + T.h, 'rgba(255,213,79,.45)', 1, [4, 4]);
+        subs(c, [['V', 'Z']], X(VZ) - 4, T.y + T.h - 4, C.volt, 11, 'right');
+        circ(c, X(u), Y(curve(u)), 5, C.volt, '#0f1420', 2);
+        cv.wm(c);
+      }
+    };
+    new Anim('anim5d', o);
+  })();
+
+  /* =========================================================
+     6. Summary recap
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv6', 720, 840);
+    const B = { x: 72, y: 16, w: 576, h: 64 };
+    const BG = { x: 64, w: 616, y: 150, h: 330, bar: [124, 0] }, IG = { x: 104, y: 560, w: 560, h: 170 };
+    let ph, E, Mv, acc, VRd, span;
+    function counters() {
+      const VR = SV.VR;
+      $('c6b').textContent = (VBI + VR).toFixed(3) + ' V'; $('c6s').textContent = fA(IS0);
+      $('c6g').textContent = fA(igen(VR)); $('c6t').textContent = fA(iTot(VR));
+    }
+    function tween(dt) {
+      let m = false;
+      if (VRd !== SV.VR) { VRd = tweenTo(VRd, SV.VR, dt, 3); m = true; }
+      const t = spanFor(VRd); if (span !== t) { span = tweenLog(span, t, dt); m = true; }
+      return m;
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const j = jr(VRd), g = jbarR(c, B, j, ph);
+      E.draw(c, g);
+      const yw = B.y + B.h + 14; darrow(c, g.eL, g.eR, yw, C.cur); txt(c, 'W', g.eR + 8, yw, C.cur, 13, 700);
+      umTicks(c, B, yw + 16);
+      bandRev(c, { x: BG.x, w: BG.w, y: BG.y, h: BG.h }, VRd, span, ph, Mv, { mini: true });
+      ivRev(c, IG, VRd);
+      cv.wm(c);
+    }
+    const o = {
+      reset() { ph = 0; E = new GenEvents(); Mv = []; acc = { v: 0 }; setVR(5); VRd = 5; span = spanFor(5); },
+      step(dt) { ph += dt; tween(dt); E.step(dt, B, barGeom(B, jr(VRd)), 0.035); Mv = moverStepR(Mv, acc, dt); },
+      tween, draw
+    };
+    const A = new Anim('anim6', o);
+    SV.subs.push(() => { A.dirty = true; counters(); });
+    counters();
+  })();
+
+  /* ---------- sticky mini-nav highlight ---------- */
+  (function () {
+    const links = Array.from(document.querySelectorAll('.toc a'));
+    const secs = links.map(l => document.querySelector(l.getAttribute('href')));
+    function upd() {
+      let cur = 0;
+      secs.forEach((s, i) => { if (s.getBoundingClientRect().top < 120) cur = i; });
+      links.forEach((l, i) => l.classList.toggle('active', i === cur));
+    }
+    window.addEventListener('scroll', upd, { passive: true }); upd();
+  })();
+
+  let last = performance.now();
+  function frameLoop(ts) {
+    const dt = Math.min(0.05, Math.max(0, (ts - last) / 1000)); last = ts;
+    anims.forEach(a => {
+      if (!a.visible) return;
+      if (a.playing) { a.o.step(dt); a.o.draw(); }
+      else if (a.o.tween && a.o.tween(dt)) a.o.draw();
+      else if (a.dirty) a.o.draw();
+      a.dirty = false;
+    });
+    requestAnimationFrame(frameLoop);
+  }
+  function onResize() { anims.forEach(a => { a.dirty = true; }); }
+  window.addEventListener('resize', onResize);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(onResize);
+  requestAnimationFrame(frameLoop);
+})();
+</script>
+</body>
+</html>
