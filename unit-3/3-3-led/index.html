@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>3.3 Light-Emitting Diode (LED)</title>
+  <meta name="description" content="The light-emitting diode: radiative recombination and photon energy, direct versus indirect band gaps, LED materials, colours and spectra, the V-I characteristic and forward voltage, and choosing the series resistor. An interactive lesson.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1420;
+      --panel: #1a2132;
+      --panel-hover: #212a3f;
+      --border: #2a3448;
+      --text: #e6e9ef;
+      --muted: #9aa4b8;
+      --electron: #4fc3f7;
+      --hole: #ff8a65;
+      --energy: #ffd54f;
+      --success: #81c784;
+      --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+      --max: 960px;
+      --radius: 12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: var(--font); font-size: 16px; line-height: 1.65;
+      overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column;
+    }
+    a { color: var(--electron); }
+    .wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 16px; }
+
+    /* Sticky mini-nav */
+    .toc {
+      position: sticky; top: 0; z-index: 10; background: rgba(15, 20, 32, .95);
+      border-bottom: 1px solid var(--border); backdrop-filter: blur(6px);
+    }
+    .toc ul { display: flex; gap: 4px; list-style: none; margin: 0 auto; padding: 8px 16px; max-width: var(--max); overflow-x: auto; scrollbar-width: none; }
+    .toc ul::-webkit-scrollbar { display: none; }
+    .toc a {
+      display: block; white-space: nowrap; text-decoration: none; color: var(--muted);
+      font-size: 0.85rem; font-weight: 500; padding: 6px 10px; border-radius: 999px;
+    }
+    .toc a:hover { color: var(--text); background: var(--panel); }
+    .toc a.active { color: var(--bg); background: var(--electron); }
+
+    main { flex: 1; padding: 24px 0 48px; }
+    .crumbs { font-size: 0.875rem; color: var(--muted); margin: 0 0 16px; }
+    .crumbs a { color: var(--muted); }
+    .crumbs a:hover { color: var(--electron); }
+    .eyebrow { font-family: var(--mono); font-size: 0.8rem; color: var(--electron); letter-spacing: .04em; margin: 0; }
+    h1 { font-size: clamp(1.5rem, 6vw, 2.2rem); line-height: 1.2; margin: 4px 0 6px; }
+    .subtitle { color: var(--muted); margin: 0 0 8px; }
+    section { scroll-margin-top: 64px; padding-top: 28px; }
+    h2 { font-size: clamp(1.3rem, 5vw, 1.6rem); line-height: 1.25; margin: 0 0 14px; }
+    h3 { font-size: 1.05rem; margin: 0 0 8px; }
+    .prose { font-size: 17px; line-height: 1.7; max-width: 70ch; }
+    .prose p, .prose ul, .prose ol { margin: 0 0 14px; }
+    .prose ul, .prose ol { padding-left: 22px; }
+    .prose li { margin: 4px 0; }
+    .prose strong { color: #fff; }
+    .prose p.eq { text-align: center; font-family: var(--mono); font-size: 16px; background: #141b2b; border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; overflow-wrap: anywhere; }
+    hr.sep { border: 0; border-top: 1px solid var(--border); margin: 40px 0 0; }
+    .rm-note { font-size: 0.78rem; color: var(--muted); margin: 0 0 8px; }
+
+    .tbl-wrap { overflow-x: auto; margin: 0 0 14px; }
+    table.cmp { border-collapse: collapse; width: 100%; font-size: 0.92rem; min-width: 520px; }
+    table.cmp th, table.cmp td { border: 1px solid var(--border); padding: 7px 10px; text-align: left; vertical-align: top; }
+    table.cmp thead th { background: #141b2b; color: var(--muted); font-weight: 600; }
+    table.cmp th[scope="row"] { color: var(--muted); font-weight: 600; white-space: nowrap; }
+    table.cmp .zc { color: var(--electron); } table.cmp .ac { color: var(--hole); }
+
+    /* Buttons & controls */
+    .btn {
+      font: inherit; font-size: 0.88rem; font-weight: 600; color: var(--text);
+      background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+      padding: 7px 12px; cursor: pointer; min-height: 38px;
+    }
+    .btn:hover:not(:disabled) { background: var(--panel-hover); border-color: var(--electron); }
+    .btn:disabled { opacity: .45; cursor: default; }
+    .btn:focus-visible, input:focus-visible, canvas:focus-visible { outline: 2px solid var(--electron); outline-offset: 2px; }
+    .btn[aria-pressed="true"] { background: rgba(255,213,79,.14); border-color: var(--energy); color: var(--energy); }
+    .seg { display: inline-flex; gap: 0; flex-wrap: nowrap; }
+    .seg .btn { border-radius: 0; padding: 7px 10px; }
+    .seg .btn:first-child { border-radius: 8px 0 0 8px; }
+    .seg .btn:last-child { border-radius: 0 8px 8px 0; }
+    .seg .btn + .btn { margin-left: -1px; }
+
+    figure.anim {
+      margin: 18px 0 0; background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 12px; min-width: 0;
+    }
+    .ctrls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-bottom: 12px; }
+    .sliders { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-bottom: 12px; }
+    .slider { flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; }
+    .slider label { display: flex; justify-content: space-between; gap: 8px; font-size: 0.8rem; color: var(--muted); }
+    .slider output { font-family: var(--mono); color: var(--energy); white-space: nowrap; }
+    input[type="range"] { width: 100%; accent-color: var(--energy); margin: 4px 0 0; }
+    canvas { display: block; width: 100%; border-radius: 8px; background: #141b2b; }
+    .narrow { max-width: 820px; margin-left: auto; margin-right: auto; }
+
+    .counters { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px auto 0; }
+    .ctr {
+      flex: 1 1 110px; background: #141b2b; border: 1px solid var(--border); border-radius: 8px;
+      padding: 6px 10px; font-size: 0.78rem; color: var(--muted); min-width: 0;
+    }
+    .ctr b { display: block; font-family: var(--mono); font-size: 1rem; font-weight: 500; color: var(--text); overflow-wrap: anywhere; }
+    .ctr.v b { color: var(--energy); } .ctr.p b { color: #ef9a9a; } .ctr.n b { color: #90caf9; } .ctr.w b { color: var(--success); }
+    .ctr.b b { color: #ce93d8; } .ctr.q b { color: #ff8a65; }
+
+    .keypoints {
+      margin-top: 16px; padding: 14px 16px; border-radius: var(--radius);
+      background: rgba(129,199,132,.07); border: 1px solid rgba(129,199,132,.35);
+    }
+    .keypoints h3 { color: var(--success); font-size: 0.95rem; text-transform: uppercase; letter-spacing: .05em; }
+    .keypoints ul { margin: 0; padding-left: 20px; }
+    .keypoints li { margin: 4px 0; }
+
+    .further { margin-top: 48px; color: var(--muted); font-size: 0.85rem; }
+    .further h3 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 0 0 6px; }
+    .further ul { margin: 0; padding-left: 18px; }
+    .further li { margin: 3px 0; }
+
+    .pager { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 32px; }
+    .pager a {
+      display: block; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 12px 14px; text-decoration: none; color: var(--text); min-width: 0;
+    }
+    .pager a:hover { border-color: var(--electron); }
+    .pager small { display: block; color: var(--muted); font-size: 0.75rem; }
+    .pager .next { text-align: right; }
+    .site-foot { border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; text-align: center; padding: 18px 16px; }
+
+    /* Justified paragraphs on desktop; phones stay left-aligned to avoid wide word gaps. */
+    @media (min-width: 768px) {
+      .prose p, .prose li, .keypoints li { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+      .prose p.eq { text-align: center; }
+    }
+  </style>
+<body>
+
+  <nav class="toc" aria-label="Sections">
+    <ul>
+      <li><a href="#s0">Emission</a></li>
+      <li><a href="#s1">Direct gap</a></li>
+      <li><a href="#s2">Colours</a></li>
+      <li><a href="#s3">V–I curve</a></li>
+      <li><a href="#s4">Driving</a></li>
+      <li><a href="#s5">Summary</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="wrap">
+      <header>
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="../../index.html">Home</a> / <a href="../index.html">Unit 3</a> / 3.3
+        </nav>
+        <p class="eyebrow">TOPIC 3.3</p>
+        <h1>Light-Emitting Diode (LED)</h1>
+        <p class="subtitle">When an electron falls across the band gap and gives its energy away as light</p>
+        <p class="rm-note" id="rmNote" hidden>Your device asks for reduced motion, so every animation starts paused. Press Play on any animation to run it. Sliders and buttons still update the picture.</p>
+      </header>
+
+      <!-- ================= SECTION 0 ================= -->
+      <section id="s0" aria-labelledby="h0">
+        <h2 id="h0">How a forward-biased junction makes light</h2>
+        <div class="prose">
+          <p>A <strong>LIGHT-EMITTING DIODE</strong> is a pn junction that turns electrical energy directly into light. Its basic behaviour is the same as any forward-biased diode (topic 2.3). The applied voltage lowers the barrier, electrons from the n side are <strong>injected</strong> into the p side, and holes from the p side are injected into the n side.</p>
+          <p>Near the junction, the injected minority carriers <strong>recombine</strong> with majority carriers. Each recombination drops an electron from the conduction band to the valence band. The energy it loses is about the band gap E<sub>g</sub>. In an ordinary silicon diode this energy ends up as heat. In an LED material it is released as a <strong>PHOTON</strong>. This is called <strong>radiative recombination</strong>, and light produced this way is called <strong>electroluminescence</strong>.</p>
+          <p>The photon energy, and therefore the colour, is fixed by the band gap:</p>
+          <p class="eq">E<sub>photon</sub> = hf = hc/λ ≈ E<sub>g</sub> &nbsp; ⇒ &nbsp; λ (nm) ≈ 1240 / E<sub>g</sub> (eV)</p>
+          <p>Example: GaAs has E<sub>g</sub> = 1.42 eV, giving λ ≈ 1240/1.42 ≈ <strong>873 nm</strong>, in the infrared. A red LED at 630 nm needs E<sub>g</sub> ≈ 1240/630 ≈ <strong>1.97 eV</strong>. A blue LED at 465 nm needs about <strong>2.67 eV</strong>.</p>
+          <p>A wider band gap gives a shorter wavelength, which means bluer light. Choosing the colour of an LED therefore means choosing (and alloying) the semiconductor to get the right band gap.</p>
+        </div>
+
+        <figure class="anim" id="anim0">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s0g"><span>Band gap E<sub>g</sub></span><output id="o0g"></output></label><input type="range" id="s0g" min="1.3" max="3.4" step="0.01" value="1.97"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv0" style="aspect-ratio:720/420" role="img" aria-label="Band diagram of a forward-biased pn junction. Electrons flow left in the n-side conduction band and holes flow right in the p-side valence band. In the shaded recombination zone near the junction, electrons drop across the band gap and photons fly out, drawn as wavy lines in the colour that matches the band gap. The band-gap slider changes the gap and the photon colour."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr v"><span>E<sub>g</sub> ≈ photon energy</span><b id="c0e"></b></div>
+            <div class="ctr q"><span>Wavelength λ</span><b id="c0l"></b></div>
+            <div class="ctr w"><span>Colour</span><b id="c0c"></b></div>
+            <div class="ctr b"><span>Typical material</span><b id="c0m"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: emission">
+          <h3>Key points</h3>
+          <ul>
+            <li>Forward bias injects electrons and holes across the junction, where they recombine.</li>
+            <li>In an LED, recombination releases a photon of energy ≈ E<sub>g</sub> (electroluminescence).</li>
+            <li>λ (nm) ≈ 1240 / E<sub>g</sub> (eV). A wider gap gives a bluer colour.</li>
+            <li>Red needs about 2.0 eV, blue about 2.7 eV, and GaAs (1.42 eV) emits infrared.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 1 ================= -->
+      <section id="s1" aria-labelledby="h1s">
+        <h2 id="h1s">Why silicon does not glow: direct and indirect band gaps</h2>
+        <div class="prose">
+          <p>An electron in a crystal has both an energy E and a crystal momentum, written as the wave vector k. A transition must conserve both. A photon carries plenty of energy but almost no momentum, so an electron can emit a photon only if it falls <strong>straight down</strong> on the E-k diagram, without changing k.</p>
+          <ul>
+            <li>In a <strong>DIRECT band gap</strong> semiconductor, such as GaAs, InGaN or AlGaInP, the bottom of the conduction band sits directly above the top of the valence band, at the same k. Electrons can drop straight down and emit light efficiently.</li>
+            <li>In an <strong>INDIRECT band gap</strong> semiconductor, such as <strong>silicon</strong> and <strong>germanium</strong>, the conduction band minimum is at a different k. To recombine, the electron must also hand over momentum to a lattice vibration (a <strong>phonon</strong>). That three-particle process is unlikely, so most electrons instead recombine through defect levels in the gap and give their energy to the lattice as <strong>heat</strong>.</li>
+          </ul>
+          <p>This is why ordinary silicon and germanium diodes give no useful light, and why LEDs are made from compound semiconductors of groups III and V. Older green and yellow LEDs used GaP, which is indirect. Nitrogen doping adds traps that let it emit a little light, but with low efficiency.</p>
+        </div>
+
+        <figure class="anim" id="anim1">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="seg" role="group" aria-label="Band gap type">
+              <button class="btn" type="button" data-gap="direct" aria-pressed="true">Direct (GaAs)</button>
+              <button class="btn" type="button" data-gap="indirect" aria-pressed="false">Indirect (Si)</button>
+            </div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv1" style="aspect-ratio:720/400" role="img" aria-label="E-k diagram. In the direct-gap view the conduction band minimum sits above the valence band maximum at k = 0, and electrons drop straight down emitting photons. In the indirect-gap view the conduction band minimum is shifted in k; electrons mostly fall through a defect level in the gap and release heat, shown as red squiggles, and only rarely emit a photon with the help of a phonon."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr b"><span>Transition</span><b id="c1t"></b></div>
+            <div class="ctr v"><span>Photons emitted</span><b id="c1p"></b></div>
+            <div class="ctr p"><span>Recombinations as heat</span><b id="c1h"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: direct and indirect">
+          <h3>Key points</h3>
+          <ul>
+            <li>A photon has energy but almost no momentum, so light needs a vertical transition on the E-k diagram.</li>
+            <li>Direct gap (GaAs, InGaN, AlGaInP): CB minimum above the VB maximum, so efficient light.</li>
+            <li>Indirect gap (Si, Ge): a phonon is needed, so recombination mostly makes heat.</li>
+            <li>That is why LEDs use III-V compounds, not silicon.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 2 ================= -->
+      <section id="s2" aria-labelledby="h2s">
+        <h2 id="h2s">Materials, colours and the emission spectrum</h2>
+        <div class="prose">
+          <p>Alloying two compounds lets the band gap be tuned smoothly between their values. Common LED materials are:</p>
+          <ul>
+            <li><strong>GaAs</strong> (1.42 eV): infrared, about 870 to 940 nm. Used in remote controls, optocouplers and sensors.</li>
+            <li><strong>GaAsP</strong>, <strong>AlGaAs</strong>: red, the classic early LEDs.</li>
+            <li><strong>AlGaInP</strong>: bright red, orange, amber and yellow.</li>
+            <li><strong>InGaN</strong>: green, blue and violet. More indium gives a smaller gap.</li>
+            <li><strong>White LEDs</strong>: a blue InGaN chip coated with a yellow <strong>phosphor</strong>. The phosphor absorbs part of the blue and re-emits a broad yellow band, and blue plus yellow looks white.</li>
+          </ul>
+          <p>An LED is not perfectly monochromatic. Electrons and holes are spread over an energy range of a few kT in their bands, so the emitted photons are spread too. The width of the spectrum is roughly:</p>
+          <p class="eq">ΔE ≈ 1.8 kT ≈ 47 meV at 300 K &nbsp; ⇒ &nbsp; Δλ ≈ λ²·ΔE / 1240</p>
+          <p>For a red LED that is about <strong>15 to 20 nm</strong>. That is far narrower than an incandescent lamp, but much broader than a laser. The dashed curve in the plot is the human eye's daytime sensitivity, which peaks at 555 nm. For the same optical power, green looks much brighter than deep red or blue, and infrared is invisible.</p>
+        </div>
+
+        <figure class="anim" id="anim2">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="seg" role="group" aria-label="LED type">
+              <button class="btn" type="button" data-led="ir" aria-pressed="false">IR</button>
+              <button class="btn" type="button" data-led="red" aria-pressed="true">Red</button>
+              <button class="btn" type="button" data-led="yellow" aria-pressed="false">Yellow</button>
+              <button class="btn" type="button" data-led="green" aria-pressed="false">Green</button>
+              <button class="btn" type="button" data-led="blue" aria-pressed="false">Blue</button>
+              <button class="btn" type="button" data-led="white" aria-pressed="false">White</button>
+            </div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv2" style="aspect-ratio:720/380" role="img" aria-label="Emission spectrum of the selected LED on a wavelength axis from 350 to 1000 nanometres, with a rainbow strip marking the visible range and a dashed curve for the eye's sensitivity. Coloured LEDs show a single narrow peak; the white LED shows a sharp blue peak plus a broad yellow phosphor band."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr q"><span>Peak λ</span><b id="c2l"></b></div>
+            <div class="ctr w"><span>Width (FWHM)</span><b id="c2w"></b></div>
+            <div class="ctr b"><span>Material</span><b id="c2m"></b></div>
+            <div class="ctr v"><span>Typical V<sub>F</sub> at 20 mA</span><b id="c2v"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: materials and spectrum">
+          <h3>Key points</h3>
+          <ul>
+            <li>GaAs: infrared. AlGaInP: red to yellow. InGaN: green to blue.</li>
+            <li>White LED: a blue chip plus a yellow phosphor.</li>
+            <li>Spectral width ΔE ≈ 1.8kT, about 15 to 30 nm: nearly one colour, but not a laser.</li>
+            <li>The eye is most sensitive at 555 nm (green). IR is invisible.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 3 ================= -->
+      <section id="s3" aria-labelledby="h3s">
+        <h2 id="h3s">The V-I characteristic and forward voltage</h2>
+        <div class="prose">
+          <p>Electrically, an LED is a diode with the familiar exponential forward curve. Because its band gap is wider than silicon's, it needs a <strong>higher forward voltage</strong> before useful current flows. As a rule of thumb, V<sub>F</sub> is at least about E<sub>g</sub>/q:</p>
+          <ul>
+            <li>Infrared (GaAs): about <strong>1.2 to 1.5 V</strong></li>
+            <li>Red, orange and yellow: about <strong>1.8 to 2.2 V</strong></li>
+            <li>Green, blue and white (InGaN): about <strong>2.9 to 3.4 V</strong>, a little above E<sub>g</sub>/q because of extra resistance and barriers in these structures</li>
+          </ul>
+          <p>Typical indicator LEDs are rated for about <strong>20 mA</strong> continuous, with an absolute maximum of around 30 mA. The light output is roughly <strong>proportional to the forward current</strong>, which is why LEDs are controlled by current, not by voltage.</p>
+          <p>LEDs are delicate in <strong>reverse</strong>: their reverse breakdown voltage is low, typically only <strong>3 to 5 V</strong>. In circuits where an LED may see a reverse voltage, a protection diode is placed in anti-parallel with it.</p>
+        </div>
+
+        <figure class="anim" id="anim3">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s3i"><span>Forward current I<sub>F</sub></span><output id="o3i"></output></label><input type="range" id="s3i" min="1" max="30" step="0.5" value="20"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv3" style="aspect-ratio:720/420" role="img" aria-label="Forward V-I curves from 0 to 4 volts for a silicon diode (dashed) and infrared, red, yellow, green and blue LEDs, each turning on at a higher voltage as the band gap grows. A horizontal line marks the chosen current and a dot on each curve shows its forward voltage."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr p"><span>V<sub>F</sub> infrared</span><b id="c3a"></b></div>
+            <div class="ctr q"><span>V<sub>F</sub> red</span><b id="c3b"></b></div>
+            <div class="ctr w"><span>V<sub>F</sub> green</span><b id="c3c"></b></div>
+            <div class="ctr n"><span>V<sub>F</sub> blue</span><b id="c3d"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: V-I characteristic">
+          <h3>Key points</h3>
+          <ul>
+            <li>Same exponential curve as any diode, but V<sub>F</sub> ≳ E<sub>g</sub>/q.</li>
+            <li>IR ≈ 1.2 V, red ≈ 2 V, green and blue ≈ 3 V or more. Silicon ≈ 0.7 V.</li>
+            <li>Rated about 20 mA. Light output is roughly proportional to current.</li>
+            <li>Low reverse breakdown, about 3 to 5 V: protect against reverse voltage.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 4 ================= -->
+      <section id="s4" aria-labelledby="h4s">
+        <h2 id="h4s">Driving an LED: the series resistor</h2>
+        <div class="prose">
+          <p>Because the curve is so steep, connecting an LED straight across a voltage source is a mistake. A few hundred millivolts too much would let the current run away and destroy it. The simplest fix is a <strong>series resistor</strong> that sets the current:</p>
+          <p class="eq">R = (V<sub>S</sub> − V<sub>F</sub>) / I<sub>F</sub></p>
+          <p>Example: a red LED (V<sub>F</sub> ≈ 2.0 V) from a 5 V supply at I<sub>F</sub> = 15 mA needs R = (5 − 2.0)/0.015 = <strong>200 Ω</strong>. Choose the next standard value up, <strong>220 Ω</strong>, which gives I<sub>F</sub> ≈ (5 − 2.0)/220 ≈ <strong>13.6 mA</strong>. The resistor dissipates I<sup>2</sup>R ≈ 41 mW, so a ¼ W part is fine, and the LED dissipates V<sub>F</sub>·I<sub>F</sub> ≈ 27 mW.</p>
+          <p>The same resistor gives a blue LED (V<sub>F</sub> ≈ 3.1 V) only about 9 mA, because less voltage is left across the resistor. With a 3.3 V supply a blue LED barely lights at all. A supply must exceed V<sub>F</sub> with some margin for a resistor to control the current well. For high-power lighting LEDs, a dedicated <strong>constant-current driver</strong> replaces the resistor.</p>
+        </div>
+
+        <figure class="anim" id="anim4">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="seg" role="group" aria-label="LED colour">
+              <button class="btn" type="button" data-drv="red" aria-pressed="true">Red</button>
+              <button class="btn" type="button" data-drv="green" aria-pressed="false">Green</button>
+              <button class="btn" type="button" data-drv="blue" aria-pressed="false">Blue</button>
+              <button class="btn" type="button" data-drv="white" aria-pressed="false">White</button>
+            </div>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s4v"><span>Supply voltage V<sub>S</sub></span><output id="o4v"></output></label><input type="range" id="s4v" min="0" max="12" step="0.1" value="5"></div>
+            <div class="slider"><label for="s4r"><span>Series resistor R</span><output id="o4r"></output></label><input type="range" id="s4r" min="47" max="1000" step="1" value="220"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv4" style="aspect-ratio:720/400" role="img" aria-label="A supply, a series resistor and an LED. The LED glows brighter as its current rises. Below the circuit, a bar shows the forward current against the 20 milliamp rating and 30 milliamp maximum, and the resistor value needed for 15 milliamps is calculated from the formula."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr w"><span>I<sub>F</sub></span><b id="c4i"></b></div>
+            <div class="ctr v"><span>V<sub>F</sub></span><b id="c4v"></b></div>
+            <div class="ctr q"><span>P<sub>R</sub></span><b id="c4r"></b></div>
+            <div class="ctr b"><span>P<sub>LED</sub></span><b id="c4p"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: driving an LED">
+          <h3>Key points</h3>
+          <ul>
+            <li>Never drive an LED straight from a voltage source: the current would run away.</li>
+            <li>R = (V<sub>S</sub> − V<sub>F</sub>)/I<sub>F</sub>. Round up to a standard value.</li>
+            <li>Check the resistor power I<sub>F</sub><sup>2</sup>R and the LED power V<sub>F</sub>·I<sub>F</sub>.</li>
+            <li>The supply must be well above V<sub>F</sub>, which matters most for blue and white LEDs.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 5 ================= -->
+      <section id="s5" aria-labelledby="h5s">
+        <h2 id="h5s">Summary and applications</h2>
+        <div class="prose">
+          <p>An LED is a forward-biased pn junction in a <strong>direct band gap</strong> semiconductor, where injected carriers recombine and emit photons of energy <strong>≈ E<sub>g</sub></strong>, so λ ≈ 1240/E<sub>g</sub> nm. The material sets the colour and the forward voltage (≈ 1.2 V for IR up to ≈ 3.3 V for blue). The current, set by a series resistor, sets the brightness.</p>
+          <p><strong>Advantages:</strong> low voltage and power, small size, very long life (tens of thousands of hours), fast switching (nanoseconds), rugged, available in many colours, and highly efficient for lighting.</p>
+          <p><strong>Limitations:</strong> they need current limiting, can be destroyed by small reverse voltages (about 5 V), their output falls as temperature rises, and V<sub>F</sub> varies from part to part.</p>
+          <p><strong>Applications:</strong> indicator lamps, <strong>seven-segment</strong> and dot-matrix displays, backlights and general lighting (white LEDs), traffic signals, infrared remote controls, and optocouplers (an IR LED paired with a photodiode, topic 3.4). A seven-segment display contains seven LEDs (a to g) with either all anodes or all cathodes joined: a <strong>common-anode</strong> or <strong>common-cathode</strong> display.</p>
+        </div>
+
+        <figure class="anim" id="anim5">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+            <div class="seg" role="group" aria-label="Display colour">
+              <button class="btn" type="button" data-seg="red" aria-pressed="true">Red</button>
+              <button class="btn" type="button" data-seg="green" aria-pressed="false">Green</button>
+              <button class="btn" type="button" data-seg="blue" aria-pressed="false">Blue</button>
+            </div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv5" style="aspect-ratio:720/340" role="img" aria-label="A common-cathode seven-segment LED display counting from 0 to 9. Lit segments glow in the chosen colour and are labelled a to g. Beside it, the number of lit segments, the total current at 10 milliamps per segment and the total LED power are listed."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr v"><span>Digit</span><b id="c5d"></b></div>
+            <div class="ctr b"><span>Segments lit</span><b id="c5n"></b></div>
+            <div class="ctr w"><span>Total current</span><b id="c5i"></b></div>
+            <div class="ctr q"><span>LED power</span><b id="c5p"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: summary">
+          <h3>Key points</h3>
+          <ul>
+            <li>Forward bias leads to recombination in a direct-gap material, which emits a photon with hf ≈ E<sub>g</sub>.</li>
+            <li>The material sets the colour and V<sub>F</sub>. The current (via R) sets the brightness.</li>
+            <li>Efficient, fast and long-lived, but needs current limiting and protection from reverse voltage.</li>
+            <li>Uses: indicators, seven-segment displays, lighting, IR remotes, optocouplers.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <aside class="further" aria-label="Further reading">
+        <h3>Further reading</h3>
+        <ul>
+          <li><em>Semiconductor Physics and Devices</em>, Donald A. Neamen. Chapter: “Optical Devices”.</li>
+          <li><em>Electronic Devices and Circuits</em>, David A. Bell. Section on light-emitting diodes.</li>
+          <li><em>Electronic Devices and Circuits</em>, S. Salivahanan and N. Suresh Kumar. Section on light-emitting diodes.</li>
+          <li><em>Electronic Devices and Circuits</em>, Jacob Millman, Christos C. Halkias and Satyabrata Jit. Section on light-emitting diodes.</li>
+        </ul>
+      </aside>
+
+      <nav class="pager" aria-label="Topic navigation">
+        <a href="../3-2-zener-voltage-regulator/index.html"><small>← Previous</small>3.2 Zener Voltage Regulator</a>
+        <a class="next" href="../3-4-photodiode/index.html"><small>Next →</small>3.4 Photodiode</a>
+      </nav>
+    </div>
+  </main>
+
+  <footer class="site-foot">© 2026 Naveen Bokka</footer>
+
+
+<script>
+(function () {
+  'use strict';
+  /* ---------- colours ---------- */
+  const C = {
+    text: '#e6e9ef', muted: '#9aa4b8', grid: 'rgba(255,255,255,.07)',
+    P: '#7d3a3a', N: '#2e4a7d', DEP: '#3a3f4f',
+    hole: '#ff8a65', elec: '#4fc3f7', acc: '#ef9a9a', don: '#90caf9',
+    field: '#ffd54f', diff: '#ce93d8', drift: '#81c784', rec: '#ef5350',
+    ok: '#81c784', bad: '#ef5350', axis: '#5a6478',
+    band: '#e6e9ef', volt: '#ffd54f', cur: '#81c784', metal: '#b0bec5', hot: '#ef5350'
+  };
+  const FONT = 'Inter, system-ui, sans-serif';
+  const MONO = '"JetBrains Mono", Consolas, monospace';
+  const RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const TAU = Math.PI * 2;
+  const $ = id => document.getElementById(id);
+  if (RM) $('rmNote').hidden = false;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const lerp = (a, b, u) => a + (b - a) * u;
+  const hash = k => { const s = Math.sin(k * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+
+  /* ---------- number formatting ---------- */
+  const SUP = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '-': '⁻' };
+  const sup = n => String(n).split('').map(ch => SUP[ch] || ch).join('');
+  function sci(v, d) {
+    if (v === 0) return '0';
+    const neg = v < 0; v = Math.abs(v);
+    let e = Math.floor(Math.log10(v)), m = v / Math.pow(10, e);
+    if (+m.toFixed(d) >= 10) { m /= 10; e += 1; }
+    return (neg ? '−' : '') + m.toFixed(d) + ' × 10' + sup(e);
+  }
+  const fUm = v => { const a = Math.abs(v); return (a >= 1 ? a.toFixed(2) : a >= 0.1 ? a.toFixed(3) : a.toFixed(4)) + ' µm'; };
+  const fNum = v => { const a = Math.abs(v); const s = a >= 10 ? a.toFixed(0) : a >= 1 ? String(+a.toFixed(1)) : a >= 0.1 ? String(+a.toFixed(2)) : String(+a.toFixed(3)); return (v < 0 ? '−' : '') + s; };
+  const fI = i => {
+    const a = Math.abs(i), s = i < 0 ? '−' : '';
+    if (a < 1e-15) return '0';
+    if (a >= 1e-3) return s + (a * 1e3).toFixed(a >= 1e-2 ? 1 : 2) + ' mA';
+    if (a >= 1e-6) return s + (a * 1e6).toFixed(a >= 1e-5 ? 1 : 2) + ' µA';
+    if (a >= 1e-9) return s + (a * 1e9).toFixed(a >= 1e-8 ? 1 : 2) + ' nA';
+    return s + sci(a, 2).replace('−', '') + ' A';
+  };
+  const fR = r => !isFinite(r) || r > 1e8 ? '> 100 MΩ' : r >= 1e6 ? (r / 1e6).toFixed(1) + ' MΩ' : r >= 1e3 ? (r / 1e3).toFixed(1) + ' kΩ' : r.toFixed(1) + ' Ω';
+  const fV = v => (v < 0 ? '−' : '') + Math.abs(v).toFixed(2) + ' V';
+  function niceStep(x) { const p = Math.pow(10, Math.floor(Math.log10(x))), m = x / p; return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 5 ? 5 : 10) * p; }
+
+  /* ---------- Canvas helpers ---------- */
+  let FS = 1;
+  function Cv(id, W, H, cap) { this.el = $(id); this.W = W; this.H = H; this.cap = cap || 2; this.ctx = this.el.getContext('2d'); }
+  Cv.prototype.begin = function () {
+    const w = this.el.clientWidth; if (!w) return null;
+    const dpr = window.devicePixelRatio || 1;
+    const pw = Math.round(w * dpr), ph = Math.round(w * dpr * this.H / this.W);
+    if (this.el.width !== pw || this.el.height !== ph) { this.el.width = pw; this.el.height = ph; }
+    const c = this.ctx, s = pw / this.W;
+    FS = Math.min(this.cap, Math.max(1, 1.15 * this.W / w));
+    c.setTransform(s, 0, 0, s, 0, 0); c.clearRect(0, 0, this.W, this.H);
+    c.textBaseline = 'middle'; c.textAlign = 'left'; c.globalAlpha = 1; c.setLineDash([]); c.lineCap = 'butt'; c.shadowBlur = 0;
+    return c;
+  };
+  // Watermark: drawn inside the canvas, bottom-right, 13 px on screen at any size.
+  Cv.prototype.wm = function (c) {
+    const k = this.W / this.el.clientWidth, s = 13 * k;
+    c.save(); c.setTransform(this.el.width / this.W, 0, 0, this.el.width / this.W, 0, 0);
+    c.globalAlpha = 1; c.shadowBlur = 0; c.font = '500 ' + s.toFixed(1) + 'px ' + FONT; c.fillStyle = 'rgba(255,255,255,.35)';
+    c.textAlign = 'right'; c.textBaseline = 'bottom'; c.fillText('© Naveen Bokka', this.W - 6 * k, this.H - 4 * k); c.restore();
+  };
+  function circ(c, x, y, r, fill, stroke, lw) {
+    c.beginPath(); c.arc(x, y, Math.max(0, r), 0, TAU);
+    if (fill) { c.fillStyle = fill; c.fill(); }
+    if (stroke) { c.strokeStyle = stroke; c.lineWidth = lw || 1.5; c.stroke(); }
+  }
+  function txt(c, s, x, y, col, size, weight, align, font) {
+    c.font = (weight || 600) + ' ' + ((size || 12) * FS).toFixed(1) + 'px ' + (font || FONT);
+    c.fillStyle = col || C.text; c.textAlign = align || 'left'; c.fillText(s, x, y);
+  }
+  // Label made of [main, subscript] parts, e.g. [['V','Z'],[' = 5.1 V','']]
+  function subs(c, parts, x, y, col, size, align) {
+    const z = (size || 13) * FS, zs = z * 0.72;
+    let w = 0;
+    const ws = parts.map(p => {
+      c.font = '700 ' + z.toFixed(1) + 'px ' + FONT; const a = c.measureText(p[0]).width;
+      c.font = '700 ' + zs.toFixed(1) + 'px ' + FONT; const b = p[1] ? c.measureText(p[1]).width : 0;
+      w += a + b; return [a, b];
+    });
+    let x0 = align === 'right' ? x - w : align === 'center' ? x - w / 2 : x;
+    c.fillStyle = col; c.textAlign = 'left';
+    parts.forEach((p, k) => {
+      c.font = '700 ' + z.toFixed(1) + 'px ' + FONT; c.fillText(p[0], x0, y); x0 += ws[k][0];
+      if (p[1]) { c.font = '700 ' + zs.toFixed(1) + 'px ' + FONT; c.fillText(p[1], x0, y + z * 0.3); x0 += ws[k][1]; }
+    });
+    return w;
+  }
+  function line(c, x0, y0, x1, y1, col, lw, dash) {
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []);
+    c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke(); c.setLineDash([]);
+  }
+  function pline(c, pts, col, lw, dash) {
+    if (pts.length < 2) return;
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []); c.lineJoin = 'round';
+    c.beginPath(); pts.forEach((p, k) => k ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); c.stroke(); c.setLineDash([]);
+  }
+  function arrow(c, x0, y0, x1, y1, col, lw, head) {
+    const dx = x1 - x0, dy = y1 - y0, L = Math.hypot(dx, dy); if (L < 2) return;
+    lw = lw || 3;
+    const ux = dx / L, uy = dy / L, hs = Math.min(head || 10, L * 0.8), hw = Math.max(hs * 0.55, lw * 0.9);
+    line(c, x0, y0, x1 - ux * hs * 0.9, y1 - uy * hs * 0.9, col, lw);
+    c.fillStyle = col; c.beginPath(); c.moveTo(x1, y1);
+    c.lineTo(x1 - ux * hs - uy * hw, y1 - uy * hs + ux * hw);
+    c.lineTo(x1 - ux * hs + uy * hw, y1 - uy * hs - ux * hw); c.closePath(); c.fill();
+  }
+  function darrow(c, x0, x1, y, col) {   // dimension arrow with end ticks
+    line(c, x0, y - 5, x0, y + 5, col, 1.3); line(c, x1, y - 5, x1, y + 5, col, 1.3);
+    if (x1 - x0 > 14) { arrow(c, (x0 + x1) / 2, y, x0 + 1, y, col, 1.4, 6); arrow(c, (x0 + x1) / 2, y, x1 - 1, y, col, 1.4, 6); }
+    else line(c, x0, y, x1, y, col, 1.4);
+  }
+  function rect(c, x, y, w, h, fill) { c.fillStyle = fill; c.fillRect(x, y, w, h); }
+  function hatch(c, x0, y0, x1, y1) {
+    if (x1 - x0 < 0.5) return;
+    rect(c, x0, y0, x1 - x0, y1 - y0, C.DEP);
+    c.save(); c.beginPath(); c.rect(x0, y0, x1 - x0, y1 - y0); c.clip();
+    c.strokeStyle = 'rgba(255,255,255,.10)'; c.lineWidth = 1; c.beginPath();
+    for (let x = x0 - (y1 - y0); x < x1; x += 9) { c.moveTo(x, y1); c.lineTo(x + (y1 - y0), y0); }
+    c.stroke(); c.restore();
+  }
+  // Fixed ion: circled − (acceptor) or circled + (donor)
+  function ion(c, x, y, r, kind, a) {
+    const col = kind === 'a' ? C.acc : C.don;
+    c.globalAlpha = a; circ(c, x, y, r, null, col, Math.max(1, r * 0.22));
+    c.strokeStyle = col; c.lineWidth = Math.max(1, r * 0.24); c.beginPath();
+    c.moveTo(x - r * 0.5, y); c.lineTo(x + r * 0.5, y);
+    if (kind === 'd') { c.moveTo(x, y - r * 0.5); c.lineTo(x, y + r * 0.5); }
+    c.stroke(); c.globalAlpha = 1;
+  }
+  function carrier(c, x, y, kind, a, r) {
+    c.globalAlpha = a; circ(c, x, y, r || (kind === 'h' ? 3.6 : 3.2), kind === 'h' ? C.hole : C.elec); c.globalAlpha = 1;
+  }
+  const jig = (k, ph, amp) => [amp * Math.sin(ph * 1.7 + k * 1.31), amp * Math.cos(ph * 1.3 + k * 2.07)];
+  function tag(c, s, x, y, align) {   // region label on a dark chip
+    c.font = '700 ' + (14 * FS).toFixed(1) + 'px ' + FONT;
+    const w = c.measureText(s).width + 10, h = 14 * FS + 8, x0 = align === 'right' ? x - w : x;
+    c.fillStyle = 'rgba(15,20,32,.75)'; c.fillRect(x0, y, w, h);
+    txt(c, s, x0 + w / 2, y + h / 2, '#fff', 14, 700, 'center');
+  }
+  // Zener diode symbol, horizontal, anode on the left, centred at (x, y)
+  function zsym(c, x, y, col, lab) {
+    const h = 13;
+    line(c, x - 58, y, x - 13, y, col, 2.2); line(c, x + 12, y, x + 58, y, col, 2.2);
+    c.fillStyle = col; c.beginPath(); c.moveTo(x - 13, y - h); c.lineTo(x - 13, y + h); c.lineTo(x + 12, y); c.closePath(); c.fill();
+    pline(c, [[x + 5, y - h - 6], [x + 12, y - h], [x + 12, y + h], [x + 19, y + h + 6]], col, 2.8);
+    if (lab !== false) {
+      txt(c, 'A', x - 58, y - 13, C.muted, 12, 700, 'left'); txt(c, 'K', x + 58, y - 13, C.muted, 12, 700, 'right');
+    }
+  }
+
+  /* ---------- Animation registry ---------- */
+  const anims = [];
+  function Anim(rootId, o) {
+    this.root = $(rootId); this.o = o; this.playing = !RM; this.visible = true; this.dirty = true;
+    this.pb = this.root.querySelector('[data-act="play"]');
+    this.pb.addEventListener('click', () => this.setPlaying(!this.playing));
+    this.root.querySelector('[data-act="reset"]').addEventListener('click', () => { o.reset(); this.setPlaying(!RM); });
+    o.reset(); this.sync(); anims.push(this);
+    if ('IntersectionObserver' in window) {
+      this.visible = false;
+      new IntersectionObserver(es => es.forEach(e => { this.visible = e.isIntersecting; if (this.visible) this.dirty = true; }))
+        .observe(this.root);
+    }
+  }
+  Anim.prototype.setPlaying = function (p) { this.playing = p; this.sync(); this.dirty = true; };
+  Anim.prototype.sync = function () { this.pb.textContent = this.playing ? 'Pause' : 'Play'; };
+  const segBtns = (root, key, cb) => {
+    const bs = Array.from(document.querySelectorAll(root + ' [data-' + key + ']'));
+    const set = v => { bs.forEach(b => b.setAttribute('aria-pressed', String(b.dataset[key] === v))); cb(v); };
+    bs.forEach(b => b.addEventListener('click', () => set(b.dataset[key])));
+    return set;
+  };
+
+  /* ---------- LED model ----------
+     λ (nm) ≈ 1240 / E (eV). Forward curve with ideality n = 2 and series resistance:
+       V(I) = n·VT·ln(I/IS + 1) + I·Rs,  IS chosen so that V(20 mA) = typical VF.          */
+  const VTH = 0.0259;
+  function mkDiode(vf, n, rs) { const nv = n * VTH, is = 0.02 / Math.exp((vf - 0.02 * rs) / nv); return { nv, is, rs }; }
+  const LEDS = {
+    ir:     { name: 'Infrared', lam: 940, mat: 'GaAs',             vf: 1.2, fw: 0.05 },
+    red:    { name: 'Red',      lam: 630, mat: 'AlGaInP',          vf: 2.0, fw: 0.055 },
+    yellow: { name: 'Yellow',   lam: 590, mat: 'AlGaInP',          vf: 2.1, fw: 0.06 },
+    green:  { name: 'Green',    lam: 525, mat: 'InGaN',            vf: 3.0, fw: 0.12 },
+    blue:   { name: 'Blue',     lam: 465, mat: 'InGaN',            vf: 3.1, fw: 0.11 },
+    white:  { name: 'White',    lam: 455, mat: 'InGaN + phosphor', vf: 3.1, fw: 0.11, white: true }
+  };
+  Object.keys(LEDS).forEach(k => { LEDS[k].d = mkDiode(LEDS[k].vf, 2, 8); });
+  const SI = { name: 'Silicon', d: mkDiode(0.75, 1.3, 1) };
+  const vOf = (L, I) => L.d.nv * Math.log(I / L.d.is + 1) + I * L.d.rs;
+  function iOfV(L, V) {   // current at voltage V (bisection in log I)
+    if (V <= 0) return 0;
+    let lo = -20, hi = 0;
+    for (let k = 0; k < 60; k++) { const m = (lo + hi) / 2; if (vOf(L, Math.pow(10, m)) < V) lo = m; else hi = m; }
+    return Math.pow(10, (lo + hi) / 2);
+  }
+  function wl2rgb(l, a) {   // visible wavelength → colour (Bruton's approximation)
+    let r = 0, g = 0, b = 0;
+    if (l >= 380 && l < 440) { r = -(l - 440) / 60; b = 1; }
+    else if (l >= 440 && l < 490) { g = (l - 440) / 50; b = 1; }
+    else if (l >= 490 && l < 510) { g = 1; b = -(l - 510) / 20; }
+    else if (l >= 510 && l < 580) { r = (l - 510) / 70; g = 1; }
+    else if (l >= 580 && l < 645) { r = 1; g = -(l - 645) / 65; }
+    else if (l >= 645 && l <= 780) { r = 1; }
+    const f = l < 380 || l > 780 ? 0 : l < 420 ? 0.3 + 0.7 * (l - 380) / 40 : l > 700 ? 0.3 + 0.7 * (780 - l) / 80 : 1;
+    const cc = v => Math.round(255 * Math.pow(v * f, 0.8));
+    return 'rgba(' + cc(r) + ',' + cc(g) + ',' + cc(b) + ',' + (a == null ? 1 : a) + ')';
+  }
+  // Display colour: invisible IR and UV get stand-in colours
+  const lamCol = (l, a) => l > 780 ? 'rgba(200,90,110,' + (a == null ? 1 : a) + ')' : l < 380 ? 'rgba(160,120,255,' + (a == null ? 1 : a) + ')' : wl2rgb(Math.max(l, 400), a);
+  const ledCol = (L, a) => L.white ? 'rgba(235,240,255,' + (a == null ? 1 : a) + ')' : lamCol(L.lam, a);
+  function colName(l) {
+    return l > 780 ? 'Infrared (invisible)' : l > 620 ? 'Red' : l > 590 ? 'Orange / amber' : l > 570 ? 'Yellow' : l > 495 ? 'Green' : l > 450 ? 'Blue' : l >= 380 ? 'Violet' : 'Ultraviolet';
+  }
+  function matName(l) {
+    return l > 780 ? 'GaAs, AlGaAs' : l > 570 ? 'AlGaInP, GaAsP' : l >= 380 ? 'InGaN' : 'AlGaN, GaN';
+  }
+  const fmA = i => (i * 1000).toFixed(i < 0.01 ? 2 : 1) + ' mA';
+  const fW = p => p >= 1 ? p.toFixed(2) + ' W' : (p * 1000).toFixed(p < 0.01 ? 1 : 0) + ' mW';
+  // Photon: a short travelling wave packet
+  function photon(c, x, y, ang, len, wl, col, a) {
+    const ux = Math.cos(ang), uy = Math.sin(ang), nx = -uy, ny = ux, pts = [];
+    for (let s = 0; s <= len; s += 1.5) { const env = Math.sin(Math.PI * s / len), w = 5 * env * Math.sin(TAU * s / wl); pts.push([x + ux * s + nx * w, y + uy * s + ny * w]); }
+    c.save(); c.globalAlpha = a; c.shadowColor = col; c.shadowBlur = 10; pline(c, pts, col, 2.2); c.restore();
+  }
+
+  /* =========================================================
+     0. Emission: forward-biased band diagram with photons
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv0', 720, 420);
+    const jx = 380, Y0 = 344, K = 60, xL = 70, xR = 690, bend = 70, BAR = 0.35;
+    const zL = jx - bend - 60, zR = jx - 10;   // recombination zone (p side, near the junction)
+    let Eg, ph, E, H, R, P, accE, accH, A = null;
+    const ev = x => x <= jx - bend ? 0 : x >= jx + bend ? -BAR : -BAR * (1 - Math.cos(Math.PI * (x - jx + bend) / (2 * bend))) / 2;
+    const Y = e => Y0 - e * K;
+    const lam = () => 1240 / Eg;
+    function sync() {
+      $('s0g').value = Eg; $('o0g').textContent = Eg.toFixed(2) + ' eV';
+      const l = lam();
+      $('c0e').textContent = Eg.toFixed(2) + ' eV'; $('c0l').textContent = l.toFixed(0) + ' nm';
+      $('c0c').textContent = colName(l); $('c0m').textContent = matName(l);
+      if (A) A.dirty = true;
+    }
+    function step(dt) {
+      ph += dt;
+      accE += dt * 3; accH += dt * 3;
+      while (accE >= 1) { accE -= 1; E.push({ x: xR - 4, o: 4 + Math.random() * 10, tx: zL + Math.random() * (zR - zL), w: false }); }
+      while (accH >= 1) { accH -= 1; H.push({ x: xL + 4, o: 4 + Math.random() * 10, tx: zL + Math.random() * (zR - zL), w: false }); }
+      E.forEach(e => { if (!e.w) { e.x -= 95 * dt; if (e.x <= e.tx) { e.x = e.tx; e.w = true; } } });
+      H.forEach(h => { if (!h.w) { h.x += 75 * dt; if (h.x >= h.tx) { h.x = h.tx; h.w = true; } } });
+      // pair waiting electrons with waiting holes
+      let we = E.filter(e => e.w), wh = H.filter(h => h.w);
+      while (we.length && wh.length) {
+        const e = we.shift(), h = wh.shift();
+        R.push({ x: e.x, t: 0, hx: h.x });
+        E.splice(E.indexOf(e), 1); H.splice(H.indexOf(h), 1);
+      }
+      if (E.length > 30) E.shift(); if (H.length > 30) H.shift();
+      R.forEach(r => { r.t += dt; if (r.t >= 0.35 && !r.p) { r.p = true; P.push({ x: r.x, y: Y(ev(r.x) + Eg / 2), ang: -Math.PI / 2 - 0.5 + Math.random() * 1.0, d: 0 }); } });
+      R = R.filter(r => r.t < 0.6);
+      P.forEach(p => { p.d += 150 * dt; });
+      P = P.filter(p => p.d < 340);
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const l = lam(), col = lamCol(l), xs = [];
+      for (let x = xL; x <= xR; x += 2) xs.push(x);
+      // zone
+      c.fillStyle = lamCol(l, 0.10); c.fillRect(zL, Y(Eg) - 6, zR - zL, Y(0) - Y(Eg) + 12);
+      txt(c, 'recombination zone', (zL + zR) / 2, Y(-0.5) + 14, C.muted, 10, 600, 'center');
+      line(c, jx, Y(Eg) - 20, jx, Y(-BAR) + 30, 'rgba(255,255,255,.2)', 1, [3, 4]);
+      txt(c, 'p-type', (xL + jx) / 2, 22, '#fff', 13, 700, 'center'); txt(c, 'n-type', (jx + xR) / 2, 22, '#fff', 13, 700, 'center');
+      txt(c, 'forward biased', jx, 40, C.volt, 11, 600, 'center');
+      // bands
+      pline(c, xs.map(x => [x, Y(ev(x) + Eg)]), C.band, 2.6);
+      pline(c, xs.map(x => [x, Y(ev(x))]), C.band, 2.6);
+      subs(c, [['E', 'c']], xL - 8, Y(Eg), C.band, 12, 'right');
+      subs(c, [['E', 'v']], xL - 8, Y(0), C.band, 12, 'right');
+      // Eg arrow
+      const ax = xL + 26;
+      arrow(c, ax, (Y(0) + Y(Eg)) / 2, ax, Y(Eg) + 2, C.volt, 1.6, 7); arrow(c, ax, (Y(0) + Y(Eg)) / 2, ax, Y(0) - 2, C.volt, 1.6, 7);
+      subs(c, [['E', 'g'], [' = ' + Eg.toFixed(2) + ' eV', '']], ax + 8, (Y(0) + Y(Eg)) / 2, C.volt, 12, 'left');
+      // background carriers
+      for (let i = 0; i < 12; i++) {
+        const d = jig(i, ph, 1.5);
+        const xe = jx + bend + 10 + hash(i + 3) * (xR - jx - bend - 30), xh = xL + 50 + hash(i + 7) * (jx - bend - xL - 120);
+        carrier(c, xe + d[0], Y(ev(xe) + Eg) - 6 - hash(i + 5) * 8 + d[1] * 0.4, 'e', 0.45, 3);
+        carrier(c, xh + d[0], Y(ev(xh)) + 6 + hash(i + 9) * 8 + d[1] * 0.4, 'h', 0.45, 3.3);
+      }
+      // moving carriers
+      E.forEach(e => carrier(c, e.x, Y(ev(e.x) + Eg) - e.o, 'e', 1, 3.6));
+      H.forEach(h => carrier(c, h.x, Y(ev(h.x)) + h.o, 'h', 1, 3.8));
+      // recombination events
+      R.forEach(r => {
+        const u = clamp(r.t / 0.35, 0, 1), yt = Y(ev(r.x) + Eg) - 6, yb = Y(ev(r.x)) + 6;
+        line(c, r.x, yt, r.x, yb, lamCol(l, 0.6 * (1 - Math.max(0, r.t - 0.35) / 0.25)), 1.4, [3, 3]);
+        if (u < 1) { c.save(); c.shadowColor = C.elec; c.shadowBlur = 8; carrier(c, r.x, lerp(yt, yb, u), 'e', 1, 3.8); c.restore(); }
+        else { const f = 1 - (r.t - 0.35) / 0.25; circ(c, r.x, yb, 4 + 10 * (1 - f), null, lamCol(l, f), 2); }
+      });
+      P.forEach(p => photon(c, p.x + Math.cos(p.ang) * p.d, p.y + Math.sin(p.ang) * p.d, p.ang, 42, clamp(l / 45, 8, 22), col, clamp(1 - p.d / 340, 0, 1)));
+      // formula
+      txt(c, 'λ ≈ 1240 / ' + Eg.toFixed(2) + ' = ' + l.toFixed(0) + ' nm', xR, 64, col, 13, 700, 'right', MONO);
+      txt(c, colName(l), xR, 86, col, 12, 700, 'right');
+      cv.wm(c);
+    }
+    const o = { reset() { Eg = 1.97; ph = 0; E = []; H = []; R = []; P = []; accE = 0.5; accH = 0; sync(); }, step, draw };
+    A = new Anim('anim0', o);
+    $('s0g').addEventListener('input', e => { Eg = +e.target.value; sync(); });
+  })();
+
+  /* =========================================================
+     1. Direct vs indirect: E-k diagram
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv1', 720, 400);
+    const G = { x: 140, y: 30, w: 440, h: 330 }, Emin = -1.3, Emax = 3.0;
+    const X = k => G.x + (k + 1) / 2 * G.w, Y = e => G.y + (Emax - e) / (Emax - Emin) * G.h;
+    const KI = 0.72, ET = 0.65;
+    let mode, ph, ev, acc, nP, nH, n, P, Hq, A = null;
+    const vb = k => -1.1 * k * k;
+    const cb = k => mode === 'direct' ? 1.42 + 1.3 * k * k : Math.min(2.6 + 1.3 * k * k, 1.12 + 1.8 * Math.pow(Math.abs(k) - KI, 2));
+    const kmin = () => mode === 'direct' ? 0 : KI;
+    function sync() {
+      $('c1t').textContent = mode === 'direct' ? 'Direct: vertical' : 'Indirect: needs Δk';
+      $('c1p').textContent = String(nP); $('c1h').textContent = String(nH);
+      if (A) A.dirty = true;
+    }
+    const setMode = segBtns('#anim1', 'gap', v => { mode = v; ev = null; acc = 0; nP = 0; nH = 0; n = 0; P = []; Hq = []; sync(); });
+    function step(dt) {
+      ph += dt;
+      if (!ev) { acc += dt; if (acc > 0.9) { acc = 0; n++; ev = { t: 0, kind: mode === 'direct' ? 'photon' : (n % 10 === 0 ? 'phonon' : 'heat') }; } }
+      else {
+        ev.t += dt;
+        const dur = ev.kind === 'heat' ? 0.9 : 0.5;
+        if (ev.t >= dur) {
+          if (ev.kind === 'heat') { nH++; Hq.push({ x: X(kmin()) + 30, y: Y(ET), t: 0 }); }
+          else { nP++; P.push({ x: X(0), y: Y((vb(0) + cb(kmin())) / 2), d: 0 }); }
+          ev = null; sync();
+        }
+      }
+      P.forEach(p => { p.d += 160 * dt; }); P = P.filter(p => p.d < 260);
+      Hq.forEach(h => { h.t += dt; }); Hq = Hq.filter(h => h.t < 0.8);
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const ks = []; for (let k = -1; k <= 1.0001; k += 0.01) ks.push(k);
+      c.save(); c.beginPath(); c.rect(G.x, G.y, G.w, G.h); c.clip();
+      c.fillStyle = 'rgba(79,195,247,.10)'; c.beginPath(); c.moveTo(G.x, G.y + G.h); ks.forEach(k => c.lineTo(X(k), Y(vb(k)))); c.lineTo(G.x + G.w, G.y + G.h); c.closePath(); c.fill();
+      pline(c, ks.map(k => [X(k), Y(cb(k))]), C.band, 2.6);
+      pline(c, ks.map(k => [X(k), Y(vb(k))]), C.band, 2.6);
+      c.restore();
+      line(c, X(0), G.y, X(0), G.y + G.h, 'rgba(255,255,255,.15)', 1, [3, 4]);
+      line(c, G.x, G.y + G.h, G.x + G.w, G.y + G.h, C.axis, 1.2);
+      txt(c, 'k (crystal momentum)', G.x + G.w, G.y + G.h + 14, C.muted, 10, 600, 'right');
+      txt(c, '0', X(0), G.y + G.h + 14, C.muted, 10, 500, 'center', MONO);
+      txt(c, 'E', G.x - 10, G.y + 6, C.muted, 12, 700, 'right');
+      txt(c, 'conduction band', X(0), Y(cb(0)) - 24, C.text, 11, 600, 'center');
+      txt(c, 'valence band', X(0), Y(vb(0)) + 40, C.text, 11, 600, 'center');
+      const km = kmin(), ecm = cb(km);
+      // electrons at the CB minimum (both valleys in the indirect case), holes at the VB top
+      [km].concat(mode === 'indirect' ? [-KI] : []).forEach((kk, j) => {
+        for (let i = 0; i < 5; i++) { const d = jig(i + 10 * j, ph, 1.4), dx = (i - 2) * 9; carrier(c, X(kk) + dx + d[0], Y(cb(kk + dx / G.w * 2)) - 6 + d[1] * 0.4, 'e', 0.9, 3.4); }
+      });
+      for (let i = 0; i < 4; i++) { const d = jig(i + 30, ph, 1.4), dx = (i - 1.5) * 9; carrier(c, X(0) + dx + d[0], Y(vb(dx / G.w * 2)) + 7 + d[1] * 0.4, 'h', 0.9, 3.6); }
+      if (mode === 'indirect') {
+        line(c, X(km) - 50, Y(ET), X(km) + 50, Y(ET), C.diff, 2, [5, 4]);
+        txt(c, 'defect level', X(km) + 56, Y(ET), C.diff, 10, 600, 'left');
+        arrow(c, X(0) + 6, Y(ecm) - 18, X(km) - 6, Y(ecm) - 18, C.muted, 1.4, 6);
+        txt(c, 'Δk', (X(0) + X(km)) / 2, Y(ecm) - 30, C.muted, 11, 700, 'center');
+      }
+      // event in progress
+      if (ev) {
+        const u = clamp(ev.t / (ev.kind === 'heat' ? 0.9 : 0.5), 0, 1);
+        let x, y;
+        if (ev.kind === 'photon') { x = X(0); y = lerp(Y(ecm) - 6, Y(0) + 6, u); line(c, X(0), Y(ecm), X(0), Y(0), 'rgba(255,255,255,.35)', 1.2, [3, 3]); }
+        else if (ev.kind === 'phonon') { x = lerp(X(km), X(0), u); y = lerp(Y(ecm) - 6, Y(0) + 6, u); line(c, X(km), Y(ecm), X(0), Y(0), 'rgba(255,255,255,.35)', 1.2, [3, 3]); }
+        else {
+          if (u < 0.5) { x = X(km); y = lerp(Y(ecm) - 6, Y(ET), u / 0.5); }
+          else { x = lerp(X(km), X(0) + 20, (u - 0.5) / 0.5); y = lerp(Y(ET), Y(vb(0)) + 6, (u - 0.5) / 0.5); }
+        }
+        c.save(); c.shadowColor = C.elec; c.shadowBlur = 10; carrier(c, x, y, 'e', 1, 4.2); c.restore();
+      }
+      P.forEach(p => photon(c, p.x + 10 + p.d, p.y, 0, 44, 14, mode === 'direct' ? lamCol(873) : lamCol(1100), clamp(1 - p.d / 260, 0, 1)));
+      Hq.forEach(h => {
+        const f = 1 - h.t / 0.8;
+        for (let j = 0; j < 3; j++) {
+          const pts = []; for (let s = 0; s <= 18; s += 1.5) pts.push([h.x + 8 + j * 10 + 3 * Math.sin(s * 0.9), h.y - s - h.t * 30]);
+          c.globalAlpha = f; pline(c, pts, C.hot, 1.8); c.globalAlpha = 1;
+        }
+      });
+      // side notes
+      const nx = G.x + G.w + 18;
+      if (mode === 'direct') {
+        txt(c, 'Direct gap', nx, 60, C.text, 13, 700, 'left');
+        txt(c, 'CB minimum above', nx, 84, C.muted, 11, 600, 'left');
+        txt(c, 'VB maximum (same k)', nx, 100, C.muted, 11, 600, 'left');
+        txt(c, '→ photon emitted', nx, 124, C.ok, 11, 700, 'left');
+      } else {
+        txt(c, 'Indirect gap', nx, 60, C.text, 13, 700, 'left');
+        txt(c, 'CB minimum at', nx, 84, C.muted, 11, 600, 'left');
+        txt(c, 'a different k', nx, 100, C.muted, 11, 600, 'left');
+        txt(c, '→ mostly heat', nx, 124, C.hot, 11, 700, 'left');
+        txt(c, '(1 in 10 here: photon', nx, 148, C.muted, 10, 600, 'left');
+        txt(c, ' + phonon; far rarer', nx, 162, C.muted, 10, 600, 'left');
+        txt(c, ' in real silicon)', nx, 176, C.muted, 10, 600, 'left');
+      }
+      cv.wm(c);
+    }
+    const o = { reset() { ph = 0; setMode('direct'); }, step, draw };
+    A = new Anim('anim1', o);
+  })();
+
+  /* =========================================================
+     2. Emission spectra
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv2', 720, 380);
+    const G = { x: 60, y: 30, w: 620, h: 250 }, L0 = 350, L1 = 1000;
+    const X = l => G.x + (l - L0) / (L1 - L0) * G.w, Y = s => G.y + G.h - s * (G.h - 14);
+    let key, ph, A = null;
+    const gE = (l, lp, fw) => { const e = 1240 / l, ep = 1240 / lp; return Math.exp(-4 * Math.LN2 * Math.pow((e - ep) / fw, 2)); };
+    const spec = (L, l) => L.white ? 0.75 * gE(l, L.lam, L.fw) + 0.62 * gE(l, 565, 0.42) : gE(l, L.lam, L.fw);
+    const eye = l => 1.019 * Math.exp(-285.4 * Math.pow(l / 1000 - 0.559, 2));
+    function fwhm(L) { const lp = L.lam, ep = 1240 / lp; return 1240 / (ep - L.fw / 2) - 1240 / (ep + L.fw / 2); }
+    function sync() {
+      const L = LEDS[key];
+      $('c2l').textContent = L.white ? '455 + ~565 nm' : L.lam + ' nm';
+      $('c2w').textContent = L.white ? 'broad (phosphor)' : fwhm(L).toFixed(0) + ' nm';
+      $('c2m').textContent = L.mat; $('c2v').textContent = L.vf.toFixed(1) + ' V';
+      if (A) A.dirty = true;
+    }
+    const setKey = segBtns('#anim2', 'led', v => { key = v; sync(); });
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const L = LEDS[key];
+      rect(c, G.x, G.y, G.w, G.h, 'rgba(255,255,255,.02)');
+      for (let l = 400; l <= 1000; l += 100) { line(c, X(l), G.y, X(l), G.y + G.h, C.grid, 1); }
+      // rainbow strip
+      const sy = G.y + G.h + 6;
+      for (let l = L0; l < L1; l += 2) rect(c, X(l), sy, X(l + 2) - X(l) + 0.5, 12, l < 380 || l > 780 ? '#1b2233' : wl2rgb(l));
+      txt(c, 'UV', X(365), sy + 6, C.muted, 9, 700, 'center'); txt(c, 'infrared (invisible)', X(890), sy + 6, C.muted, 10, 700, 'center');
+      for (let l = 400; l <= 1000; l += 100) txt(c, String(l) + (l === 1000 ? ' nm' : ''), X(l), sy + 26, C.muted, 10, 500, l === 1000 ? 'right' : 'center', MONO);
+      // eye sensitivity
+      const ep = []; for (let l = 380; l <= 780; l += 2) ep.push([X(l), Y(eye(l))]);
+      pline(c, ep, 'rgba(230,233,239,.45)', 1.4, [5, 4]);
+      line(c, G.x + 6, G.y + 26, G.x + 30, G.y + 26, 'rgba(230,233,239,.6)', 1.4, [5, 4]);
+      txt(c, 'eye sensitivity (peak 555 nm)', G.x + 36, G.y + 26, C.muted, 10, 600, 'left');
+      // emission
+      const pts = []; for (let l = L0; l <= L1; l += 1) pts.push([X(l), Y(spec(L, l))]);
+      const pulse = 0.22 + 0.06 * Math.sin(ph * 2);
+      if (L.white) {
+        for (let l = L0; l < L1; l += 2) { const s = spec(L, l); if (s > 0.01) rect(c, X(l), Y(s), X(l + 2) - X(l) + 0.5, G.y + G.h - Y(s), wl2rgb(l, pulse + 0.1)); }
+      } else {
+        c.fillStyle = ledCol(L, pulse); c.beginPath(); c.moveTo(X(L0), G.y + G.h); pts.forEach(p => c.lineTo(p[0], p[1])); c.lineTo(X(L1), G.y + G.h); c.closePath(); c.fill();
+      }
+      c.save(); c.shadowColor = ledCol(L); c.shadowBlur = 10; pline(c, pts, ledCol(L), 2.6); c.restore();
+      if (L.white) { txt(c, 'blue chip', X(455), Y(0.78) - 10, lamCol(455), 11, 700, 'center'); txt(c, 'yellow phosphor', X(600), Y(0.66) - 10, lamCol(580), 11, 700, 'left'); }
+      else {
+        txt(c, L.name + ' · ' + L.lam + ' nm', X(L.lam), Y(1) - 12, ledCol(L), 12, 700, 'center');
+        const lp = L.lam, e0 = 1240 / lp, a = 1240 / (e0 + L.fw / 2), b = 1240 / (e0 - L.fw / 2);
+        line(c, X(a), Y(0.5), X(b), Y(0.5), ledCol(L), 1.4);
+        txt(c, 'FWHM ' + (b - a).toFixed(0) + ' nm', X(b) + 6, Y(0.5), ledCol(L), 10, 600, 'left');
+      }
+      line(c, G.x, G.y + G.h, G.x + G.w, G.y + G.h, C.axis, 1.2);
+      txt(c, 'relative intensity', G.x + 4, G.y + 8, C.muted, 10, 600, 'left');
+      cv.wm(c);
+    }
+    const o = { reset() { ph = 0; setKey('red'); }, step(dt) { ph += dt; }, draw };
+    A = new Anim('anim2', o);
+  })();
+
+  /* =========================================================
+     3. V-I curves
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv3', 720, 420);
+    const G = { x: 70, y: 30, w: 610, h: 330 };
+    const X = v => G.x + v / 4 * G.w, Y = i => G.y + G.h - i / 0.03 * G.h;
+    const ORDER = ['ir', 'red', 'yellow', 'green', 'blue'];
+    let IF, ph, A = null;
+    function sync() {
+      $('s3i').value = IF * 1000; $('o3i').textContent = (IF * 1000).toFixed(1) + ' mA';
+      $('c3a').textContent = vOf(LEDS.ir, IF).toFixed(2) + ' V'; $('c3b').textContent = vOf(LEDS.red, IF).toFixed(2) + ' V';
+      $('c3c').textContent = vOf(LEDS.green, IF).toFixed(2) + ' V'; $('c3d').textContent = vOf(LEDS.blue, IF).toFixed(2) + ' V';
+      if (A) A.dirty = true;
+    }
+    function curve(c, L, col, dash) {
+      const pts = []; for (let lg = -7; lg <= Math.log10(0.032); lg += 0.02) { const I = Math.pow(10, lg); pts.push([X(vOf(L, I)), Y(I)]); }
+      pts.unshift([X(vOf(L, 1e-7)) - 0.1, Y(0)]); pts.unshift([G.x, Y(0)]);
+      pline(c, pts, col, 2.4, dash);
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      rect(c, G.x, G.y, G.w, G.h, 'rgba(255,255,255,.02)');
+      [0, 10, 20, 30].forEach(m => { line(c, G.x, Y(m / 1000), G.x + G.w, Y(m / 1000), C.grid, 1); txt(c, String(m), G.x - 6, Y(m / 1000), C.muted, 10, 500, 'right', MONO); });
+      [0, 1, 2, 3, 4].forEach(v => { line(c, X(v), G.y + G.h, X(v), G.y + G.h + 4, C.axis, 1); txt(c, v + (v === 4 ? ' V' : ''), X(v), G.y + G.h + 14, C.muted, 10, 500, v === 4 ? 'right' : 'center', MONO); });
+      subs(c, [['I', 'F'], [' (mA)', '']], G.x - 6, G.y - 14, C.muted, 11, 'right');
+      subs(c, [['forward voltage V', 'F']], G.x + G.w / 2, G.y + G.h + 30, C.muted, 11, 'center');
+      line(c, G.x, G.y + G.h, G.x + G.w, G.y + G.h, C.axis, 1.2); line(c, G.x, G.y, G.x, G.y + G.h, C.axis, 1.2);
+      c.save(); c.beginPath(); c.rect(G.x, G.y - 2, G.w, G.h + 2); c.clip();
+      curve(c, SI, C.metal, [6, 4]);
+      ORDER.forEach(k => curve(c, LEDS[k], ledCol(LEDS[k]), null));
+      c.restore();
+      txt(c, 'Si', X(vOf(SI, 0.028)) - 6, Y(0.028), C.metal, 11, 700, 'right');
+      const SIDE = { ir: -1, red: -1, yellow: 1, green: -1, blue: 1 };
+      ORDER.forEach(k => txt(c, k === 'ir' ? 'IR' : LEDS[k].name, X(vOf(LEDS[k], 0.028)) + 6 * SIDE[k], Y(0.028), ledCol(LEDS[k]), 11, 700, SIDE[k] < 0 ? 'right' : 'left'));
+      line(c, G.x, Y(IF), G.x + G.w, Y(IF), 'rgba(255,213,79,.4)', 1, [4, 4]);
+      c.save(); c.shadowBlur = 8 + 5 * Math.sin(ph * 4);
+      ORDER.forEach((k, j) => {
+        const L = LEDS[k], v = vOf(L, IF); c.shadowColor = ledCol(L);
+        circ(c, X(v), Y(IF), 5.5, ledCol(L), '#0f1420', 2);
+        txt(c, v.toFixed(2), X(v) + 9 * SIDE[k], Y(IF) - 12, ledCol(L), 10, 700, SIDE[k] < 0 ? 'right' : 'left', MONO);
+      });
+      c.restore();
+      cv.wm(c);
+    }
+    const o = { reset() { IF = 0.02; ph = 0; sync(); }, step(dt) { ph += dt; }, draw };
+    A = new Anim('anim3', o);
+    $('s3i').addEventListener('input', e => { IF = +e.target.value / 1000; sync(); });
+  })();
+
+  /* =========================================================
+     4. Driving circuit with a series resistor
+     ========================================================= */
+  function res(c, x0, y0, x1, y1, col) {
+    const L = Math.hypot(x1 - x0, y1 - y0), ux = (x1 - x0) / L, uy = (y1 - y0) / L, nx = -uy, ny = ux, lead = L * 0.18, n = 6, amp = 7;
+    const pts = [[x0, y0], [x0 + ux * lead, y0 + uy * lead]];
+    for (let i = 0; i < n; i++) { const t = lead + (L - 2 * lead) * (i + 0.5) / n, s = i % 2 ? -1 : 1; pts.push([x0 + ux * t + nx * amp * s, y0 + uy * t + ny * amp * s]); }
+    pts.push([x1 - ux * lead, y1 - uy * lead], [x1, y1]);
+    pline(c, pts, col, 2.2);
+  }
+  // LED symbol, vertical, anode on top, centred at (x, y)
+  function ledsym(c, x, y, col, glowCol, g) {
+    if (g > 0.01) {
+      const rg = c.createRadialGradient(x, y, 2, x, y, 30 + 70 * g);
+      rg.addColorStop(0, glowCol.replace(/[\d.]+\)$/, (0.75 * g).toFixed(2) + ')')); rg.addColorStop(1, glowCol.replace(/[\d.]+\)$/, '0)'));
+      c.fillStyle = rg; c.beginPath(); c.arc(x, y, 30 + 70 * g, 0, TAU); c.fill();
+    }
+    const h = 14;
+    c.fillStyle = col; c.beginPath(); c.moveTo(x - h, y - 12); c.lineTo(x + h, y - 12); c.lineTo(x, y + 12); c.closePath(); c.fill();
+    line(c, x - h, y + 12, x + h, y + 12, col, 2.8);
+    arrow(c, x + 18, y - 4, x + 34, y - 16, col, 1.6, 6); arrow(c, x + 20, y + 6, x + 36, y - 6, col, 1.6, 6);
+  }
+  (function () {
+    const cv = new Cv('cv4', 720, 400);
+    let key, VS, R, ph, A = null;
+    function sol() {
+      const L = LEDS[key];
+      if (VS <= 0) return { I: 0, V: 0 };
+      let lo = -14, hi = Math.log10(VS / R) + 0.01;
+      for (let k = 0; k < 60; k++) { const m = (lo + hi) / 2, I = Math.pow(10, m); if (VS - I * R - vOf(L, I) > 0) lo = m; else hi = m; }
+      const I = Math.pow(10, (lo + hi) / 2); return { I, V: vOf(L, I) };
+    }
+    function sync() {
+      $('s4v').value = VS; $('s4r').value = R;
+      $('o4v').textContent = VS.toFixed(1) + ' V'; $('o4r').textContent = R + ' Ω';
+      const s = sol();
+      $('c4i').textContent = fmA(s.I); $('c4v').textContent = s.V.toFixed(2) + ' V';
+      $('c4r').textContent = fW(s.I * s.I * R); $('c4p').textContent = fW(s.I * s.V);
+      if (A) A.dirty = true;
+    }
+    const setKey = segBtns('#anim4', 'drv', v => { key = v; sync(); });
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const L = LEDS[key], s = sol(), g = clamp(s.I / 0.025, 0, 1.2) * (0.85 + 0.15 * Math.sin(ph * 3) * (s.I > 0.03 ? 1 : 0));
+      const x0 = 110, y0 = 50, y1 = 230, xl = 470, ym = (y0 + y1) / 2, wc = C.metal;
+      pline(c, [[x0, ym - 20], [x0, y0], [200, y0]], wc, 2); res(c, 200, y0, 320, y0, C.text);
+      pline(c, [[320, y0], [xl, y0], [xl, ym - 12]], wc, 2);
+      pline(c, [[xl, ym + 12], [xl, y1], [x0, y1], [x0, ym + 20]], wc, 2);
+      circ(c, x0, ym, 20, '#141b2b', C.volt, 2);
+      txt(c, '+', x0, ym - 9, C.volt, 13, 700, 'center'); txt(c, '−', x0, ym + 9, C.volt, 13, 700, 'center');
+      subs(c, [['V', 'S']], x0 - 28, ym - 9, C.volt, 13, 'right'); txt(c, VS.toFixed(1) + ' V', x0 - 28, ym + 11, C.volt, 12, 700, 'right', MONO);
+      subs(c, [['R = ' + R + ' Ω', '']], 260, y0 - 22, C.text, 12, 'center');
+      txt(c, 'drop ' + (s.I * R).toFixed(2) + ' V', 260, y0 + 26, C.muted, 11, 600, 'center', MONO);
+      ledsym(c, xl, ym, ledCol(L), ledCol(L, 1), g);
+      subs(c, [['V', 'F'], [' = ' + s.V.toFixed(2) + ' V', '']], xl + 44, ym + 22, C.text, 12, 'left');
+      txt(c, L.name + ' LED', xl + 44, ym + 42, ledCol(L), 12, 700, 'left');
+      // current bar
+      const bx = 170, bw = 420, by = 290, bh = 14, Xb = i => bx + i / 0.04 * bw;
+      subs(c, [['I', 'F']], bx - 12, by + bh / 2, C.text, 12, 'right');
+      rect(c, bx, by, bw, bh, '#0f1420');
+      const over = s.I > 0.03, bc = over ? C.bad : ledCol(L);
+      rect(c, bx, by, Xb(Math.min(s.I, 0.04)) - bx, bh, bc);
+      [[0.02, '20 mA rated', C.ok], [0.03, '30 mA max', C.bad]].forEach(t => { line(c, Xb(t[0]), by - 5, Xb(t[0]), by + bh + 3, t[2], 1.6); txt(c, t[1], Xb(t[0]), by - 12, t[2], 10, 600, 'center'); });
+      txt(c, fmA(s.I), bx + bw + 14, by + bh / 2, bc, 12, 700, 'left', MONO);
+      const msg = VS < L.vf - 0.3 ? [[['Supply below V', 'F'], [': the LED stays dark', '']], C.volt] : over ? [[['Over 30 mA: the LED will be damaged. Raise R.', '']], C.bad] : s.I < 0.002 ? [[['Barely lit: less than 2 mA', '']], C.volt] : [[['OK: current within the rating', '']], C.ok];
+      subs(c, msg[0], bx, by + 36, msg[1], 12, 'left');
+      const rn = (VS - L.vf) / 0.015;
+      if (rn > 0) subs(c, [['For 15 mA: R = (V', 'S'], [' − V', 'F'], [')/I', 'F'], [' = (' + VS.toFixed(1) + ' − ' + L.vf.toFixed(1) + ')/0.015 = ' + rn.toFixed(0) + ' Ω', '']], bx, by + 66, C.muted, 11, 'left');
+      cv.wm(c);
+    }
+    const o = { reset() { VS = 5; R = 220; ph = 0; setKey('red'); }, step(dt) { ph += dt; }, draw };
+    A = new Anim('anim4', o);
+    $('s4v').addEventListener('input', e => { VS = +e.target.value; sync(); });
+    $('s4r').addEventListener('input', e => { R = +e.target.value; sync(); });
+  })();
+
+  /* =========================================================
+     5. Seven-segment display
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv5', 720, 340);
+    const DIG = ['abcdef', 'bc', 'abdeg', 'abcdg', 'bcfg', 'acdfg', 'acdefg', 'abc', 'abcdefg', 'abcdfg'];
+    const ox = 150, oy = 40, w = 130, h = 250, t = 20;
+    // segment rectangles: [x, y, horizontal?]
+    const SEG = {
+      a: [ox, oy, true], g: [ox, oy + h / 2, true], d: [ox, oy + h, true],
+      f: [ox, oy, false], b: [ox + w, oy, false], e: [ox, oy + h / 2, false], c: [ox + w, oy + h / 2, false]
+    };
+    let key, ph, dig, A = null;
+    function sync() {
+      const L = LEDS[key], n = DIG[dig].length;
+      $('c5d').textContent = String(dig); $('c5n').textContent = n + ' of 7';
+      $('c5i').textContent = (n * 10) + ' mA'; $('c5p').textContent = fW(n * 0.01 * L.vf);
+      if (A) A.dirty = true;
+    }
+    const setKey = segBtns('#anim5', 'seg', v => { key = v; sync(); });
+    function segPath(c, s) {
+      const [x, y, hz] = SEG[s], g = 4, a = t / 2;
+      c.beginPath();
+      if (hz) { const x0 = x + g, x1 = x + w - g; c.moveTo(x0, y); c.lineTo(x0 + a, y - a); c.lineTo(x1 - a, y - a); c.lineTo(x1, y); c.lineTo(x1 - a, y + a); c.lineTo(x0 + a, y + a); }
+      else { const y0 = y + g, y1 = y + h / 2 - g; c.moveTo(x, y0); c.lineTo(x + a, y0 + a); c.lineTo(x + a, y1 - a); c.lineTo(x, y1); c.lineTo(x - a, y1 - a); c.lineTo(x - a, y0 + a); }
+      c.closePath();
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const L = LEDS[key], on = DIG[dig];
+      rect(c, ox - 40, oy - 30, w + 80, h + 60, '#0b0f18');
+      Object.keys(SEG).forEach(s => {
+        const lit = on.indexOf(s) >= 0;
+        c.save();
+        if (lit) { c.shadowColor = ledCol(L); c.shadowBlur = 18; }
+        segPath(c, s); c.fillStyle = lit ? ledCol(L) : 'rgba(255,255,255,.06)'; c.fill();
+        c.restore();
+        const [x, y, hz] = SEG[s];
+        txt(c, s, hz ? x + w / 2 : x + (s === 'b' || s === 'c' ? 18 : -18), hz ? y + (s === 'd' ? 22 : -20) : y + h / 4, lit ? C.text : C.muted, 11, 700, 'center');
+      });
+      const tx = 380;
+      txt(c, 'Common-cathode display', tx, 50, C.text, 14, 700, 'left');
+      txt(c, 'Each segment is one LED. A segment lights', tx, 78, C.muted, 11, 600, 'left');
+      txt(c, 'when its anode is driven high through a resistor.', tx, 96, C.muted, 11, 600, 'left');
+      txt(c, 'Digit ' + dig + ': segments ' + on.split('').join(' '), tx, 136, ledCol(L), 13, 700, 'left');
+      txt(c, 'Current: ' + on.length + ' × 10 mA = ' + on.length * 10 + ' mA', tx, 166, C.text, 12, 700, 'left', MONO);
+      txt(c, 'Power:   ' + on.length + ' × ' + L.vf.toFixed(1) + ' V × 10 mA = ' + fW(on.length * 0.01 * L.vf), tx, 190, C.text, 12, 700, 'left', MONO);
+      txt(c, '"8" lights all seven: the worst case', tx, 230, C.muted, 11, 600, 'left');
+      txt(c, 'for the supply and the common pin.', tx, 248, C.muted, 11, 600, 'left');
+      cv.wm(c);
+    }
+    const o = {
+      reset() { ph = 0; dig = 8; setKey('red'); },
+      step(dt) { ph += dt; if (ph >= 1) { ph -= 1; dig = (dig + 1) % 10; sync(); } }, draw
+    };
+    A = new Anim('anim5', o);
+  })();
+
+
+  /* ---------- sticky mini-nav highlight ---------- */
+  (function () {
+    const links = Array.from(document.querySelectorAll('.toc a'));
+    const secs = links.map(l => document.querySelector(l.getAttribute('href')));
+    function upd() {
+      let cur = 0;
+      secs.forEach((s, i) => { if (s.getBoundingClientRect().top < 120) cur = i; });
+      links.forEach((l, i) => l.classList.toggle('active', i === cur));
+    }
+    window.addEventListener('scroll', upd, { passive: true }); upd();
+  })();
+
+  let last = performance.now();
+  function frameLoop(ts) {
+    const dt = Math.min(0.05, Math.max(0, (ts - last) / 1000)); last = ts;
+    anims.forEach(a => {
+      if (!a.visible) return;
+      if (a.playing) { a.o.step(dt); a.o.draw(); }
+      else if (a.o.tween && a.o.tween(dt)) a.o.draw();
+      else if (a.dirty) a.o.draw();
+      a.dirty = false;
+    });
+    requestAnimationFrame(frameLoop);
+  }
+  function onResize() { anims.forEach(a => { a.dirty = true; }); }
+  window.addEventListener('resize', onResize);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(onResize);
+  requestAnimationFrame(frameLoop);
+})();
+</script>
+</body>
+</html>
