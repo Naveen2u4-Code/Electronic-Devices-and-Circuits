@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>3.2 Zener Diode as a Voltage Regulator</title>
+  <meta name="description" content="The Zener shunt voltage regulator: how the series resistor and Zener share current, line and load regulation, drop-out, and how to choose the series resistor and power ratings. An interactive lesson.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1420;
+      --panel: #1a2132;
+      --panel-hover: #212a3f;
+      --border: #2a3448;
+      --text: #e6e9ef;
+      --muted: #9aa4b8;
+      --electron: #4fc3f7;
+      --hole: #ff8a65;
+      --energy: #ffd54f;
+      --success: #81c784;
+      --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+      --max: 960px;
+      --radius: 12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: var(--font); font-size: 16px; line-height: 1.65;
+      overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column;
+    }
+    a { color: var(--electron); }
+    .wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 16px; }
+
+    /* Sticky mini-nav */
+    .toc {
+      position: sticky; top: 0; z-index: 10; background: rgba(15, 20, 32, .95);
+      border-bottom: 1px solid var(--border); backdrop-filter: blur(6px);
+    }
+    .toc ul { display: flex; gap: 4px; list-style: none; margin: 0 auto; padding: 8px 16px; max-width: var(--max); overflow-x: auto; scrollbar-width: none; }
+    .toc ul::-webkit-scrollbar { display: none; }
+    .toc a {
+      display: block; white-space: nowrap; text-decoration: none; color: var(--muted);
+      font-size: 0.85rem; font-weight: 500; padding: 6px 10px; border-radius: 999px;
+    }
+    .toc a:hover { color: var(--text); background: var(--panel); }
+    .toc a.active { color: var(--bg); background: var(--electron); }
+
+    main { flex: 1; padding: 24px 0 48px; }
+    .crumbs { font-size: 0.875rem; color: var(--muted); margin: 0 0 16px; }
+    .crumbs a { color: var(--muted); }
+    .crumbs a:hover { color: var(--electron); }
+    .eyebrow { font-family: var(--mono); font-size: 0.8rem; color: var(--electron); letter-spacing: .04em; margin: 0; }
+    h1 { font-size: clamp(1.5rem, 6vw, 2.2rem); line-height: 1.2; margin: 4px 0 6px; }
+    .subtitle { color: var(--muted); margin: 0 0 8px; }
+    section { scroll-margin-top: 64px; padding-top: 28px; }
+    h2 { font-size: clamp(1.3rem, 5vw, 1.6rem); line-height: 1.25; margin: 0 0 14px; }
+    h3 { font-size: 1.05rem; margin: 0 0 8px; }
+    .prose { font-size: 17px; line-height: 1.7; max-width: 70ch; }
+    .prose p, .prose ul, .prose ol { margin: 0 0 14px; }
+    .prose ul, .prose ol { padding-left: 22px; }
+    .prose li { margin: 4px 0; }
+    .prose strong { color: #fff; }
+    .prose p.eq { text-align: center; font-family: var(--mono); font-size: 16px; background: #141b2b; border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; overflow-wrap: anywhere; }
+    hr.sep { border: 0; border-top: 1px solid var(--border); margin: 40px 0 0; }
+    .rm-note { font-size: 0.78rem; color: var(--muted); margin: 0 0 8px; }
+
+    .tbl-wrap { overflow-x: auto; margin: 0 0 14px; }
+    table.cmp { border-collapse: collapse; width: 100%; font-size: 0.92rem; min-width: 520px; }
+    table.cmp th, table.cmp td { border: 1px solid var(--border); padding: 7px 10px; text-align: left; vertical-align: top; }
+    table.cmp thead th { background: #141b2b; color: var(--muted); font-weight: 600; }
+    table.cmp th[scope="row"] { color: var(--muted); font-weight: 600; white-space: nowrap; }
+    table.cmp .zc { color: var(--electron); } table.cmp .ac { color: var(--hole); }
+
+    /* Buttons & controls */
+    .btn {
+      font: inherit; font-size: 0.88rem; font-weight: 600; color: var(--text);
+      background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+      padding: 7px 12px; cursor: pointer; min-height: 38px;
+    }
+    .btn:hover:not(:disabled) { background: var(--panel-hover); border-color: var(--electron); }
+    .btn:disabled { opacity: .45; cursor: default; }
+    .btn:focus-visible, input:focus-visible, canvas:focus-visible { outline: 2px solid var(--electron); outline-offset: 2px; }
+    .btn[aria-pressed="true"] { background: rgba(255,213,79,.14); border-color: var(--energy); color: var(--energy); }
+    .seg { display: inline-flex; gap: 0; flex-wrap: nowrap; }
+    .seg .btn { border-radius: 0; padding: 7px 10px; }
+    .seg .btn:first-child { border-radius: 8px 0 0 8px; }
+    .seg .btn:last-child { border-radius: 0 8px 8px 0; }
+    .seg .btn + .btn { margin-left: -1px; }
+
+    figure.anim {
+      margin: 18px 0 0; background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 12px; min-width: 0;
+    }
+    .ctrls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-bottom: 12px; }
+    .sliders { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-bottom: 12px; }
+    .slider { flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; }
+    .slider label { display: flex; justify-content: space-between; gap: 8px; font-size: 0.8rem; color: var(--muted); }
+    .slider output { font-family: var(--mono); color: var(--energy); white-space: nowrap; }
+    input[type="range"] { width: 100%; accent-color: var(--energy); margin: 4px 0 0; }
+    canvas { display: block; width: 100%; border-radius: 8px; background: #141b2b; }
+    .narrow { max-width: 820px; margin-left: auto; margin-right: auto; }
+
+    .counters { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px auto 0; }
+    .ctr {
+      flex: 1 1 110px; background: #141b2b; border: 1px solid var(--border); border-radius: 8px;
+      padding: 6px 10px; font-size: 0.78rem; color: var(--muted); min-width: 0;
+    }
+    .ctr b { display: block; font-family: var(--mono); font-size: 1rem; font-weight: 500; color: var(--text); overflow-wrap: anywhere; }
+    .ctr.v b { color: var(--energy); } .ctr.p b { color: #ef9a9a; } .ctr.n b { color: #90caf9; } .ctr.w b { color: var(--success); }
+    .ctr.b b { color: #ce93d8; } .ctr.q b { color: #ff8a65; }
+
+    .keypoints {
+      margin-top: 16px; padding: 14px 16px; border-radius: var(--radius);
+      background: rgba(129,199,132,.07); border: 1px solid rgba(129,199,132,.35);
+    }
+    .keypoints h3 { color: var(--success); font-size: 0.95rem; text-transform: uppercase; letter-spacing: .05em; }
+    .keypoints ul { margin: 0; padding-left: 20px; }
+    .keypoints li { margin: 4px 0; }
+
+    .further { margin-top: 48px; color: var(--muted); font-size: 0.85rem; }
+    .further h3 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 0 0 6px; }
+    .further ul { margin: 0; padding-left: 18px; }
+    .further li { margin: 3px 0; }
+
+    .pager { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 32px; }
+    .pager a {
+      display: block; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 12px 14px; text-decoration: none; color: var(--text); min-width: 0;
+    }
+    .pager a:hover { border-color: var(--electron); }
+    .pager small { display: block; color: var(--muted); font-size: 0.75rem; }
+    .pager .next { text-align: right; }
+    .site-foot { border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; text-align: center; padding: 18px 16px; }
+
+    /* Justified paragraphs on desktop; phones stay left-aligned to avoid wide word gaps. */
+    @media (min-width: 768px) {
+      .prose p, .prose li, .keypoints li { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+      .prose p.eq { text-align: center; }
+    }
+  </style>
+<body>
+
+  <nav class="toc" aria-label="Sections">
+    <ul>
+      <li><a href="#s0">Circuit</a></li>
+      <li><a href="#s1">Line regulation</a></li>
+      <li><a href="#s2">Load regulation</a></li>
+      <li><a href="#s3">Design</a></li>
+      <li><a href="#s4">Summary</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="wrap">
+      <header>
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="../../index.html">Home</a> / <a href="../index.html">Unit 3</a> / 3.2
+        </nav>
+        <p class="eyebrow">TOPIC 3.2</p>
+        <h1>Zener Diode as a Voltage Regulator</h1>
+        <p class="subtitle">One resistor and one Zener: holding the output steady when the input or the load changes</p>
+        <p class="rm-note" id="rmNote" hidden>Your device asks for reduced motion, so every animation starts paused. Press Play on any animation to run it. Sliders and buttons still update the picture.</p>
+      </header>
+
+      <!-- ================= SECTION 0 ================= -->
+      <section id="s0" aria-labelledby="h0">
+        <h2 id="h0">The shunt regulator circuit</h2>
+        <div class="prose">
+          <p>A <strong>voltage regulator</strong> keeps the voltage across a load constant even when the input voltage changes (from mains variation or rectifier ripple) or when the load draws more or less current. The simplest regulator uses the Zener diode from topic 3.1.</p>
+          <p>A <strong>series resistor R<sub>S</sub></strong> connects the unregulated input V<sub>in</sub> to the output node. The Zener sits <strong>in parallel with the load</strong> R<sub>L</sub>, reverse biased with its cathode to the positive side. Because it is in parallel (in "shunt") with the load, this is called a <strong>SHUNT REGULATOR</strong>.</p>
+          <p>While the Zener is in breakdown, the load voltage is pinned at V<sub>L</sub> ≈ V<sub>Z</sub>. The currents then follow directly:</p>
+          <p class="eq">I<sub>S</sub> = (V<sub>in</sub> − V<sub>Z</sub>) / R<sub>S</sub> &nbsp;·&nbsp; I<sub>L</sub> = V<sub>Z</sub> / R<sub>L</sub> &nbsp;·&nbsp; I<sub>Z</sub> = I<sub>S</sub> − I<sub>L</sub></p>
+          <p>R<sub>S</sub> drops the difference between V<sub>in</sub> and V<sub>Z</sub>. The Zener takes whatever part of I<sub>S</sub> the load does not use. Example, with a 5.1 V, 500 mW Zener, V<sub>in</sub> = 12 V, R<sub>S</sub> = 120 Ω and R<sub>L</sub> = 250 Ω: I<sub>S</sub> = 6.9/120 = <strong>57.5 mA</strong>, I<sub>L</sub> = 5.1/250 = <strong>20.4 mA</strong>, so I<sub>Z</sub> = <strong>37.1 mA</strong>.</p>
+          <p>This only works while the Zener is actually in breakdown. To check, remove the Zener and find the voltage the divider would give on its own:</p>
+          <p class="eq">V<sub>open</sub> = V<sub>in</sub> · R<sub>L</sub> / (R<sub>S</sub> + R<sub>L</sub>)</p>
+          <p>If V<sub>open</sub> is above V<sub>Z</sub>, the Zener conducts and clamps the output at V<sub>Z</sub>. If it is below V<sub>Z</sub>, the Zener stays off and V<sub>L</sub> = V<sub>open</sub>: the regulator has <strong>dropped out</strong>. In practice the Zener current must also stay above I<sub>ZK</sub> to hold V<sub>Z</sub> firmly.</p>
+          <p>The hand calculations here treat the Zener as ideal, fixed at 5.1 V. The animations use a real Zener curve, whose voltage rises a little with current (r<sub>Z</sub>) and sags near the knee. Their readouts therefore sit slightly off the ideal figures: V<sub>L</sub> ≈ 5.24 V and I<sub>Z</sub> ≈ 35 mA in this example.</p>
+        </div>
+
+        <figure class="anim" id="anim0">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s0v"><span>Input voltage V<sub>in</sub></span><output id="o0v"></output></label><input type="range" id="s0v" min="4" max="18" step="0.1" value="12"></div>
+            <div class="slider"><label for="s0r"><span>Load resistance R<sub>L</sub></span><output id="o0r"></output></label><input type="range" id="s0r" min="0" max="1000" step="1" value="332"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv0" style="aspect-ratio:720/400" role="img" aria-label="A shunt regulator: an input source, a 120 ohm series resistor, a 5.1 volt Zener from the output node to ground and a load resistor in parallel. Moving dots show conventional current: the input current I_S splits at the node into the Zener current I_Z and the load current I_L. A stacked bar below shows I_S as the sum of I_Z and I_L."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr v"><span>V<sub>L</sub></span><b id="c0v"></b></div>
+            <div class="ctr w"><span>I<sub>S</sub></span><b id="c0s"></b></div>
+            <div class="ctr b"><span>I<sub>Z</sub></span><b id="c0z"></b></div>
+            <div class="ctr n"><span>I<sub>L</sub></span><b id="c0l"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: shunt regulator">
+          <h3>Key points</h3>
+          <ul>
+            <li>R<sub>S</sub> in series from V<sub>in</sub>, with the Zener (reverse biased) in parallel with the load.</li>
+            <li>In breakdown V<sub>L</sub> ≈ V<sub>Z</sub>, I<sub>S</sub> = (V<sub>in</sub> − V<sub>Z</sub>)/R<sub>S</sub>, I<sub>L</sub> = V<sub>Z</sub>/R<sub>L</sub>, I<sub>Z</sub> = I<sub>S</sub> − I<sub>L</sub>.</li>
+            <li>The Zener soaks up the current the load does not take.</li>
+            <li>Regulation needs V<sub>in</sub>·R<sub>L</sub>/(R<sub>S</sub> + R<sub>L</sub>) &gt; V<sub>Z</sub> and I<sub>Z</sub> ≥ I<sub>ZK</sub>. Otherwise it drops out.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 1 ================= -->
+      <section id="s1" aria-labelledby="h1s">
+        <h2 id="h1s">Line regulation: when the input changes</h2>
+        <div class="prose">
+          <p>Suppose V<sub>in</sub> rises. The voltage across R<sub>S</sub> rises with it, so I<sub>S</sub> increases. The load still sees about V<sub>Z</sub>, so I<sub>L</sub> stays the same and <strong>all the extra current goes into the Zener</strong>. Because the Zener curve is so steep, this extra current raises V<sub>L</sub> only by ΔI<sub>Z</sub>·r<sub>Z</sub>.</p>
+          <p>In the small-signal picture, the Zener is a resistance r<sub>Z</sub>, and R<sub>S</sub> forms a voltage divider with r<sub>Z</sub> ∥ R<sub>L</sub>:</p>
+          <p class="eq">ΔV<sub>L</sub> / ΔV<sub>in</sub> = (r<sub>Z</sub> ∥ R<sub>L</sub>) / [ R<sub>S</sub> + (r<sub>Z</sub> ∥ R<sub>L</sub>) ] ≈ r<sub>Z</sub> / (R<sub>S</sub> + r<sub>Z</sub>)</p>
+          <p>This ratio, often quoted as a percentage or in mV per volt, is the <strong>LINE REGULATION</strong>. Smaller is better. For the example, r<sub>Z</sub> ≈ 8.5 Ω at I<sub>Z</sub> ≈ 37 mA, so the ratio is about 8.2/128 ≈ <strong>6.4 %</strong>. A 4 V peak-to-peak ripple on the input becomes only about <strong>0.26 V</strong> peak-to-peak at the output.</p>
+          <p>If V<sub>in</sub> falls too far, V<sub>open</sub> drops below V<sub>Z</sub> and regulation is lost. Here that happens below V<sub>in</sub> ≈ V<sub>Z</sub>(R<sub>S</sub> + R<sub>L</sub>)/R<sub>L</sub> = 5.1 × 370/250 ≈ <strong>7.5 V</strong>. Below that point V<sub>L</sub> simply follows the divider.</p>
+        </div>
+
+        <figure class="anim" id="anim1">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s1v"><span>DC input V<sub>in</sub></span><output id="o1v"></output></label><input type="range" id="s1v" min="4" max="18" step="0.1" value="12"></div>
+            <div class="slider"><label for="s1a"><span>Input ripple (peak)</span><output id="o1a"></output></label><input type="range" id="s1a" min="0" max="3" step="0.05" value="2"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv1" style="aspect-ratio:720/470" role="img" aria-label="Top: output voltage against input voltage for R_S = 120 ohms and R_L = 250 ohms. With the Zener the curve rises along the divider line until about 7.5 volts, then stays almost flat near 5.1 volts; without the Zener (dashed) it keeps rising. The input range covered by the ripple is shaded. Bottom: the input voltage with ripple over time, and the much smaller output ripple drawn on a magnified millivolt scale."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr v"><span>V<sub>L</sub> (DC)</span><b id="c1v"></b></div>
+            <div class="ctr q"><span>Input ripple (p-p)</span><b id="c1i"></b></div>
+            <div class="ctr b"><span>Output ripple (p-p)</span><b id="c1o"></b></div>
+            <div class="ctr w"><span>ΔV<sub>L</sub>/ΔV<sub>in</sub></span><b id="c1r"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: line regulation">
+          <h3>Key points</h3>
+          <ul>
+            <li>A higher V<sub>in</sub> raises I<sub>S</sub>. The extra current flows into the Zener, not the load.</li>
+            <li>Line regulation: ΔV<sub>L</sub>/ΔV<sub>in</sub> ≈ r<sub>Z</sub>/(R<sub>S</sub> + r<sub>Z</sub>), here about 6 %.</li>
+            <li>Ripple at the input is cut by the same factor.</li>
+            <li>Below V<sub>in</sub> = V<sub>Z</sub>(R<sub>S</sub> + R<sub>L</sub>)/R<sub>L</sub> the regulator drops out.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 2 ================= -->
+      <section id="s2" aria-labelledby="h2s">
+        <h2 id="h2s">Load regulation: when the load changes</h2>
+        <div class="prose">
+          <p>Now hold V<sub>in</sub> fixed and change the load. Since V<sub>L</sub> stays near V<sub>Z</sub>, the current through R<sub>S</sub> is set by V<sub>in</sub> and hardly changes. So:</p>
+          <p class="eq">I<sub>Z</sub> + I<sub>L</sub> = I<sub>S</sub> ≈ constant</p>
+          <p>If the load draws more current, the Zener draws <strong>exactly that much less</strong>. The Zener acts as a current "reservoir" that gives up current to the load as needed. The small fall in I<sub>Z</sub> lowers V<sub>L</sub> slightly. The output resistance of the regulator is r<sub>Z</sub> ∥ R<sub>S</sub> ≈ r<sub>Z</sub>:</p>
+          <p class="eq">ΔV<sub>L</sub> / ΔI<sub>L</sub> ≈ −(r<sub>Z</sub> ∥ R<sub>S</sub>) &nbsp; and &nbsp; Load regulation = (V<sub>NL</sub> − V<sub>FL</sub>) / V<sub>FL</sub> × 100 %</p>
+          <p>where V<sub>NL</sub> and V<sub>FL</sub> are the output voltages at no load and at full load.</p>
+          <p>The reservoir is limited. When I<sub>L</sub> grows until I<sub>Z</sub> falls to I<sub>ZK</sub>, the Zener leaves breakdown and V<sub>L</sub> collapses. For the example (V<sub>in</sub> = 12 V, R<sub>S</sub> = 120 Ω), I<sub>S</sub> ≈ 57.5 mA, so the largest load current is about I<sub>S</sub> − I<sub>ZK</sub> ≈ <strong>56.5 mA</strong>, a minimum R<sub>L</sub> of about 5.1/0.0565 ≈ <strong>90 Ω</strong>. In the plot, the real Zener's soft knee lets it hang on a little longer, to about 60 mA, while V<sub>L</sub> sags towards 4.7 V.</p>
+          <p>The opposite extreme is just as important. With <strong>no load</strong> the Zener carries all of I<sub>S</sub> and dissipates the most power: here P<sub>Z</sub> = 5.1 × 0.0575 ≈ <strong>0.29 W</strong>.</p>
+        </div>
+
+        <figure class="anim" id="anim2">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s2r"><span>Load resistance R<sub>L</sub> (V<sub>in</sub> = 12 V, R<sub>S</sub> = 120 Ω)</span><output id="o2r"></output></label><input type="range" id="s2r" min="0" max="1000" step="1" value="332"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv2" style="aspect-ratio:720/470" role="img" aria-label="Top: output voltage against load current. It stays almost flat near 5.1 volts up to about 56 milliamps, then falls in the shaded drop-out region. Bottom: the input current I_S stays nearly constant while the Zener current falls one-for-one as the load current rises, reaching I_ZK at the drop-out point. A vertical cursor follows the load slider."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr p"><span>R<sub>L</sub></span><b id="c2r"></b></div>
+            <div class="ctr n"><span>I<sub>L</sub></span><b id="c2l"></b></div>
+            <div class="ctr b"><span>I<sub>Z</sub></span><b id="c2z"></b></div>
+            <div class="ctr v"><span>V<sub>L</sub></span><b id="c2v"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: load regulation">
+          <h3>Key points</h3>
+          <ul>
+            <li>I<sub>S</sub> is fixed by V<sub>in</sub> and R<sub>S</sub>, so I<sub>Z</sub> + I<sub>L</sub> stays constant.</li>
+            <li>More load current means less Zener current. V<sub>L</sub> falls only by ΔI<sub>L</sub>·(r<sub>Z</sub> ∥ R<sub>S</sub>).</li>
+            <li>Maximum load: I<sub>L,max</sub> = I<sub>S</sub> − I<sub>ZK</sub>. Beyond it the output collapses.</li>
+            <li>No load is the worst case for the Zener: it carries all of I<sub>S</sub>.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 3 ================= -->
+      <section id="s3" aria-labelledby="h3s">
+        <h2 id="h3s">Designing the series resistor</h2>
+        <div class="prose">
+          <p>The design task is to choose R<sub>S</sub> so the Zener stays between I<sub>ZK</sub> and I<sub>ZM</sub> for every combination of input voltage and load current. Treat the Zener as ideal (V<sub>L</sub> = V<sub>Z</sub>) and check the two extremes:</p>
+          <ul>
+            <li><strong>Lowest input, heaviest load</strong> (V<sub>in,min</sub>, I<sub>L,max</sub>): the Zener current is smallest, and it must still be at least I<sub>ZK</sub>. This sets the <strong>largest</strong> allowed R<sub>S</sub>.</li>
+            <li><strong>Highest input, lightest load</strong> (V<sub>in,max</sub>, I<sub>L,min</sub>): the Zener current is largest, and it must not exceed I<sub>ZM</sub>. This sets the <strong>smallest</strong> allowed R<sub>S</sub>.</li>
+          </ul>
+          <p class="eq">R<sub>S,max</sub> = (V<sub>in,min</sub> − V<sub>Z</sub>) / (I<sub>ZK</sub> + I<sub>L,max</sub>) &nbsp; and &nbsp; R<sub>S,min</sub> = (V<sub>in,max</sub> − V<sub>Z</sub>) / (I<sub>ZM</sub> + I<sub>L,min</sub>)</p>
+          <p>Choose a standard value between the two. If R<sub>S,min</sub> &gt; R<sub>S,max</sub>, no resistor works: use a Zener with a higher power rating, or narrow the input or load range.</p>
+          <p><strong>Worked example.</strong> V<sub>Z</sub> = 5.1 V, P<sub>ZM</sub> = 0.5 W (I<sub>ZM</sub> = 98 mA), I<sub>ZK</sub> = 1 mA. V<sub>in</sub> varies from 9 V to 15 V and I<sub>L</sub> from 0 to 30 mA.</p>
+          <ul>
+            <li>R<sub>S,max</sub> = (9 − 5.1) / (0.001 + 0.030) = 3.9 / 0.031 ≈ <strong>126 Ω</strong>.</li>
+            <li>R<sub>S,min</sub> = (15 − 5.1) / (0.098 + 0) = 9.9 / 0.098 ≈ <strong>101 Ω</strong>.</li>
+            <li>Choose <strong>R<sub>S</sub> = 120 Ω</strong> (a standard E12 value).</li>
+            <li>Zener power, worst case (15 V, no load): I<sub>Z</sub> = 9.9/120 = 82.5 mA, so P<sub>Z</sub> = 5.1 × 0.0825 ≈ <strong>0.42 W</strong>, under the 0.5 W rating.</li>
+            <li>Resistor power, worst case (15 V): P<sub>RS</sub> = (V<sub>in,max</sub> − V<sub>Z</sub>)²/R<sub>S</sub> = 9.9²/120 ≈ <strong>0.82 W</strong>, so use a 1 W resistor (2 W for margin).</li>
+          </ul>
+          <p>Try raising I<sub>L,max</sub> to 40 mA below. R<sub>S,max</sub> drops to about 95 Ω, below R<sub>S,min</sub>, and no resistor works with this Zener.</p>
+        </div>
+
+        <figure class="anim" id="anim3">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s3a"><span>V<sub>in,min</sub></span><output id="o3a"></output></label><input type="range" id="s3a" min="6" max="12" step="0.1" value="9"></div>
+            <div class="slider"><label for="s3b"><span>V<sub>in,max</sub></span><output id="o3b"></output></label><input type="range" id="s3b" min="12" max="24" step="0.1" value="15"></div>
+            <div class="slider"><label for="s3c"><span>I<sub>L,max</sub> (I<sub>L,min</sub> = 0)</span><output id="o3c"></output></label><input type="range" id="s3c" min="0" max="80" step="1" value="30"></div>
+            <div class="slider"><label for="s3d"><span>Your R<sub>S</sub></span><output id="o3d"></output></label><input type="range" id="s3d" min="20" max="300" step="1" value="120"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv3" style="aspect-ratio:720/420" role="img" aria-label="A resistance number line from 0 to 300 ohms with the allowed window between R_S,min and R_S,max shaded green, or a red gap when no value works, and a marker for the chosen R_S. Below, two bars show the Zener current in the two worst cases: low input with full load, which must stay above I_ZK, and high input with no load, which must stay below I_ZM. The worst-case Zener and resistor powers are listed at the bottom."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr w"><span>R<sub>S,min</sub></span><b id="c3a"></b></div>
+            <div class="ctr w"><span>R<sub>S,max</sub></span><b id="c3b"></b></div>
+            <div class="ctr b"><span>P<sub>Z</sub> worst case</span><b id="c3c"></b></div>
+            <div class="ctr q"><span>P<sub>RS</sub> worst case</span><b id="c3d"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: design">
+          <h3>Key points</h3>
+          <ul>
+            <li>R<sub>S,max</sub> = (V<sub>in,min</sub> − V<sub>Z</sub>)/(I<sub>ZK</sub> + I<sub>L,max</sub>) keeps the Zener in breakdown.</li>
+            <li>R<sub>S,min</sub> = (V<sub>in,max</sub> − V<sub>Z</sub>)/(I<sub>ZM</sub> + I<sub>L,min</sub>) keeps it within its power rating.</li>
+            <li>Pick a standard R<sub>S</sub> between them. If R<sub>S,min</sub> &gt; R<sub>S,max</sub>, no value works.</li>
+            <li>Rate R<sub>S</sub> for (V<sub>in,max</sub> − V<sub>Z</sub>)²/R<sub>S</sub>, and check P<sub>Z</sub> at maximum input with no load.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 4 ================= -->
+      <section id="s4" aria-labelledby="h4s">
+        <h2 id="h4s">Summary</h2>
+        <div class="prose">
+          <p>The Zener shunt regulator is a <strong>series resistor R<sub>S</sub></strong> feeding a <strong>Zener in parallel with the load</strong>. While the Zener is in breakdown, V<sub>L</sub> ≈ V<sub>Z</sub>, and the Zener absorbs changes: extra input current from a higher V<sub>in</sub> (line regulation ≈ r<sub>Z</sub>/(R<sub>S</sub> + r<sub>Z</sub>)), and current released by a lighter load (I<sub>Z</sub> + I<sub>L</sub> = I<sub>S</sub>). R<sub>S</sub> must lie between R<sub>S,min</sub> and R<sub>S,max</sub> so that I<sub>ZK</sub> ≤ I<sub>Z</sub> ≤ I<sub>ZM</sub> in every case.</p>
+          <p>The circuit is simple and cheap, but it is <strong>inefficient</strong>. The full I<sub>S</sub> flows all the time, even with no load, and both R<sub>S</sub> and the Zener waste power. It suits small load currents and voltage references. Larger loads use a transistor to carry the current, with the Zener only setting the reference voltage.</p>
+        </div>
+
+        <figure class="anim" id="anim4">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s4v"><span>V<sub>in</sub></span><output id="o4v"></output></label><input type="range" id="s4v" min="0" max="20" step="0.1" value="12"></div>
+            <div class="slider"><label for="s4s"><span>R<sub>S</sub></span><output id="o4s"></output></label><input type="range" id="s4s" min="20" max="400" step="1" value="120"></div>
+            <div class="slider"><label for="s4r"><span>R<sub>L</sub></span><output id="o4r"></output></label><input type="range" id="s4r" min="0" max="1000" step="1" value="332"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv4" style="aspect-ratio:720/470" role="img" aria-label="A playground for the whole regulator: the circuit with current dots, a status label (regulating, dropped out, or over I_ZM), and three bars: output voltage against V_Z, Zener current against I_ZK and I_ZM, and Zener power against its 0.5 watt rating."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr v"><span>V<sub>L</sub></span><b id="c4v"></b></div>
+            <div class="ctr b"><span>I<sub>Z</sub></span><b id="c4z"></b></div>
+            <div class="ctr q"><span>P<sub>Z</sub></span><b id="c4p"></b></div>
+            <div class="ctr w"><span>Status</span><b id="c4s"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: summary">
+          <h3>Key points</h3>
+          <ul>
+            <li>Series R<sub>S</sub> with a shunt Zener: V<sub>L</sub> ≈ V<sub>Z</sub> while I<sub>ZK</sub> ≤ I<sub>Z</sub> ≤ I<sub>ZM</sub>.</li>
+            <li>Line changes go into I<sub>Z</sub>. Load changes trade off against I<sub>Z</sub>, since I<sub>Z</sub> + I<sub>L</sub> = I<sub>S</sub>.</li>
+            <li>R<sub>S,min</sub> ≤ R<sub>S</sub> ≤ R<sub>S,max</sub> from the two worst cases.</li>
+            <li>Simple but wasteful: best for small currents and references.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <aside class="further" aria-label="Further reading">
+        <h3>Further reading</h3>
+        <ul>
+          <li><em>Microelectronic Circuits</em> (6th ed.), Adel S. Sedra and Kenneth C. Smith. Chapter: “Diodes”, section on Zener shunt regulators.</li>
+          <li><em>Electronic Devices and Circuits</em>, David A. Bell. Section on Zener diode voltage regulators.</li>
+          <li><em>Electronic Devices and Circuits</em>, S. Salivahanan and N. Suresh Kumar. Section on Zener diode voltage regulators.</li>
+          <li><em>Electronic Devices and Circuits</em>, Jacob Millman, Christos C. Halkias and Satyabrata Jit. Chapter: “Semiconductor-Diode Characteristics”.</li>
+        </ul>
+      </aside>
+
+      <nav class="pager" aria-label="Topic navigation">
+        <a href="../3-1-zener-diode/index.html"><small>← Previous</small>3.1 Zener Diode</a>
+        <a class="next" href="../3-3-led/index.html"><small>Next →</small>3.3 Light-Emitting Diode</a>
+      </nav>
+    </div>
+  </main>
+
+  <footer class="site-foot">© 2026 Naveen Bokka</footer>
+
+
+<script>
+(function () {
+  'use strict';
+  /* ---------- colours ---------- */
+  const C = {
+    text: '#e6e9ef', muted: '#9aa4b8', grid: 'rgba(255,255,255,.07)',
+    P: '#7d3a3a', N: '#2e4a7d', DEP: '#3a3f4f',
+    hole: '#ff8a65', elec: '#4fc3f7', acc: '#ef9a9a', don: '#90caf9',
+    field: '#ffd54f', diff: '#ce93d8', drift: '#81c784', rec: '#ef5350',
+    ok: '#81c784', bad: '#ef5350', axis: '#5a6478',
+    band: '#e6e9ef', volt: '#ffd54f', cur: '#81c784', metal: '#b0bec5', hot: '#ef5350'
+  };
+  const FONT = 'Inter, system-ui, sans-serif';
+  const MONO = '"JetBrains Mono", Consolas, monospace';
+  const RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const TAU = Math.PI * 2;
+  const $ = id => document.getElementById(id);
+  if (RM) $('rmNote').hidden = false;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const lerp = (a, b, u) => a + (b - a) * u;
+  const hash = k => { const s = Math.sin(k * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+
+  /* ---------- number formatting ---------- */
+  const SUP = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '-': '⁻' };
+  const sup = n => String(n).split('').map(ch => SUP[ch] || ch).join('');
+  function sci(v, d) {
+    if (v === 0) return '0';
+    const neg = v < 0; v = Math.abs(v);
+    let e = Math.floor(Math.log10(v)), m = v / Math.pow(10, e);
+    if (+m.toFixed(d) >= 10) { m /= 10; e += 1; }
+    return (neg ? '−' : '') + m.toFixed(d) + ' × 10' + sup(e);
+  }
+  const fUm = v => { const a = Math.abs(v); return (a >= 1 ? a.toFixed(2) : a >= 0.1 ? a.toFixed(3) : a.toFixed(4)) + ' µm'; };
+  const fNum = v => { const a = Math.abs(v); const s = a >= 10 ? a.toFixed(0) : a >= 1 ? String(+a.toFixed(1)) : a >= 0.1 ? String(+a.toFixed(2)) : String(+a.toFixed(3)); return (v < 0 ? '−' : '') + s; };
+  const fI = i => {
+    const a = Math.abs(i), s = i < 0 ? '−' : '';
+    if (a < 1e-15) return '0';
+    if (a >= 1e-3) return s + (a * 1e3).toFixed(a >= 1e-2 ? 1 : 2) + ' mA';
+    if (a >= 1e-6) return s + (a * 1e6).toFixed(a >= 1e-5 ? 1 : 2) + ' µA';
+    if (a >= 1e-9) return s + (a * 1e9).toFixed(a >= 1e-8 ? 1 : 2) + ' nA';
+    return s + sci(a, 2).replace('−', '') + ' A';
+  };
+  const fR = r => !isFinite(r) || r > 1e8 ? '> 100 MΩ' : r >= 1e6 ? (r / 1e6).toFixed(1) + ' MΩ' : r >= 1e3 ? (r / 1e3).toFixed(1) + ' kΩ' : r.toFixed(1) + ' Ω';
+  const fV = v => (v < 0 ? '−' : '') + Math.abs(v).toFixed(2) + ' V';
+  function niceStep(x) { const p = Math.pow(10, Math.floor(Math.log10(x))), m = x / p; return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 5 ? 5 : 10) * p; }
+
+
+  /* ---------- Zener regulator model (the 5.1 V, 500 mW Zener of topic 3.1) ----------
+     Zener in breakdown, by current: VZ(IZ) = VB + Vk·ln(IZ/I0) + rz·IZ
+     Output node: (Vin − VL)/RS = IZ + VL/RL, solved by bisection on log IZ.
+     If the Zener would carry < 1 nA it is off and VL = Vin·RL/(RS + RL).           */
+  const VZ = 5.1, PZM = 0.5;
+  const Z = (function () {
+    const Vk = 0.2 * Math.pow(0.2, (VZ - 3.3) / 3.7), rz = 6, IZT = 0.02, I0 = 1e-3;
+    return { Vk, rz, IZK: 0.001, IZM: PZM / VZ, I0, VB: VZ - Vk * Math.log(IZT / I0) - rz * IZT };
+  })();
+  const vzAt = I => Z.VB + Z.Vk * Math.log(I / Z.I0) + Z.rz * I;
+  function solve(Vin, RS, RL) {
+    const out = (V, IZ) => ({ V, IS: (Vin - V) / RS, IZ, IL: V / RL, PZ: V * IZ, PR: (Vin - V) * (Vin - V) / RS });
+    if (Vin <= 0) return out(0, 0);
+    const g = I => { const V = vzAt(I); return (Vin - V) / RS - I - V / RL; };
+    if (g(1e-9) <= 0) return out(isFinite(RL) ? Vin * RL / (RS + RL) : Vin, 0);
+    let lo = -9, hi = Math.log10(Vin / RS) + 0.01;
+    for (let k = 0; k < 50; k++) { const m = (lo + hi) / 2; if (g(Math.pow(10, m)) > 0) lo = m; else hi = m; }
+    const I = Math.pow(10, (lo + hi) / 2);
+    return out(vzAt(I), I);
+  }
+  const status = s => s.IZ < Z.IZK ? 'Dropped out' : s.IZ > Z.IZM ? 'Over IZM' : 'Regulating';
+  const stCol = st => st === 'Regulating' ? C.ok : st === 'Dropped out' ? C.volt : C.bad;
+  // Log slider for RL: 0…1000 → 40 Ω … 10 kΩ
+  const rlOf = u => 40 * Math.pow(250, u / 1000);
+  const fmA = i => (i * 1000).toFixed(1) + ' mA';
+  const fOhm = r => r >= 1000 ? (r / 1000).toFixed(r >= 10000 ? 1 : 2) + ' kΩ' : r.toFixed(0) + ' Ω';
+  const fW = p => p >= 1 ? p.toFixed(2) + ' W' : (p * 1000).toFixed(0) + ' mW';
+
+  /* ---------- Canvas helpers ---------- */
+  let FS = 1;
+  function Cv(id, W, H, cap) { this.el = $(id); this.W = W; this.H = H; this.cap = cap || 2; this.ctx = this.el.getContext('2d'); }
+  Cv.prototype.begin = function () {
+    const w = this.el.clientWidth; if (!w) return null;
+    const dpr = window.devicePixelRatio || 1;
+    const pw = Math.round(w * dpr), ph = Math.round(w * dpr * this.H / this.W);
+    if (this.el.width !== pw || this.el.height !== ph) { this.el.width = pw; this.el.height = ph; }
+    const c = this.ctx, s = pw / this.W;
+    FS = Math.min(this.cap, Math.max(1, 1.15 * this.W / w));
+    c.setTransform(s, 0, 0, s, 0, 0); c.clearRect(0, 0, this.W, this.H);
+    c.textBaseline = 'middle'; c.textAlign = 'left'; c.globalAlpha = 1; c.setLineDash([]); c.lineCap = 'butt'; c.shadowBlur = 0;
+    return c;
+  };
+  // Watermark: drawn inside the canvas, bottom-right, 13 px on screen at any size.
+  Cv.prototype.wm = function (c) {
+    const k = this.W / this.el.clientWidth, s = 13 * k;
+    c.save(); c.setTransform(this.el.width / this.W, 0, 0, this.el.width / this.W, 0, 0);
+    c.globalAlpha = 1; c.shadowBlur = 0; c.font = '500 ' + s.toFixed(1) + 'px ' + FONT; c.fillStyle = 'rgba(255,255,255,.35)';
+    c.textAlign = 'right'; c.textBaseline = 'bottom'; c.fillText('© Naveen Bokka', this.W - 6 * k, this.H - 4 * k); c.restore();
+  };
+  function circ(c, x, y, r, fill, stroke, lw) {
+    c.beginPath(); c.arc(x, y, Math.max(0, r), 0, TAU);
+    if (fill) { c.fillStyle = fill; c.fill(); }
+    if (stroke) { c.strokeStyle = stroke; c.lineWidth = lw || 1.5; c.stroke(); }
+  }
+  function txt(c, s, x, y, col, size, weight, align, font) {
+    c.font = (weight || 600) + ' ' + ((size || 12) * FS).toFixed(1) + 'px ' + (font || FONT);
+    c.fillStyle = col || C.text; c.textAlign = align || 'left'; c.fillText(s, x, y);
+  }
+  // Label made of [main, subscript] parts, e.g. [['V','Z'],[' = 5.1 V','']]
+  function subs(c, parts, x, y, col, size, align) {
+    const z = (size || 13) * FS, zs = z * 0.72;
+    let w = 0;
+    const ws = parts.map(p => {
+      c.font = '700 ' + z.toFixed(1) + 'px ' + FONT; const a = c.measureText(p[0]).width;
+      c.font = '700 ' + zs.toFixed(1) + 'px ' + FONT; const b = p[1] ? c.measureText(p[1]).width : 0;
+      w += a + b; return [a, b];
+    });
+    let x0 = align === 'right' ? x - w : align === 'center' ? x - w / 2 : x;
+    c.fillStyle = col; c.textAlign = 'left';
+    parts.forEach((p, k) => {
+      c.font = '700 ' + z.toFixed(1) + 'px ' + FONT; c.fillText(p[0], x0, y); x0 += ws[k][0];
+      if (p[1]) { c.font = '700 ' + zs.toFixed(1) + 'px ' + FONT; c.fillText(p[1], x0, y + z * 0.3); x0 += ws[k][1]; }
+    });
+    return w;
+  }
+  function line(c, x0, y0, x1, y1, col, lw, dash) {
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []);
+    c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke(); c.setLineDash([]);
+  }
+  function pline(c, pts, col, lw, dash) {
+    if (pts.length < 2) return;
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []); c.lineJoin = 'round';
+    c.beginPath(); pts.forEach((p, k) => k ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); c.stroke(); c.setLineDash([]);
+  }
+  function arrow(c, x0, y0, x1, y1, col, lw, head) {
+    const dx = x1 - x0, dy = y1 - y0, L = Math.hypot(dx, dy); if (L < 2) return;
+    lw = lw || 3;
+    const ux = dx / L, uy = dy / L, hs = Math.min(head || 10, L * 0.8), hw = Math.max(hs * 0.55, lw * 0.9);
+    line(c, x0, y0, x1 - ux * hs * 0.9, y1 - uy * hs * 0.9, col, lw);
+    c.fillStyle = col; c.beginPath(); c.moveTo(x1, y1);
+    c.lineTo(x1 - ux * hs - uy * hw, y1 - uy * hs + ux * hw);
+    c.lineTo(x1 - ux * hs + uy * hw, y1 - uy * hs - ux * hw); c.closePath(); c.fill();
+  }
+  function darrow(c, x0, x1, y, col) {   // dimension arrow with end ticks
+    line(c, x0, y - 5, x0, y + 5, col, 1.3); line(c, x1, y - 5, x1, y + 5, col, 1.3);
+    if (x1 - x0 > 14) { arrow(c, (x0 + x1) / 2, y, x0 + 1, y, col, 1.4, 6); arrow(c, (x0 + x1) / 2, y, x1 - 1, y, col, 1.4, 6); }
+    else line(c, x0, y, x1, y, col, 1.4);
+  }
+  function rect(c, x, y, w, h, fill) { c.fillStyle = fill; c.fillRect(x, y, w, h); }
+  function hatch(c, x0, y0, x1, y1) {
+    if (x1 - x0 < 0.5) return;
+    rect(c, x0, y0, x1 - x0, y1 - y0, C.DEP);
+    c.save(); c.beginPath(); c.rect(x0, y0, x1 - x0, y1 - y0); c.clip();
+    c.strokeStyle = 'rgba(255,255,255,.10)'; c.lineWidth = 1; c.beginPath();
+    for (let x = x0 - (y1 - y0); x < x1; x += 9) { c.moveTo(x, y1); c.lineTo(x + (y1 - y0), y0); }
+    c.stroke(); c.restore();
+  }
+  // Fixed ion: circled − (acceptor) or circled + (donor)
+  function ion(c, x, y, r, kind, a) {
+    const col = kind === 'a' ? C.acc : C.don;
+    c.globalAlpha = a; circ(c, x, y, r, null, col, Math.max(1, r * 0.22));
+    c.strokeStyle = col; c.lineWidth = Math.max(1, r * 0.24); c.beginPath();
+    c.moveTo(x - r * 0.5, y); c.lineTo(x + r * 0.5, y);
+    if (kind === 'd') { c.moveTo(x, y - r * 0.5); c.lineTo(x, y + r * 0.5); }
+    c.stroke(); c.globalAlpha = 1;
+  }
+  function carrier(c, x, y, kind, a, r) {
+    c.globalAlpha = a; circ(c, x, y, r || (kind === 'h' ? 3.6 : 3.2), kind === 'h' ? C.hole : C.elec); c.globalAlpha = 1;
+  }
+  const jig = (k, ph, amp) => [amp * Math.sin(ph * 1.7 + k * 1.31), amp * Math.cos(ph * 1.3 + k * 2.07)];
+  function tag(c, s, x, y, align) {   // region label on a dark chip
+    c.font = '700 ' + (14 * FS).toFixed(1) + 'px ' + FONT;
+    const w = c.measureText(s).width + 10, h = 14 * FS + 8, x0 = align === 'right' ? x - w : x;
+    c.fillStyle = 'rgba(15,20,32,.75)'; c.fillRect(x0, y, w, h);
+    txt(c, s, x0 + w / 2, y + h / 2, '#fff', 14, 700, 'center');
+  }
+  // Zener diode symbol, horizontal, anode on the left, centred at (x, y)
+  function zsym(c, x, y, col, lab) {
+    const h = 13;
+    line(c, x - 58, y, x - 13, y, col, 2.2); line(c, x + 12, y, x + 58, y, col, 2.2);
+    c.fillStyle = col; c.beginPath(); c.moveTo(x - 13, y - h); c.lineTo(x - 13, y + h); c.lineTo(x + 12, y); c.closePath(); c.fill();
+    pline(c, [[x + 5, y - h - 6], [x + 12, y - h], [x + 12, y + h], [x + 19, y + h + 6]], col, 2.8);
+    if (lab !== false) {
+      txt(c, 'A', x - 58, y - 13, C.muted, 12, 700, 'left'); txt(c, 'K', x + 58, y - 13, C.muted, 12, 700, 'right');
+    }
+  }
+
+  /* ---------- Animation registry ---------- */
+  const anims = [];
+  function Anim(rootId, o) {
+    this.root = $(rootId); this.o = o; this.playing = !RM; this.visible = true; this.dirty = true;
+    this.pb = this.root.querySelector('[data-act="play"]');
+    this.pb.addEventListener('click', () => this.setPlaying(!this.playing));
+    this.root.querySelector('[data-act="reset"]').addEventListener('click', () => { o.reset(); this.setPlaying(!RM); });
+    o.reset(); this.sync(); anims.push(this);
+    if ('IntersectionObserver' in window) {
+      this.visible = false;
+      new IntersectionObserver(es => es.forEach(e => { this.visible = e.isIntersecting; if (this.visible) this.dirty = true; }))
+        .observe(this.root);
+    }
+  }
+  Anim.prototype.setPlaying = function (p) { this.playing = p; this.sync(); this.dirty = true; };
+  Anim.prototype.sync = function () { this.pb.textContent = this.playing ? 'Pause' : 'Play'; };
+  const segBtns = (root, key, cb) => {
+    const bs = Array.from(document.querySelectorAll(root + ' [data-' + key + ']'));
+    const set = v => { bs.forEach(b => b.setAttribute('aria-pressed', String(b.dataset[key] === v))); cb(v); };
+    bs.forEach(b => b.addEventListener('click', () => set(b.dataset[key])));
+    return set;
+  };
+
+  /* ---------- circuit drawing (Sections 0 and 4) ---------- */
+  function res(c, x0, y0, x1, y1, col) {   // zig-zag resistor between two points
+    const L = Math.hypot(x1 - x0, y1 - y0), ux = (x1 - x0) / L, uy = (y1 - y0) / L, nx = -uy, ny = ux, lead = L * 0.18, n = 6, amp = 7;
+    const pts = [[x0, y0], [x0 + ux * lead, y0 + uy * lead]];
+    for (let i = 0; i < n; i++) { const t = lead + (L - 2 * lead) * (i + 0.5) / n, s = i % 2 ? -1 : 1; pts.push([x0 + ux * t + nx * amp * s, y0 + uy * t + ny * amp * s]); }
+    pts.push([x1 - ux * lead, y1 - uy * lead], [x1, y1]);
+    pline(c, pts, col, 2.2);
+  }
+  function zsymV(c, x, y, col) { c.save(); c.translate(x, y); c.rotate(-Math.PI / 2); zsym(c, 0, 0, col, false); c.restore(); }
+  function pathLen(p) { let L = 0; for (let i = 1; i < p.length; i++) L += Math.hypot(p[i][0] - p[i - 1][0], p[i][1] - p[i - 1][1]); return L; }
+  function ptAt(p, s) {
+    for (let i = 1; i < p.length; i++) {
+      const d = Math.hypot(p[i][0] - p[i - 1][0], p[i][1] - p[i - 1][1]);
+      if (s <= d) { const u = s / d; return [lerp(p[i - 1][0], p[i][0], u), lerp(p[i - 1][1], p[i][1], u)]; }
+      s -= d;
+    }
+    return p[p.length - 1];
+  }
+  function dots(c, p, off, I, col) {   // conventional-current dots along a path
+    if (I < 2e-4) return;
+    const L = pathLen(p), sp = 22;
+    c.save(); c.shadowColor = col; c.shadowBlur = 6; c.globalAlpha = clamp(0.4 + I * 12, 0.4, 1);
+    for (let s = ((off % sp) + sp) % sp; s < L; s += sp) { const q = ptAt(p, s); circ(c, q[0], q[1], 3, col); }
+    c.restore();
+  }
+  const flowSpeed = I => Math.min(170, 1500 * I);
+  function Flow() { this.s = 0; this.z = 0; this.l = 0; }
+  Flow.prototype.step = function (dt, s) { this.s += dt * flowSpeed(s.IS); this.z += dt * flowSpeed(s.IZ); this.l += dt * flowSpeed(s.IL); };
+  function circuit(c, B, s, Vin, RS, RL, F) {
+    const x0 = B.x + 40, y0 = B.y + 34, y1 = B.y + B.h - 16, xn = B.x + B.w * 0.56, x2 = B.x + B.w - 90, ym = (y0 + y1) / 2;
+    const st = status(s), zc = st === 'Regulating' ? C.diff : st === 'Dropped out' ? C.muted : C.bad;
+    const wc = C.metal;
+    pline(c, [[x0, ym - 20], [x0, y0], [x0 + 70, y0]], wc, 2);
+    res(c, x0 + 70, y0, x0 + 170, y0, C.text);
+    pline(c, [[x0 + 170, y0], [x2, y0], [x2, ym - 45]], wc, 2);
+    res(c, x2, ym - 45, x2, ym + 45, C.text);
+    pline(c, [[x2, ym + 45], [x2, y1], [x0, y1], [x0, ym + 20]], wc, 2);
+    line(c, xn, y0, xn, ym - 58, wc, 2); line(c, xn, ym + 58, xn, y1, wc, 2);
+    if (st === 'Over IZM') { c.save(); c.shadowColor = C.bad; c.shadowBlur = 18; zsymV(c, xn, ym, zc); c.restore(); }
+    else zsymV(c, xn, ym, zc);
+    circ(c, xn, y0, 4, wc); circ(c, xn, y1, 4, wc);
+    // source
+    circ(c, x0, ym, 20, '#141b2b', C.volt, 2);
+    txt(c, '+', x0, ym - 9, C.volt, 13, 700, 'center'); txt(c, '−', x0, ym + 9, C.volt, 13, 700, 'center');
+    subs(c, [['V', 'in']], x0 + 30, ym - 9, C.volt, 13, 'left');
+    txt(c, Vin.toFixed(1) + ' V', x0 + 30, ym + 11, C.volt, 12, 700, 'left', MONO);
+    // resistor labels
+    subs(c, [['R', 'S'], [' = ' + RS.toFixed(0) + ' Ω', '']], x0 + 120, y0 - 20, C.text, 12, 'center');
+    subs(c, [['R', 'L']], x2 + 16, ym - 9, C.text, 13, 'left');
+    txt(c, fOhm(RL), x2 + 16, ym + 11, C.text, 12, 700, 'left', MONO);
+    // load voltage
+    const xv = (xn + x2) / 2 + 6;
+    txt(c, '+', xv, y0 + 22, C.volt, 13, 700, 'center'); txt(c, '−', xv, y1 - 20, C.volt, 13, 700, 'center');
+    subs(c, [['V', 'L']], xv, ym - 9, C.volt, 13, 'center');
+    txt(c, s.V.toFixed(2) + ' V', xv, ym + 11, C.volt, 13, 700, 'center', MONO);
+    // currents
+    subs(c, [['I', 'S'], [' = ' + fmA(s.IS), '']], (x0 + 170 + xn) / 2, y0 - 20, C.cur, 11, 'center');
+    subs(c, [['I', 'Z'], [' = ' + fmA(s.IZ), '']], xn - 26, ym, C.diff, 11, 'right');
+    subs(c, [['I', 'L'], [' = ' + fmA(s.IL), '']], (xn + x2) / 2, y0 - 20, C.elec, 11, 'center');
+    // current dots
+    dots(c, [[x0, ym - 20], [x0, y0], [xn, y0]], F.s, s.IS, C.cur);
+    dots(c, [[xn, y0], [xn, y1]], F.z, s.IZ, C.diff);
+    dots(c, [[xn, y0], [x2, y0], [x2, y1], [xn, y1]], F.l, s.IL, C.elec);
+    dots(c, [[xn, y1], [x0, y1], [x0, ym + 20]], F.s, s.IS, C.cur);
+    return { st };
+  }
+  // Horizontal meter: label, bar, ticks [{v, lab, col}], value text
+  function meter(c, y, parts, val, max, ticks, col, vtxt) {
+    const x = 170, w = 420, h = 14;
+    subs(c, parts, x - 12, y + h / 2, C.text, 12, 'right');
+    rect(c, x, y, w, h, '#0f1420');
+    rect(c, x, y, clamp(val / max, 0, 1) * w, h, col);
+    if (val > max) arrow(c, x + w - 14, y + h / 2, x + w + 8, y + h / 2, col, 2, 7);
+    ticks.forEach(t => { const tx = x + t.v / max * w; line(c, tx, y - 5, tx, y + h + 3, t.col, 1.6); subs(c, t.lab, tx, y - 13, t.col, 10, 'center'); });
+    txt(c, vtxt, x + w + 16, y + h / 2, col, 12, 700, 'left', MONO);
+  }
+
+  /* =========================================================
+     0. The circuit with current flow
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv0', 720, 400);
+    const B = { x: 20, y: 10, w: 680, h: 250 }, RS = 120;
+    let Vin, u, F, A = null;
+    const sol = () => solve(Vin, RS, rlOf(u));
+    function sync() {
+      $('s0v').value = Vin; $('s0r').value = u;
+      $('o0v').textContent = Vin.toFixed(1) + ' V'; $('o0r').textContent = fOhm(rlOf(u));
+      const s = sol();
+      $('c0v').textContent = fV(s.V); $('c0s').textContent = fmA(s.IS); $('c0z').textContent = fmA(s.IZ); $('c0l').textContent = fmA(s.IL);
+      if (A) A.dirty = true;
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const s = sol(), RL = rlOf(u);
+      circuit(c, B, s, Vin, RS, RL, F);
+      // stacked current bar
+      const x = 120, w = 560, y = 318, h = 22, X = i => x + i / 0.12 * w;
+      subs(c, [['I', 'S'], [' = I', 'Z'], [' + I', 'L']], x - 12, y + h / 2, C.text, 12, 'right');
+      rect(c, x, y, w, h, '#0f1420');
+      rect(c, x, y, X(Math.min(s.IZ, 0.12)) - x, h, C.diff);
+      rect(c, X(Math.min(s.IZ, 0.12)), y, X(Math.min(s.IS, 0.12)) - X(Math.min(s.IZ, 0.12)), h, C.elec);
+      if (s.IZ > 0.006) subs(c, [['I', 'Z']], (x + X(s.IZ)) / 2, y + h / 2, '#0f1420', 11, 'center');
+      if (s.IL > 0.006) subs(c, [['I', 'L']], (X(s.IZ) + X(Math.min(s.IS, 0.12))) / 2, y + h / 2, '#0f1420', 11, 'center');
+      for (let m = 0; m <= 120; m += 20) { line(c, X(m / 1000), y + h, X(m / 1000), y + h + 4, C.axis, 1); txt(c, m + (m === 120 ? ' mA' : ''), X(m / 1000), y + h + 14, C.muted, 10, 500, m === 120 ? 'right' : 'center', MONO); }
+      const st = status(s);
+      subs(c, st === 'Regulating' ? [['Zener in breakdown: V', 'L'], [' held near V', 'Z']] : st === 'Dropped out' ? [['Dropped out: Zener off, V', 'L'], [' = V', 'in'], ['·R', 'L'], ['/(R', 'S'], [' + R', 'L'], [')', '']] : [['Zener current above I', 'ZM'], [': it would overheat', '']], x, y - 16, stCol(st), 11, 'left');
+      cv.wm(c);
+    }
+    const o = {
+      reset() { Vin = 12; u = 332; F = new Flow(); sync(); },
+      step(dt) { F.step(dt, sol()); }, draw
+    };
+    A = new Anim('anim0', o);
+    $('s0v').addEventListener('input', e => { Vin = +e.target.value; sync(); });
+    $('s0r').addEventListener('input', e => { u = +e.target.value; sync(); });
+  })();
+
+  /* =========================================================
+     1. Line regulation: transfer curve and ripple
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv1', 720, 470);
+    const RS = 120, RL = 250, G1 = { x: 70, y: 34, w: 610, h: 200 }, G2 = { x: 70, y: 290, w: 610, h: 140 };
+    const TW = 4, FQ = 0.5;
+    let Vdc, Amp, t, A = null, curve = null;
+    const vinAt = tt => Vdc + Amp * Math.sin(TAU * FQ * tt);
+    function sync() {
+      $('s1v').value = Vdc; $('s1a').value = Amp;
+      $('o1v').textContent = Vdc.toFixed(1) + ' V'; $('o1a').textContent = '± ' + Amp.toFixed(2) + ' V';
+      const s0 = solve(Vdc, RS, RL);
+      let mn = Infinity, mx = -Infinity;
+      for (let k = 0; k < 64; k++) { const v = solve(Vdc + Amp * Math.sin(TAU * k / 64), RS, RL).V; mn = Math.min(mn, v); mx = Math.max(mx, v); }
+      const d = 0.01, lr = (solve(Vdc + d, RS, RL).V - solve(Vdc - d, RS, RL).V) / (2 * d);
+      $('c1v').textContent = fV(s0.V); $('c1i').textContent = (2 * Amp).toFixed(2) + ' V';
+      $('c1o').textContent = ((mx - mn) * 1000).toFixed(0) + ' mV'; $('c1r').textContent = (lr * 100).toFixed(1) + ' %';
+      if (A) A.dirty = true;
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      if (!curve) { curve = []; for (let v = 0; v <= 20.001; v += 0.05) curve.push([v, solve(v, RS, RL).V]); }
+      const X = v => G1.x + v / 20 * G1.w, Y = v => G1.y + G1.h - v / 8 * G1.h;
+      rect(c, G1.x, G1.y, G1.w, G1.h, 'rgba(255,255,255,.02)');
+      rect(c, X(Math.max(0, Vdc - Amp)), G1.y, X(Vdc + Amp) - X(Math.max(0, Vdc - Amp)) + 1, G1.h, 'rgba(255,213,79,.08)');
+      [0, 2, 4, 6, 8].forEach(v => { line(c, G1.x, Y(v), G1.x + G1.w, Y(v), C.grid, 1); txt(c, String(v), G1.x - 6, Y(v), C.muted, 10, 500, 'right', MONO); });
+      [0, 5, 10, 15, 20].forEach(v => { line(c, X(v), G1.y + G1.h, X(v), G1.y + G1.h + 4, C.axis, 1); txt(c, v + (v === 20 ? ' V' : ''), X(v), G1.y + G1.h + 13, C.muted, 10, 500, v === 20 ? 'right' : 'center', MONO); });
+      subs(c, [['V', 'L'], [' (V)', '']], G1.x - 6, G1.y - 16, C.muted, 11, 'right');
+      subs(c, [['V', 'in']], G1.x + G1.w / 2, G1.y + G1.h + 28, C.muted, 11, 'center');
+      line(c, G1.x, G1.y + G1.h, G1.x + G1.w, G1.y + G1.h, C.axis, 1.2);
+      c.save(); c.beginPath(); c.rect(G1.x, G1.y, G1.w, G1.h); c.clip();
+      pline(c, [[X(0), Y(0)], [X(20), Y(20 * RL / (RS + RL))]], 'rgba(154,164,184,.6)', 1.6, [6, 5]);
+      c.restore();
+      txt(c, 'without Zener', X(10.4) + 8, Y(10.4 * RL / (RS + RL)) + 10, C.muted, 10, 600, 'left');
+      line(c, G1.x, Y(VZ), G1.x + G1.w, Y(VZ), 'rgba(206,147,216,.35)', 1, [4, 4]);
+      subs(c, [['V', 'Z'], [' = 5.1 V', '']], G1.x + G1.w - 4, Y(VZ) + 14, C.diff, 10, 'right');
+      const vd = VZ * (RS + RL) / RL;
+      line(c, X(vd), G1.y, X(vd), G1.y + G1.h, 'rgba(255,213,79,.45)', 1, [3, 4]);
+      txt(c, 'dropout ≈ ' + vd.toFixed(1) + ' V', X(vd) + 5, G1.y + 12, C.volt, 10, 600, 'left');
+      pline(c, curve.map(p => [X(p[0]), Y(p[1])]), C.cur, 2.6);
+      txt(c, 'with Zener: nearly flat', X(15), Y(VZ) + 30, C.cur, 10, 700, 'center');
+      const vn = vinAt(t), sn = solve(vn, RS, RL);
+      c.save(); c.shadowColor = C.volt; c.shadowBlur = 10; circ(c, X(vn), Y(sn.V), 6, C.volt, '#0f1420', 2); c.restore();
+      // time traces
+      rect(c, G2.x, G2.y, G2.w, G2.h, 'rgba(255,255,255,.02)');
+      const Yi = v => G2.y + G2.h - v / 20 * G2.h;
+      const N = 160, pts = [];
+      for (let k = 0; k < N; k++) { const tt = t - TW + k * TW / (N - 1), vi = vinAt(tt); pts.push([G2.x + k / (N - 1) * G2.w, vi, solve(vi, RS, RL).V]); }
+      const v0 = solve(Vdc, RS, RL).V;
+      let dev = 0; pts.forEach(p => { dev = Math.max(dev, Math.abs(p[2] - v0)); });
+      const R = Math.max(0.01, niceStep(dev * 1.25)), Yo = d => G2.y + G2.h / 2 - d / R * (G2.h / 2 - 6);
+      [0, 10, 20].forEach(v => { line(c, G2.x, Yi(v), G2.x + G2.w, Yi(v), C.grid, 1); txt(c, String(v), G2.x - 6, Yi(v), C.muted, 10, 500, 'right', MONO); });
+      subs(c, [['V', 'in'], [' (V)', '']], G2.x - 6, G2.y - 14, C.volt, 11, 'right');
+      txt(c, '+' + (R * 1000).toFixed(0) + ' mV', G2.x + G2.w - 4, Yo(R) + 2, C.cur, 10, 600, 'right', MONO);
+      txt(c, '−' + (R * 1000).toFixed(0) + ' mV', G2.x + G2.w - 4, Yo(-R) - 2, C.cur, 10, 600, 'right', MONO);
+      subs(c, [['V', 'L'], [' ripple (magnified)', '']], G2.x + G2.w - 4, G2.y - 14, C.cur, 11, 'right');
+      line(c, G2.x, G2.y + G2.h, G2.x + G2.w, G2.y + G2.h, C.axis, 1.2);
+      c.save(); c.beginPath(); c.rect(G2.x, G2.y, G2.w, G2.h); c.clip();
+      pline(c, pts.map(p => [p[0], Yi(p[1])]), C.volt, 2.2);
+      pline(c, pts.map(p => [p[0], Yo(p[2] - v0)]), C.cur, 2.4);
+      c.restore();
+      txt(c, 'time →', G2.x + G2.w / 2, G2.y + G2.h + 14, C.muted, 10, 600, 'center');
+      cv.wm(c);
+    }
+    const o = { reset() { Vdc = 12; Amp = 2; t = 0; sync(); }, step(dt) { t += dt; }, draw };
+    A = new Anim('anim1', o);
+    $('s1v').addEventListener('input', e => { Vdc = +e.target.value; sync(); });
+    $('s1a').addEventListener('input', e => { Amp = +e.target.value; sync(); });
+  })();
+
+  /* =========================================================
+     2. Load regulation
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv2', 720, 470);
+    const Vin = 12, RS = 120, G1 = { x: 70, y: 30, w: 610, h: 160 }, G2 = { x: 70, y: 244, w: 610, h: 180 };
+    const IMAX = 0.09;
+    const sweep = [];
+    for (let k = 0; k <= 400; k++) { const RL = 10 * Math.pow(1e5, k / 400); sweep.push(solve(Vin, RS, RL)); }
+    sweep.sort((a, b) => a.IL - b.IL);
+    const drop = sweep.find(s => s.IZ < Z.IZK);
+    const ILd = drop ? drop.IL : IMAX;
+    let u, ph, A = null;
+    function sync() {
+      $('s2r').value = u; const RL = rlOf(u), s = solve(Vin, RS, RL);
+      $('o2r').textContent = fOhm(RL);
+      $('c2r').textContent = fOhm(RL); $('c2l').textContent = fmA(s.IL); $('c2z').textContent = fmA(s.IZ); $('c2v').textContent = fV(s.V);
+      if (A) A.dirty = true;
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const X = i => G1.x + i / IMAX * G1.w, Y1 = v => G1.y + G1.h - v / 6 * G1.h, Y2 = i => G2.y + G2.h - i / 0.07 * G2.h;
+      const s = solve(Vin, RS, rlOf(u));
+      [G1, G2].forEach(G => { rect(c, G.x, G.y, G.w, G.h, 'rgba(255,255,255,.02)'); rect(c, X(ILd), G.y, G.x + G.w - X(ILd), G.h, 'rgba(255,213,79,.07)'); });
+      txt(c, 'dropped out', (X(ILd) + G1.x + G1.w) / 2, G1.y + 12, C.volt, 10, 700, 'center');
+      // V_L vs I_L
+      [0, 2, 4, 6].forEach(v => { line(c, G1.x, Y1(v), G1.x + G1.w, Y1(v), C.grid, 1); txt(c, String(v), G1.x - 6, Y1(v), C.muted, 10, 500, 'right', MONO); });
+      subs(c, [['V', 'L'], [' (V)', '']], G1.x - 6, G1.y - 14, C.muted, 11, 'right');
+      line(c, G1.x, G1.y + G1.h, G1.x + G1.w, G1.y + G1.h, C.axis, 1.2);
+      line(c, G1.x, Y1(VZ), G1.x + G1.w, Y1(VZ), 'rgba(206,147,216,.35)', 1, [4, 4]);
+      c.save(); c.beginPath(); c.rect(G1.x, G1.y, G1.w, G1.h); c.clip();
+      pline(c, sweep.map(p => [X(p.IL), Y1(p.V)]), C.cur, 2.6);
+      c.restore();
+      subs(c, [['V', 'Z']], G1.x + G1.w - 4, Y1(VZ) - 10, C.diff, 10, 'right');
+      // currents vs I_L
+      [0, 20, 40, 60].forEach(m => { line(c, G2.x, Y2(m / 1000), G2.x + G2.w, Y2(m / 1000), C.grid, 1); txt(c, String(m), G2.x - 6, Y2(m / 1000), C.muted, 10, 500, 'right', MONO); });
+      txt(c, 'I (mA)', G2.x - 6, G2.y - 14, C.muted, 11, 600, 'right');
+      line(c, G2.x, G2.y + G2.h, G2.x + G2.w, G2.y + G2.h, C.axis, 1.2);
+      for (let m = 0; m <= 90; m += 10) { line(c, X(m / 1000), G2.y + G2.h, X(m / 1000), G2.y + G2.h + 4, C.axis, 1); txt(c, m + (m === 90 ? ' mA' : ''), X(m / 1000), G2.y + G2.h + 13, C.muted, 10, 500, m === 90 ? 'right' : 'center', MONO); }
+      subs(c, [['load current I', 'L']], G2.x + G2.w / 2, G2.y + G2.h + 28, C.muted, 11, 'center');
+      line(c, G2.x, Y2(Z.IZK), G2.x + G2.w, Y2(Z.IZK), 'rgba(239,83,80,.7)', 1, [4, 3]);
+      subs(c, [['I', 'ZK']], G2.x + G2.w - 4, Y2(Z.IZK) - 9, C.bad, 10, 'right');
+      c.save(); c.beginPath(); c.rect(G2.x, G2.y, G2.w, G2.h); c.clip();
+      pline(c, sweep.map(p => [X(p.IL), Y2(p.IS)]), C.cur, 2.4);
+      pline(c, sweep.map(p => [X(p.IL), Y2(p.IL)]), C.elec, 2.2, [6, 4]);
+      pline(c, sweep.map(p => [X(p.IL), Y2(p.IZ)]), C.diff, 2.6);
+      c.restore();
+      subs(c, [['I', 'S'], [' = I', 'Z'], [' + I', 'L']], X(0.004), Y2(solve(Vin, RS, 1e6).IS) - 12, C.cur, 11, 'left');
+      subs(c, [['I', 'Z']], X(0.012), Y2(solve(Vin, RS, VZ / 0.012).IZ) - 12, C.diff, 11, 'left');
+      subs(c, [['I', 'L']], X(0.045), Y2(0.045) + 14, C.elec, 11, 'left');
+      // cursor
+      const xc = X(Math.min(s.IL, IMAX));
+      line(c, xc, G1.y, xc, G2.y + G2.h, 'rgba(255,213,79,.4)', 1, [2, 3]);
+      c.save(); c.shadowColor = C.volt; c.shadowBlur = 8 + 5 * Math.sin(ph * 4);
+      circ(c, xc, Y1(s.V), 6, C.volt, '#0f1420', 2);
+      circ(c, xc, Y2(s.IZ), 5, C.diff, '#0f1420', 2); circ(c, xc, Y2(s.IS), 5, C.cur, '#0f1420', 2);
+      c.restore();
+      cv.wm(c);
+    }
+    const o = { reset() { u = 332; ph = 0; sync(); }, step(dt) { ph += dt; }, draw };
+    A = new Anim('anim2', o);
+    $('s2r').addEventListener('input', e => { u = +e.target.value; sync(); });
+  })();
+
+  /* =========================================================
+     3. Designing R_S
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv3', 720, 420);
+    let vmin, vmax, ilm, RS, ph, A = null;
+    const calc = () => {
+      const rmax = (vmin - VZ) / (Z.IZK + ilm), rmin = (vmax - VZ) / (Z.IZM + 0);
+      const izA = (vmin - VZ) / RS - ilm, izB = (vmax - VZ) / RS;
+      return { rmax, rmin, izA, izB, pz: VZ * izB, pr: (vmax - VZ) * (vmax - VZ) / RS };
+    };
+    function sync() {
+      if (vmax < vmin) vmax = vmin;
+      $('s3a').value = vmin; $('s3b').value = vmax; $('s3c').value = ilm * 1000; $('s3d').value = RS;
+      $('o3a').textContent = vmin.toFixed(1) + ' V'; $('o3b').textContent = vmax.toFixed(1) + ' V';
+      $('o3c').textContent = (ilm * 1000).toFixed(0) + ' mA'; $('o3d').textContent = RS + ' Ω';
+      const k = calc();
+      $('c3a').textContent = k.rmin.toFixed(1) + ' Ω'; $('c3b').textContent = k.rmax.toFixed(1) + ' Ω';
+      $('c3c').textContent = fW(k.pz); $('c3d').textContent = fW(k.pr);
+      if (A) A.dirty = true;
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const k = calc(), NL = { x: 60, y: 74, w: 620 }, X = r => NL.x + clamp(r, 0, 300) / 300 * NL.w;
+      subs(c, [['Allowed range for R', 'S']], NL.x, 20, C.text, 13, 'left');
+      // number line
+      line(c, NL.x, NL.y, NL.x + NL.w, NL.y, C.axis, 1.5);
+      for (let r = 0; r <= 300; r += 50) { line(c, X(r), NL.y - 4, X(r), NL.y + 4, C.axis, 1.2); txt(c, r + (r === 300 ? ' Ω' : ''), X(r), NL.y + 16, C.muted, 10, 500, r === 300 ? 'right' : 'center', MONO); }
+      const ok = k.rmin <= k.rmax;
+      if (ok) {
+        rect(c, X(k.rmin), NL.y - 12, Math.max(2, X(k.rmax) - X(k.rmin)), 24, 'rgba(129,199,132,.35)');
+        subs(c, [['R', 'S,min'], [' = ' + k.rmin.toFixed(0) + ' Ω', '']], X(k.rmin) - 4, NL.y - 26, C.ok, 11, 'right');
+        subs(c, [['R', 'S,max'], [' = ' + k.rmax.toFixed(0) + ' Ω', '']], X(k.rmax) + 4, NL.y - 26, C.ok, 11, 'left');
+      } else {
+        rect(c, X(k.rmax), NL.y - 12, Math.max(2, X(k.rmin) - X(k.rmax)), 24, 'rgba(239,83,80,.35)');
+        subs(c, [['R', 'S,max'], [' = ' + k.rmax.toFixed(0) + ' Ω', '']], X(k.rmax) - 4, NL.y - 26, C.bad, 11, 'right');
+        subs(c, [['R', 'S,min'], [' = ' + k.rmin.toFixed(0) + ' Ω', '']], X(k.rmin) + 4, NL.y - 26, C.bad, 11, 'left');
+      }
+      // chosen RS marker
+      const inside = ok && RS >= k.rmin && RS <= k.rmax, mc = inside ? C.volt : C.bad, xm = X(RS);
+      c.fillStyle = mc; c.beginPath(); c.moveTo(xm, NL.y + 24); c.lineTo(xm - 7, NL.y + 36); c.lineTo(xm + 7, NL.y + 36); c.closePath(); c.fill();
+      subs(c, [['your R', 'S'], [' = ' + RS + ' Ω', '']], xm, NL.y + 48, mc, 11, 'center');
+      if (!ok) subs(c, [['No R', 'S'], [' works: use a higher-power Zener or narrow the ranges', '']], NL.x + NL.w / 2, NL.y + 70, C.bad, 12, 'center');
+      // worst-case meters
+      const mx = 0.12;
+      txt(c, 'Worst case 1: lowest input, full load (' + vmin.toFixed(1) + ' V, ' + (ilm * 1000).toFixed(0) + ' mA)', 40, 186, C.text, 12, 700, 'left');
+      meter(c, 214, [['I', 'Z']], Math.max(0, k.izA), mx, [{ v: Z.IZK, lab: [['I', 'ZK']], col: C.bad }], k.izA >= Z.IZK ? C.diff : C.bad,
+        k.izA <= 0 ? 'off ✗' : fmA(k.izA) + (k.izA >= Z.IZK ? ' ✓' : ' ✗'));
+      txt(c, 'Worst case 2: highest input, no load (' + vmax.toFixed(1) + ' V, 0 mA)', 40, 266, C.text, 12, 700, 'left');
+      meter(c, 294, [['I', 'Z']], k.izB, mx, [{ v: Z.IZM, lab: [['I', 'ZM']], col: C.bad }], k.izB <= Z.IZM ? C.diff : C.bad,
+        fmA(k.izB) + (k.izB <= Z.IZM ? ' ✓' : ' ✗'));
+      // power
+      const pzOk = k.pz <= PZM, ratings = [0.25, 0.5, 1, 2, 5, 10], pick = ratings.find(r => r >= k.pr) || 10;
+      subs(c, [['P', 'Z,max'], [' = V', 'Z'], ['·I', 'Z'], [' = ' + fW(k.pz) + (pzOk ? '  (rating 0.5 W ✓)' : '  (over the 0.5 W rating ✗)'), '']], 40, 352, pzOk ? C.text : C.bad, 12, 'left');
+      subs(c, [['P', 'RS,max'], [' = (V', 'in,max'], [' − V', 'Z'], [')²/R', 'S'], [' = ' + fW(k.pr) + '  → use a ' + (pick >= 1 ? pick + ' W' : pick * 1000 + ' mW') + ' resistor or larger', '']], 40, 380, C.text, 12, 'left');
+      cv.wm(c);
+    }
+    const o = { reset() { vmin = 9; vmax = 15; ilm = 0.03; RS = 120; ph = 0; sync(); }, step(dt) { ph += dt; }, draw };
+    A = new Anim('anim3', o);
+    $('s3a').addEventListener('input', e => { vmin = +e.target.value; sync(); });
+    $('s3b').addEventListener('input', e => { vmax = +e.target.value; sync(); });
+    $('s3c').addEventListener('input', e => { ilm = +e.target.value / 1000; sync(); });
+    $('s3d').addEventListener('input', e => { RS = +e.target.value; sync(); });
+  })();
+
+  /* =========================================================
+     4. Summary playground
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv4', 720, 470);
+    const B = { x: 20, y: 10, w: 680, h: 250 };
+    let Vin, RS, u, F, A = null;
+    const sol = () => solve(Vin, RS, rlOf(u));
+    function sync() {
+      $('s4v').value = Vin; $('s4s').value = RS; $('s4r').value = u;
+      $('o4v').textContent = Vin.toFixed(1) + ' V'; $('o4s').textContent = RS + ' Ω'; $('o4r').textContent = fOhm(rlOf(u));
+      const s = sol(), st = status(s);
+      $('c4v').textContent = fV(s.V); $('c4z').textContent = fmA(s.IZ); $('c4p').textContent = fW(s.PZ); $('c4s').textContent = st;
+      if (A) A.dirty = true;
+    }
+    function draw() {
+      const c = cv.begin(); if (!c) return;
+      const s = sol(), st = status(s);
+      circuit(c, B, s, Vin, RS, rlOf(u), F);
+      subs(c, st === 'Regulating' ? [['Regulating', '']] : st === 'Dropped out' ? [['Dropped out: not regulating', '']] : [['Over I', 'ZM'], [': Zener overheats', '']], 680, 290, stCol(st), 13, 'right');
+      meter(c, 330, [['V', 'L']], s.V, 8, [{ v: VZ, lab: [['V', 'Z']], col: C.diff }], C.volt, s.V.toFixed(2) + ' V');
+      meter(c, 378, [['I', 'Z']], s.IZ, 0.12, [{ v: Z.IZK, lab: [['I', 'ZK']], col: C.volt }, { v: Z.IZM, lab: [['I', 'ZM']], col: C.bad }], st === 'Regulating' ? C.diff : stCol(st), fmA(s.IZ));
+      meter(c, 426, [['P', 'Z']], s.PZ, 0.8, [{ v: PZM, lab: [['P', 'ZM']], col: C.bad }], s.PZ > PZM ? C.bad : C.hole, fW(s.PZ));
+      cv.wm(c);
+    }
+    const o = { reset() { Vin = 12; RS = 120; u = 332; F = new Flow(); sync(); }, step(dt) { F.step(dt, sol()); }, draw };
+    A = new Anim('anim4', o);
+    $('s4v').addEventListener('input', e => { Vin = +e.target.value; sync(); });
+    $('s4s').addEventListener('input', e => { RS = +e.target.value; sync(); });
+    $('s4r').addEventListener('input', e => { u = +e.target.value; sync(); });
+  })();
+
+
+  /* ---------- sticky mini-nav highlight ---------- */
+  (function () {
+    const links = Array.from(document.querySelectorAll('.toc a'));
+    const secs = links.map(l => document.querySelector(l.getAttribute('href')));
+    function upd() {
+      let cur = 0;
+      secs.forEach((s, i) => { if (s.getBoundingClientRect().top < 120) cur = i; });
+      links.forEach((l, i) => l.classList.toggle('active', i === cur));
+    }
+    window.addEventListener('scroll', upd, { passive: true }); upd();
+  })();
+
+  let last = performance.now();
+  function frameLoop(ts) {
+    const dt = Math.min(0.05, Math.max(0, (ts - last) / 1000)); last = ts;
+    anims.forEach(a => {
+      if (!a.visible) return;
+      if (a.playing) { a.o.step(dt); a.o.draw(); }
+      else if (a.o.tween && a.o.tween(dt)) a.o.draw();
+      else if (a.dirty) a.o.draw();
+      a.dirty = false;
+    });
+    requestAnimationFrame(frameLoop);
+  }
+  function onResize() { anims.forEach(a => { a.dirty = true; }); }
+  window.addEventListener('resize', onResize);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(onResize);
+  requestAnimationFrame(frameLoop);
+})();
+</script>
+</body>
+</html>
