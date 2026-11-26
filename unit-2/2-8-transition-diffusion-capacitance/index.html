@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>2.8 Transition and Diffusion Capacitance</title>
+  <meta name="description" content="The capacitance of a pn junction diode: transition (depletion) capacitance as a parallel-plate capacitor with voltage-dependent spacing, the varactor diode, diffusion capacitance from stored minority carriers, which one dominates in reverse and forward bias, and reverse recovery. An interactive lesson.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1420;
+      --panel: #1a2132;
+      --panel-hover: #212a3f;
+      --border: #2a3448;
+      --text: #e6e9ef;
+      --muted: #9aa4b8;
+      --electron: #4fc3f7;
+      --hole: #ff8a65;
+      --energy: #ffd54f;
+      --success: #81c784;
+      --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+      --max: 960px;
+      --radius: 12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: var(--font); font-size: 16px; line-height: 1.65;
+      overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column;
+    }
+    a { color: var(--electron); }
+    .wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 16px; }
+
+    /* Sticky mini-nav */
+    .toc {
+      position: sticky; top: 0; z-index: 10; background: rgba(15, 20, 32, .95);
+      border-bottom: 1px solid var(--border); backdrop-filter: blur(6px);
+    }
+    .toc ul { display: flex; gap: 4px; list-style: none; margin: 0 auto; padding: 8px 16px; max-width: var(--max); overflow-x: auto; scrollbar-width: none; }
+    .toc ul::-webkit-scrollbar { display: none; }
+    .toc a {
+      display: block; white-space: nowrap; text-decoration: none; color: var(--muted);
+      font-size: 0.85rem; font-weight: 500; padding: 6px 10px; border-radius: 999px;
+    }
+    .toc a:hover { color: var(--text); background: var(--panel); }
+    .toc a.active { color: var(--bg); background: var(--electron); }
+
+    main { flex: 1; padding: 24px 0 48px; }
+    .crumbs { font-size: 0.875rem; color: var(--muted); margin: 0 0 16px; }
+    .crumbs a { color: var(--muted); }
+    .crumbs a:hover { color: var(--electron); }
+    .eyebrow { font-family: var(--mono); font-size: 0.8rem; color: var(--electron); letter-spacing: .04em; margin: 0; }
+    h1 { font-size: clamp(1.5rem, 6vw, 2.2rem); line-height: 1.2; margin: 4px 0 6px; }
+    .subtitle { color: var(--muted); margin: 0 0 8px; }
+    section { scroll-margin-top: 64px; padding-top: 28px; }
+    h2 { font-size: clamp(1.3rem, 5vw, 1.6rem); line-height: 1.25; margin: 0 0 14px; }
+    h3 { font-size: 1.05rem; margin: 0 0 8px; }
+    .prose { font-size: 17px; line-height: 1.7; max-width: 70ch; }
+    .prose p, .prose ul, .prose ol { margin: 0 0 14px; }
+    .prose ul, .prose ol { padding-left: 22px; }
+    .prose li { margin: 4px 0; }
+    .prose strong { color: #fff; }
+    .prose p.eq { text-align: center; font-family: var(--mono); font-size: 16px; background: #141b2b; border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; overflow-wrap: anywhere; }
+    hr.sep { border: 0; border-top: 1px solid var(--border); margin: 40px 0 0; }
+    .rm-note { font-size: 0.78rem; color: var(--muted); margin: 0 0 8px; }
+
+    /* Buttons & controls */
+    .btn {
+      font: inherit; font-size: 0.88rem; font-weight: 600; color: var(--text);
+      background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+      padding: 7px 12px; cursor: pointer; min-height: 38px;
+    }
+    .btn:hover:not(:disabled) { background: var(--panel-hover); border-color: var(--electron); }
+    .btn:focus-visible, input:focus-visible, canvas:focus-visible { outline: 2px solid var(--electron); outline-offset: 2px; }
+    .btn[aria-pressed="true"] { background: rgba(255,213,79,.14); border-color: var(--energy); color: var(--energy); }
+    .seg { display: inline-flex; flex-wrap: nowrap; }
+    .seg .btn { border-radius: 0; padding: 7px 12px; }
+    .seg .btn:first-child { border-radius: 8px 0 0 8px; }
+    .seg .btn:last-child { border-radius: 0 8px 8px 0; }
+    .seg .btn + .btn { margin-left: -1px; }
+
+    figure.anim {
+      margin: 18px 0 0; background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 12px; min-width: 0;
+    }
+    .ctrls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-bottom: 12px; }
+    .sliders { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-bottom: 12px; }
+    .slider { flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; }
+    .slider label { display: flex; justify-content: space-between; gap: 8px; font-size: 0.8rem; color: var(--muted); }
+    .slider output { font-family: var(--mono); color: var(--energy); white-space: nowrap; }
+    input[type="range"] { width: 100%; accent-color: var(--energy); margin: 4px 0 0; }
+    canvas { display: block; width: 100%; border-radius: 8px; background: #141b2b; }
+    .narrow { max-width: 820px; margin-left: auto; margin-right: auto; }
+
+    .counters { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px auto 0; }
+    .ctr {
+      flex: 1 1 110px; background: #141b2b; border: 1px solid var(--border); border-radius: 8px;
+      padding: 6px 10px; font-size: 0.78rem; color: var(--muted); min-width: 0;
+    }
+    .ctr b { display: block; font-family: var(--mono); font-size: 1rem; font-weight: 500; color: var(--text); overflow-wrap: anywhere; }
+    .ctr.v b { color: var(--energy); } .ctr.p b { color: #ef9a9a; } .ctr.n b { color: #90caf9; } .ctr.w b { color: var(--success); }
+    .ctr.b b { color: #ce93d8; } .ctr.q b { color: #ff8a65; } .ctr.e b { color: #4fc3f7; } .ctr.g b { color: #fff59d; }
+
+    .keypoints {
+      margin-top: 16px; padding: 14px 16px; border-radius: var(--radius);
+      background: rgba(129,199,132,.07); border: 1px solid rgba(129,199,132,.35);
+    }
+    .keypoints h3 { color: var(--success); font-size: 0.95rem; text-transform: uppercase; letter-spacing: .05em; }
+    .keypoints ul { margin: 0; padding-left: 20px; }
+    .keypoints li { margin: 4px 0; }
+
+    .further { margin-top: 48px; color: var(--muted); font-size: 0.85rem; }
+    .further h3 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 0 0 6px; }
+    .further ul { margin: 0; padding-left: 18px; }
+    .further li { margin: 3px 0; }
+
+    .pager { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 32px; }
+    .pager a {
+      display: block; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 12px 14px; text-decoration: none; color: var(--text); min-width: 0;
+    }
+    .pager a:hover { border-color: var(--electron); }
+    .pager small { display: block; color: var(--muted); font-size: 0.75rem; }
+    .pager .next { text-align: right; }
+    .site-foot { border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; text-align: center; padding: 18px 16px; }
+
+    /* Justified paragraphs on desktop; phones stay left-aligned to avoid wide word gaps. */
+    @media (min-width: 768px) {
+      .prose p, .prose li, .keypoints li { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+      .prose p.eq { text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="toc" aria-label="Sections">
+    <ul>
+      <li><a href="#s0">Stored charge</a></li>
+      <li><a href="#s1">Transition C<sub>T</sub></a></li>
+      <li><a href="#s2">Varactor</a></li>
+      <li><a href="#s3">Diffusion C<sub>D</sub></a></li>
+      <li><a href="#s4">Which dominates</a></li>
+      <li><a href="#s5">Summary</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="wrap">
+      <header>
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="../../index.html">Home</a> / <a href="../index.html">Unit 2</a> / 2.8
+        </nav>
+        <p class="eyebrow">TOPIC 2.8</p>
+        <h1>Transition and Diffusion Capacitance</h1>
+        <p class="subtitle">Two kinds of stored charge, two capacitances: one rules reverse bias, the other forward bias</p>
+        <p class="rm-note" id="rmNote" hidden>Your device asks for reduced motion, so every animation starts paused. Press Play on any animation to run it. Sliders and buttons still update the picture.</p>
+      </header>
+
+      <!-- ================= SECTION 0 ================= -->
+      <section id="s0" aria-labelledby="h0">
+        <h2 id="h0">Two kinds of stored charge</h2>
+        <div class="prose">
+          <p>A capacitor is anything whose stored charge changes when its voltage changes: C = dQ/dV. A pn junction stores charge in two different places, so it has two capacitances.</p>
+          <ul>
+            <li><strong>DEPLETION CHARGE.</strong> The fixed ions in the depletion region: negative acceptors on the p side, positive donors on the n side (topic 2.1). When the voltage changes, the depletion region widens or narrows and ions are uncovered or covered at its edges. This gives the <strong>TRANSITION</strong> (depletion, junction or space-charge) <strong>CAPACITANCE C<sub>T</sub></strong>.</li>
+            <li><strong>INJECTED MINORITY CARRIERS.</strong> In forward bias, holes injected into the n side and electrons injected into the p side form decaying "tails" beyond the depletion region (topic 2.3). More voltage, more stored carriers. This gives the <strong>DIFFUSION</strong> (storage) <strong>CAPACITANCE C<sub>D</sub></strong>.</li>
+          </ul>
+          <p>Move the bias below. In reverse bias the depletion region is wide and there are no tails: only C<sub>T</sub> matters. In forward bias the depletion region narrows and the tails grow explosively: C<sub>D</sub> takes over.</p>
+        </div>
+
+        <figure class="anim" id="anim0">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s0v"><span>Bias voltage V</span><output id="o0v"></output></label><input type="range" id="s0v" min="-10" max="0.72" step="0.01" value="-5"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv0" style="aspect-ratio:720/330" role="img" aria-label="A pn junction: p region on the left, n region on the right, and the depletion region between them containing fixed negative ions on the p side and fixed positive ions on the n side. The depletion region is wide in reverse bias and narrow in forward bias. In forward bias, injected electrons appear as a cloud in the p region and injected holes as a cloud in the n region, both thinning out with distance from the junction and growing rapidly as the voltage rises. Pressing Play sweeps the bias from reverse to forward."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr v"><span>V</span><b id="c0v"></b></div>
+            <div class="ctr w"><span>Depletion width W</span><b id="c0w"></b></div>
+            <div class="ctr b"><span>C<sub>T</sub></span><b id="c0t"></b></div>
+            <div class="ctr q"><span>C<sub>D</sub></span><b id="c0d"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: stored charge">
+          <h3>Key points</h3>
+          <ul>
+            <li>C = dQ/dV: any charge that changes with voltage acts as a capacitance.</li>
+            <li>Depletion-region ions → transition capacitance C<sub>T</sub>.</li>
+            <li>Injected minority carriers → diffusion capacitance C<sub>D</sub>.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 1 ================= -->
+      <section id="s1" aria-labelledby="h1s">
+        <h2 id="h1s">Transition capacitance C<sub>T</sub></h2>
+        <div class="prose">
+          <p>The depletion region is an insulating layer between two conducting neutral regions: a <strong>PARALLEL-PLATE CAPACITOR</strong> whose plate spacing is the depletion width W. A small increase in reverse voltage uncovers a thin slab of ions at each edge, +ΔQ on the n side and −ΔQ on the p side, just like charging a capacitor. The result is exactly the parallel-plate formula:</p>
+          <p class="eq">C<sub>T</sub> = ε<sub>s</sub>A / W</p>
+          <p>The difference from an ordinary capacitor is that W itself depends on the voltage. For an abrupt junction W ∝ (V<sub>bi</sub> + V<sub>R</sub>)<sup>1/2</sup> (topic 2.4), so</p>
+          <p class="eq">C<sub>T</sub> = C<sub>T0</sub> / (1 + V<sub>R</sub>/V<sub>bi</sub>)<sup>m</sup>,  m = 1/2 (abrupt), 1/3 (linearly graded)</p>
+          <p>For the example junction (A = 10<sup>−4</sup> cm<sup>2</sup>, V<sub>bi</sub> = 0.754 V): <strong>C<sub>T0</sub> = 3.16 pF</strong> at zero bias (W = 0.33 µm), 2.07 pF at 1 V, <strong>1.15 pF at 5 V</strong> (W = 0.90 µm) and 0.84 pF at 10 V. Typical values are a few picofarads, so C<sub>T</sub> matters at high frequencies and in fast switching. In forward bias the formula would blow up near V<sub>bi</sub>; a common approximation is C<sub>T</sub> ≈ 2C<sub>T0</sub>.</p>
+        </div>
+
+        <figure class="anim" id="anim1">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s1r"><span>Reverse voltage V<sub>R</sub></span><output id="o1r"></output></label><input type="range" id="s1r" min="0" max="20" step="0.1" value="5"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv1" style="aspect-ratio:720/470" role="img" aria-label="Top: the depletion region of the junction drawn as a capacitor, with the neutral p and n regions as plates. A small alternating voltage is added to the reverse bias, and the edges of the depletion region move in and out; the thin slabs of ions uncovered at each edge are highlighted as plus and minus delta Q. Bottom: transition capacitance against reverse voltage from 0 to 20 volts, falling from 3.16 picofarads, with a dot at the chosen voltage."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr v"><span>V<sub>R</sub></span><b id="c1r"></b></div>
+            <div class="ctr w"><span>W</span><b id="c1w"></b></div>
+            <div class="ctr b"><span>C<sub>T</sub> = ε<sub>s</sub>A/W</span><b id="c1t"></b></div>
+            <div class="ctr e"><span>C<sub>T</sub>/C<sub>T0</sub></span><b id="c1x"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: transition capacitance">
+          <h3>Key points</h3>
+          <ul>
+            <li>C<sub>T</sub> = ε<sub>s</sub>A/W: a parallel-plate capacitor with voltage-dependent spacing.</li>
+            <li>C<sub>T</sub> = C<sub>T0</sub>/(1 + V<sub>R</sub>/V<sub>bi</sub>)<sup>m</sup>; m = 1/2 abrupt, 1/3 graded.</li>
+            <li>Example: 3.16 pF at 0 V, 1.15 pF at 5 V. Dominant in reverse bias.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 2 ================= -->
+      <section id="s2" aria-labelledby="h2s">
+        <h2 id="h2s">Using C<sub>T</sub>: the varactor diode</h2>
+        <div class="prose">
+          <p>A capacitance that can be set by a DC voltage is very useful. A <strong>VARACTOR</strong> (varicap) diode is a diode designed to be used this way: always reverse biased, so almost no current flows, with its C<sub>T</sub> forming part of a tuned LC circuit. The resonant frequency is</p>
+          <p class="eq">f = 1 / (2π√(L·C<sub>T</sub>))</p>
+          <p>so turning a voltage knob tunes the circuit, with no moving parts. This is how radio and TV tuners, voltage-controlled oscillators and phase-locked loops are tuned. With the example junction and L = 10 µH, raising V<sub>R</sub> from 1 V to 20 V lowers C<sub>T</sub> from 2.07 pF to 0.60 pF and raises f from about <strong>35 MHz to 65 MHz</strong>. Real varactors use a larger area and a <strong>HYPERABRUPT</strong> doping profile (m larger than 1/2) to get a wider tuning range.</p>
+        </div>
+
+        <figure class="anim" id="anim2">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s2r"><span>Reverse voltage V<sub>R</sub></span><output id="o2r"></output></label><input type="range" id="s2r" min="1" max="20" step="0.1" value="5"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv2" style="aspect-ratio:720/420" role="img" aria-label="Left: a tuned circuit, a 10 microhenry inductor in parallel with a reverse-biased varactor diode fed from an adjustable DC voltage through a resistor. Right: resonant frequency against reverse voltage, rising from about 35 to 65 megahertz, with a dot at the chosen voltage. Bottom: the oscillation drawn as a sine wave whose cycles get closer together as the frequency rises."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr v"><span>V<sub>R</sub></span><b id="c2r"></b></div>
+            <div class="ctr b"><span>C<sub>T</sub></span><b id="c2c"></b></div>
+            <div class="ctr w"><span>f (L = 10 µH)</span><b id="c2f"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: varactor">
+          <h3>Key points</h3>
+          <ul>
+            <li>Varactor: a reverse-biased diode used as a voltage-controlled capacitor.</li>
+            <li>f = 1/(2π√(LC<sub>T</sub>)): higher V<sub>R</sub> → smaller C<sub>T</sub> → higher f.</li>
+            <li>Used in tuners, VCOs and PLLs; hyperabrupt profiles widen the range.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 3 ================= -->
+      <section id="s3" aria-labelledby="h3s">
+        <h2 id="h3s">Diffusion capacitance C<sub>D</sub></h2>
+        <div class="prose">
+          <p>In forward bias, the injected minority carriers spread out from the junction with exponentially decaying profiles (topic 2.3). Each injected carrier lives on average one lifetime τ before it recombines, so in steady state the stored minority charge is simply the current times the lifetime:</p>
+          <p class="eq">Q = τ<sub>T</sub> · I</p>
+          <p>Here τ<sub>T</sub> is the mean transit time, the lifetimes weighted by how the current is shared. In the example, two thirds of the current is holes (τ<sub>p</sub> = 1 µs) and one third electrons (τ<sub>n</sub> = 0.1 µs), so <strong>τ<sub>T</sub> = 0.70 µs</strong>. Since I ∝ exp(V/ηV<sub>T</sub>), a small change in V changes Q in proportion:</p>
+          <p class="eq">C<sub>D</sub> = dQ/dV = τ<sub>T</sub>·I / ηV<sub>T</sub> = τ<sub>T</sub> / r<sub>d</sub></p>
+          <p>C<sub>D</sub> is proportional to the current, and it is <strong>LARGE</strong>: for the example diode, 27 pF at 1 µA, 2.7 nF at 100 µA, <strong>27 nF at 1 mA</strong> (Q = 0.70 nC) and 270 nF at 10 mA. Some books include a factor of ½ for a long diode; the simple form above is the one used by Millman and by Sedra and Smith.</p>
+          <p>This stored charge also explains why a diode does not switch off instantly. When the bias is reversed, the stored carriers must first be swept out or recombine, so a large reverse current flows for a time of the order of τ: the <strong>REVERSE RECOVERY TIME</strong>. Fast-switching diodes use short lifetimes; Schottky diodes avoid minority storage altogether.</p>
+        </div>
+
+        <figure class="anim" id="anim3">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s3i"><span>Forward current I</span><output id="o3i"></output></label><input type="range" id="s3i" min="-6" max="-2" step="0.01" value="-3"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv3" style="aspect-ratio:720/520" role="img" aria-label="Top: excess minority carrier concentration against distance from the junction, electrons on the p side on the left and holes on the n side on the right, both decaying exponentially; the hole tail is larger and longer. A small alternating voltage makes the tails swell and shrink, and the band between the largest and smallest tail is highlighted as delta Q. Bottom: diffusion capacitance against forward current on log-log axes, a straight line from picofarads to hundreds of nanofarads, with a dot at the chosen current."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr w"><span>I</span><b id="c3i"></b></div>
+            <div class="ctr q"><span>Q = τ<sub>T</sub>I</span><b id="c3q"></b></div>
+            <div class="ctr v"><span>r<sub>d</sub> = V<sub>T</sub>/I</span><b id="c3r"></b></div>
+            <div class="ctr b"><span>C<sub>D</sub> = τ<sub>T</sub>/r<sub>d</sub></span><b id="c3d"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: diffusion capacitance">
+          <h3>Key points</h3>
+          <ul>
+            <li>Stored minority charge Q = τ<sub>T</sub>I.</li>
+            <li>C<sub>D</sub> = τ<sub>T</sub>I/ηV<sub>T</sub> = τ<sub>T</sub>/r<sub>d</sub>: proportional to current.</li>
+            <li>Example (τ<sub>T</sub> = 0.70 µs): 27 nF at 1 mA, far larger than C<sub>T</sub>.</li>
+            <li>Stored charge causes reverse recovery time when switching off.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 4 ================= -->
+      <section id="s4" aria-labelledby="h4s">
+        <h2 id="h4s">Which one dominates?</h2>
+        <div class="prose">
+          <p>Both capacitances are always present, in parallel, but they change with voltage in completely different ways. C<sub>T</sub> changes slowly (as a square root), while C<sub>D</sub> follows the current and rises ten times every 60 mV.</p>
+          <ul>
+            <li><strong>REVERSE BIAS:</strong> C<sub>D</sub> is essentially zero; the diode is a small C<sub>T</sub> of a few picofarads.</li>
+            <li><strong>FORWARD BIAS:</strong> C<sub>D</sub> overtakes C<sub>T</sub> at about <strong>0.48 V</strong> for the example diode (both about 5 pF there; the current is only about 0.2 µA). At normal operating currents C<sub>D</sub> is thousands of times larger.</li>
+          </ul>
+          <p>In short: <strong>C<sub>T</sub> for reverse bias, C<sub>D</sub> for forward bias.</strong></p>
+        </div>
+
+        <figure class="anim" id="anim4">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s4v"><span>Bias voltage V</span><output id="o4v"></output></label><input type="range" id="s4v" min="-10" max="0.75" step="0.01" value="0"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv4" style="aspect-ratio:720/440" role="img" aria-label="Capacitance on a log scale from 0.1 picofarad to 1 microfarad against bias voltage, with a stretched scale in forward bias. The transition capacitance is a nearly flat line of a few picofarads that rises slowly towards forward bias; the diffusion capacitance is negligible in reverse bias and shoots up steeply in forward bias, crossing the transition capacitance near 0.48 volts. A dot marks each at the chosen voltage. Pressing Play sweeps the bias."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr b"><span>C<sub>T</sub></span><b id="c4t"></b></div>
+            <div class="ctr q"><span>C<sub>D</sub></span><b id="c4d"></b></div>
+            <div class="ctr w"><span>Total</span><b id="c4s"></b></div>
+            <div class="ctr v"><span>Dominant</span><b id="c4m"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: comparison">
+          <h3>Key points</h3>
+          <ul>
+            <li>C<sub>T</sub> and C<sub>D</sub> are in parallel; the total is their sum.</li>
+            <li>Reverse bias: C<sub>T</sub> only (picofarads).</li>
+            <li>Forward bias: C<sub>D</sub> dominates above about 0.48 V (example), reaching nanofarads at milliamperes.</li>
+          </ul>
+        </aside>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SECTION 5 ================= -->
+      <section id="s5" aria-labelledby="h5s">
+        <h2 id="h5s">Summary</h2>
+        <div class="prose">
+          <p>A pn junction stores charge in two places. The ions of the depletion region give the <strong>transition capacitance C<sub>T</sub> = ε<sub>s</sub>A/W = C<sub>T0</sub>/(1 + V<sub>R</sub>/V<sub>bi</sub>)<sup>m</sup></strong>, a few picofarads that fall as the reverse voltage rises; the varactor diode uses it as a voltage-tuned capacitor. The injected minority carriers give the <strong>diffusion capacitance C<sub>D</sub> = τ<sub>T</sub>I/ηV<sub>T</sub></strong>, proportional to the forward current and usually far larger. C<sub>T</sub> dominates in reverse bias and C<sub>D</sub> in forward bias; the stored charge behind C<sub>D</sub> also sets the reverse recovery time.</p>
+        </div>
+
+        <figure class="anim" id="anim5">
+          <div class="ctrls">
+            <button class="btn" type="button" data-act="play">Pause</button>
+            <button class="btn" type="button" data-act="reset">Reset</button>
+          </div>
+          <div class="sliders">
+            <div class="slider"><label for="s5v"><span>Bias voltage V</span><output id="o5v"></output></label><input type="range" id="s5v" min="-10" max="0.72" step="0.01" value="-5"></div>
+          </div>
+          <div class="narrow">
+            <canvas id="cv5" style="aspect-ratio:720/600" role="img" aria-label="Recap linked to one bias slider. Top: the junction with its depletion region and, in forward bias, the injected carrier clouds. Bottom: transition and diffusion capacitance against bias on a log scale with dots at the chosen voltage. Pressing Play sweeps the bias."></canvas>
+          </div>
+          <div class="counters narrow">
+            <div class="ctr v"><span>V</span><b id="c5v"></b></div>
+            <div class="ctr b"><span>C<sub>T</sub></span><b id="c5t"></b></div>
+            <div class="ctr q"><span>C<sub>D</sub></span><b id="c5d"></b></div>
+            <div class="ctr w"><span>Dominant</span><b id="c5m"></b></div>
+          </div>
+        </figure>
+
+        <aside class="keypoints" aria-label="Key points: summary">
+          <h3>Key points</h3>
+          <ul>
+            <li>C<sub>T</sub> (depletion ions): ε<sub>s</sub>A/W, a few pF, falls with V<sub>R</sub>. Dominant in reverse bias.</li>
+            <li>Varactor: reverse-biased diode as a voltage-controlled capacitor.</li>
+            <li>C<sub>D</sub> (stored minority carriers): τ<sub>T</sub>I/ηV<sub>T</sub>, ∝ I. Dominant in forward bias.</li>
+            <li>Stored charge → reverse recovery time when switching.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <aside class="further" aria-label="Further reading">
+        <h3>Further reading</h3>
+        <ul>
+          <li><em>Semiconductor Physics and Devices</em>, Donald A. Neamen. Chapters: “The pn Junction” (junction capacitance, varactor diodes) and “The pn Junction Diode” (small-signal model, diffusion capacitance, charge storage and diode transients).</li>
+          <li><em>Microelectronic Circuits</em> (6th ed.), Adel S. Sedra and Kenneth C. Smith. Chapter: “Diodes” (the pn junction: capacitive effects).</li>
+          <li><em>Electronic Devices and Circuits</em>, Jacob Millman, Christos C. Halkias and Satyabrata Jit. Chapter: “Semiconductor-Diode Characteristics” (transition and diffusion capacitance, varactor diodes).</li>
+          <li><em>Device Electronics for Integrated Circuits</em> (3rd ed.), Richard S. Muller, Theodore I. Kamins and Mansun Chan. Chapter: “pn Junctions” and “Currents in pn Junctions”.</li>
+        </ul>
+      </aside>
+
+      <nav class="pager" aria-label="Topic navigation">
+        <a href="../2-7-diode-resistance/index.html"><small>← Previous</small>2.7 Diode Resistance</a>
+        <a class="next" href="../2-9-breakdown-mechanisms/index.html"><small>Next →</small>2.9 Breakdown Mechanisms</a>
+      </nav>
+    </div>
+  </main>
+
+  <footer class="site-foot">© 2026 Naveen Bokka</footer>
+
+<script>
+(function () {
+  'use strict';
+  /* ---------- colours ---------- */
+  const C = {
+    text: '#e6e9ef', muted: '#9aa4b8', grid: 'rgba(255,255,255,.07)',
+    P: '#7d3a3a', N: '#2e4a7d', DEP: '#3a3f4f',
+    hole: '#ff8a65', elec: '#4fc3f7', volt: '#ffd54f', cur: '#81c784', gen: '#fff59d',
+    bar: '#ce93d8', metal: '#b0bec5', axis: '#5a6478', si: '#4fc3f7', ge: '#ff8a65'
+  };
+  const FONT = 'Inter, system-ui, sans-serif';
+  const MONO = '"JetBrains Mono", Consolas, monospace';
+  const RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const TAU = Math.PI * 2;
+  const $ = id => document.getElementById(id);
+  if (RM) $('rmNote').hidden = false;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const lerp = (a, b, u) => a + (b - a) * u;
+  const hash = k => { const s = Math.sin(k * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+  const smooth = u => { u = clamp(u, 0, 1); return u * u * (3 - 2 * u); };
+
+  /* ---------- number formatting ---------- */
+  const SUP = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '-': '⁻' };
+  const sup = n => String(n).split('').map(ch => SUP[ch] || ch).join('');
+  function sci(v, d) {
+    if (v === 0) return '0';
+    const neg = v < 0; v = Math.abs(v);
+    let e = Math.floor(Math.log10(v)), m = v / Math.pow(10, e);
+    if (+m.toFixed(d) >= 10) { m /= 10; e += 1; }
+    return (neg ? '−' : '') + m.toFixed(d) + ' × 10' + sup(e);
+  }
+  function fA(i) {
+    if (i < 0) return '−' + fA(-i);
+    const P = [[1, 'A'], [1e-3, 'mA'], [1e-6, 'µA'], [1e-9, 'nA'], [1e-12, 'pA'], [1e-15, 'fA'], [1e-18, 'aA']];
+    for (let k = 0; k < P.length; k++) if (i >= P[k][0] * 0.9995) { const v = i / P[k][0]; return (v >= 100 ? v.toFixed(0) : v >= 10 ? v.toFixed(1) : v.toFixed(2)) + ' ' + P[k][1]; }
+    return i === 0 ? '0 A' : sci(i, 2) + ' A';
+  }
+  const fV = v => (Math.abs(v) >= 1 ? v.toFixed(1) : v.toFixed(3)).replace('-', '−') + ' V';
+  const fmV = v => (v * 1000).toFixed(1) + ' mV';
+  const fNum = x => { const a = Math.abs(x); return a >= 1e4 || (a < 1e-3 && a > 0) ? sci(x, 2) : (a >= 100 ? x.toFixed(0) : a >= 10 ? x.toFixed(1) : x.toFixed(3)).replace('-', '−'); };
+
+  /* ---------- Canvas helpers ---------- */
+  let FS = 1;
+  function Cv(id, W, H, cap) { this.el = $(id); this.W = W; this.H = H; this.cap = cap || 2; this.ctx = this.el.getContext('2d'); }
+  Cv.prototype.begin = function () {
+    const w = this.el.clientWidth; if (!w) return null;
+    const dpr = window.devicePixelRatio || 1;
+    const pw = Math.round(w * dpr), ph = Math.round(w * dpr * this.H / this.W);
+    if (this.el.width !== pw || this.el.height !== ph) { this.el.width = pw; this.el.height = ph; }
+    const c = this.ctx, s = pw / this.W;
+    FS = Math.min(this.cap, Math.max(1, 1.15 * this.W / w));
+    c.setTransform(s, 0, 0, s, 0, 0); c.clearRect(0, 0, this.W, this.H);
+    c.textBaseline = 'middle'; c.textAlign = 'left'; c.globalAlpha = 1; c.setLineDash([]); c.lineCap = 'butt'; c.shadowBlur = 0;
+    return c;
+  };
+  // Watermark: drawn inside the canvas, bottom-right, 13 px on screen at any size, never interactive.
+  Cv.prototype.wm = function (c) {
+    const k = this.W / this.el.clientWidth, s = 13 * k;
+    c.save(); c.setTransform(this.el.width / this.W, 0, 0, this.el.width / this.W, 0, 0);
+    c.globalAlpha = 1; c.shadowBlur = 0; c.font = '500 ' + s.toFixed(1) + 'px ' + FONT; c.fillStyle = 'rgba(255,255,255,.35)';
+    c.textAlign = 'right'; c.textBaseline = 'bottom'; c.fillText('© Naveen Bokka', this.W - 6 * k, this.H - 4 * k); c.restore();
+  };
+  function circ(c, x, y, r, fill, stroke, lw) {
+    c.beginPath(); c.arc(x, y, Math.max(0, r), 0, TAU);
+    if (fill) { c.fillStyle = fill; c.fill(); }
+    if (stroke) { c.strokeStyle = stroke; c.lineWidth = lw || 1.5; c.stroke(); }
+  }
+  function txt(c, s, x, y, col, size, weight, align, font) {
+    c.font = (weight || 600) + ' ' + ((size || 12) * FS).toFixed(1) + 'px ' + (font || FONT);
+    c.fillStyle = col || C.text; c.textAlign = align || 'left'; c.fillText(s, x, y);
+  }
+  // Label made of [main, subscript] parts, e.g. [['V','bi'],[' + V','R']]
+  function subs(c, parts, x, y, col, size, align) {
+    const z = (size || 13) * FS, zs = z * 0.72;
+    let w = 0;
+    const ws = parts.map(p => {
+      c.font = '700 ' + z.toFixed(1) + 'px ' + FONT; const a = c.measureText(p[0]).width;
+      c.font = '700 ' + zs.toFixed(1) + 'px ' + FONT; const b = p[1] ? c.measureText(p[1]).width : 0;
+      w += a + b; return [a, b];
+    });
+    let x0 = align === 'right' ? x - w : align === 'center' ? x - w / 2 : x;
+    c.fillStyle = col; c.textAlign = 'left';
+    parts.forEach((p, k) => {
+      c.font = '700 ' + z.toFixed(1) + 'px ' + FONT; c.fillText(p[0], x0, y); x0 += ws[k][0];
+      if (p[1]) { c.font = '700 ' + zs.toFixed(1) + 'px ' + FONT; c.fillText(p[1], x0, y + z * 0.3); x0 += ws[k][1]; }
+    });
+    return w;
+  }
+  function line(c, x0, y0, x1, y1, col, lw, dash) {
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []);
+    c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke(); c.setLineDash([]);
+  }
+  function pline(c, pts, col, lw, dash) {
+    if (pts.length < 2) return;
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []); c.lineJoin = 'round';
+    c.beginPath(); pts.forEach((p, k) => k ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); c.stroke(); c.setLineDash([]);
+  }
+  function arrow(c, x0, y0, x1, y1, col, lw, head) {
+    const dx = x1 - x0, dy = y1 - y0, L = Math.hypot(dx, dy); if (L < 2) return;
+    lw = lw || 3;
+    const ux = dx / L, uy = dy / L, hs = Math.min(head || 10, L * 0.8), hw = Math.max(hs * 0.55, lw * 0.9);
+    line(c, x0, y0, x1 - ux * hs * 0.9, y1 - uy * hs * 0.9, col, lw);
+    c.fillStyle = col; c.beginPath(); c.moveTo(x1, y1);
+    c.lineTo(x1 - ux * hs - uy * hw, y1 - uy * hs + ux * hw);
+    c.lineTo(x1 - ux * hs + uy * hw, y1 - uy * hs - ux * hw); c.closePath(); c.fill();
+  }
+  function rect(c, x, y, w, h, fill) { c.fillStyle = fill; c.fillRect(x, y, w, h); }
+  function carrier(c, x, y, kind, a, r) {
+    c.globalAlpha = a; circ(c, x, y, r || (kind === 'h' ? 3.6 : 3.2), kind === 'h' ? C.hole : C.elec); c.globalAlpha = 1;
+  }
+  function glowCarrier(c, x, y, kind, a, r) { c.save(); c.shadowColor = kind === 'h' ? C.hole : C.elec; c.shadowBlur = 8; carrier(c, x, y, kind, a, r); c.restore(); }
+  const jig = (k, ph, amp) => [amp * Math.sin(ph * 1.7 + k * 1.31), amp * Math.cos(ph * 1.3 + k * 2.07)];
+  const tweenTo = (cur, target, dt, rate) => Math.abs(cur - target) < 1e-3 ? target : cur + (target - cur) * Math.min(1, dt * (rate || 5));
+  function clipTo(c, G) { c.save(); c.beginPath(); c.rect(G.x, G.y - 1, G.w, G.h + 2); c.clip(); }
+  function dot(c, x, y) { circ(c, x, y, 6, C.volt, '#0f1420', 2); }
+
+  /* ---------- automatic voltage sweep used while an animation plays ---------- */
+  function Sweep(lo, hi, T) { this.lo = lo; this.hi = hi; this.T = T; this.t = 0; }
+  Sweep.prototype.val = function () { return this.lo + (this.hi - this.lo) * (0.5 - 0.5 * Math.cos(TAU * this.t / this.T)); };
+  Sweep.prototype.from = function (v) {   // continue from the present value, heading upward
+    const u = clamp((v - this.lo) / (this.hi - this.lo), 0, 1);
+    this.t = Math.acos(1 - 2 * u) / TAU * this.T;
+  };
+
+  /* ---------- Animation registry ---------- */
+  const anims = [];
+  function Anim(rootId, o) {
+    this.root = $(rootId); this.o = o; this.playing = !RM; this.visible = true; this.dirty = true;
+    this.pb = this.root.querySelector('[data-act="play"]');
+    this.pb.addEventListener('click', () => this.setPlaying(!this.playing));
+    this.root.querySelector('[data-act="reset"]').addEventListener('click', () => { o.reset(); this.setPlaying(!RM); });
+    o.reset(); this.sync(); anims.push(this);
+    if ('IntersectionObserver' in window) {
+      this.visible = false;
+      new IntersectionObserver(es => es.forEach(e => { this.visible = e.isIntersecting; if (this.visible) this.dirty = true; }))
+        .observe(this.root);
+    }
+  }
+  Anim.prototype.setPlaying = function (p) {
+    if (p && !this.playing && this.o.onPlay) this.o.onPlay();
+    this.playing = p; this.sync(); this.dirty = true;
+  };
+  Anim.prototype.sync = function () { this.pb.textContent = this.playing ? 'Pause' : 'Play'; };
+
+  /* ---------- generic plot with a log y axis ---------- */
+  const DEC = { '-21': '1 zA', '-18': '1 aA', '-15': '1 fA', '-12': '1 pA', '-9': '1 nA', '-6': '1 µA', '-3': '1 mA', '0': '1 A' };
+  function logPlot(c, G, x0, x1, xt, xfmt, L0, L1, ylab, ylabFn) {
+    const X = x => G.x + (x - x0) / (x1 - x0) * G.w;
+    const Y = v => G.y + G.h - (Math.log10(Math.max(v, 1e-40)) - L0) / (L1 - L0) * G.h;
+    rect(c, G.x, G.y, G.w, G.h, 'rgba(255,255,255,.02)');
+    for (let e = L0; e <= L1; e++) {
+      const y = G.y + G.h - (e - L0) / (L1 - L0) * G.h, lab = (ylabFn || (k => DEC[String(k)]))(e);
+      line(c, G.x, y, G.x + G.w, y, lab ? 'rgba(255,255,255,.13)' : C.grid, 1);
+      if (lab) txt(c, lab, G.x - 6, y, C.muted, 10, 500, 'right', MONO);
+    }
+    xt.forEach((x, k) => {
+      const last = k === xt.length - 1;
+      line(c, X(x), G.y + G.h, X(x), G.y + G.h + 4, C.axis, 1);
+      txt(c, xfmt(x, last), X(x), G.y + G.h + 14, C.muted, 10, 500, last ? 'right' : 'center', MONO);
+    });
+    line(c, G.x, G.y + G.h, G.x + G.w, G.y + G.h, C.axis, 1.2); line(c, G.x, G.y, G.x, G.y + G.h, C.axis, 1.2);
+    if (ylab) txt(c, ylab, G.x + 6, G.y + 10, C.muted, 11, 600, 'left');
+    return { X, Y };
+  }
+
+  /* ---------- physics: the example junction of topics 2.1–2.7 at 300 K ----------
+       W = √[2εs(Vbi − V)/q · (NA + ND)/(NA·ND)],  CT = εs·A/W  (held at its V = 0.55 V value above that: ≈ 2·CT0)
+       IS from the diffusion currents; τT = lifetimes weighted by the hole/electron share of the current
+       CD = τT·dI/dV = τT·IS·exp(V/VT)/VT                                                                 */
+  const Q = 1.602e-19, ES = 11.7 * 8.854e-14, VT = 0.0259, NI = 1.5e10;
+  const NA0 = 1e17, ND0 = 1e16, DEV = { A: 1e-4, Dp: 10, tp: 1e-6, Dn: 25, tn: 1e-7 };
+  const LP = Math.sqrt(DEV.Dp * DEV.tp), LN = Math.sqrt(DEV.Dn * DEV.tn);
+  const HP = DEV.Dp / (LP * ND0), HN = DEV.Dn / (LN * NA0);
+  const IS = DEV.A * Q * NI * NI * (HP + HN);
+  const TAUT = (HP * DEV.tp + HN * DEV.tn) / (HP + HN);
+  const VBI = VT * Math.log(NA0 * ND0 / (NI * NI)), VCL = 0.55;
+  const Wof = V => Math.sqrt(2 * ES * Math.max(VBI - V, 0.02) / Q * (NA0 + ND0) / (NA0 * ND0));   // cm
+  const xnOf = V => Wof(V) * NA0 / (NA0 + ND0), xpOf = V => Wof(V) * ND0 / (NA0 + ND0);
+  const ctOf = V => ES * DEV.A / Wof(Math.min(V, VCL));
+  const CT0 = ctOf(0);
+  const iOf = V => IS * (Math.exp(V / VT) - 1);
+  const cdOf = V => TAUT * IS * Math.exp(V / VT) / VT;
+  const fCap = x => {
+    const U = [[1e-6, 'µF'], [1e-9, 'nF'], [1e-12, 'pF'], [1e-15, 'fF']];
+    for (let k = 0; k < U.length; k++) if (x >= U[k][0] * 0.9995) { const v = x / U[k][0]; return (v >= 100 ? v.toFixed(0) : v >= 10 ? v.toFixed(1) : v.toFixed(2)) + ' ' + U[k][1]; }
+    return x < 1e-18 ? '≈ 0' : sci(x, 2) + ' F';
+  };
+  const fUm = w => (w * 1e4).toFixed(3) + ' µm';
+  const fVs = v => (v < 0 ? '−' : v > 0 ? '+' : '') + Math.abs(v).toFixed(2) + ' V';
+
+  /* ---------- the junction picture (sections 0, 1, 5) ---------- */
+  const SC = 150 / 1e-4;   // px per cm (150 px per µm)
+  function junction(c, B, V, ph, opt) {
+    opt = opt || {};
+    const xj = B.x + B.w * 0.32, xp = xpOf(V) * SC, xn = xnOf(V) * SC, el = xj - xp, er = xj + xn;
+    rect(c, B.x, B.y, el - B.x, B.h, C.P); rect(c, el, B.y, er - el, B.h, C.DEP); rect(c, er, B.y, B.x + B.w - er, B.h, C.N);
+    // ions: p side is ten times more heavily doped, so its ion layer is ten times thinner
+    rect(c, el, B.y, xp, B.h, 'rgba(239,154,154,.35)');
+    if (xp > 9) for (let y = B.y + 14; y < B.y + B.h - 6; y += 18) txt(c, '−', el + xp / 2, y, '#ef9a9a', 13, 700, 'center');
+    for (let x = xj + 7; x < er - 3; x += 14) for (let y = B.y + 12; y < B.y + B.h - 4; y += 16) {
+      circ(c, x, y, 5, null, '#90caf9', 1.1); txt(c, '+', x, y + 0.5, '#90caf9', 9, 700, 'center');
+    }
+    line(c, xj, B.y, xj, B.y + B.h, 'rgba(255,255,255,.25)', 1, [3, 3]);
+    // injected minority carriers (amount drawn on a log scale, not to scale)
+    const e = Math.exp(V / VT) - 1, f = clamp(Math.log10(Math.max(e, 1)) / 12, 0, 1);
+    if (!opt.noTails) {
+      const nh = Math.round(80 * f), ne = Math.round(30 * f);
+      c.save(); c.beginPath(); c.rect(B.x, B.y, B.w, B.h); c.clip();
+      for (let k = 0; k < nh; k++) {
+        const d = jig(k, ph, 2), x = er + 5 + 75 * -Math.log(1 - 0.97 * hash(k * 3.1 + 1)), y = B.y + 8 + hash(k * 7.7 + 2) * (B.h - 16);
+        carrier(c, x + d[0], y + d[1], 'h', 0.95);
+      }
+      for (let k = 0; k < ne; k++) {
+        const d = jig(k + 99, ph, 2), x = el - 5 - 35 * -Math.log(1 - 0.97 * hash(k * 5.3 + 4)), y = B.y + 8 + hash(k * 9.1 + 5) * (B.h - 16);
+        carrier(c, x + d[0], y + d[1], 'e', 0.95);
+      }
+      c.restore();
+    }
+    txt(c, 'p', B.x + 14, B.y + 16, '#ef9a9a', 15, 700, 'left'); txt(c, 'n', B.x + B.w - 14, B.y + 16, '#90caf9', 15, 700, 'right');
+    // W dimension
+    const yW = B.y - 12;
+    line(c, el, yW - 5, el, yW + 5, C.text, 1.2); line(c, er, yW - 5, er, yW + 5, C.text, 1.2); line(c, el, yW, er, yW, C.text, 1.2);
+    txt(c, 'W = ' + fUm(Wof(V)), er + 8, yW, C.text, 11, 700, 'left', MONO);
+    return { xj, el, er, f };
+  }
+
+  /* ---------- C against V chart (sections 4 and 5): reverse side compressed ---------- */
+  const uOf = V => V < 0 ? V / 10 * 0.4 : V / 0.75 * 0.6, vOfU = u => u < 0 ? u / 0.4 * 10 : u / 0.6 * 0.75;
+  const CL = { '-13': '0.1 pF', '-12': '1 pF', '-11': '10 pF', '-10': '100 pF', '-9': '1 nF', '-8': '10 nF', '-7': '100 nF', '-6': '1 µF' };
+  function cvChart(c, G, V, ylab) {
+    const ticks = [-10, -5, 0, 0.25, 0.5, 0.75].map(uOf);
+    const ax = logPlot(c, G, -0.4, 0.6, ticks, (u, last) => { const v = vOfU(u); return (Math.abs(v) >= 1 ? v.toFixed(0) : v.toFixed(2)).replace('-', '−') + (last ? ' V' : ''); }, -13, -6, ylab, e => CL[String(e)]), X = ax.X, Y = ax.Y;
+    rect(c, X(-0.4), G.y, X(0) - X(-0.4), G.h, 'rgba(79,195,247,.04)');
+    txt(c, 'reverse', (X(-0.4) + X(0)) / 2, G.y + G.h - 12, C.muted, 10, 600, 'center');
+    txt(c, 'forward', (X(0) + X(0.6)) / 2, G.y + G.h - 12, C.muted, 10, 600, 'center');
+    line(c, X(0), G.y, X(0), G.y + G.h, 'rgba(255,255,255,.2)', 1);
+    const pts = f => { const p = []; for (let u = -0.4; u <= 0.6001; u += 0.002) p.push([X(u), Y(f(vOfU(u)))]); return p; };
+    clipTo(c, G);
+    pline(c, pts(v => ctOf(v) + cdOf(v)), 'rgba(255,255,255,.55)', 1.4, [2, 3]);
+    pline(c, pts(ctOf), C.bar, 2.8); pline(c, pts(cdOf), C.hole, 2.8);
+    c.restore();
+    subs(c, [['C', 'T']], X(uOf(-7)), Y(ctOf(-7)) - 14, C.bar, 13, 'center');
+    subs(c, [['C', 'D']], X(uOf(0.62)) - 10, Y(cdOf(0.62)), C.hole, 13, 'right');
+    const u = uOf(V);
+    line(c, X(u), G.y, X(u), G.y + G.h, 'rgba(255,213,79,.35)', 1, [2, 3]);
+    circ(c, X(u), Y(ctOf(V)), 6, C.bar, '#0f1420', 2);
+    const yd = Y(cdOf(V)); if (yd <= G.y + G.h && yd >= G.y) circ(c, X(u), yd, 6, C.hole, '#0f1420', 2);
+    return { X, Y };
+  }
+
+  /* =========================================================
+     Shared pattern: one slider, swept while playing
+     ========================================================= */
+  function sAnim(id, sliderId, ex) {
+    const st = { x: ex.def, sw: new Sweep(ex.lo, ex.hi, ex.per || 12), ph: 0, A: null };
+    st.sync = () => { $(sliderId).value = st.x; $('o' + sliderId.slice(1)).textContent = ex.out(st.x); ex.counters(st); if (st.A) st.A.dirty = true; };
+    const o = {
+      reset() { st.x = ex.def; st.ph = 0; st.sw.from(st.x); st.sync(); },
+      onPlay() { st.sw.from(st.x); },
+      step(dt) { st.ph += dt; if (!ex.hold) { st.sw.t += dt; st.x = st.sw.val(); } st.sync(); },
+      draw: () => ex.draw(st)
+    };
+    st.A = new Anim(id, o);
+    $(sliderId).addEventListener('input', e => { st.x = +e.target.value; if (!ex.hold) st.A.setPlaying(false); st.sync(); });
+    return st;
+  }
+
+  /* =========================================================
+     0. Two kinds of stored charge
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv0', 720, 330), B = { x: 40, y: 50, w: 640, h: 170 };
+    sAnim('anim0', 's0v', {
+      def: -5, lo: -10, hi: 0.72, per: 14, out: fVs,
+      counters(st) {
+        $('c0v').textContent = fVs(st.x); $('c0w').textContent = fUm(Wof(st.x));
+        $('c0t').textContent = fCap(ctOf(st.x)); $('c0d').textContent = fCap(cdOf(st.x));
+      },
+      draw(st) {
+        const c = cv.begin(); if (!c) return;
+        const J = junction(c, B, st.x, st.ph * 3);
+        const y = B.y + B.h + 26;
+        subs(c, [['depletion ions → C', 'T']], (J.el + J.er) / 2, y, C.bar, 12, 'center');
+        if (J.f > 0.02) {
+          subs(c, [['injected carriers → C', 'D']], J.er + 110, y + 24, C.hole, 12, 'center');
+          txt(c, 'injected electrons', J.el - 60, y + 24, C.elec, 12, 700, 'center');
+        }
+        txt(c, st.x < 0 ? 'reverse bias' : 'forward bias', B.x, y + 50, C.volt, 12, 700, 'left');
+        txt(c, 'carrier clouds drawn on a log scale, not to scale', B.x + B.w, y + 50, C.muted, 10, 500, 'right');
+        cv.wm(c);
+      }
+    });
+  })();
+
+  /* =========================================================
+     1. Transition capacitance: the depletion layer as a capacitor
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv1', 720, 470), B = { x: 40, y: 44, w: 640, h: 130 }, G = { x: 112, y: 236, w: 568, h: 190 }, DV = 0.35;
+    sAnim('anim1', 's1r', {
+      def: 5, lo: 0, hi: 20, hold: true, out: x => x.toFixed(1) + ' V',
+      counters(st) {
+        const V = -st.x; $('c1r').textContent = st.x.toFixed(1) + ' V'; $('c1w').textContent = fUm(Wof(V));
+        $('c1t').textContent = fCap(ctOf(V)); $('c1x').textContent = (ctOf(V) / CT0).toFixed(3);
+      },
+      draw(st) {
+        const c = cv.begin(); if (!c) return;
+        const V0 = -st.x, V = V0 + DV * Math.sin(TAU * st.ph / 1.6);
+        const J = junction(c, B, V, 0, { noTails: true });
+        // slabs uncovered by the ±ΔV swing
+        const xj = J.xj, nA = xnOf(V0 - DV) * SC, nB = xnOf(V0 + DV) * SC, pA = xpOf(V0 - DV) * SC, pB = xpOf(V0 + DV) * SC;
+        c.fillStyle = 'rgba(255,213,79,.22)'; c.fillRect(xj + nB, B.y, nA - nB, B.h); c.fillRect(xj - pA, B.y, pA - pB, B.h);
+        c.strokeStyle = 'rgba(255,213,79,.7)'; c.lineWidth = 1; c.setLineDash([3, 3]);
+        c.strokeRect(xj + nB, B.y, nA - nB, B.h); c.strokeRect(xj - pA, B.y, pA - pB, B.h); c.setLineDash([]);
+        txt(c, '+ΔQ', xj + (nA + nB) / 2, B.y + B.h + 14, C.volt, 11, 700, 'center');
+        txt(c, '−ΔQ', xj - (pA + pB) / 2 - 10, B.y + B.h + 14, C.volt, 11, 700, 'right');
+        txt(c, 'plate (neutral p)', B.x + 8, B.y + B.h - 12, '#ef9a9a', 11, 600, 'left');
+        txt(c, 'plate (neutral n)', B.x + B.w - 8, B.y + B.h - 12, '#90caf9', 11, 600, 'right');
+        subs(c, [['V', 'R'], [' = ' + st.x.toFixed(1) + ' V ± ' + DV.toFixed(2) + ' V', '']], B.x + B.w, B.y - 30, C.volt, 11, 'right');
+        // CT against VR
+        const X = v => G.x + v / 20 * G.w, Y = cc => G.y + G.h - cc / 3.5e-12 * G.h;
+        rect(c, G.x, G.y, G.w, G.h, 'rgba(255,255,255,.02)');
+        [0, 1, 2, 3].forEach(p => { line(c, G.x, Y(p * 1e-12), G.x + G.w, Y(p * 1e-12), C.grid, 1); txt(c, p + (p === 3 ? ' pF' : ''), G.x - 6, Y(p * 1e-12), C.muted, 10, 500, 'right', MONO); });
+        [0, 5, 10, 15, 20].forEach(v => { line(c, X(v), G.y + G.h, X(v), G.y + G.h + 4, C.axis, 1); txt(c, v + (v === 20 ? ' V' : ''), X(v), G.y + G.h + 14, C.muted, 10, 500, v === 20 ? 'right' : 'center', MONO); });
+        line(c, G.x, G.y + G.h, G.x + G.w, G.y + G.h, C.axis, 1.2); line(c, G.x, G.y, G.x, G.y + G.h, C.axis, 1.2);
+        subs(c, [['C', 'T'], [' against reverse voltage V', 'R']], G.x + 8, G.y + 10, C.muted, 11, 'left');
+        const pa = [], pg = [];
+        for (let v = 0; v <= 20.001; v += 0.1) { pa.push([X(v), Y(ctOf(-v))]); pg.push([X(v), Y(CT0 / Math.cbrt(1 + v / VBI))]); }
+        pline(c, pg, 'rgba(255,255,255,.45)', 1.4, [5, 4]); pline(c, pa, C.bar, 2.8);
+        txt(c, 'abrupt, m = 1/2', X(12), Y(ctOf(-12)) + 16, C.bar, 11, 700, 'center');
+        txt(c, 'graded, m = 1/3 (same C₀)', X(12), Y(CT0 / Math.cbrt(1 + 12 / VBI)) - 12, 'rgba(255,255,255,.65)', 10, 600, 'center');
+        dot(c, X(st.x), Y(ctOf(-st.x)));
+        cv.wm(c);
+      }
+    });
+  })();
+
+  /* =========================================================
+     2. Varactor: tuned circuit
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv2', 720, 420), L = 10e-6, G = { x: 410, y: 24, w: 274, h: 220 }, S = { x: 40, y: 300, w: 640, h: 80 };
+    const fOf = vr => 1 / (TAU * Math.sqrt(L * ctOf(-vr)));
+    function diode(c, x, yTop, yBot, col) {   // cathode at the top (reverse biased by +VR)
+      const m = (yTop + yBot) / 2;
+      line(c, x, yTop, x, m - 10, col, 2); line(c, x, m + 10, x, yBot, col, 2);
+      c.fillStyle = col; c.beginPath(); c.moveTo(x, m - 10); c.lineTo(x - 11, m + 10); c.lineTo(x + 11, m + 10); c.closePath(); c.fill();
+      line(c, x - 12, m - 10, x + 12, m - 10, col, 2.4);
+      line(c, x - 12, m - 4, x - 12, m - 10, col, 2); line(c, x + 12, m - 10, x + 12, m - 16, col, 2);   // varactor tabs
+    }
+    sAnim('anim2', 's2r', {
+      def: 5, lo: 1, hi: 20, per: 12, out: x => x.toFixed(1) + ' V',
+      counters(st) { $('c2r').textContent = st.x.toFixed(1) + ' V'; $('c2c').textContent = fCap(ctOf(-st.x)); $('c2f').textContent = (fOf(st.x) / 1e6).toFixed(1) + ' MHz'; },
+      draw(st) {
+        const c = cv.begin(); if (!c) return;
+        const col = C.metal, yT = 50, yB = 240, xL = 70, xD = 190;
+        line(c, xL, yT, xD, yT, col, 2); line(c, xL, yB, xD, yB, col, 2);
+        // inductor
+        line(c, xL, yT, xL, 100, col, 2); line(c, xL, 190, xL, yB, col, 2);
+        c.strokeStyle = C.energy; c.lineWidth = 2; c.beginPath();
+        for (let k = 0; k < 4; k++) c.arc(xL, 100 + 11.25 + k * 22.5, 11.25, -Math.PI / 2, Math.PI / 2, false);
+        c.stroke();
+        txt(c, 'L = 10 µH', xL - 18, 145, C.energy, 11, 700, 'right');
+        // blocking capacitor
+        line(c, xD, yT, xD, 82, col, 2); line(c, xD - 14, 82, xD + 14, 82, col, 2.4); line(c, xD - 14, 90, xD + 14, 90, col, 2.4); line(c, xD, 90, xD, 120, col, 2);
+        txt(c, 'C (large, blocks DC)', xD + 20, 86, C.muted, 10, 600, 'left');
+        circ(c, xD, 120, 3, col);
+        diode(c, xD, 120, yB, C.bar);
+        subs(c, [['C', 'T']], xD + 22, 182, C.bar, 13, 'left');
+        // bias resistor to +VR
+        line(c, xD, 120, 232, 120, col, 2);
+        c.strokeStyle = col; c.lineWidth = 2; c.beginPath(); c.moveTo(232, 120);
+        for (let k = 0; k < 6; k++) c.lineTo(236 + k * 6, 120 + (k % 2 ? 6 : -6));
+        c.lineTo(272, 120); c.lineTo(290, 120); c.stroke();
+        txt(c, 'R', 254, 106, C.muted, 11, 700, 'center');
+        subs(c, [['+V', 'R'], [' = ' + st.x.toFixed(1) + ' V', '']], 296, 120, C.volt, 12, 'left');
+        line(c, xL + 60, yB, xL + 60, yB + 10, col, 2); line(c, xL + 48, yB + 10, xL + 72, yB + 10, col, 2); line(c, xL + 53, yB + 15, xL + 67, yB + 15, col, 2); line(c, xL + 58, yB + 20, xL + 62, yB + 20, col, 2);
+        // f against VR
+        const X = v => G.x + v / 20 * G.w, Y = f => G.y + G.h - (f - 30e6) / 40e6 * G.h;
+        rect(c, G.x, G.y, G.w, G.h, 'rgba(255,255,255,.02)');
+        [30, 40, 50, 60, 70].forEach(m => { line(c, G.x, Y(m * 1e6), G.x + G.w, Y(m * 1e6), C.grid, 1); txt(c, m + (m === 70 ? ' MHz' : ''), G.x - 6, Y(m * 1e6), C.muted, 10, 500, 'right', MONO); });
+        [0, 5, 10, 15, 20].forEach(v => { line(c, X(v), G.y + G.h, X(v), G.y + G.h + 4, C.axis, 1); txt(c, v + (v === 20 ? ' V' : ''), X(v), G.y + G.h + 14, C.muted, 10, 500, v === 20 ? 'right' : 'center', MONO); });
+        line(c, G.x, G.y + G.h, G.x + G.w, G.y + G.h, C.axis, 1.2); line(c, G.x, G.y, G.x, G.y + G.h, C.axis, 1.2);
+        txt(c, 'resonant frequency', G.x + 8, G.y + G.h - 12, C.muted, 11, 600, 'left');
+        const p = []; for (let v = 1; v <= 20.001; v += 0.1) p.push([X(v), Y(fOf(v))]);
+        pline(c, p, C.cur, 2.8); dot(c, X(st.x), Y(fOf(st.x)));
+        // oscillation strip
+        rect(c, S.x, S.y, S.w, S.h, 'rgba(255,255,255,.02)');
+        const cyc = fOf(st.x) / 5e6, w = [];
+        for (let x = 0; x <= S.w; x += 1.5) w.push([S.x + x, S.y + S.h / 2 - 30 * Math.sin(TAU * (x / S.w * cyc - st.ph * 0.6))]);
+        pline(c, w, C.cur, 2);
+        txt(c, 'f = ' + (fOf(st.x) / 1e6).toFixed(1) + ' MHz (cycles drawn ∝ f)', S.x, S.y - 12, C.cur, 11, 700, 'left', MONO);
+        cv.wm(c);
+      }
+    });
+  })();
+
+  /* =========================================================
+     3. Diffusion capacitance: stored minority charge
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv3', 720, 520), P = { x: 60, y: 30, w: 620, h: 220 }, G = { x: 112, y: 312, w: 568, h: 170 }, DV = 0.005;
+    const x0 = -50e-4, x1 = 100e-4;   // cm
+    const CLb = { '-11': '10 pF', '-10': '100 pF', '-9': '1 nF', '-8': '10 nF', '-7': '100 nF', '-6': '1 µF' };
+    const ILb = { '-6': '1 µA', '-5': '10 µA', '-4': '100 µA', '-3': '1 mA', '-2': '10 mA' };
+    sAnim('anim3', 's3i', {
+      def: -3, lo: -6, hi: -2, hold: true, out: x => fA(Math.pow(10, x)),
+      counters(st) {
+        const I = Math.pow(10, st.x);
+        $('c3i').textContent = fA(I); $('c3q').textContent = fCap(TAUT * I).replace('F', 'C');
+        $('c3r').textContent = (VT / I >= 1000 ? (VT / I / 1000).toFixed(VT / I >= 1e4 ? 1 : 2) + ' kΩ' : (VT / I).toFixed(VT / I >= 100 ? 0 : 1) + ' Ω'); $('c3d').textContent = fCap(TAUT * I / VT);
+      },
+      draw(st) {
+        const c = cv.begin(); if (!c) return;
+        const X = x => P.x + (x - x0) / (x1 - x0) * P.w, k = Math.exp(DV * Math.sin(TAU * st.ph / 1.6) / VT);
+        const Hh = P.h * 0.7, Y = h => P.y + P.h - h;   // hole tail peak at the bias point is drawn at 70% height
+        const hole = (x, s) => Hh * s * Math.exp(-x / LP), elec = (x, s) => Hh * 0.1 * s * Math.exp(x / LN);
+        rect(c, P.x, P.y, X(0) - P.x, P.h, 'rgba(125,58,58,.25)'); rect(c, X(0), P.y, P.x + P.w - X(0), P.h, 'rgba(46,74,125,.25)');
+        line(c, P.x, P.y + P.h, P.x + P.w, P.y + P.h, C.axis, 1.2); line(c, X(0), P.y, X(0), P.y + P.h, 'rgba(255,255,255,.35)', 1.2);
+        [-50, -25, 0, 25, 50, 75, 100].forEach(u => { txt(c, String(u).replace('-', '−') + (u === 100 ? ' µm' : ''), X(u * 1e-4), P.y + P.h + 14, C.muted, 10, 500, u === 100 ? 'right' : 'center', MONO); });
+        txt(c, 'p side: excess electrons', P.x + 6, P.y + 12, C.elec, 11, 700, 'left');
+        txt(c, 'n side: excess holes', P.x + P.w - 6, P.y + 12, C.hole, 11, 700, 'right');
+        const band = (fn, a, b, s0, s1, fill) => {
+          c.fillStyle = fill; c.beginPath();
+          for (let x = a; x <= b; x += (b - a) / 200) c.lineTo(X(x), Y(fn(x, s1)));
+          for (let x = b; x >= a; x -= (b - a) / 200) c.lineTo(X(x), Y(fn(x, s0)));
+          c.closePath(); c.fill();
+        };
+        const kl = Math.exp(-DV / VT), kh = Math.exp(DV / VT);
+        band(hole, 0, x1, 0, k, 'rgba(255,138,101,.25)'); band(elec, x0, 0, 0, k, 'rgba(79,195,247,.25)');
+        band(hole, 0, x1, kl, kh, 'rgba(255,213,79,.35)'); band(elec, x0, 0, kl, kh, 'rgba(255,213,79,.35)');
+        const ph = [], pe = [];
+        for (let x = 0; x <= x1; x += x1 / 200) ph.push([X(x), Y(hole(x, k))]);
+        for (let x = x0; x <= 0; x -= x0 / 200) pe.push([X(x), Y(elec(x, k))]);
+        pline(c, ph, C.hole, 2.6); pline(c, pe, C.elec, 2.6);
+        subs(c, [['stored charge Q = τ', 'T'], ['I', '']], X(30e-4), Y(hole(30e-4, 1)) - 26, C.hole, 12, 'left');
+        txt(c, 'ΔQ for V ± 5 mV', X(8e-4), Y(hole(8e-4, kh)) - 12, C.volt, 11, 700, 'left');
+        txt(c, 'height scaled to I (shape is the same at every current)', P.x + P.w - 6, P.y + 30, C.muted, 10, 500, 'right');
+        // CD against I
+        const ax = logPlot(c, G, -6, -2, [-6, -5, -4, -3, -2], e => ILb[String(e)], -11, -6, '', e => CLb[String(e)]), XG = ax.X, YG = ax.Y;
+        const p = []; for (let e = -6; e <= -1.999; e += 0.05) p.push([XG(e), YG(TAUT * Math.pow(10, e) / VT)]);
+        pline(c, p, C.bar, 2.8);
+        subs(c, [['C', 'D'], [' = τ', 'T'], ['I/V', 'T']], XG(-4.6), YG(TAUT * Math.pow(10, -4.6) / VT) - 22, C.bar, 12, 'right');
+        dot(c, XG(st.x), YG(TAUT * Math.pow(10, st.x) / VT));
+        cv.wm(c);
+      }
+    });
+  })();
+
+  /* =========================================================
+     4. Which dominates
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv4', 720, 440), G = { x: 112, y: 24, w: 568, h: 360 };
+    sAnim('anim4', 's4v', {
+      def: 0, lo: -10, hi: 0.75, per: 16, out: fVs,
+      counters(st) {
+        const V = st.x; $('c4t').textContent = fCap(ctOf(V)); $('c4d').textContent = fCap(cdOf(V)); $('c4s').textContent = fCap(ctOf(V) + cdOf(V));
+        $('c4m').textContent = cdOf(V) > ctOf(V) ? 'diffusion' : 'transition';
+      },
+      draw(st) {
+        const c = cv.begin(); if (!c) return;
+        const ax = cvChart(c, G, st.x, 'capacitance (log scale)');
+        const Vx = 0.4804, X = ax.X, Y = ax.Y;
+        circ(c, X(uOf(Vx)), Y(ctOf(Vx)), 4, '#fff');
+        txt(c, 'cross-over ≈ 0.48 V', X(uOf(Vx)) - 8, Y(ctOf(Vx)) + 18, C.text, 10, 700, 'right');
+        txt(c, 'dotted: total', G.x + G.w - 6, G.y + 10, 'rgba(255,255,255,.6)', 10, 600, 'right');
+        cv.wm(c);
+      }
+    });
+  })();
+
+  /* =========================================================
+     5. Summary
+     ========================================================= */
+  (function () {
+    const cv = new Cv('cv5', 720, 600), B = { x: 40, y: 44, w: 640, h: 150 }, G = { x: 112, y: 250, w: 568, h: 300 };
+    sAnim('anim5', 's5v', {
+      def: -5, lo: -10, hi: 0.72, per: 14, out: fVs,
+      counters(st) {
+        const V = st.x; $('c5v').textContent = fVs(V); $('c5t').textContent = fCap(ctOf(V)); $('c5d').textContent = fCap(cdOf(V));
+        $('c5m').textContent = cdOf(V) > ctOf(V) ? 'diffusion' : 'transition';
+      },
+      draw(st) {
+        const c = cv.begin(); if (!c) return;
+        junction(c, B, st.x, st.ph * 3);
+        cvChart(c, G, st.x, 'capacitance (log scale)');
+        cv.wm(c);
+      }
+    });
+  })();
+
+  /* ---------- sticky mini-nav highlight ---------- */
+  (function () {
+    const links = Array.from(document.querySelectorAll('.toc a'));
+    const secs = links.map(l => document.querySelector(l.getAttribute('href')));
+    function upd() {
+      let cur = 0;
+      secs.forEach((s, i) => { if (s.getBoundingClientRect().top < 120) cur = i; });
+      links.forEach((l, i) => l.classList.toggle('active', i === cur));
+    }
+    window.addEventListener('scroll', upd, { passive: true }); upd();
+  })();
+
+  let last = performance.now();
+  function frameLoop(ts) {
+    const dt = Math.min(0.05, Math.max(0, (ts - last) / 1000)); last = ts;
+    anims.forEach(a => {
+      if (!a.visible) return;
+      if (a.playing) { a.o.step(dt); a.o.draw(); }
+      else if (a.o.tween && a.o.tween(dt)) a.o.draw();
+      else if (a.dirty) a.o.draw();
+      a.dirty = false;
+    });
+    requestAnimationFrame(frameLoop);
+  }
+  function onResize() { anims.forEach(a => { a.dirty = true; }); }
+  window.addEventListener('resize', onResize);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(onResize);
+  requestAnimationFrame(frameLoop);
+})();
+</script>
+</body>
+</html>
