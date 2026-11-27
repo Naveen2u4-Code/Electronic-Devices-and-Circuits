@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>3.6 Varactor Diode</title>
+  <meta name="description" content="The varactor diode told as step-by-step animations: the reverse-biased junction as a capacitor, how the depletion width sets the capacitance, the C-V characteristic for abrupt, graded and hyperabrupt junctions, and using a varactor to tune an LC circuit, an FM radio and a VCO.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1420;
+      --panel: #1a2132;
+      --panel-hover: #212a3f;
+      --border: #2a3448;
+      --text: #e6e9ef;
+      --muted: #9aa4b8;
+      --electron: #4fc3f7;
+      --hole: #ff8a65;
+      --energy: #ffd54f;
+      --success: #81c784;
+      --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+      --max: 960px;
+      --radius: 12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: var(--font); font-size: 16px; line-height: 1.65;
+      overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column;
+    }
+    a { color: var(--electron); }
+    .wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 16px; }
+
+    /* Sticky mini-nav */
+    .toc {
+      position: sticky; top: 0; z-index: 10; background: rgba(15, 20, 32, .95);
+      border-bottom: 1px solid var(--border); backdrop-filter: blur(6px);
+    }
+    .toc ul { display: flex; gap: 4px; list-style: none; margin: 0 auto; padding: 8px 16px; max-width: var(--max); overflow-x: auto; scrollbar-width: none; }
+    .toc ul::-webkit-scrollbar { display: none; }
+    .toc a {
+      display: block; white-space: nowrap; text-decoration: none; color: var(--muted);
+      font-size: 0.85rem; font-weight: 500; padding: 6px 10px; border-radius: 999px;
+    }
+    .toc a:hover { color: var(--text); background: var(--panel); }
+    .toc a.active { color: var(--bg); background: var(--electron); }
+
+    main { flex: 1; padding: 24px 0 48px; }
+    .crumbs { font-size: 0.875rem; color: var(--muted); margin: 0 0 16px; }
+    .crumbs a { color: var(--muted); }
+    .crumbs a:hover { color: var(--electron); }
+    .eyebrow { font-family: var(--mono); font-size: 0.8rem; color: var(--electron); letter-spacing: .04em; margin: 0; }
+    h1 { font-size: clamp(1.5rem, 6vw, 2.2rem); line-height: 1.2; margin: 4px 0 6px; }
+    .subtitle { color: var(--muted); margin: 0 0 8px; }
+    .howto {
+      margin: 14px 0 0; padding: 10px 14px; border-radius: 8px; font-size: 0.9rem; color: var(--muted);
+      background: rgba(79,195,247,.06); border: 1px solid rgba(79,195,247,.3);
+    }
+    .howto b { color: var(--text); }
+    section { scroll-margin-top: 64px; padding-top: 28px; }
+    h2 { font-size: clamp(1.3rem, 5vw, 1.6rem); line-height: 1.25; margin: 0 0 4px; }
+    h3 { font-size: 1.05rem; margin: 0 0 8px; }
+    hr.sep { border: 0; border-top: 1px solid var(--border); margin: 40px 0 0; }
+    .rm-note { font-size: 0.78rem; color: var(--muted); margin: 0 0 8px; }
+
+    /* Buttons & controls */
+    .btn {
+      font: inherit; font-size: 0.88rem; font-weight: 600; color: var(--text);
+      background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+      padding: 7px 12px; cursor: pointer; min-height: 38px;
+    }
+    .btn:hover:not(:disabled) { background: var(--panel-hover); border-color: var(--electron); }
+    .btn:disabled { opacity: .45; cursor: default; }
+    .btn:focus-visible, input:focus-visible, figure.story:focus-visible, .dot:focus-visible { outline: 2px solid var(--electron); outline-offset: 2px; }
+    .btn[aria-pressed="true"] { background: rgba(255,213,79,.14); border-color: var(--energy); color: var(--energy); }
+    .btn.primary { border-color: var(--electron); min-width: 84px; }
+    .seg { display: inline-flex; gap: 0; flex-wrap: wrap; }
+    .seg .btn { border-radius: 0; padding: 7px 10px; }
+    .seg .btn:first-child { border-radius: 8px 0 0 8px; }
+    .seg .btn:last-child { border-radius: 0 8px 8px 0; }
+    .seg .btn + .btn { margin-left: -1px; }
+
+    /* Story player: canvas + stepped caption + controls */
+    figure.story {
+      margin: 14px 0 0; background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 12px; min-width: 0;
+    }
+    canvas { display: block; width: 100%; border-radius: 8px; background: #141b2b; }
+    .narrow { max-width: 820px; margin-left: auto; margin-right: auto; }
+    .cap {
+      margin-top: 12px; background: #141b2b; border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 14px 12px;
+    }
+    .cap-head { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+    .cap-num { font-family: var(--mono); font-size: .78rem; color: var(--electron); white-space: nowrap; }
+    .bar { flex: 1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+    .bar i { display: block; height: 100%; width: 0; background: var(--electron); }
+    .cap-text { margin: 0; font-size: 1.02rem; line-height: 1.6; min-height: 5em; }
+    .cap-text strong { color: #fff; }
+    .cap-text.fade { animation: capin .45s ease; }
+    @keyframes capin { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+    .ctrls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-top: 12px; }
+    .dots { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; flex: 1; justify-content: center; min-width: 0; }
+    .dot {
+      width: 30px; height: 30px; border-radius: 50%; padding: 0; cursor: pointer;
+      border: 1px solid var(--border); background: var(--panel); color: var(--muted);
+      font: 600 .75rem var(--mono);
+    }
+    .dot:hover { border-color: var(--electron); }
+    .dot.seen { color: var(--text); border-color: #3d4a63; }
+    .dot[aria-current="step"] { background: var(--electron); border-color: var(--electron); color: var(--bg); }
+    .tryit { margin-top: 12px; padding: 10px 12px; border-radius: 8px; border: 1px dashed rgba(255,213,79,.45); background: rgba(255,213,79,.05); }
+    .tryit-row { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: flex-end; }
+    .slider { flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; }
+    .slider label { display: flex; justify-content: space-between; gap: 8px; font-size: 0.8rem; color: var(--muted); }
+    .slider output { font-family: var(--mono); color: var(--energy); white-space: nowrap; }
+    input[type="range"] { width: 100%; accent-color: var(--energy); margin: 4px 0 0; }
+
+    .keypoints {
+      margin-top: 16px; padding: 14px 16px; border-radius: var(--radius);
+      background: rgba(129,199,132,.07); border: 1px solid rgba(129,199,132,.35);
+    }
+    .keypoints h3 { color: var(--success); font-size: 0.95rem; text-transform: uppercase; letter-spacing: .05em; }
+    .keypoints ul { margin: 0; padding-left: 20px; }
+    .keypoints li { margin: 4px 0; }
+
+    .further { margin-top: 48px; color: var(--muted); font-size: 0.85rem; }
+    .further h3 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 0 0 6px; }
+    .further ul { margin: 0; padding-left: 18px; }
+    .further li { margin: 3px 0; }
+
+    .pager { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 32px; }
+    .pager a {
+      display: block; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 12px 14px; text-decoration: none; color: var(--text); min-width: 0;
+    }
+    .pager a:hover { border-color: var(--electron); }
+    .pager small { display: block; color: var(--muted); font-size: 0.75rem; }
+    .pager .next { text-align: right; }
+    .site-foot { border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; text-align: center; padding: 18px 16px; }
+
+    @media (prefers-reduced-motion: reduce) { .cap-text.fade { animation: none; } }
+    @media (min-width: 768px) { .keypoints li { text-align: justify; hyphens: auto; -webkit-hyphens: auto; } }
+  </style>
+</head>
+<body>
+
+  <nav class="toc" aria-label="Sections">
+    <ul>
+      <li><a href="#s0">Junction capacitor</a></li>
+      <li><a href="#s1">C-V curve</a></li>
+      <li><a href="#s2">Tuning</a></li>
+      <li><a href="#s3">Recap</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="wrap">
+      <header>
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="../../index.html">Home</a> / <a href="../index.html">Unit 3</a> / 3.6
+        </nav>
+        <p class="eyebrow">TOPIC 3.6</p>
+        <h1>Varactor Diode</h1>
+        <p class="subtitle">A reverse-biased junction whose capacitance is set by a voltage</p>
+        <p class="howto"><b>How to watch:</b> each animation explains itself in steps and plays on its own.
+          Use <b>Back</b> and <b>Next</b> or the numbered dots to go at your own pace (←/→ keys work too).
+          The last step of every animation lets you <b>try it</b> yourself.</p>
+        <p class="rm-note" id="rmNote" hidden>Your device asks for reduced motion, so every animation starts paused. Step through with Next, or press Play.</p>
+      </header>
+
+      <!-- ================= SCENE 0 ================= -->
+      <section id="s0" aria-labelledby="h0s">
+        <h2 id="h0s">1. A junction that acts as a capacitor</h2>
+        <figure class="story" id="st0" tabindex="0" aria-label="Animation: A junction that acts as a capacitor. Use the left and right arrow keys to step.">
+          <div class="narrow"><canvas id="cv0" style="aspect-ratio:720/400" role="img" aria-label="A pn junction connected to a variable reverse-bias source. The neutral p and n regions are labelled as conducting plates and the carrier-free depletion region as the insulator. As the reverse voltage rises the depletion region widens and a capacitance bar falls."></canvas></div>
+          <div class="cap narrow"><div class="cap-head"><span class="cap-num"></span><div class="bar"><i></i></div></div><p class="cap-text" aria-live="polite"></p></div>
+          <div class="tryit narrow" data-show="5">
+            <div class="tryit-row">
+              <div class="slider"><label for="s0v"><span>Reverse voltage V<sub>R</sub></span><output id="o0v"></output></label><input type="range" id="s0v" min="0" max="20" step="0.1" value="5"></div>
+            </div>
+          </div>
+          <div class="ctrls narrow">
+            <button class="btn" type="button" data-act="prev">◀ Back</button>
+            <button class="btn primary" type="button" data-act="play">Pause</button>
+            <div class="dots" role="group" aria-label="Steps"></div>
+            <button class="btn" type="button" data-act="next">Next ▶</button>
+            <button class="btn" type="button" data-act="replay">↺ Replay</button>
+          </div>
+        </figure>
+      </section>
+      <hr class="sep">
+      <!-- ================= SCENE 1 ================= -->
+      <section id="s1" aria-labelledby="h1s">
+        <h2 id="h1s">2. The C-V characteristic</h2>
+        <figure class="story" id="st1" tabindex="0" aria-label="Animation: The C-V characteristic. Use the left and right arrow keys to step.">
+          <div class="narrow"><canvas id="cv1" style="aspect-ratio:720/400" role="img" aria-label="Capacitance against reverse voltage, falling steeply then levelling off, for abrupt, linearly graded and hyperabrupt junctions, with the capacitance ratio between 1 V and 20 V marked."></canvas></div>
+          <div class="cap narrow"><div class="cap-head"><span class="cap-num"></span><div class="bar"><i></i></div></div><p class="cap-text" aria-live="polite"></p></div>
+          <div class="tryit narrow" data-show="4">
+            <div class="tryit-row">
+              <div class="slider"><label for="s1v"><span>Reverse voltage V<sub>R</sub></span><output id="o1v"></output></label><input type="range" id="s1v" min="0" max="20" step="0.1" value="4"></div>
+              <div class="seg" role="group" aria-label="Junction type">
+                <button class="btn" type="button" data-typ="graded" aria-pressed="false">Graded</button>
+                <button class="btn" type="button" data-typ="abrupt" aria-pressed="true">Abrupt</button>
+                <button class="btn" type="button" data-typ="hyper" aria-pressed="false">Hyperabrupt</button>
+              </div>
+            </div>
+          </div>
+          <div class="ctrls narrow">
+            <button class="btn" type="button" data-act="prev">◀ Back</button>
+            <button class="btn primary" type="button" data-act="play">Pause</button>
+            <div class="dots" role="group" aria-label="Steps"></div>
+            <button class="btn" type="button" data-act="next">Next ▶</button>
+            <button class="btn" type="button" data-act="replay">↺ Replay</button>
+          </div>
+        </figure>
+      </section>
+      <hr class="sep">
+      <!-- ================= SCENE 2 ================= -->
+      <section id="s2" aria-labelledby="h2s">
+        <h2 id="h2s">3. Tuning a resonant circuit</h2>
+        <figure class="story" id="st2" tabindex="0" aria-label="Animation: Tuning a resonant circuit. Use the left and right arrow keys to step.">
+          <div class="narrow"><canvas id="cv2" style="aspect-ratio:720/420" role="img" aria-label="An LC tank made of an inductor and a varactor, with a blocking capacitor, a large resistor and a variable tuning voltage. Below it the tank voltage oscillates faster as the tuning voltage rises; an FM-band dial needle sweeps from 88 to 108 MHz; and a modulated tuning voltage produces a frequency-modulated wave."></canvas></div>
+          <div class="cap narrow"><div class="cap-head"><span class="cap-num"></span><div class="bar"><i></i></div></div><p class="cap-text" aria-live="polite"></p></div>
+          <div class="tryit narrow" data-show="4">
+            <div class="tryit-row">
+              <div class="slider"><label for="s2v"><span>Tuning voltage V<sub>T</sub></span><output id="o2v"></output></label><input type="range" id="s2v" min="0" max="20" step="0.05" value="3"></div>
+              <div class="seg" role="group" aria-label="Inductor">
+                <button class="btn" type="button" data-ind="0.1" aria-pressed="true">0.1 µH</button>
+                <button class="btn" type="button" data-ind="0.47" aria-pressed="false">0.47 µH</button>
+                <button class="btn" type="button" data-ind="1" aria-pressed="false">1 µH</button>
+              </div>
+            </div>
+          </div>
+          <div class="ctrls narrow">
+            <button class="btn" type="button" data-act="prev">◀ Back</button>
+            <button class="btn primary" type="button" data-act="play">Pause</button>
+            <div class="dots" role="group" aria-label="Steps"></div>
+            <button class="btn" type="button" data-act="next">Next ▶</button>
+            <button class="btn" type="button" data-act="replay">↺ Replay</button>
+          </div>
+        </figure>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= RECAP ================= -->
+      <section id="s3" aria-labelledby="hrs">
+        <h2 id="hrs">Recap</h2>
+        <aside class="keypoints" aria-label="Key points">
+          <h3>Key points</h3>
+          <ul>
+            <li>A reverse-biased junction is a capacitor: the neutral p and n regions are the plates, the carrier-free depletion region is the dielectric. <strong>C = εA/W</strong>.</li>
+            <li>Raising the reverse voltage widens W, so C falls: a <strong>voltage-variable capacitor</strong>. A diode made for this is a <strong>varactor</strong> (varicap, tuning diode), symbol = diode with capacitor plates. It is always reverse biased.</li>
+            <li><strong>C = C<sub>0</sub>/(1 + V<sub>R</sub>/V<sub>0</sub>)<sup>n</sup></strong>: n = ½ for an abrupt junction (C ∝ 1/√V<sub>R</sub>), ⅓ for linearly graded, about 1 to 2 for hyperabrupt.</li>
+            <li>The <strong>capacitance ratio</strong> C<sub>max</sub>/C<sub>min</sub> sets the tuning range; hyperabrupt diodes give the largest ratio.</li>
+            <li>With an inductor it forms a tank of resonant frequency <strong>f = 1/(2π√(LC))</strong>; raising V<sub>T</sub> lowers C and raises f. A large series resistor isolates the bias supply, and a blocking capacitor stops the coil shorting the DC.</li>
+            <li>Uses: electronic tuning of radio and TV receivers, voltage-controlled oscillators (VCOs) in PLLs and frequency synthesisers, FM modulators, automatic frequency control and tunable filters.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <aside class="further" aria-label="Further reading">
+        <h3>Further reading</h3>
+        <ul>
+          <li><em>Semiconductor Physics and Devices</em>, Donald A. Neamen. Chapter: “The pn Junction” (junction capacitance, varactor diodes).</li>
+          <li><em>Electronic Devices and Circuits</em>, David A. Bell. Section on varactor diodes.</li>
+          <li><em>Electronic Devices and Circuits</em>, S. Salivahanan and N. Suresh Kumar. Section on varactor diodes.</li>
+          <li><em>Electronic Devices and Circuits</em>, Jacob Millman, Christos C. Halkias and Satyabrata Jit. Section on varactor diodes.</li>
+        </ul>
+      </aside>
+
+      <nav class="pager" aria-label="Topic navigation">
+        <a href="../3-5-solar-cell/index.html"><small>← Previous</small>3.5 Solar Cell</a>
+        <a class="next" href="../3-7-tunnel-diode/index.html"><small>Next →</small>3.7 Tunnel Diode</a>
+      </nav>
+    </div>
+  </main>
+
+  <footer class="site-foot">© 2026 Naveen Bokka</footer>
+
+
+<script>
+(function () {
+  'use strict';
+  /* ---------- colours ---------- */
+  const C = {
+    text: '#e6e9ef', muted: '#9aa4b8', grid: 'rgba(255,255,255,.07)',
+    P: '#7d3a3a', N: '#2e4a7d', DEP: '#3a3f4f',
+    hole: '#ff8a65', elec: '#4fc3f7', acc: '#ef9a9a', don: '#90caf9',
+    field: '#ffd54f', ok: '#81c784', bad: '#ef5350', axis: '#5a6478',
+    band: '#e6e9ef', cur: '#81c784', metal: '#b0bec5', wire: '#8a94a8', photon: '#ffffff', bg: '#141b2b'
+  };
+  const FONT = 'Inter, system-ui, sans-serif';
+  const MONO = '"JetBrains Mono", Consolas, monospace';
+  const RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const TAU = Math.PI * 2;
+  const $ = id => document.getElementById(id);
+  if (RM) $('rmNote').hidden = false;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const lerp = (a, b, u) => a + (b - a) * u;
+  const ease = u => u * u * (3 - 2 * u);
+  const hash = k => { const s = Math.sin(k * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+
+  /* ---------- number formatting ---------- */
+  const SUP = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '-': '⁻' };
+  const sup = n => String(n).split('').map(ch => SUP[ch] || ch).join('');
+  function sci(v, d) {
+    if (v === 0) return '0';
+    let e = Math.floor(Math.log10(v)), m = v / Math.pow(10, e);
+    if (+m.toFixed(d) >= 10) { m /= 10; e += 1; }
+    return m.toFixed(d) + ' × 10' + sup(e);
+  }
+  const fI = i => {
+    const a = Math.abs(i), s = i < 0 ? '−' : '';
+    if (a < 1e-12) return '0';
+    if (a >= 1e-3) return s + (a * 1e3).toFixed(2) + ' mA';
+    if (a >= 1e-6) return s + (a * 1e6).toFixed(a >= 1e-5 ? 1 : 2) + ' µA';
+    if (a >= 1e-9) return s + (a * 1e9).toFixed(1) + ' nA';
+    return s + (a * 1e12).toFixed(0) + ' pA';
+  };
+  const fV = v => (v < 0 ? '−' : '') + Math.abs(v).toFixed(2) + ' V';
+  const fR = r => r >= 1e6 ? (r / 1e6).toFixed(2) + ' MΩ' : (r / 1e3).toFixed(r < 1e5 ? 1 : 0) + ' kΩ';
+  const fT = t => t >= 1e-6 ? (t * 1e6).toFixed(t >= 1e-5 ? 0 : 1) + ' µs' : (t * 1e9).toFixed(0) + ' ns';
+
+  /* ---------- wavelength → display colour ---------- */
+  function wlCol(l) {
+    if (l < 380) return 'rgb(190,150,255)';          // ultraviolet: drawn violet
+    if (l > 760) return 'rgb(200,100,100)';          // infrared: drawn dull red
+    let r = 0, g = 0, b = 0;
+    if (l < 440) { r = (440 - l) / 60; b = 1; }
+    else if (l < 490) { g = (l - 440) / 50; b = 1; }
+    else if (l < 510) { g = 1; b = (510 - l) / 20; }
+    else if (l < 580) { r = (l - 510) / 70; g = 1; }
+    else if (l < 645) { r = 1; g = (645 - l) / 65; }
+    else r = 1;
+    const f = l < 420 ? 0.55 + 0.45 * (l - 380) / 40 : l > 700 ? 0.55 + 0.45 * (760 - l) / 60 : 1;
+    const m = v => Math.round(255 * (0.18 + 0.82 * v * f));
+    return 'rgb(' + m(r) + ',' + m(g) + ',' + m(b) + ')';
+  }
+  const bandName = l => l < 380 ? 'ultraviolet' : l > 750 ? 'infrared' : l < 450 ? 'violet' : l < 495 ? 'blue' : l < 570 ? 'green' : l < 590 ? 'yellow' : l < 620 ? 'orange' : 'red';
+
+  /* ---------- Canvas helpers ---------- */
+  let FS = 1;
+  function Cv(id, W, H, cap) { this.el = $(id); this.W = W; this.H = H; this.cap = cap || 2; this.ctx = this.el.getContext('2d'); }
+  Cv.prototype.begin = function () {
+    const w = this.el.clientWidth; if (!w) return null;
+    const dpr = window.devicePixelRatio || 1;
+    const pw = Math.round(w * dpr), ph = Math.round(w * dpr * this.H / this.W);
+    if (this.el.width !== pw || this.el.height !== ph) { this.el.width = pw; this.el.height = ph; }
+    const c = this.ctx, s = pw / this.W;
+    FS = Math.min(this.cap, Math.max(1, 1.15 * this.W / w));
+    c.setTransform(s, 0, 0, s, 0, 0); c.clearRect(0, 0, this.W, this.H);
+    c.textBaseline = 'middle'; c.textAlign = 'left'; c.globalAlpha = 1; c.setLineDash([]); c.lineCap = 'butt'; c.shadowBlur = 0;
+    return c;
+  };
+  Cv.prototype.wm = function (c) {
+    const k = this.W / this.el.clientWidth, s = 13 * k;
+    c.save(); c.setTransform(this.el.width / this.W, 0, 0, this.el.width / this.W, 0, 0);
+    c.globalAlpha = 1; c.shadowBlur = 0; c.font = '500 ' + s.toFixed(1) + 'px ' + FONT; c.fillStyle = 'rgba(255,255,255,.35)';
+    c.textAlign = 'right'; c.textBaseline = 'bottom'; c.fillText('© Naveen Bokka', this.W - 6 * k, this.H - 4 * k); c.restore();
+  };
+  function circ(c, x, y, r, fill, stroke, lw) {
+    c.beginPath(); c.arc(x, y, Math.max(0, r), 0, TAU);
+    if (fill) { c.fillStyle = fill; c.fill(); }
+    if (stroke) { c.strokeStyle = stroke; c.lineWidth = lw || 1.5; c.stroke(); }
+  }
+  function txt(c, s, x, y, col, size, weight, align, font) {
+    c.font = (weight || 600) + ' ' + ((size || 12) * FS).toFixed(1) + 'px ' + (font || FONT);
+    c.fillStyle = col || C.text; c.textAlign = align || 'left'; c.fillText(s, x, y);
+  }
+  // Label made of [main, subscript] parts, e.g. [['I','λ'],[' = 5 µA','']]
+  function subs(c, parts, x, y, col, size, align, font) {
+    const z = (size || 13) * FS, zs = z * 0.72, f = font || FONT;
+    let w = 0;
+    const ws = parts.map(p => {
+      c.font = '700 ' + z.toFixed(1) + 'px ' + f; const a = c.measureText(p[0]).width;
+      c.font = '700 ' + zs.toFixed(1) + 'px ' + f; const b = p[1] ? c.measureText(p[1]).width : 0;
+      w += a + b; return [a, b];
+    });
+    let x0 = align === 'right' ? x - w : align === 'center' ? x - w / 2 : x;
+    c.fillStyle = col; c.textAlign = 'left';
+    parts.forEach((p, k) => {
+      c.font = '700 ' + z.toFixed(1) + 'px ' + f; c.fillText(p[0], x0, y); x0 += ws[k][0];
+      if (p[1]) { c.font = '700 ' + zs.toFixed(1) + 'px ' + f; c.fillText(p[1], x0, y + z * 0.3); x0 += ws[k][1]; }
+    });
+    return w;
+  }
+  function line(c, x0, y0, x1, y1, col, lw, dash) {
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []);
+    c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke(); c.setLineDash([]);
+  }
+  function pline(c, pts, col, lw, dash) {
+    if (pts.length < 2) return;
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []); c.lineJoin = 'round';
+    c.beginPath(); pts.forEach((p, k) => k ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); c.stroke(); c.setLineDash([]);
+  }
+  function arrow(c, x0, y0, x1, y1, col, lw, head) {
+    const dx = x1 - x0, dy = y1 - y0, L = Math.hypot(dx, dy); if (L < 2) return;
+    lw = lw || 3;
+    const ux = dx / L, uy = dy / L, hs = Math.min(head || 10, L * 0.8), hw = Math.max(hs * 0.55, lw * 0.9);
+    line(c, x0, y0, x1 - ux * hs * 0.9, y1 - uy * hs * 0.9, col, lw);
+    c.fillStyle = col; c.beginPath(); c.moveTo(x1, y1);
+    c.lineTo(x1 - ux * hs - uy * hw, y1 - uy * hs + ux * hw);
+    c.lineTo(x1 - ux * hs + uy * hw, y1 - uy * hs - ux * hw); c.closePath(); c.fill();
+  }
+  function vdim(c, x, y0, y1, col) {   // vertical dimension arrow with end ticks
+    line(c, x - 5, y0, x + 5, y0, col, 1.3); line(c, x - 5, y1, x + 5, y1, col, 1.3);
+    if (Math.abs(y1 - y0) > 14) { const m = (y0 + y1) / 2; arrow(c, x, m, x, y0, col, 1.4, 6); arrow(c, x, m, x, y1, col, 1.4, 6); }
+    else line(c, x, y0, x, y1, col, 1.4);
+  }
+  function rect(c, x, y, w, h, fill) { c.fillStyle = fill; c.fillRect(x, y, w, h); }
+  function hatch(c, x0, y0, x1, y1) {
+    if (x1 - x0 < 0.5) return;
+    rect(c, x0, y0, x1 - x0, y1 - y0, C.DEP);
+    c.save(); c.beginPath(); c.rect(x0, y0, x1 - x0, y1 - y0); c.clip();
+    c.strokeStyle = 'rgba(255,255,255,.10)'; c.lineWidth = 1; c.beginPath();
+    for (let x = x0 - (y1 - y0); x < x1; x += 9) { c.moveTo(x, y1); c.lineTo(x + (y1 - y0), y0); }
+    c.stroke(); c.restore();
+  }
+  function ion(c, x, y, r, kind, a) {
+    const col = kind === 'a' ? C.acc : C.don, a0 = c.globalAlpha;
+    c.globalAlpha = a0 * a; circ(c, x, y, r, null, col, Math.max(1, r * 0.22));
+    c.strokeStyle = col; c.lineWidth = Math.max(1, r * 0.24); c.beginPath();
+    c.moveTo(x - r * 0.5, y); c.lineTo(x + r * 0.5, y);
+    if (kind === 'd') { c.moveTo(x, y - r * 0.5); c.lineTo(x, y + r * 0.5); }
+    c.stroke(); c.globalAlpha = a0;
+  }
+  function carrier(c, x, y, kind, a, r) {
+    const a0 = c.globalAlpha;
+    c.globalAlpha = a0 * a; circ(c, x, y, r || (kind === 'h' ? 3.6 : 3.2), kind === 'h' ? C.hole : C.elec); c.globalAlpha = a0;
+  }
+  const jig = (k, ph, amp) => [amp * Math.sin(ph * 1.7 + k * 1.31), amp * Math.cos(ph * 1.3 + k * 2.07)];
+  function tag(c, s, x, y, align) {
+    c.font = '700 ' + (13 * FS).toFixed(1) + 'px ' + FONT;
+    const w = c.measureText(s).width + 10, h = 13 * FS + 8, x0 = align === 'right' ? x - w : align === 'center' ? x - w / 2 : x;
+    c.fillStyle = 'rgba(15,20,32,.78)'; c.fillRect(x0, y, w, h);
+    txt(c, s, x0 + w / 2, y + h / 2, '#fff', 13, 700, 'center');
+  }
+  // A photon: wavy line whose head is at (x, y), travelling along unit vector (dx, dy)
+  function photon(c, x, y, dx, dy, col, ph, len) {
+    len = len || 42;
+    const nx = -dy, ny = dx, n = 26;
+    c.save(); c.shadowColor = col; c.shadowBlur = 8;
+    c.strokeStyle = col; c.lineWidth = 2; c.beginPath();
+    for (let k = 0; k <= n; k++) {
+      const s = k / n * len, w = 4.5 * Math.sin(s * 0.42 - ph * 14) * (1 - k / n * 0.5);
+      const px = x - dx * s + nx * w, py = y - dy * s + ny * w;
+      k ? c.lineTo(px, py) : c.moveTo(px, py);
+    }
+    c.stroke();
+    c.fillStyle = col; c.beginPath(); c.moveTo(x + dx * 5, y + dy * 5);
+    c.lineTo(x - dx * 3 + nx * 4, y - dy * 3 + ny * 4); c.lineTo(x - dx * 3 - nx * 4, y - dy * 3 - ny * 4); c.closePath(); c.fill();
+    c.restore();
+  }
+  // Diode symbol: anode at -len, cathode at +len along angle ang (0 = anode left)
+  function dsym(c, x, y, ang, col, len) {
+    len = len || 40; const h = 12;
+    c.save(); c.translate(x, y); c.rotate(ang);
+    line(c, -len, 0, -11, 0, col, 2.2); line(c, 11, 0, len, 0, col, 2.2);
+    c.fillStyle = col; c.beginPath(); c.moveTo(-11, -h); c.lineTo(-11, h); c.lineTo(11, 0); c.closePath(); c.fill();
+    line(c, 11, -h, 11, h, col, 2.8);
+    c.restore();
+  }
+  // Two parallel light arrows from (x0,y0) to (x1,y1)
+  function rays(c, x0, y0, x1, y1, col, gap) {
+    const dx = x1 - x0, dy = y1 - y0, L = Math.hypot(dx, dy), g = gap || 7, nx = -dy / L * g, ny = dx / L * g;
+    arrow(c, x0 + nx, y0 + ny, x1 + nx, y1 + ny, col, 1.8, 7); arrow(c, x0 - nx, y0 - ny, x1 - nx, y1 - ny, col, 1.8, 7);
+  }
+  function resV(c, x, y0, y1, col) {
+    const n = 6, w = 8, h = y1 - y0, pts = [[x, y0]];
+    for (let k = 0; k < n; k++) pts.push([x + (k % 2 ? -w : w), y0 + h * (k + 0.5) / n]);
+    pts.push([x, y1]); pline(c, pts, col, 2);
+  }
+  function ground(c, x, y, col) { line(c, x - 12, y, x + 12, y, col, 2); line(c, x - 8, y + 5, x + 8, y + 5, col, 2); line(c, x - 4, y + 10, x + 4, y + 10, col, 2); }
+  function lamp(c, x, y, lv, col, ph) {
+    col = col || '#fff8e1';
+    if (lv > 0.01) {
+      c.save(); c.shadowColor = col; c.shadowBlur = 10 + 22 * lv; circ(c, x, y, 12, col); c.restore();
+      for (let k = 0; k < 8; k++) {
+        const a = k * TAU / 8 + (ph || 0) * 0.3, r0 = 17, r1 = 17 + 4 + 8 * lv;
+        line(c, x + Math.cos(a) * r0, y + Math.sin(a) * r0, x + Math.cos(a) * r1, y + Math.sin(a) * r1, col, 2);
+      }
+    } else circ(c, x, y, 12, '#2a3448', '#5a6478', 1.5);
+  }
+
+  /* ---------- Story player ----------
+     Each scene is a list of steps. Every step has a caption (shown under the canvas)
+     and a duration. While playing, the scene advances by itself; Back / Next / dots jump.
+     When paused, a jump fast-forwards the step's simulation so the still frame shows it. */
+  const stories = [];
+  function Story(id, o) {
+    const R = this.root = $(id); this.o = o; this.steps = o.steps; this.n = o.steps.length;
+    this.s = 0; this.ts = 0; this.t = 0; this.tr = 1; this.playing = !RM; this.visible = true; this.dirty = true;
+    this.capEl = R.querySelector('.cap-text'); this.numEl = R.querySelector('.cap-num'); this.barEl = R.querySelector('.bar i');
+    this.pb = R.querySelector('[data-act="play"]');
+    this.prevB = R.querySelector('[data-act="prev"]'); this.nextB = R.querySelector('[data-act="next"]');
+    this.pb.addEventListener('click', () => this.setPlaying(!this.playing));
+    this.prevB.addEventListener('click', () => this.go(this.s - 1));
+    this.nextB.addEventListener('click', () => this.go(this.s + 1));
+    R.querySelector('[data-act="replay"]').addEventListener('click', () => { this.playing = true; this.sync(); this.go(0); });
+    const dots = R.querySelector('.dots');
+    this.dots = this.steps.map((st, k) => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'dot'; b.textContent = String(k + 1);
+      b.setAttribute('aria-label', 'Step ' + (k + 1) + (k === this.n - 1 ? ': try it' : ''));
+      b.addEventListener('click', () => this.go(k));
+      dots.appendChild(b); return b;
+    });
+    this.shows = Array.from(R.querySelectorAll('[data-show]'));
+    R.addEventListener('keydown', e => {
+      if (e.target.tagName === 'INPUT') return;
+      if (e.key === 'ArrowRight') { this.go(this.s + 1); e.preventDefault(); }
+      else if (e.key === 'ArrowLeft') { this.go(this.s - 1); e.preventDefault(); }
+    });
+    if ('IntersectionObserver' in window) {
+      this.visible = false;
+      new IntersectionObserver(es => es.forEach(e => { this.visible = e.isIntersecting; if (this.visible) this.dirty = true; }), { threshold: 0.25 })
+        .observe(R);
+    }
+    stories.push(this); this.sync(); this.go(0);
+  }
+  Story.prototype.setPlaying = function (p) { this.playing = p; this.sync(); this.dirty = true; };
+  Story.prototype.sync = function () { this.pb.textContent = this.playing ? 'Pause' : 'Play'; };
+  Story.prototype.adv = function (dt) {
+    this.t += dt; this.ts += dt; this.tr = Math.min(1, this.tr + dt / 0.9);
+    this.o.step(dt, this.s, this.ts, this);
+  };
+  Story.prototype.go = function (k) {
+    k = clamp(k, 0, this.n - 1);
+    this.s = k; this.ts = 0; this.tr = 0;
+    if (this.o.enter) this.o.enter(k, this);
+    if (!this.playing) {
+      const st = this.steps[k], snap = st.snap != null ? st.snap : Math.min(3, (st.dur || 6) * 0.5);
+      for (let x = 0; x < snap; x += 1 / 30) this.adv(1 / 30);
+      this.tr = 1;
+    }
+    this.capEl.innerHTML = this.steps[k].cap;
+    this.capEl.classList.remove('fade'); void this.capEl.offsetWidth; this.capEl.classList.add('fade');
+    this.numEl.textContent = (k === this.n - 1 ? 'Try it · ' : '') + 'Step ' + (k + 1) + ' of ' + this.n;
+    this.dots.forEach((d, j) => { if (j === k) { d.setAttribute('aria-current', 'step'); d.classList.add('seen'); } else d.removeAttribute('aria-current'); });
+    this.shows.forEach(el => { el.hidden = el.dataset.show.split(',').indexOf(String(k)) < 0; });
+    this.prevB.disabled = k === 0; this.nextB.disabled = k === this.n - 1;
+    this.updBar(); this.dirty = true;
+  };
+  Story.prototype.updBar = function () {
+    const st = this.steps[this.s];
+    this.barEl.style.width = (this.s === this.n - 1 ? 100 : clamp(this.ts / st.dur, 0, 1) * 100) + '%';
+  };
+  Story.prototype.tick = function (dt) {
+    this.adv(dt);
+    if (this.s < this.n - 1 && this.ts >= this.steps[this.s].dur) this.go(this.s + 1);
+    this.updBar();
+  };
+  Story.prototype.draw = function () {
+    const c = this.o.cv.begin(); if (!c) return;
+    this.o.draw(c, this.s, ease(this.tr), this);
+    c.globalAlpha = 1; this.o.cv.wm(c);
+  };
+  const segBtns = (root, key, cb) => {
+    const bs = Array.from(document.querySelectorAll(root + ' [data-' + key + ']'));
+    const set = v => { bs.forEach(b => b.setAttribute('aria-pressed', String(b.dataset[key] === v))); cb(v); };
+    bs.forEach(b => b.addEventListener('click', () => set(b.dataset[key])));
+    return set;
+  };
+  /* ---------- varactor model ----------
+     C(VR) = C0 / (1 + VR/V0)^n   with C0 = 60 pF, V0 = 0.7 V.
+     n = 1/2 abrupt, 1/3 linearly graded, about 1 hyperabrupt.            */
+  const C0 = 60, V0 = 0.7;
+  const TYPES = { abrupt: { n: 0.5, name: 'abrupt', nl: 'n = ½', col: '#4fc3f7' }, graded: { n: 1 / 3, name: 'linearly graded', nl: 'n = ⅓', col: '#81c784' }, hyper: { n: 1, name: 'hyperabrupt', nl: 'n ≈ 1', col: '#ce93d8' } };
+  const capOf = (vr, n) => C0 / Math.pow(1 + Math.max(0, vr) / V0, n == null ? 0.5 : n);
+  const fpF = c => (c >= 10 ? c.toFixed(1) : c.toFixed(2)) + ' pF';
+  const fMHz = f => (f / 1e6).toFixed(1) + ' MHz';
+  // Varactor symbol: a diode whose cathode bar is doubled like capacitor plates
+  function vsym(c, x, y, ang, col, len) {
+    len = len || 40; const h = 12;
+    c.save(); c.translate(x, y); c.rotate(ang);
+    line(c, -len, 0, -11, 0, col, 2.2); line(c, 17, 0, len, 0, col, 2.2);
+    c.fillStyle = col; c.beginPath(); c.moveTo(-11, -h); c.lineTo(-11, h); c.lineTo(11, 0); c.closePath(); c.fill();
+    line(c, 11, -h, 11, h, col, 2.8); line(c, 17, -h, 17, h, col, 2.8);
+    c.restore();
+  }
+  function battV(c, x, y, col, label) {   // variable DC source, + on top
+    line(c, x - 16, y - 6, x + 16, y - 6, col, 3); line(c, x - 9, y + 6, x + 9, y + 6, col, 3);
+    arrow(c, x - 22, y + 20, x + 22, y - 20, C.field, 1.6, 7);
+    txt(c, '+', x + 22, y - 14, C.hole, 13, 700, 'left');
+    if (label) txt(c, label, x + 28, y + 10, C.text, 12, 700, 'left');
+  }
+
+  /* =====================================================================
+     SCENE 0: the depletion region as a voltage-controlled capacitor
+     ===================================================================== */
+  (function () {
+    const cv = new Cv('cv0', 720, 400);
+    const DX0 = 100, DX1 = 620, DY0 = 96, DY1 = 236, MID = 360;
+    const Wpx = vr => 34 * Math.sqrt(1 + vr / V0);
+    const holes = [], elecs = [], ions = [];
+    for (let k = 0; k < 32; k++) {
+      holes.push({ u: hash(k * 3 + 1), y: lerp(DY0 + 12, DY1 - 12, hash(k * 3 + 2)), k });
+      elecs.push({ u: hash(k * 5 + 7), y: lerp(DY0 + 12, DY1 - 12, hash(k * 5 + 9)), k: k + 40 });
+    }
+    for (let j = 0; j < 7; j++) for (let y = DY0 + 16; y < DY1 - 6; y += 26) {
+      ions.push({ x: MID - 7 - 14 * j, y, kind: 'a' }); ions.push({ x: MID + 7 + 14 * j, y, kind: 'd' });
+    }
+    let S = null, ph = 0, vr = 0, slV = 5;
+    const vS = $('s0v'), vO = $('o0v');
+    function syncS() { slV = +vS.value; vO.textContent = slV.toFixed(1) + ' V'; if (S) S.dirty = true; }
+    vS.addEventListener('input', syncS); syncS();
+    function target(s, ts) {
+      if (s <= 1) return 0;
+      if (s === 2) return 20 * ease(clamp((ts - 0.5) / 5.5, 0, 1));
+      if (s === 3) return lerp(20, 1, ease(clamp((ts - 0.5) / 4, 0, 1)));
+      if (s === 4) return 5;
+      return slV;
+    }
+    const o = {
+      cv,
+      steps: [
+        { dur: 9, cap: 'Look at an ordinary pn junction again. The p and n regions are full of free carriers, so they <strong>conduct</strong>. The depletion region between them has <strong>no free carriers</strong>, so it behaves as an <strong>insulator</strong>.' },
+        { dur: 10, cap: 'Conductor, insulator, conductor: that is a <strong>capacitor</strong>. The neutral regions are the plates, the depletion region is the dielectric, and the ions are the stored charge ±Q. Like a parallel-plate capacitor, <strong>C = εA / W</strong>, where W is the depletion width.' },
+        { dur: 10, cap: 'Now apply a <strong>reverse</strong> voltage and raise it. The depletion region widens (W ∝ √(V<sub>0</sub> + V<sub>R</sub>)), so the “plates” move apart and the <strong>capacitance falls</strong>.' },
+        { dur: 9, cap: 'Lower the voltage and W shrinks, so C rises again. The capacitance follows the voltage instantly, with no moving parts. A diode built for this job is a <strong>varactor</strong> (variable reactor), also called a <strong>varicap</strong> or tuning diode.' },
+        { dur: 8, cap: 'Its symbol is a diode with a capacitor’s double plate on the cathode. A varactor is <strong>always reverse biased</strong>. Forward bias would make it conduct and stop it acting as a capacitor.' },
+        { dur: 0, cap: '<strong>Try it:</strong> set the reverse voltage and watch the depletion width and the capacitance.' }
+      ],
+      step(dt, s, ts) { ph += dt; const t = target(s, ts); vr += (t - vr) * Math.min(1, dt * 6); },
+      draw(c, s, tr) {
+        const w = Wpx(vr), dl = MID - w / 2, dr = MID + w / 2, cap = capOf(vr);
+        const dim = s === 4 ? 1 - 0.75 * tr : 1;
+        c.globalAlpha = dim;
+        /* circuit with variable source */
+        const bat = s >= 2 ? 1 : 0;
+        if (bat) {
+          pline(c, [[DX0 - 8, 166], [60, 166], [60, 330], [345, 330]], C.wire, 2);
+          pline(c, [[375, 330], [660, 330], [660, 166], [DX1 + 8, 166]], C.wire, 2);
+          line(c, 354, 316, 354, 344, C.text, 3); line(c, 366, 308, 366, 352, C.text, 3);
+          arrow(c, 340, 352, 382, 306, C.field, 1.5, 7);
+          txt(c, '−', 344, 300, C.muted, 14, 700, 'center'); txt(c, '+', 378, 296, C.muted, 14, 700, 'center');
+          txt(c, 'reverse bias V', 360, 372, C.muted, 11, 600, 'center');
+        }
+        /* device */
+        rect(c, DX0, DY0, dl - DX0, DY1 - DY0, C.P); rect(c, dr, DY0, DX1 - dr, DY1 - DY0, C.N); hatch(c, dl, DY0, dr, DY1);
+        rect(c, DX0 - 8, DY0, 8, DY1 - DY0, C.metal); rect(c, DX1, DY0, 8, DY1 - DY0, C.metal);
+        ions.forEach(i => { if (i.x > dl + 3 && i.x < dr - 3) ion(c, i.x, i.y, 5.5, i.kind, 0.95); });
+        holes.forEach(h => { const j = jig(h.k, ph, 2); carrier(c, lerp(DX0 + 10, dl - 8, h.u) + j[0], h.y + j[1], 'h', 1); });
+        elecs.forEach(e => { const j = jig(e.k, ph, 2); carrier(c, lerp(dr + 8, DX1 - 10, e.u) + j[0], e.y + j[1], 'e', 1); });
+        tag(c, 'p', DX0 + 4, DY0 + 4); tag(c, 'n', DX1 - 4, DY0 + 4, 'right');
+        if (s === 0) {
+          c.globalAlpha = dim * tr;
+          txt(c, 'conductor', (DX0 + dl) / 2, DY1 + 18, C.acc, 12, 700, 'center');
+          txt(c, 'insulator', MID, DY1 + 18, C.text, 12, 700, 'center');
+          txt(c, 'conductor', (dr + DX1) / 2, DY1 + 18, C.don, 12, 700, 'center');
+        }
+        if (s >= 1) {
+          c.globalAlpha = dim * (s === 1 ? tr : 1);
+          rect(c, dl - 4, DY0 - 10, 4, DY1 - DY0 + 20, '#e0e0e0'); rect(c, dr, DY0 - 10, 4, DY1 - DY0 + 20, '#e0e0e0');
+          txt(c, '−Q', dl - 10, DY0 - 14, C.acc, 13, 700, 'right'); txt(c, '+Q', dr + 10, DY0 - 14, C.don, 13, 700, 'left');
+          txt(c, 'plate', dl - 10, DY1 + 18, C.text, 11, 600, 'right'); txt(c, 'plate', dr + 10, DY1 + 18, C.text, 11, 600, 'left');
+          line(c, dl, DY1 + 36, dr, DY1 + 36, C.field, 1.3);
+          line(c, dl, DY1 + 30, dl, DY1 + 42, C.field, 1.3); line(c, dr, DY1 + 30, dr, DY1 + 42, C.field, 1.3);
+          txt(c, 'W', MID, DY1 + 50, C.field, 13, 700, 'center');
+          txt(c, 'C = εA / W', MID, 40, C.field, 15, 700, 'center', MONO);
+        }
+        /* readouts */
+        if (s >= 2) {
+          c.globalAlpha = dim;
+          txt(c, 'VR = ' + vr.toFixed(1) + ' V', 690, 40, C.text, 12, 700, 'right', MONO);
+          txt(c, 'W = ' + (0.2 * Math.sqrt(1 + vr / V0)).toFixed(2) + ' µm', 690, 62, C.field, 12, 700, 'right', MONO);
+          txt(c, 'C = ' + fpF(cap), 690, 84, C.ok, 13, 700, 'right', MONO);
+          const bh = 200 * cap / C0;
+          rect(c, 30, 300 - bh, 18, bh, C.ok); c.strokeStyle = C.axis; c.lineWidth = 1; c.strokeRect(30.5, 100, 18, 200);
+          txt(c, 'C', 39, 314, C.ok, 12, 700, 'center');
+        }
+        c.globalAlpha = 1;
+        /* symbol card */
+        if (s === 4) {
+          c.globalAlpha = tr;
+          c.fillStyle = 'rgba(15,20,32,.94)'; c.fillRect(130, 60, 460, 250);
+          c.strokeStyle = C.axis; c.lineWidth = 1; c.strokeRect(130.5, 60.5, 460, 250);
+          txt(c, 'Varactor (varicap) symbol', 360, 90, C.energy, 15, 700, 'center');
+          vsym(c, 360, 170, 0, C.text, 80);
+          txt(c, 'A (p)', 280, 200, C.muted, 11, 600, 'center'); txt(c, 'K (n)', 440, 200, C.muted, 11, 600, 'center');
+          txt(c, 'diode + capacitor plates', 360, 232, C.text, 12, 600, 'center');
+          txt(c, 'cathode kept positive: always reverse biased', 360, 270, C.field, 12, 700, 'center');
+          c.globalAlpha = 1;
+        }
+      }
+    };
+    S = new Story('st0', o);
+  })();
+
+  /* =====================================================================
+     SCENE 1: the C-V characteristic
+     ===================================================================== */
+  (function () {
+    const cv = new Cv('cv1', 720, 400);
+    const PL = 80, PR = 480, PT = 40, PB = 350, VMX = 20, CMX = 70;
+    const xV = v => PL + v / VMX * (PR - PL), yC = cc => PB - cc / CMX * (PB - PT);
+    let S = null, slV = 4, typ = 'abrupt';
+    const vS = $('s1v'), vO = $('o1v');
+    function syncS() { slV = +vS.value; vO.textContent = slV.toFixed(1) + ' V'; if (S) S.dirty = true; }
+    vS.addEventListener('input', syncS); syncS();
+    segBtns('#st1', 'typ', v => { typ = v; if (S) S.dirty = true; });
+    function axes(c) {
+      for (let cc = 10; cc <= 70; cc += 10) { line(c, PL, yC(cc), PR, yC(cc), C.grid, 1); txt(c, String(cc), PL - 8, yC(cc), C.muted, 10, 600, 'right'); }
+      for (let v = 5; v <= 20; v += 5) { line(c, xV(v), PT, xV(v), PB, C.grid, 1); txt(c, String(v), xV(v), PB + 13, C.muted, 10, 600, 'center'); }
+      line(c, PL, PB, PR, PB, C.axis, 1.5); line(c, PL, PT, PL, PB, C.axis, 1.5);
+      txt(c, '0', PL - 8, PB, C.muted, 10, 600, 'right');
+      txt(c, 'C (pF)', PL - 8, PT - 16, C.muted, 11, 600, 'left'); txt(c, 'reverse voltage VR (V)', PR, PB + 30, C.muted, 11, 600, 'right');
+    }
+    function curve(c, n, col, vEnd, lw) {
+      const pts = []; for (let k = 0; k <= 200; k++) { const v = (vEnd == null ? VMX : vEnd) * k / 200; pts.push([xV(v), yC(capOf(v, n))]); }
+      pline(c, pts, col, lw || 2.6);
+    }
+    function panel(c, rows) {
+      rows.forEach((r, k) => {
+        const y = 56 + k * 28, x = 510;
+        if (r[1] === 'h') txt(c, r[0], x, y, C.text, 13, 700, 'left');
+        else if (r[1] === 'f') txt(c, r[0], x, y, C.field, 12, 700, 'left', MONO);
+        else if (r[1] === 'm') txt(c, r[0], x, y, C.muted, 11, 600, 'left');
+        else txt(c, r[0], x, y, r[2] || C.text, 12, 700, 'left', MONO);
+      });
+    }
+    const A = TYPES.abrupt, G = TYPES.graded, H = TYPES.hyper;
+    const o = {
+      cv,
+      steps: [
+        { dur: 9, cap: 'Plot the capacitance against the reverse voltage. It falls <strong>fast at first</strong>, then more and more slowly, because W grows as a square root of the voltage.' },
+        { dur: 10, cap: 'The curve follows <strong>C = C<sub>0</sub> / (1 + V<sub>R</sub>/V<sub>0</sub>)<sup>n</sup></strong>, where C<sub>0</sub> is the zero-bias capacitance and V<sub>0</sub> ≈ 0.7 V the barrier potential. For an abrupt junction n = ½, so C ∝ 1/√(V<sub>0</sub> + V<sub>R</sub>): <strong>quadruple (V<sub>0</sub> + V<sub>R</sub>) and C halves</strong>.' },
+        { dur: 10, cap: 'The exponent n depends on how the doping changes across the junction. A linearly graded junction gives n = ⅓. Varactors are given a special <strong>hyperabrupt</strong> profile, with n around 1 or more, so the capacitance swings much further.' },
+        { dur: 10, cap: 'What matters for tuning is the <strong>capacitance ratio</strong> C<sub>max</sub>/C<sub>min</sub> over the usable voltage range, here 1 V to 20 V. The hyperabrupt diode gives the largest ratio, so it can tune over the widest frequency range.' },
+        { dur: 0, cap: '<strong>Try it:</strong> pick a junction type and set the reverse voltage.' }
+      ],
+      step() {},
+      draw(c, s, tr, st) {
+        const ts = st.ts;
+        axes(c);
+        if (s === 0) {
+          const v = VMX * ease(clamp((ts - 0.3) / 4.5, 0, 1)), cc = capOf(v, A.n);
+          curve(c, A.n, A.col, v);
+          circ(c, xV(v), yC(cc), 6.5, '#fff', A.col, 2.5);
+          panel(c, [['Abrupt junction', 'h'], ['VR = ' + v.toFixed(1) + ' V', ''], ['C   = ' + fpF(cc), '', A.col]]);
+          return;
+        }
+        if (s === 1) {
+          curve(c, A.n, A.col);
+          const pts = [[3.3, 30], [15.3, 15]];
+          const a = clamp((ts - 1) / 1, 0, 1);
+          c.globalAlpha = a;
+          pts.forEach(p => { line(c, xV(p[0]), PB, xV(p[0]), yC(p[1]), C.muted, 1, [4, 3]); line(c, PL, yC(p[1]), xV(p[0]), yC(p[1]), C.muted, 1, [4, 3]); circ(c, xV(p[0]), yC(p[1]), 5, A.col); });
+          txt(c, 'V0+VR = 4 V → 30 pF', xV(3.3) + 10, yC(30) - 14, C.text, 11, 700, 'left');
+          txt(c, 'V0+VR = 16 V → 15 pF', xV(15.3) - 4, yC(15) - 16, C.text, 11, 700, 'right');
+          c.globalAlpha = 1;
+          panel(c, [['C = C0 / (1 + VR/V0)^n', 'f'], ['C0 = 60 pF, V0 = 0.7 V', 'm'], ['', ''], ['abrupt: n = ½', '', A.col], ['C ∝ 1/√(V0 + VR)', '', A.col], ['', ''], ['×4 voltage → ½ C', '', C.ok]]);
+          return;
+        }
+        const list = [A, G, H];
+        if (s === 2) {
+          list.forEach((t, k) => {
+            const a = k === 0 ? 1 : clamp((ts - 0.6 - (k - 1) * 1.6) / 1, 0, 1); if (a <= 0) return;
+            c.globalAlpha = a; curve(c, t.n, t.col);
+            txt(c, t.name + '  (' + t.nl + ')', xV(10), yC(capOf(10, t.n)) - 13, t.col, 11, 700, 'left');
+            c.globalAlpha = 1;
+          });
+          panel(c, [['Doping profile sets n', 'h'], ['graded:     n = ⅓', '', G.col], ['abrupt:     n = ½', '', A.col], ['hyperabrupt: n ≈ 1–2', '', H.col], ['', ''], ['bigger n → bigger swing', 'm']]);
+          return;
+        }
+        if (s === 3) {
+          list.forEach(t => curve(c, t.n, t.col, null, 2));
+          line(c, xV(1), PT, xV(1), PB, C.muted, 1, [4, 3]); line(c, xV(20), PT, xV(20), PB, C.muted, 1, [4, 3]);
+          txt(c, '1 V', xV(1) + 4, PT + 8, C.muted, 10, 600, 'left'); txt(c, '20 V', xV(20) - 4, PT + 8, C.muted, 10, 600, 'right');
+          const rows = [['Cmax / Cmin (1 → 20 V)', 'h']];
+          list.forEach((t, k) => {
+            const a = clamp((ts - 0.5 - k * 0.8) / 0.6, 0, 1);
+            c.globalAlpha = a;
+            circ(c, xV(1), yC(capOf(1, t.n)), 4.5, t.col); circ(c, xV(20), yC(capOf(20, t.n)), 4.5, t.col);
+            c.globalAlpha = 1;
+            if (a > 0) rows.push([['abrupt', 'graded', 'hyper'][k].padEnd(7) + (capOf(1, t.n).toFixed(1) + '/' + capOf(20, t.n).toFixed(1)).padEnd(10) + '= ' + (capOf(1, t.n) / capOf(20, t.n)).toFixed(1), '', t.col]);
+          });
+          panel(c, rows);
+          return;
+        }
+        const t = TYPES[typ], cc = capOf(slV, t.n);
+        list.forEach(u => { if (u !== t) curve(c, u.n, u.col, null, 1.2); });
+        curve(c, t.n, t.col, null, 3);
+        line(c, xV(slV), PB, xV(slV), yC(cc), t.col, 1, [3, 3]); line(c, PL, yC(cc), xV(slV), yC(cc), t.col, 1, [3, 3]);
+        circ(c, xV(slV), yC(cc), 7, '#fff', t.col, 2.5);
+        panel(c, [[t.name, 'h'], [t.nl, 'm'], ['VR = ' + slV.toFixed(1) + ' V', ''], ['C   = ' + fpF(cc), '', t.col], ['', ''], ['C0/C = ' + (C0 / cc).toFixed(2), '']]);
+      }
+    };
+    S = new Story('st1', o);
+  })();
+
+  /* =====================================================================
+     SCENE 2: tuning an LC circuit, FM radio, VCO
+     ===================================================================== */
+  (function () {
+    const cv = new Cv('cv2', 720, 420);
+    const TOP = 60, BOT = 200, XL = 150, XV = 300, XS = 480;
+    let S = null, ph = 0, vt = 2, slV = 3, Lh = 0.1e-6, fmT = 0;
+    const vS = $('s2v'), vO = $('o2v');
+    function syncS() { slV = +vS.value; vO.textContent = slV.toFixed(2) + ' V'; if (S) S.dirty = true; }
+    vS.addEventListener('input', syncS); syncS();
+    segBtns('#st2', 'ind', v => { Lh = +v * 1e-6; if (S) S.dirty = true; });
+    const fOf = (v, L) => 1 / (TAU * Math.sqrt((L || Lh) * capOf(v) * 1e-12));
+    const vForF = f => V0 * (Math.pow(C0 / (1e12 / (Math.pow(TAU * f, 2) * 0.1e-6)), 2) - 1);
+    const V88 = vForF(88e6), V108 = vForF(108e6);
+    function vtOf(s, ts) {
+      if (s === 0) return 2;
+      if (s === 1) return lerp(1, 8, ease(clamp((ts - 0.5) / 6, 0, 1)));
+      if (s === 2) return lerp(V88, V108, 0.5 - 0.5 * Math.cos(TAU * ts / 7));
+      if (s === 3) return 4 + 3.4 * Math.sin(TAU * ts * 0.35);
+      return slV;
+    }
+    function coil(c, x, y0, y1, col) {
+      const n = 5, h = (y1 - y0 - 20) / n;
+      line(c, x, y0, x, y0 + 10, col, 2); line(c, x, y1 - 10, x, y1, col, 2);
+      c.strokeStyle = col; c.lineWidth = 2; c.beginPath();
+      for (let k = 0; k < n; k++) c.arc(x, y0 + 10 + h * (k + 0.5), h / 2, -Math.PI / 2, Math.PI / 2);
+      c.stroke();
+    }
+    function resH(c, x0, x1, y, col) {
+      const n = 6, w = (x1 - x0), pts = [[x0, y]];
+      for (let k = 0; k < n; k++) pts.push([x0 + w * (k + 0.5) / n, y + (k % 2 ? -8 : 8)]);
+      pts.push([x1, y]); pline(c, pts, col, 2);
+    }
+    const o = {
+      cv,
+      steps: [
+        { dur: 11, cap: 'The classic use: tuning. The varactor and an inductor L form a resonant <strong>LC tank</strong> with f = 1/(2π√(LC)). A DC <strong>tuning voltage V<sub>T</sub></strong> reverse-biases the varactor through a large resistor R, which keeps the radio-frequency signal out of the supply. The capacitor C<sub>b</sub> blocks the DC, so the coil cannot short it out.' },
+        { dur: 10, cap: 'Turn V<sub>T</sub> up: the varactor’s capacitance <strong>falls</strong>, so the resonant <strong>frequency rises</strong>. The tank voltage below oscillates faster. A voltage now controls a frequency.' },
+        { dur: 10, cap: 'This is how a modern FM radio tunes. With L = 0.1 µH, sweeping V<sub>T</sub> between about 1.7 V and 4.7 V covers the whole <strong>88–108 MHz</strong> band. The tuning knob is just a potentiometer setting V<sub>T</sub>, and a microcontroller can do it digitally.' },
+        { dur: 10, cap: 'Wiggle V<sub>T</sub> with an audio signal and the frequency wiggles with it: that is <strong>frequency modulation</strong> (exaggerated here). The same idea gives the <strong>voltage-controlled oscillator (VCO)</strong> inside phase-locked loops, frequency synthesisers and automatic frequency control.' },
+        { dur: 0, cap: '<strong>Try it:</strong> set the tuning voltage and the inductor, and read off the capacitance and the resonant frequency.' }
+      ],
+      step(dt, s, ts) { ph += dt; fmT = ts; vt = vtOf(s, ts); },
+      draw(c, s, tr, st) {
+        const L = s === 4 ? Lh : 0.1e-6, cap = capOf(vt), f = fOf(vt, L);
+        /* circuit */
+        line(c, XL, TOP, 205, TOP, C.wire, 2); line(c, 225, TOP, 340, TOP, C.wire, 2); line(c, 420, TOP, XS, TOP, C.wire, 2);
+        line(c, 210, TOP - 14, 210, TOP + 14, C.text, 3); line(c, 220, TOP - 14, 220, TOP + 14, C.text, 3);
+        resH(c, 340, 420, TOP, C.text);
+        line(c, XL, BOT, XS, BOT, C.wire, 2);
+        coil(c, XL, TOP, BOT, C.text);
+        vsym(c, XV, (TOP + BOT) / 2, -Math.PI / 2, C.text, 70);
+        line(c, XS, TOP, XS, (TOP + BOT) / 2 - 8, C.wire, 2); line(c, XS, (TOP + BOT) / 2 + 8, XS, BOT, C.wire, 2);
+        battV(c, XS, (TOP + BOT) / 2, C.text, '');
+        ground(c, XL, BOT + 2, C.text);
+        circ(c, XV, TOP, 3.5, C.text); circ(c, XV, BOT, 3.5, C.text);
+        const lab = k => s === 0 ? clamp((st.ts - 0.5 - k * 1.2) / 0.6, 0, 1) : 1;
+        const labs = [
+          [() => txt(c, 'L = ' + (L * 1e6).toFixed(L < 1e-6 ? 2 : 1) + ' µH', XL - 16, (TOP + BOT) / 2, C.text, 12, 700, 'right')],
+          [() => { txt(c, 'varactor', XV + 20, (TOP + BOT) / 2 + 30, C.text, 12, 700, 'left'); txt(c, 'C = ' + fpF(cap), XV + 20, (TOP + BOT) / 2 + 48, C.ok, 12, 700, 'left', MONO); }],
+          [() => { txt(c, 'Cb', 215, TOP - 26, C.text, 12, 700, 'center'); txt(c, 'blocks DC', 215, TOP + 28, C.muted, 10, 600, 'center'); }],
+          [() => { txt(c, 'R = 100 kΩ', 380, TOP - 22, C.text, 12, 700, 'center'); txt(c, 'keeps RF out of supply', 380, TOP + 24, C.muted, 10, 600, 'center'); }],
+          [() => { subs(c, [['V', 'T'], [' = ' + vt.toFixed(2) + ' V', '']], XS + 30, (TOP + BOT) / 2 + 2, C.field, 13, 'left'); }]
+        ];
+        labs.forEach((l, k) => { c.globalAlpha = lab(k); l[0](); c.globalAlpha = 1; });
+        txt(c, 'f = 1 / (2π√(LC))', 690, 40, C.text, 12, 700, 'right', MONO);
+        txt(c, 'f = ' + fMHz(f), 690, 66, C.field, 15, 700, 'right', MONO);
+        /* tank-voltage window */
+        const WX0 = 40, WX1 = 680, WY0 = 250, WY1 = 400;
+        rect(c, WX0, WY0, WX1 - WX0, WY1 - WY0, '#0d1220');
+        let ymid = (WY0 + WY1) / 2 + 10, amp = 42;
+        if (s === 2) {
+          ymid = 360; amp = 28;
+          const dx = mhz => lerp(WX0 + 40, WX1 - 40, (mhz - 88) / 20);
+          line(c, dx(88), 292, dx(108), 292, C.axis, 1.5);
+          for (let m = 88; m <= 108; m += 2) { line(c, dx(m), 286, dx(m), 298, C.muted, 1); txt(c, String(m), dx(m), 276, C.muted, 10, 600, 'center'); }
+          txt(c, 'FM band (MHz)', WX0 + 8, 262, C.muted, 10, 600, 'left');
+          const fx = dx(clamp(f / 1e6, 88, 108));
+          line(c, fx, 268, fx, 306, C.bad, 2.5);
+        } else txt(c, 'tank voltage · 100 ns window', WX0 + 8, WY0 + 12, C.muted, 10, 600, 'left');
+        const pts = []; let phase = ph * 4;
+        const N = 640, dt = 100e-9 / N;
+        for (let k = 0; k <= N; k++) {
+          let fl = f;
+          if (s === 3) fl = fOf(4 + 3.4 * Math.sin(TAU * (k / N) * 1.5 - ph * 2.2), L);
+          phase += TAU * fl * dt;
+          pts.push([lerp(WX0 + 4, WX1 - 4, k / N), ymid - amp * Math.sin(phase)]);
+        }
+        c.save(); c.beginPath(); c.rect(WX0, WY0, WX1 - WX0, WY1 - WY0); c.clip();
+        pline(c, pts, C.field, 2); c.restore();
+        if (s === 3) txt(c, 'frequency modulated', WX1 - 8, WY0 + 12, C.ok, 11, 700, 'right');
+      }
+    };
+    S = new Story('st2', o);
+  })();
+
+  /* ---------- sticky mini-nav highlight ---------- */
+  (function () {
+    const links = Array.from(document.querySelectorAll('.toc a'));
+    const secs = links.map(l => document.querySelector(l.getAttribute('href')));
+    function upd() {
+      let cur = 0;
+      secs.forEach((s, i) => { if (s.getBoundingClientRect().top < 120) cur = i; });
+      links.forEach((l, i) => l.classList.toggle('active', i === cur));
+    }
+    window.addEventListener('scroll', upd, { passive: true }); upd();
+  })();
+
+  let last = performance.now();
+  function frameLoop(ts) {
+    const dt = Math.min(0.05, Math.max(0, (ts - last) / 1000)); last = ts;
+    stories.forEach(st => {
+      if (!st.visible) return;
+      if (st.playing) { st.tick(dt); st.draw(); }
+      else if (st.dirty) st.draw();
+      st.dirty = false;
+    });
+    requestAnimationFrame(frameLoop);
+  }
+  function onResize() { stories.forEach(st => { st.dirty = true; }); }
+  window.addEventListener('resize', onResize);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(onResize);
+  requestAnimationFrame(frameLoop);
+})();
+</script>
+</body>
+</html>
