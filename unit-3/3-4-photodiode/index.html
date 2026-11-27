@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>3.4 Photodiode</title>
+  <meta name="description" content="The photodiode told as step-by-step animations: reverse bias, dark current and photocurrent, absorption and the cut-off wavelength, quantum efficiency and responsivity, the V-I characteristic with photoconductive and photovoltaic modes, the load-resistor circuit, response time and the optocoupler.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1420;
+      --panel: #1a2132;
+      --panel-hover: #212a3f;
+      --border: #2a3448;
+      --text: #e6e9ef;
+      --muted: #9aa4b8;
+      --electron: #4fc3f7;
+      --hole: #ff8a65;
+      --energy: #ffd54f;
+      --success: #81c784;
+      --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+      --max: 960px;
+      --radius: 12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: var(--font); font-size: 16px; line-height: 1.65;
+      overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column;
+    }
+    a { color: var(--electron); }
+    .wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 16px; }
+
+    /* Sticky mini-nav */
+    .toc {
+      position: sticky; top: 0; z-index: 10; background: rgba(15, 20, 32, .95);
+      border-bottom: 1px solid var(--border); backdrop-filter: blur(6px);
+    }
+    .toc ul { display: flex; gap: 4px; list-style: none; margin: 0 auto; padding: 8px 16px; max-width: var(--max); overflow-x: auto; scrollbar-width: none; }
+    .toc ul::-webkit-scrollbar { display: none; }
+    .toc a {
+      display: block; white-space: nowrap; text-decoration: none; color: var(--muted);
+      font-size: 0.85rem; font-weight: 500; padding: 6px 10px; border-radius: 999px;
+    }
+    .toc a:hover { color: var(--text); background: var(--panel); }
+    .toc a.active { color: var(--bg); background: var(--electron); }
+
+    main { flex: 1; padding: 24px 0 48px; }
+    .crumbs { font-size: 0.875rem; color: var(--muted); margin: 0 0 16px; }
+    .crumbs a { color: var(--muted); }
+    .crumbs a:hover { color: var(--electron); }
+    .eyebrow { font-family: var(--mono); font-size: 0.8rem; color: var(--electron); letter-spacing: .04em; margin: 0; }
+    h1 { font-size: clamp(1.5rem, 6vw, 2.2rem); line-height: 1.2; margin: 4px 0 6px; }
+    .subtitle { color: var(--muted); margin: 0 0 8px; }
+    .howto {
+      margin: 14px 0 0; padding: 10px 14px; border-radius: 8px; font-size: 0.9rem; color: var(--muted);
+      background: rgba(79,195,247,.06); border: 1px solid rgba(79,195,247,.3);
+    }
+    .howto b { color: var(--text); }
+    section { scroll-margin-top: 64px; padding-top: 28px; }
+    h2 { font-size: clamp(1.3rem, 5vw, 1.6rem); line-height: 1.25; margin: 0 0 4px; }
+    h3 { font-size: 1.05rem; margin: 0 0 8px; }
+    hr.sep { border: 0; border-top: 1px solid var(--border); margin: 40px 0 0; }
+    .rm-note { font-size: 0.78rem; color: var(--muted); margin: 0 0 8px; }
+
+    /* Buttons & controls */
+    .btn {
+      font: inherit; font-size: 0.88rem; font-weight: 600; color: var(--text);
+      background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+      padding: 7px 12px; cursor: pointer; min-height: 38px;
+    }
+    .btn:hover:not(:disabled) { background: var(--panel-hover); border-color: var(--electron); }
+    .btn:disabled { opacity: .45; cursor: default; }
+    .btn:focus-visible, input:focus-visible, figure.story:focus-visible, .dot:focus-visible { outline: 2px solid var(--electron); outline-offset: 2px; }
+    .btn[aria-pressed="true"] { background: rgba(255,213,79,.14); border-color: var(--energy); color: var(--energy); }
+    .btn.primary { border-color: var(--electron); min-width: 84px; }
+    .seg { display: inline-flex; gap: 0; flex-wrap: wrap; }
+    .seg .btn { border-radius: 0; padding: 7px 10px; }
+    .seg .btn:first-child { border-radius: 8px 0 0 8px; }
+    .seg .btn:last-child { border-radius: 0 8px 8px 0; }
+    .seg .btn + .btn { margin-left: -1px; }
+
+    /* Story player: canvas + stepped caption + controls */
+    figure.story {
+      margin: 14px 0 0; background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 12px; min-width: 0;
+    }
+    canvas { display: block; width: 100%; border-radius: 8px; background: #141b2b; }
+    .narrow { max-width: 820px; margin-left: auto; margin-right: auto; }
+    .cap {
+      margin-top: 12px; background: #141b2b; border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 14px 12px;
+    }
+    .cap-head { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+    .cap-num { font-family: var(--mono); font-size: .78rem; color: var(--electron); white-space: nowrap; }
+    .bar { flex: 1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+    .bar i { display: block; height: 100%; width: 0; background: var(--electron); }
+    .cap-text { margin: 0; font-size: 1.02rem; line-height: 1.6; min-height: 5em; }
+    .cap-text strong { color: #fff; }
+    .cap-text.fade { animation: capin .45s ease; }
+    @keyframes capin { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+    .ctrls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-top: 12px; }
+    .dots { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; flex: 1; justify-content: center; min-width: 0; }
+    .dot {
+      width: 30px; height: 30px; border-radius: 50%; padding: 0; cursor: pointer;
+      border: 1px solid var(--border); background: var(--panel); color: var(--muted);
+      font: 600 .75rem var(--mono);
+    }
+    .dot:hover { border-color: var(--electron); }
+    .dot.seen { color: var(--text); border-color: #3d4a63; }
+    .dot[aria-current="step"] { background: var(--electron); border-color: var(--electron); color: var(--bg); }
+    .tryit { margin-top: 12px; padding: 10px 12px; border-radius: 8px; border: 1px dashed rgba(255,213,79,.45); background: rgba(255,213,79,.05); }
+    .tryit-row { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: flex-end; }
+    .slider { flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; }
+    .slider label { display: flex; justify-content: space-between; gap: 8px; font-size: 0.8rem; color: var(--muted); }
+    .slider output { font-family: var(--mono); color: var(--energy); white-space: nowrap; }
+    input[type="range"] { width: 100%; accent-color: var(--energy); margin: 4px 0 0; }
+
+    .keypoints {
+      margin-top: 16px; padding: 14px 16px; border-radius: var(--radius);
+      background: rgba(129,199,132,.07); border: 1px solid rgba(129,199,132,.35);
+    }
+    .keypoints h3 { color: var(--success); font-size: 0.95rem; text-transform: uppercase; letter-spacing: .05em; }
+    .keypoints ul { margin: 0; padding-left: 20px; }
+    .keypoints li { margin: 4px 0; }
+
+    .further { margin-top: 48px; color: var(--muted); font-size: 0.85rem; }
+    .further h3 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 0 0 6px; }
+    .further ul { margin: 0; padding-left: 18px; }
+    .further li { margin: 3px 0; }
+
+    .pager { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 32px; }
+    .pager a {
+      display: block; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 12px 14px; text-decoration: none; color: var(--text); min-width: 0;
+    }
+    .pager a:hover { border-color: var(--electron); }
+    .pager small { display: block; color: var(--muted); font-size: 0.75rem; }
+    .pager .next { text-align: right; }
+    .site-foot { border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; text-align: center; padding: 18px 16px; }
+
+    @media (prefers-reduced-motion: reduce) { .cap-text.fade { animation: none; } }
+    @media (min-width: 768px) { .keypoints li { text-align: justify; hyphens: auto; -webkit-hyphens: auto; } }
+  </style>
+</head>
+<body>
+
+  <nav class="toc" aria-label="Sections">
+    <ul>
+      <li><a href="#s0">How it works</a></li>
+      <li><a href="#s1">Cut-off λ</a></li>
+      <li><a href="#s2">Responsivity</a></li>
+      <li><a href="#s3">V–I curve</a></li>
+      <li><a href="#s4">Circuit &amp; uses</a></li>
+      <li><a href="#s5">Recap</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="wrap">
+      <header>
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="../../index.html">Home</a> / <a href="../index.html">Unit 3</a> / 3.4
+        </nav>
+        <p class="eyebrow">TOPIC 3.4</p>
+        <h1>Photodiode</h1>
+        <p class="subtitle">Light in, current out: a reverse-biased junction that counts photons</p>
+        <p class="howto"><b>How to watch:</b> each animation explains itself in steps and plays on its own.
+          Use <b>Back</b> and <b>Next</b> or the numbered dots to go at your own pace (←/→ keys work too).
+          The last step of every animation lets you <b>try it</b> yourself.</p>
+        <p class="rm-note" id="rmNote" hidden>Your device asks for reduced motion, so every animation starts paused. Step through with Next, or press Play.</p>
+      </header>
+
+      <!-- ================= SCENE 0 ================= -->
+      <section id="s0" aria-labelledby="h0">
+        <h2 id="h0">1. How light makes a current</h2>
+        <figure class="story" id="st0" tabindex="0" aria-label="Animation: how a photodiode works. Use the left and right arrow keys to step.">
+          <div class="narrow"><canvas id="cv0" style="aspect-ratio:720/420" role="img" aria-label="A pn junction with a window over the depletion region, connected in reverse bias to a battery and an ammeter. Photons enter from a light source above, create electron-hole pairs in the depletion region, and the field sweeps electrons to the n side and holes to the p side, driving a current round the circuit."></canvas></div>
+          <div class="cap narrow"><div class="cap-head"><span class="cap-num"></span><div class="bar"><i></i></div></div><p class="cap-text" aria-live="polite"></p></div>
+          <div class="tryit narrow" data-show="7">
+            <div class="tryit-row">
+              <div class="slider"><label for="s0i"><span>Light intensity</span><output id="o0i"></output></label><input type="range" id="s0i" min="0" max="100" step="1" value="60"></div>
+            </div>
+          </div>
+          <div class="ctrls narrow">
+            <button class="btn" type="button" data-act="prev">◀ Back</button>
+            <button class="btn primary" type="button" data-act="play">Pause</button>
+            <div class="dots" role="group" aria-label="Steps"></div>
+            <button class="btn" type="button" data-act="next">Next ▶</button>
+            <button class="btn" type="button" data-act="replay">↺ Replay</button>
+          </div>
+        </figure>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SCENE 1 ================= -->
+      <section id="s1" aria-labelledby="h1s">
+        <h2 id="h1s">2. Which light can it detect? The cut-off wavelength</h2>
+        <figure class="story" id="st1" tabindex="0" aria-label="Animation: absorption and cut-off wavelength. Use the left and right arrow keys to step.">
+          <div class="narrow"><canvas id="cv1" style="aspect-ratio:720/400" role="img" aria-label="Energy band diagram of a reverse-biased junction, with the bands dropping steeply across the depletion region. Photons fall from above. Photons with energy below the band gap pass straight through; photons above it lift an electron to the conduction band, which rolls down to the n side while the hole rises to the p side. A side panel compares the photon energy with the band gap."></canvas></div>
+          <div class="cap narrow"><div class="cap-head"><span class="cap-num"></span><div class="bar"><i></i></div></div><p class="cap-text" aria-live="polite"></p></div>
+          <div class="tryit narrow" data-show="5">
+            <div class="tryit-row">
+              <div class="slider"><label for="s1l"><span>Wavelength λ</span><output id="o1l"></output></label><input type="range" id="s1l" min="300" max="2000" step="10" value="650"></div>
+              <div class="seg" role="group" aria-label="Material">
+                <button class="btn" type="button" data-mat="si" aria-pressed="true">Si</button>
+                <button class="btn" type="button" data-mat="gaas" aria-pressed="false">GaAs</button>
+                <button class="btn" type="button" data-mat="ingaas" aria-pressed="false">InGaAs</button>
+                <button class="btn" type="button" data-mat="ge" aria-pressed="false">Ge</button>
+              </div>
+            </div>
+          </div>
+          <div class="ctrls narrow">
+            <button class="btn" type="button" data-act="prev">◀ Back</button>
+            <button class="btn primary" type="button" data-act="play">Pause</button>
+            <div class="dots" role="group" aria-label="Steps"></div>
+            <button class="btn" type="button" data-act="next">Next ▶</button>
+            <button class="btn" type="button" data-act="replay">↺ Replay</button>
+          </div>
+        </figure>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SCENE 2 ================= -->
+      <section id="s2" aria-labelledby="h2s">
+        <h2 id="h2s">3. How much current? Quantum efficiency and responsivity</h2>
+        <figure class="story" id="st2" tabindex="0" aria-label="Animation: quantum efficiency and responsivity. Use the left and right arrow keys to step.">
+          <div class="narrow"><canvas id="cv2" style="aspect-ratio:720/400" role="img" aria-label="Photons stream from a lamp into a photodiode. Most are absorbed and each sends one electron out along the wire; some bounce off. Counters compare photons in with electrons out. A side panel works through the photon rate, the quantum efficiency, the photocurrent formula, the responsivity, and the responsivity curve of silicon against wavelength."></canvas></div>
+          <div class="cap narrow"><div class="cap-head"><span class="cap-num"></span><div class="bar"><i></i></div></div><p class="cap-text" aria-live="polite"></p></div>
+          <div class="tryit narrow" data-show="5">
+            <div class="tryit-row">
+              <div class="slider"><label for="s2p"><span>Light power P</span><output id="o2p"></output></label><input type="range" id="s2p" min="0" max="200" step="1" value="100"></div>
+              <div class="slider"><label for="s2l"><span>Wavelength λ</span><output id="o2l"></output></label><input type="range" id="s2l" min="350" max="1200" step="5" value="850"></div>
+            </div>
+          </div>
+          <div class="ctrls narrow">
+            <button class="btn" type="button" data-act="prev">◀ Back</button>
+            <button class="btn primary" type="button" data-act="play">Pause</button>
+            <div class="dots" role="group" aria-label="Steps"></div>
+            <button class="btn" type="button" data-act="next">Next ▶</button>
+            <button class="btn" type="button" data-act="replay">↺ Replay</button>
+          </div>
+        </figure>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SCENE 3 ================= -->
+      <section id="s3" aria-labelledby="h3s">
+        <h2 id="h3s">4. The V-I characteristic</h2>
+        <figure class="story" id="st3" tabindex="0" aria-label="Animation: photodiode V-I characteristic. Use the left and right arrow keys to step.">
+          <div class="narrow"><canvas id="cv3" style="aspect-ratio:720/420" role="img" aria-label="Current against voltage. The dark diode curve is drawn first, then copies shifted downward by the photocurrent for three light levels. The third quadrant, where the curves are flat, is shaded as the photoconductive mode; the fourth quadrant is shaded as the photovoltaic mode with the short-circuit current and open-circuit voltage marked."></canvas></div>
+          <div class="cap narrow"><div class="cap-head"><span class="cap-num"></span><div class="bar"><i></i></div></div><p class="cap-text" aria-live="polite"></p></div>
+          <div class="tryit narrow" data-show="5">
+            <div class="tryit-row">
+              <div class="slider"><label for="s3l"><span>Light level</span><output id="o3l"></output></label><input type="range" id="s3l" min="0" max="100" step="1" value="67"></div>
+              <div class="slider"><label for="s3v"><span>Bias voltage V</span><output id="o3v"></output></label><input type="range" id="s3v" min="-6" max="0.5" step="0.01" value="-3"></div>
+            </div>
+          </div>
+          <div class="ctrls narrow">
+            <button class="btn" type="button" data-act="prev">◀ Back</button>
+            <button class="btn primary" type="button" data-act="play">Pause</button>
+            <div class="dots" role="group" aria-label="Steps"></div>
+            <button class="btn" type="button" data-act="next">Next ▶</button>
+            <button class="btn" type="button" data-act="replay">↺ Replay</button>
+          </div>
+        </figure>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= SCENE 4 ================= -->
+      <section id="s4" aria-labelledby="h4s">
+        <h2 id="h4s">5. Using a photodiode: circuit, speed and the optocoupler</h2>
+        <figure class="story" id="st4" tabindex="0" aria-label="Animation: photodiode circuit, response time and optocoupler. Use the left and right arrow keys to step.">
+          <div class="narrow"><canvas id="cv4" style="aspect-ratio:720/420" role="img" aria-label="A photodiode reverse biased from a 5 volt supply through a load resistor, lit by a flashing light. An oscilloscope trace shows the light pulses and the output voltage across the resistor, whose edges become rounded as the resistor grows. One step shows an optocoupler: an infrared LED and a photodiode in one package separated by an isolation gap."></canvas></div>
+          <div class="cap narrow"><div class="cap-head"><span class="cap-num"></span><div class="bar"><i></i></div></div><p class="cap-text" aria-live="polite"></p></div>
+          <div class="tryit narrow" data-show="5">
+            <div class="tryit-row">
+              <div class="slider"><label for="s4r"><span>Load resistor R<sub>L</sub></span><output id="o4r"></output></label><input type="range" id="s4r" min="0" max="100" step="1" value="50"></div>
+              <div class="slider"><label for="s4l"><span>Light level</span><output id="o4l"></output></label><input type="range" id="s4l" min="0" max="100" step="1" value="100"></div>
+            </div>
+          </div>
+          <div class="ctrls narrow">
+            <button class="btn" type="button" data-act="prev">◀ Back</button>
+            <button class="btn primary" type="button" data-act="play">Pause</button>
+            <div class="dots" role="group" aria-label="Steps"></div>
+            <button class="btn" type="button" data-act="next">Next ▶</button>
+            <button class="btn" type="button" data-act="replay">↺ Replay</button>
+          </div>
+        </figure>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= RECAP ================= -->
+      <section id="s5" aria-labelledby="h5s">
+        <h2 id="h5s">Recap</h2>
+        <aside class="keypoints" aria-label="Key points">
+          <h3>Key points</h3>
+          <ul>
+            <li>A photodiode is a pn junction with a window over the junction, operated in <strong>reverse bias</strong>. Its symbol is a diode with arrows pointing in.</li>
+            <li>Dark: only the dark current flows (about nA). Light: each absorbed photon makes an electron-hole pair, the depletion field separates it, and a <strong>photocurrent I<sub>λ</sub> ∝ light intensity</strong> flows.</li>
+            <li>A photon is absorbed only if hf ≥ E<sub>g</sub>: cut-off <strong>λ<sub>c</sub> = 1240/E<sub>g</sub> nm</strong> (Si ≈ 1100 nm, Ge ≈ 1880 nm).</li>
+            <li>I<sub>λ</sub> = ηqPλ/hc. Responsivity <strong>R = I<sub>λ</sub>/P = ηλ(nm)/1240 A/W</strong>; silicon peaks around 0.5 to 0.6 A/W near 900 nm.</li>
+            <li>V-I: I = I<sub>S</sub>(e<sup>V/V<sub>T</sub></sup> − 1) − I<sub>λ</sub>. Third quadrant: <strong>photoconductive mode</strong> (sensor). Fourth quadrant: <strong>photovoltaic mode</strong> (solar cell).</li>
+            <li>Circuit: V<sub>out</sub> = I<sub>λ</sub>R<sub>L</sub>, response time τ = R<sub>L</sub>C<sub>j</sub>. Larger R<sub>L</sub> gives more output but a slower response. PIN and avalanche photodiodes are faster or more sensitive variants.</li>
+            <li>Uses: optocouplers, IR remote receivers, light meters, optical-fibre receivers, barcode scanners and smoke detectors.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <aside class="further" aria-label="Further reading">
+        <h3>Further reading</h3>
+        <ul>
+          <li><em>Semiconductor Physics and Devices</em>, Donald A. Neamen. Chapter: “Optical Devices” (photodetectors).</li>
+          <li><em>Electronic Devices and Circuits</em>, David A. Bell. Section on photodiodes.</li>
+          <li><em>Electronic Devices and Circuits</em>, S. Salivahanan and N. Suresh Kumar. Section on photodiodes.</li>
+          <li><em>Electronic Devices and Circuits</em>, Jacob Millman, Christos C. Halkias and Satyabrata Jit. Section on photodiodes.</li>
+        </ul>
+      </aside>
+
+      <nav class="pager" aria-label="Topic navigation">
+        <a href="../3-3-led/index.html"><small>← Previous</small>3.3 Light-Emitting Diode</a>
+        <a class="next" href="../3-5-solar-cell/index.html"><small>Next →</small>3.5 Solar Cell</a>
+      </nav>
+    </div>
+  </main>
+
+  <footer class="site-foot">© 2026 Naveen Bokka</footer>
+
+
+<script>
+(function () {
+  'use strict';
+  /* ---------- colours ---------- */
+  const C = {
+    text: '#e6e9ef', muted: '#9aa4b8', grid: 'rgba(255,255,255,.07)',
+    P: '#7d3a3a', N: '#2e4a7d', DEP: '#3a3f4f',
+    hole: '#ff8a65', elec: '#4fc3f7', acc: '#ef9a9a', don: '#90caf9',
+    field: '#ffd54f', ok: '#81c784', bad: '#ef5350', axis: '#5a6478',
+    band: '#e6e9ef', cur: '#81c784', metal: '#b0bec5', wire: '#8a94a8', photon: '#ffffff', bg: '#141b2b'
+  };
+  const FONT = 'Inter, system-ui, sans-serif';
+  const MONO = '"JetBrains Mono", Consolas, monospace';
+  const RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const TAU = Math.PI * 2;
+  const $ = id => document.getElementById(id);
+  if (RM) $('rmNote').hidden = false;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const lerp = (a, b, u) => a + (b - a) * u;
+  const ease = u => u * u * (3 - 2 * u);
+  const hash = k => { const s = Math.sin(k * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+
+  /* ---------- number formatting ---------- */
+  const SUP = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '-': '⁻' };
+  const sup = n => String(n).split('').map(ch => SUP[ch] || ch).join('');
+  function sci(v, d) {
+    if (v === 0) return '0';
+    let e = Math.floor(Math.log10(v)), m = v / Math.pow(10, e);
+    if (+m.toFixed(d) >= 10) { m /= 10; e += 1; }
+    return m.toFixed(d) + ' × 10' + sup(e);
+  }
+  const fI = i => {
+    const a = Math.abs(i), s = i < 0 ? '−' : '';
+    if (a < 1e-12) return '0';
+    if (a >= 1e-3) return s + (a * 1e3).toFixed(2) + ' mA';
+    if (a >= 1e-6) return s + (a * 1e6).toFixed(a >= 1e-5 ? 1 : 2) + ' µA';
+    if (a >= 1e-9) return s + (a * 1e9).toFixed(1) + ' nA';
+    return s + (a * 1e12).toFixed(0) + ' pA';
+  };
+  const fV = v => (v < 0 ? '−' : '') + Math.abs(v).toFixed(2) + ' V';
+  const fR = r => r >= 1e6 ? (r / 1e6).toFixed(2) + ' MΩ' : (r / 1e3).toFixed(r < 1e5 ? 1 : 0) + ' kΩ';
+  const fT = t => t >= 1e-6 ? (t * 1e6).toFixed(t >= 1e-5 ? 0 : 1) + ' µs' : (t * 1e9).toFixed(0) + ' ns';
+
+  /* ---------- wavelength → display colour ---------- */
+  function wlCol(l) {
+    if (l < 380) return 'rgb(190,150,255)';          // ultraviolet: drawn violet
+    if (l > 760) return 'rgb(200,100,100)';          // infrared: drawn dull red
+    let r = 0, g = 0, b = 0;
+    if (l < 440) { r = (440 - l) / 60; b = 1; }
+    else if (l < 490) { g = (l - 440) / 50; b = 1; }
+    else if (l < 510) { g = 1; b = (510 - l) / 20; }
+    else if (l < 580) { r = (l - 510) / 70; g = 1; }
+    else if (l < 645) { r = 1; g = (645 - l) / 65; }
+    else r = 1;
+    const f = l < 420 ? 0.55 + 0.45 * (l - 380) / 40 : l > 700 ? 0.55 + 0.45 * (760 - l) / 60 : 1;
+    const m = v => Math.round(255 * (0.18 + 0.82 * v * f));
+    return 'rgb(' + m(r) + ',' + m(g) + ',' + m(b) + ')';
+  }
+  const bandName = l => l < 380 ? 'ultraviolet' : l > 750 ? 'infrared' : l < 450 ? 'violet' : l < 495 ? 'blue' : l < 570 ? 'green' : l < 590 ? 'yellow' : l < 620 ? 'orange' : 'red';
+
+  /* ---------- Canvas helpers ---------- */
+  let FS = 1;
+  function Cv(id, W, H, cap) { this.el = $(id); this.W = W; this.H = H; this.cap = cap || 2; this.ctx = this.el.getContext('2d'); }
+  Cv.prototype.begin = function () {
+    const w = this.el.clientWidth; if (!w) return null;
+    const dpr = window.devicePixelRatio || 1;
+    const pw = Math.round(w * dpr), ph = Math.round(w * dpr * this.H / this.W);
+    if (this.el.width !== pw || this.el.height !== ph) { this.el.width = pw; this.el.height = ph; }
+    const c = this.ctx, s = pw / this.W;
+    FS = Math.min(this.cap, Math.max(1, 1.15 * this.W / w));
+    c.setTransform(s, 0, 0, s, 0, 0); c.clearRect(0, 0, this.W, this.H);
+    c.textBaseline = 'middle'; c.textAlign = 'left'; c.globalAlpha = 1; c.setLineDash([]); c.lineCap = 'butt'; c.shadowBlur = 0;
+    return c;
+  };
+  Cv.prototype.wm = function (c) {
+    const k = this.W / this.el.clientWidth, s = 13 * k;
+    c.save(); c.setTransform(this.el.width / this.W, 0, 0, this.el.width / this.W, 0, 0);
+    c.globalAlpha = 1; c.shadowBlur = 0; c.font = '500 ' + s.toFixed(1) + 'px ' + FONT; c.fillStyle = 'rgba(255,255,255,.35)';
+    c.textAlign = 'right'; c.textBaseline = 'bottom'; c.fillText('© Naveen Bokka', this.W - 6 * k, this.H - 4 * k); c.restore();
+  };
+  function circ(c, x, y, r, fill, stroke, lw) {
+    c.beginPath(); c.arc(x, y, Math.max(0, r), 0, TAU);
+    if (fill) { c.fillStyle = fill; c.fill(); }
+    if (stroke) { c.strokeStyle = stroke; c.lineWidth = lw || 1.5; c.stroke(); }
+  }
+  function txt(c, s, x, y, col, size, weight, align, font) {
+    c.font = (weight || 600) + ' ' + ((size || 12) * FS).toFixed(1) + 'px ' + (font || FONT);
+    c.fillStyle = col || C.text; c.textAlign = align || 'left'; c.fillText(s, x, y);
+  }
+  // Label made of [main, subscript] parts, e.g. [['I','λ'],[' = 5 µA','']]
+  function subs(c, parts, x, y, col, size, align, font) {
+    const z = (size || 13) * FS, zs = z * 0.72, f = font || FONT;
+    let w = 0;
+    const ws = parts.map(p => {
+      c.font = '700 ' + z.toFixed(1) + 'px ' + f; const a = c.measureText(p[0]).width;
+      c.font = '700 ' + zs.toFixed(1) + 'px ' + f; const b = p[1] ? c.measureText(p[1]).width : 0;
+      w += a + b; return [a, b];
+    });
+    let x0 = align === 'right' ? x - w : align === 'center' ? x - w / 2 : x;
+    c.fillStyle = col; c.textAlign = 'left';
+    parts.forEach((p, k) => {
+      c.font = '700 ' + z.toFixed(1) + 'px ' + f; c.fillText(p[0], x0, y); x0 += ws[k][0];
+      if (p[1]) { c.font = '700 ' + zs.toFixed(1) + 'px ' + f; c.fillText(p[1], x0, y + z * 0.3); x0 += ws[k][1]; }
+    });
+    return w;
+  }
+  function line(c, x0, y0, x1, y1, col, lw, dash) {
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []);
+    c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke(); c.setLineDash([]);
+  }
+  function pline(c, pts, col, lw, dash) {
+    if (pts.length < 2) return;
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []); c.lineJoin = 'round';
+    c.beginPath(); pts.forEach((p, k) => k ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); c.stroke(); c.setLineDash([]);
+  }
+  function arrow(c, x0, y0, x1, y1, col, lw, head) {
+    const dx = x1 - x0, dy = y1 - y0, L = Math.hypot(dx, dy); if (L < 2) return;
+    lw = lw || 3;
+    const ux = dx / L, uy = dy / L, hs = Math.min(head || 10, L * 0.8), hw = Math.max(hs * 0.55, lw * 0.9);
+    line(c, x0, y0, x1 - ux * hs * 0.9, y1 - uy * hs * 0.9, col, lw);
+    c.fillStyle = col; c.beginPath(); c.moveTo(x1, y1);
+    c.lineTo(x1 - ux * hs - uy * hw, y1 - uy * hs + ux * hw);
+    c.lineTo(x1 - ux * hs + uy * hw, y1 - uy * hs - ux * hw); c.closePath(); c.fill();
+  }
+  function vdim(c, x, y0, y1, col) {   // vertical dimension arrow with end ticks
+    line(c, x - 5, y0, x + 5, y0, col, 1.3); line(c, x - 5, y1, x + 5, y1, col, 1.3);
+    if (Math.abs(y1 - y0) > 14) { const m = (y0 + y1) / 2; arrow(c, x, m, x, y0, col, 1.4, 6); arrow(c, x, m, x, y1, col, 1.4, 6); }
+    else line(c, x, y0, x, y1, col, 1.4);
+  }
+  function rect(c, x, y, w, h, fill) { c.fillStyle = fill; c.fillRect(x, y, w, h); }
+  function hatch(c, x0, y0, x1, y1) {
+    if (x1 - x0 < 0.5) return;
+    rect(c, x0, y0, x1 - x0, y1 - y0, C.DEP);
+    c.save(); c.beginPath(); c.rect(x0, y0, x1 - x0, y1 - y0); c.clip();
+    c.strokeStyle = 'rgba(255,255,255,.10)'; c.lineWidth = 1; c.beginPath();
+    for (let x = x0 - (y1 - y0); x < x1; x += 9) { c.moveTo(x, y1); c.lineTo(x + (y1 - y0), y0); }
+    c.stroke(); c.restore();
+  }
+  function ion(c, x, y, r, kind, a) {
+    const col = kind === 'a' ? C.acc : C.don, a0 = c.globalAlpha;
+    c.globalAlpha = a0 * a; circ(c, x, y, r, null, col, Math.max(1, r * 0.22));
+    c.strokeStyle = col; c.lineWidth = Math.max(1, r * 0.24); c.beginPath();
+    c.moveTo(x - r * 0.5, y); c.lineTo(x + r * 0.5, y);
+    if (kind === 'd') { c.moveTo(x, y - r * 0.5); c.lineTo(x, y + r * 0.5); }
+    c.stroke(); c.globalAlpha = a0;
+  }
+  function carrier(c, x, y, kind, a, r) {
+    const a0 = c.globalAlpha;
+    c.globalAlpha = a0 * a; circ(c, x, y, r || (kind === 'h' ? 3.6 : 3.2), kind === 'h' ? C.hole : C.elec); c.globalAlpha = a0;
+  }
+  const jig = (k, ph, amp) => [amp * Math.sin(ph * 1.7 + k * 1.31), amp * Math.cos(ph * 1.3 + k * 2.07)];
+  function tag(c, s, x, y, align) {
+    c.font = '700 ' + (13 * FS).toFixed(1) + 'px ' + FONT;
+    const w = c.measureText(s).width + 10, h = 13 * FS + 8, x0 = align === 'right' ? x - w : align === 'center' ? x - w / 2 : x;
+    c.fillStyle = 'rgba(15,20,32,.78)'; c.fillRect(x0, y, w, h);
+    txt(c, s, x0 + w / 2, y + h / 2, '#fff', 13, 700, 'center');
+  }
+  // A photon: wavy line whose head is at (x, y), travelling along unit vector (dx, dy)
+  function photon(c, x, y, dx, dy, col, ph, len) {
+    len = len || 42;
+    const nx = -dy, ny = dx, n = 26;
+    c.save(); c.shadowColor = col; c.shadowBlur = 8;
+    c.strokeStyle = col; c.lineWidth = 2; c.beginPath();
+    for (let k = 0; k <= n; k++) {
+      const s = k / n * len, w = 4.5 * Math.sin(s * 0.42 - ph * 14) * (1 - k / n * 0.5);
+      const px = x - dx * s + nx * w, py = y - dy * s + ny * w;
+      k ? c.lineTo(px, py) : c.moveTo(px, py);
+    }
+    c.stroke();
+    c.fillStyle = col; c.beginPath(); c.moveTo(x + dx * 5, y + dy * 5);
+    c.lineTo(x - dx * 3 + nx * 4, y - dy * 3 + ny * 4); c.lineTo(x - dx * 3 - nx * 4, y - dy * 3 - ny * 4); c.closePath(); c.fill();
+    c.restore();
+  }
+  // Diode symbol: anode at -len, cathode at +len along angle ang (0 = anode left)
+  function dsym(c, x, y, ang, col, len) {
+    len = len || 40; const h = 12;
+    c.save(); c.translate(x, y); c.rotate(ang);
+    line(c, -len, 0, -11, 0, col, 2.2); line(c, 11, 0, len, 0, col, 2.2);
+    c.fillStyle = col; c.beginPath(); c.moveTo(-11, -h); c.lineTo(-11, h); c.lineTo(11, 0); c.closePath(); c.fill();
+    line(c, 11, -h, 11, h, col, 2.8);
+    c.restore();
+  }
+  // Two parallel light arrows from (x0,y0) to (x1,y1)
+  function rays(c, x0, y0, x1, y1, col, gap) {
+    const dx = x1 - x0, dy = y1 - y0, L = Math.hypot(dx, dy), g = gap || 7, nx = -dy / L * g, ny = dx / L * g;
+    arrow(c, x0 + nx, y0 + ny, x1 + nx, y1 + ny, col, 1.8, 7); arrow(c, x0 - nx, y0 - ny, x1 - nx, y1 - ny, col, 1.8, 7);
+  }
+  function resV(c, x, y0, y1, col) {
+    const n = 6, w = 8, h = y1 - y0, pts = [[x, y0]];
+    for (let k = 0; k < n; k++) pts.push([x + (k % 2 ? -w : w), y0 + h * (k + 0.5) / n]);
+    pts.push([x, y1]); pline(c, pts, col, 2);
+  }
+  function ground(c, x, y, col) { line(c, x - 12, y, x + 12, y, col, 2); line(c, x - 8, y + 5, x + 8, y + 5, col, 2); line(c, x - 4, y + 10, x + 4, y + 10, col, 2); }
+  function lamp(c, x, y, lv, col, ph) {
+    col = col || '#fff8e1';
+    if (lv > 0.01) {
+      c.save(); c.shadowColor = col; c.shadowBlur = 10 + 22 * lv; circ(c, x, y, 12, col); c.restore();
+      for (let k = 0; k < 8; k++) {
+        const a = k * TAU / 8 + (ph || 0) * 0.3, r0 = 17, r1 = 17 + 4 + 8 * lv;
+        line(c, x + Math.cos(a) * r0, y + Math.sin(a) * r0, x + Math.cos(a) * r1, y + Math.sin(a) * r1, col, 2);
+      }
+    } else circ(c, x, y, 12, '#2a3448', '#5a6478', 1.5);
+  }
+
+  /* ---------- Story player ----------
+     Each scene is a list of steps. Every step has a caption (shown under the canvas)
+     and a duration. While playing, the scene advances by itself; Back / Next / dots jump.
+     When paused, a jump fast-forwards the step's simulation so the still frame shows it. */
+  const stories = [];
+  function Story(id, o) {
+    const R = this.root = $(id); this.o = o; this.steps = o.steps; this.n = o.steps.length;
+    this.s = 0; this.ts = 0; this.t = 0; this.tr = 1; this.playing = !RM; this.visible = true; this.dirty = true;
+    this.capEl = R.querySelector('.cap-text'); this.numEl = R.querySelector('.cap-num'); this.barEl = R.querySelector('.bar i');
+    this.pb = R.querySelector('[data-act="play"]');
+    this.prevB = R.querySelector('[data-act="prev"]'); this.nextB = R.querySelector('[data-act="next"]');
+    this.pb.addEventListener('click', () => this.setPlaying(!this.playing));
+    this.prevB.addEventListener('click', () => this.go(this.s - 1));
+    this.nextB.addEventListener('click', () => this.go(this.s + 1));
+    R.querySelector('[data-act="replay"]').addEventListener('click', () => { this.playing = true; this.sync(); this.go(0); });
+    const dots = R.querySelector('.dots');
+    this.dots = this.steps.map((st, k) => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'dot'; b.textContent = String(k + 1);
+      b.setAttribute('aria-label', 'Step ' + (k + 1) + (k === this.n - 1 ? ': try it' : ''));
+      b.addEventListener('click', () => this.go(k));
+      dots.appendChild(b); return b;
+    });
+    this.shows = Array.from(R.querySelectorAll('[data-show]'));
+    R.addEventListener('keydown', e => {
+      if (e.target.tagName === 'INPUT') return;
+      if (e.key === 'ArrowRight') { this.go(this.s + 1); e.preventDefault(); }
+      else if (e.key === 'ArrowLeft') { this.go(this.s - 1); e.preventDefault(); }
+    });
+    if ('IntersectionObserver' in window) {
+      this.visible = false;
+      new IntersectionObserver(es => es.forEach(e => { this.visible = e.isIntersecting; if (this.visible) this.dirty = true; }), { threshold: 0.25 })
+        .observe(R);
+    }
+    stories.push(this); this.sync(); this.go(0);
+  }
+  Story.prototype.setPlaying = function (p) { this.playing = p; this.sync(); this.dirty = true; };
+  Story.prototype.sync = function () { this.pb.textContent = this.playing ? 'Pause' : 'Play'; };
+  Story.prototype.adv = function (dt) {
+    this.t += dt; this.ts += dt; this.tr = Math.min(1, this.tr + dt / 0.9);
+    this.o.step(dt, this.s, this.ts, this);
+  };
+  Story.prototype.go = function (k) {
+    k = clamp(k, 0, this.n - 1);
+    this.s = k; this.ts = 0; this.tr = 0;
+    if (this.o.enter) this.o.enter(k, this);
+    if (!this.playing) {
+      const st = this.steps[k], snap = st.snap != null ? st.snap : Math.min(3, (st.dur || 6) * 0.5);
+      for (let x = 0; x < snap; x += 1 / 30) this.adv(1 / 30);
+      this.tr = 1;
+    }
+    this.capEl.innerHTML = this.steps[k].cap;
+    this.capEl.classList.remove('fade'); void this.capEl.offsetWidth; this.capEl.classList.add('fade');
+    this.numEl.textContent = (k === this.n - 1 ? 'Try it · ' : '') + 'Step ' + (k + 1) + ' of ' + this.n;
+    this.dots.forEach((d, j) => { if (j === k) { d.setAttribute('aria-current', 'step'); d.classList.add('seen'); } else d.removeAttribute('aria-current'); });
+    this.shows.forEach(el => { el.hidden = el.dataset.show.split(',').indexOf(String(k)) < 0; });
+    this.prevB.disabled = k === 0; this.nextB.disabled = k === this.n - 1;
+    this.updBar(); this.dirty = true;
+  };
+  Story.prototype.updBar = function () {
+    const st = this.steps[this.s];
+    this.barEl.style.width = (this.s === this.n - 1 ? 100 : clamp(this.ts / st.dur, 0, 1) * 100) + '%';
+  };
+  Story.prototype.tick = function (dt) {
+    this.adv(dt);
+    if (this.s < this.n - 1 && this.ts >= this.steps[this.s].dur) this.go(this.s + 1);
+    this.updBar();
+  };
+  Story.prototype.draw = function () {
+    const c = this.o.cv.begin(); if (!c) return;
+    this.o.draw(c, this.s, ease(this.tr), this);
+    c.globalAlpha = 1; this.o.cv.wm(c);
+  };
+  const segBtns = (root, key, cb) => {
+    const bs = Array.from(document.querySelectorAll(root + ' [data-' + key + ']'));
+    const set = v => { bs.forEach(b => b.setAttribute('aria-pressed', String(b.dataset[key] === v))); cb(v); };
+    bs.forEach(b => b.addEventListener('click', () => set(b.dataset[key])));
+    return set;
+  };
+
+  /* =====================================================================
+     SCENE 0: structure, reverse bias, dark current, photocurrent, symbol
+     ===================================================================== */
+  (function () {
+    const cv = new Cv('cv0', 720, 420);
+    const DX0 = 140, DX1 = 580, DY0 = 118, DY1 = 262, MID = 360, JY = 190;
+    const D0 = [336, 384], D1 = [284, 436];
+    const IMAX = 50e-6, IDARK = 1e-9;
+    const holes = [], elecs = [], ions = [];
+    for (let k = 0; k < 30; k++) {
+      holes.push({ u: hash(k * 3 + 1), y: lerp(DY0 + 12, DY1 - 12, hash(k * 3 + 2)), k });
+      elecs.push({ u: hash(k * 5 + 7), y: lerp(DY0 + 12, DY1 - 12, hash(k * 5 + 9)), k: k + 40 });
+    }
+    for (let j = 0; j < 5; j++) for (let y = DY0 + 18; y < DY1 - 8; y += 27) {
+      ions.push({ x: MID - 8 - 16 * j, y, kind: 'a' }); ions.push({ x: MID + 8 + 16 * j, y, kind: 'd' });
+    }
+    const WIRE = [[DX0 - 8, JY], [90, JY], [90, 350], [630, 350], [630, JY], [DX1 + 8, JY]];
+    const segL = []; let wireLen = 0;
+    for (let k = 1; k < WIRE.length; k++) { const l = Math.hypot(WIRE[k][0] - WIRE[k - 1][0], WIRE[k][1] - WIRE[k - 1][1]); segL.push(l); wireLen += l; }
+    function onWire(d) {
+      d = ((d % wireLen) + wireLen) % wireLen;
+      for (let k = 0; k < segL.length; k++) {
+        if (d <= segL[k]) { const u = d / segL[k]; return [lerp(WIRE[k][0], WIRE[k + 1][0], u), lerp(WIRE[k][1], WIRE[k + 1][1], u)]; }
+        d -= segL[k];
+      }
+      return WIRE[WIRE.length - 1];
+    }
+    let S = null, ph = 0, wph = 0, acc = 0, tacc = 0, fired = false, sl = 0.6, lvl = 0, depL = D0[0], depR = D0[1];
+    let photons = [], parts = [], flashes = [];
+    const sIn = $('s0i'), oIn = $('o0i');
+    function syncSl() { sl = +sIn.value / 100; oIn.textContent = sIn.value + ' %'; if (S) S.dirty = true; }
+    sIn.addEventListener('input', syncSl); syncSl();
+    function lvlOf(s, ts) {
+      if (s < 4) return 0;
+      if (s === 4) return ts > 1.6 ? 0.25 : 0;
+      if (s === 5) return 0.15 + 0.85 * clamp((ts - 0.5) / 5, 0, 1);
+      if (s === 6) return 0.4;
+      return sl;
+    }
+    function fire(x, y, hold) { photons.push({ x0: x + (Math.random() - 0.5) * 70, y0: 62, x1: x, y1: y, u: 0, hold }); }
+    function birth(x, y, hold, thermal) {
+      parts.push({ k: 'e', x: x + 4, y, a: 1, hold, dying: false });
+      parts.push({ k: 'h', x: x - 4, y, a: 1, hold, dying: false });
+      flashes.push({ x, y, age: 0, thermal });
+    }
+    const o = {
+      cv,
+      steps: [
+        { dur: 9, cap: 'A <strong>photodiode</strong> is a pn junction built so that light can reach the junction. Red is the p side with its holes, blue is the n side with its electrons. Between them is the <strong>depletion region</strong>, holding only fixed ions.' },
+        { dur: 8, cap: 'It is always used in <strong>reverse bias</strong>: p to the battery’s −, n to its +. Watch the depletion region widen. A strong electric field <strong>E</strong> now sits across it, pointing from n to p.' },
+        { dur: 8, cap: 'In the dark almost nothing flows. Now and then heat frees an electron-hole pair (the small flashes) and the field sweeps it out. That trickle is the <strong>dark current</strong>, only about 1 nA.' },
+        { dur: 7, cap: 'Now let light in. A photon with enough energy passes through the window and is absorbed in the depletion region. Its energy breaks a bond and creates one <strong>electron-hole pair</strong>.' },
+        { dur: 8, cap: 'The field pulls the pair apart at once: the electron runs to the n side, the hole to the p side. Charge flows round the circuit. This is the <strong>photocurrent I<sub>λ</sub></strong>.' },
+        { dur: 8, cap: 'Brighter light sends more photons, which make more pairs and so more current. Watch the meter: the photocurrent is <strong>proportional to the light intensity</strong>.' },
+        { dur: 7, cap: 'The circuit symbol is a diode with arrows pointing <strong>in</strong>, because light goes in. Compare the LED (topic 3.3), whose arrows point <strong>out</strong>.' },
+        { dur: 0, cap: '<strong>Try it:</strong> move the light slider and watch the photon rate and the meter. At 0 % only the tiny dark current is left.' }
+      ],
+      enter(k) {
+        photons = [];
+        parts = parts.filter(p => !p.hold);
+        if (k === 3) fired = false;
+        if (k === 4) birth(MID - 10, JY, false);
+      },
+      step(dt, s, ts, st) {
+        ph += dt;
+        const b = s === 0 ? 0 : s === 1 ? ease(st.tr) : 1;
+        depL = lerp(D0[0], D1[0], b); depR = lerp(D0[1], D1[1], b);
+        lvl = lvlOf(s, ts);
+        if (s === 3 && !fired && ts > 0.6) { fire(MID - 10, JY, true); fired = true; }
+        const rate = lvl > 0 ? 1 + 16 * lvl : 0;
+        acc += rate * dt;
+        while (acc >= 1) { acc -= 1; fire(lerp(depL + 10, depR - 10, Math.random()), lerp(DY0 + 16, DY1 - 16, Math.random()), false); }
+        if (s >= 2) {
+          tacc += 0.45 * dt;
+          while (tacc >= 1) { tacc -= 1; birth(lerp(depL + 10, depR - 10, Math.random()), lerp(DY0 + 16, DY1 - 16, Math.random()), false, true); }
+        }
+        photons.forEach(p => { p.u += dt / 0.7; if (p.u >= 1 && !p.done) { p.done = true; birth(p.x1, p.y1, p.hold); } });
+        photons = photons.filter(p => !p.done);
+        parts.forEach(p => {
+          if (p.hold) return;
+          p.x += (p.k === 'e' ? 1 : -1) * 115 * dt;
+          if (p.k === 'e' ? p.x > depR + 6 : p.x < depL - 6) p.dying = true;
+          if (p.dying) p.a -= dt * 2.5;
+        });
+        parts = parts.filter(p => p.a > 0);
+        flashes.forEach(f => { f.age += dt; }); flashes = flashes.filter(f => f.age < 0.5);
+        wph += dt * (lvl > 0 ? 40 + 160 * lvl : 0);
+      },
+      draw(c, s, tr) {
+        const b = s === 0 ? 0 : s === 1 ? tr : 1;
+        const dl = lerp(D0[0], D1[0], b), dr = lerp(D0[1], D1[1], b);
+        const circA = s === 0 ? 0 : s === 1 ? tr : 1;
+        const dim = s === 6 ? 1 - 0.75 * tr : 1;
+
+        /* circuit */
+        if (circA > 0) {
+          c.globalAlpha = circA * dim;
+          pline(c, WIRE, C.wire, 2);
+          if (lvl > 0) {
+            const n = 28, sp = wireLen / n;
+            c.globalAlpha = circA * dim * (0.35 + 0.65 * lvl);
+            for (let k = 0; k < n; k++) { const p = onWire(wph + k * sp); circ(c, p[0], p[1], 2.6, C.cur); }
+            c.globalAlpha = circA * dim;
+            arrow(c, 648, 300, 648, 240, C.cur, 2, 8); subs(c, [['I', 'λ']], 656, 270, C.cur, 13, 'left');
+          }
+          rect(c, 284, 334, 32, 32, C.bg);
+          line(c, 294, 343, 294, 357, C.text, 3); line(c, 306, 334, 306, 366, C.text, 3);
+          txt(c, '−', 283, 330, C.muted, 15, 700, 'center'); txt(c, '+', 318, 328, C.muted, 15, 700, 'center');
+          txt(c, 'reverse bias', 300, 384, C.muted, 11, 600, 'center');
+          circ(c, 470, 350, 15, C.bg, C.text, 2); txt(c, 'A', 470, 351, C.text, 13, 700, 'center');
+          let rd = 'I ≈ 0';
+          if (s >= 2) rd = 'I = ' + fI(IDARK + IMAX * lvl) + (lvl === 0 ? ' (dark)' : '');
+          txt(c, rd, 470, 384, lvl > 0 ? C.cur : C.text, 12, 700, 'center', MONO);
+          c.globalAlpha = 1;
+        }
+
+        /* device */
+        c.globalAlpha = dim;
+        rect(c, DX0, DY0, dl - DX0, DY1 - DY0, C.P); rect(c, dr, DY0, DX1 - dr, DY1 - DY0, C.N); hatch(c, dl, DY0, dr, DY1);
+        rect(c, DX0 - 8, DY0, 8, DY1 - DY0, C.metal); rect(c, DX1, DY0, 8, DY1 - DY0, C.metal);
+        rect(c, dl - 26, DY0 - 7, dr - dl + 52, 7, 'rgba(129,212,250,.6)');
+        txt(c, 'window', dr + 32, DY0 - 4, '#81d4fa', 11, 600, 'left');
+        ions.forEach(i => { if (i.x > dl + 3 && i.x < dr - 3) ion(c, i.x, i.y, 6, i.kind, 0.95); });
+        holes.forEach(h => { const j = jig(h.k, ph, 2); carrier(c, lerp(DX0 + 10, dl - 8, h.u) + j[0], h.y + j[1], 'h', 1); });
+        elecs.forEach(e => { const j = jig(e.k, ph, 2); carrier(c, lerp(dr + 8, DX1 - 10, e.u) + j[0], e.y + j[1], 'e', 1); });
+        tag(c, 'p', DX0 + 4, DY0 + 4); tag(c, 'n', DX1 - 4, DY0 + 4, 'right');
+        txt(c, 'depletion region', MID, DY1 + 38, C.muted, 11, 600, 'center');
+        if (b > 0.05) {
+          c.globalAlpha = b * dim;
+          arrow(c, dr - 8, DY1 + 16, dl + 8, DY1 + 16, C.field, 2.5, 9);
+          txt(c, 'E', dl - 6, DY1 + 16, C.field, 14, 700, 'right');
+          c.globalAlpha = dim;
+        }
+
+        /* photons, pairs, flashes */
+        photons.forEach(p => {
+          const x = lerp(p.x0, p.x1, p.u), y = lerp(p.y0, p.y1, p.u), dx = p.x1 - p.x0, dy = p.y1 - p.y0, L = Math.hypot(dx, dy);
+          photon(c, x, y, dx / L, dy / L, C.photon, ph + p.x1);
+        });
+        flashes.forEach(f => {
+          const u = f.age / 0.5;
+          c.globalAlpha = dim * (1 - u); circ(c, f.x, f.y, 4 + 22 * u, null, f.thermal ? '#ffb74d' : '#ffffff', 2);
+          c.globalAlpha = dim;
+        });
+        parts.forEach(p => {
+          if (p.hold) { const r = 4.6 + 0.8 * Math.sin(ph * 6); carrier(c, p.x, p.y, p.k, p.a, r); }
+          else carrier(c, p.x, p.y, p.k, p.a, 4.2);
+        });
+        const held = parts.filter(p => p.hold);
+        if (held.length && s === 3) {
+          const x = held[0].x - 4, y = held[0].y;
+          circ(c, x, y, 16, null, '#ffffff', 1.4);
+          tag(c, 'e–h pair', x, y - 48, 'center');
+        }
+
+        /* light source */
+        if (s >= 2) {
+          const on = s === 3 ? 0.55 : lvl;
+          lamp(c, MID, 40, on, '#fff8e1', ph);
+          if (on < 0.01) tag(c, 'in the dark', MID + 24, 28);
+          else txt(c, 'light', MID + 34, 40, C.muted, 11, 600, 'left');
+        }
+        c.globalAlpha = 1;
+
+        /* symbol card */
+        if (s === 6) {
+          c.globalAlpha = tr;
+          c.fillStyle = 'rgba(15,20,32,.94)'; c.fillRect(120, 70, 480, 262);
+          c.strokeStyle = C.axis; c.lineWidth = 1; c.strokeRect(120.5, 70.5, 480, 262);
+          line(c, 360, 92, 360, 312, C.axis, 1);
+          const draw1 = (x, title, note, inward, col) => {
+            txt(c, title, x, 104, col, 15, 700, 'center');
+            dsym(c, x, 200, 0, C.text, 56);
+            if (inward) { rays(c, x - 46, 136, x - 14, 172, C.energy); }
+            else { rays(c, x + 4, 170, x + 36, 136, C.energy); }
+            txt(c, 'A (p)', x - 56, 230, C.muted, 11, 600, 'center'); txt(c, 'K (n)', x + 56, 230, C.muted, 11, 600, 'center');
+            txt(c, note, x, 290, C.text, 12, 600, 'center');
+          };
+          draw1(240, 'Photodiode', 'arrows IN: light enters', true, C.elec);
+          draw1(480, 'LED (3.3)', 'arrows OUT: light leaves', false, C.hole);
+          c.globalAlpha = 1;
+        }
+      }
+    };
+    S = new Story('st0', o);
+  })();
+
+  /* =====================================================================
+     SCENE 1: band diagram, absorption, cut-off wavelength
+     ===================================================================== */
+  (function () {
+    const cv = new Cv('cv1', 720, 400);
+    const X0 = 40, XA = 200, XB = 360, X1 = 520, EVP = 215, DROP = 115, PX = 70;
+    const MATS = { si: { n: 'Si', eg: 1.12 }, ge: { n: 'Ge', eg: 0.66 }, gaas: { n: 'GaAs', eg: 1.42 }, ingaas: { n: 'InGaAs', eg: 0.75 } };
+    let S = null, mat = 'si', eg = 1.12, slLam = 650, curLam = 0, ph = 0, acc = 0, fired = false;
+    let photons = [], parts = [], flashes = [];
+    const shape = x => x <= XA ? 0 : x >= XB ? 1 : 0.5 - 0.5 * Math.cos(Math.PI * (x - XA) / (XB - XA));
+    const Ev = x => EVP + DROP * shape(x), Ec = x => Ev(x) - PX * eg;
+    const eOf = l => 1240 / l;
+    const lSl = $('s1l'), lOut = $('o1l');
+    function syncL() { slLam = +lSl.value; lOut.textContent = slLam + ' nm'; if (S) S.dirty = true; }
+    lSl.addEventListener('input', syncL); syncL();
+    const setMat = segBtns('#st1', 'mat', v => { mat = v; if (S) S.dirty = true; });
+    function emit(x, lam, hold) { photons.push({ x, lam, y: -10, hold, abs: eOf(lam) >= MATS[mat].eg - 1e-9 }); curLam = lam; }
+    const sweep = ts => 400 + 1000 * (0.5 - 0.5 * Math.cos(TAU * ts / 9));
+    const o = {
+      cv,
+      steps: [
+        { dur: 9, cap: 'The same reverse-biased junction as an <strong>energy band diagram</strong>. E<sub>C</sub> is the bottom of the conduction band, E<sub>V</sub> the top of the valence band, and the gap between them is <strong>E<sub>g</sub></strong>. Reverse bias makes the bands drop steeply across the depletion region.' },
+        { dur: 8, cap: 'A photon carries energy hf = 1240/λ eV (λ in nm). This 1300 nm infrared photon has only 0.95 eV, less than silicon’s 1.12 eV gap. It cannot lift an electron across, so it <strong>passes straight through</strong>.' },
+        { dur: 7, cap: 'A 650 nm red photon carries 1.91 eV, more than E<sub>g</sub>. It is <strong>absorbed</strong>: an electron jumps from the valence band up to the conduction band and leaves a hole behind.' },
+        { dur: 8, cap: 'The steep bands do the separating. Electrons roll <strong>down</strong> the conduction band to the n side, holes float <strong>up</strong> the valence band to the p side. Every absorbed photon adds one charge to the current.' },
+        { dur: 10, cap: 'So there is a longest wavelength the diode can detect, the <strong>cut-off wavelength λ<sub>c</sub> = 1240/E<sub>g</sub></strong>. For silicon λ<sub>c</sub> ≈ 1100 nm. Watch photons switch from absorbed to passing as λ sweeps past it.' },
+        { dur: 0, cap: '<strong>Try it:</strong> change the wavelength and the material. Ge (0.66 eV) and InGaAs (0.75 eV) reach far into the infrared, which is why fibre-optic receivers at 1300 to 1550 nm use them instead of silicon.' }
+      ],
+      enter(k) {
+        photons = []; parts = []; flashes = []; fired = false; acc = 0.85;
+        if (k < 5) setMat('si');
+        curLam = k === 1 ? 1300 : k === 2 || k === 3 ? 650 : k === 4 ? 400 : k === 5 ? slLam : 0;
+      },
+      step(dt, s, ts) {
+        ph += dt; eg += (MATS[mat].eg - eg) * Math.min(1, dt * 6);
+        let period = 0, lam = 650, x = null;
+        if (s === 1) { period = 2.6; lam = 1300; x = 280; }
+        if (s === 2 && !fired && ts > 0.4) { emit(280, 650, true); fired = true; }
+        if (s === 3) { period = 0.75; }
+        if (s === 4) { period = 0.45; lam = Math.round(sweep(ts)); curLam = lam; }
+        if (s === 5) { period = 0.7; lam = slLam; curLam = lam; }
+        if (period) { acc += dt / period; if (acc >= 1) { acc -= 1; emit(x != null ? x : lerp(XA + 15, XB - 15, Math.random()), lam, false); } }
+        photons.forEach(p => {
+          p.y += 270 * dt;
+          if (p.abs && !p.done && p.y >= Ev(p.x)) {
+            p.done = true;
+            parts.push({ k: 'h', x: p.x, y: Ev(p.x), a: 1, hold: p.hold, rise: 1 });
+            parts.push({ k: 'e', x: p.x, y: Ev(p.x), y0: Ev(p.x), a: 1, hold: p.hold, rise: 0 });
+            flashes.push({ x: p.x, y: Ev(p.x), age: 0 });
+          }
+        });
+        photons = photons.filter(p => !p.done && p.y < 430);
+        parts.forEach(p => {
+          if (p.rise < 1) { p.rise = Math.min(1, p.rise + dt / 0.35); p.y = lerp(Ev(p.x), Ec(p.x), ease(p.rise)); return; }
+          if (p.hold) { p.y = p.k === 'e' ? Ec(p.x) : Ev(p.x); return; }
+          if (p.k === 'e') { p.x += 90 * dt; p.y = Ec(p.x); if (p.x > X1 - 8) p.a -= dt * 3; }
+          else { p.x -= 90 * dt; p.y = Ev(p.x); if (p.x < X0 + 8) p.a -= dt * 3; }
+        });
+        parts = parts.filter(p => p.a > 0);
+        flashes.forEach(f => { f.age += dt; }); flashes = flashes.filter(f => f.age < 0.5);
+      },
+      draw(c, s, tr) {
+        /* regions */
+        rect(c, X0, 20, XA - X0, 350, 'rgba(125,58,58,.16)');
+        rect(c, XB, 20, X1 - XB, 350, 'rgba(46,74,125,.22)');
+        rect(c, XA, 20, XB - XA, 350, 'rgba(255,255,255,.03)');
+        txt(c, 'p side', (X0 + XA) / 2, 386, C.acc, 12, 700, 'center');
+        txt(c, 'depletion region', (XA + XB) / 2, 386, C.muted, 12, 600, 'center');
+        txt(c, 'n side', (XB + X1) / 2, 386, C.don, 12, 700, 'center');
+        /* band fills and edges */
+        const xs = []; for (let x = X0; x <= X1; x += 4) xs.push(x);
+        c.fillStyle = 'rgba(255,138,101,.07)'; c.beginPath(); c.moveTo(X0, 370);
+        xs.forEach(x => c.lineTo(x, Ev(x))); c.lineTo(X1, 370); c.closePath(); c.fill();
+        c.fillStyle = 'rgba(79,195,247,.06)'; c.beginPath(); c.moveTo(X0, 20);
+        xs.forEach(x => c.lineTo(x, Ec(x))); c.lineTo(X1, 20); c.closePath(); c.fill();
+        pline(c, xs.map(x => [x, Ec(x)]), C.elec, 2.5); pline(c, xs.map(x => [x, Ev(x)]), C.hole, 2.5);
+        subs(c, [['E', 'C']], X1 + 4, Ec(X1), C.elec, 13, 'left'); subs(c, [['E', 'V']], X1 + 4, Ev(X1), C.hole, 13, 'left');
+        vdim(c, 70, Ec(70), Ev(70), C.text);
+        subs(c, [['E', 'g'], [' = ' + eg.toFixed(2) + ' eV', '']], 80, (Ec(70) + Ev(70)) / 2, C.text, 12, 'left');
+        /* field arrow */
+        arrow(c, XB - 10, 358, XA + 10, 358, C.field, 2, 8); txt(c, 'E', XA + 2, 358, C.field, 13, 700, 'right');
+        if (s === 0) {
+          c.globalAlpha = tr;
+          line(c, X0, Ec(X0), X1 - 40, Ec(X0), C.muted, 1.2, [5, 4]);
+          vdim(c, 440, Ec(X0), Ec(X1 - 1), C.field);
+          txt(c, 'q(V₀ + V_R)', 448, (Ec(X0) + Ec(X1)) / 2, C.field, 11, 700, 'left');
+          c.globalAlpha = 1;
+        }
+        if (s === 3) {
+          c.globalAlpha = tr;
+          arrow(c, 250, Ec(250) - 26, 330, Ec(330) - 26, C.elec, 2, 8); txt(c, 'electrons roll down', 335, Ec(330) - 40, C.elec, 11, 700, 'left');
+          arrow(c, 330, Ev(330) + 26, 250, Ev(250) + 26, C.hole, 2, 8); txt(c, 'holes float up', 245, Ev(250) + 40, C.hole, 11, 700, 'right');
+          c.globalAlpha = 1;
+        }
+        /* photons */
+        photons.forEach(p => {
+          const col = wlCol(p.lam);
+          photon(c, p.x, p.y, 0, 1, col, ph + p.x * 0.01, 40);
+          if (!p.abs && p.y > Ev(p.x) + 10 && p.y < 360) txt(c, 'not absorbed', p.x + 12, p.y - 14, col, 11, 700, 'left');
+        });
+        flashes.forEach(f => { const u = f.age / 0.5; c.globalAlpha = 1 - u; circ(c, f.x, f.y, 4 + 20 * u, null, '#fff', 2); c.globalAlpha = 1; });
+        parts.forEach(p => {
+          if (p.k === 'e' && p.rise < 1) line(c, p.x, Ev(p.x), p.x, p.y, '#ffffff', 1.5, [3, 3]);
+          carrier(c, p.x, p.y, p.k, p.a, 4.8);
+        });
+        if (s === 2 && parts.length && parts[0].hold) {
+          const x = parts[0].x;
+          c.globalAlpha = 0.9;
+          txt(c, 'electron', x + 10, Ec(x) - 12, C.elec, 11, 700, 'left'); txt(c, 'hole', x + 10, Ev(x) + 14, C.hole, 11, 700, 'left');
+          c.globalAlpha = 1;
+        }
+
+        /* energy-check panel */
+        const PXc = 627, BASE = 300, SC = 50;
+        line(c, 550, 24, 550, 380, C.axis, 1);
+        txt(c, 'Energy check', PXc, 36, C.text, 13, 700, 'center');
+        if (s >= 4) {
+          txt(c, 'λc = 1240 / Eg', PXc, 62, C.field, 12, 700, 'center', MONO);
+          txt(c, '= ' + Math.round(1240 / MATS[mat].eg) + ' nm', PXc, 82, C.field, 12, 700, 'center', MONO);
+        }
+        const gh = eg * SC;
+        rect(c, 568, BASE - gh, 40, gh, 'rgba(230,233,239,.22)'); c.strokeStyle = C.text; c.lineWidth = 1; c.strokeRect(568.5, BASE - gh, 40, gh);
+        subs(c, [['E', 'g']], 588, BASE + 14, C.text, 12, 'center');
+        txt(c, eg.toFixed(2), 588, BASE - gh - 14, C.text, 11, 600, 'center', MONO);
+        if (curLam > 0) {
+          const E = eOf(curLam), h = Math.min(E, 4) * SC, col = wlCol(curLam), ok = E >= MATS[mat].eg;
+          rect(c, 644, BASE - h, 40, h, col);
+          txt(c, 'hf', 664, BASE + 14, col, 12, 700, 'center');
+          txt(c, E.toFixed(2), 664, BASE - h - 14, col, 11, 600, 'center', MONO);
+          line(c, 560, BASE - gh, 694, BASE - gh, C.text, 1, [4, 3]);
+          txt(c, 'λ = ' + curLam + ' nm', PXc, 326, col, 12, 700, 'center', MONO);
+          txt(c, ok ? '✓ absorbed' : '✗ passes', PXc, 346, ok ? C.ok : C.bad, 13, 700, 'center');
+          txt(c, bandName(curLam), PXc, 364, C.muted, 11, 600, 'center');
+        }
+        line(c, 560, BASE, 694, BASE, C.axis, 1);
+      }
+    };
+    S = new Story('st1', o);
+  })();
+
+  /* =====================================================================
+     SCENE 2: photon rate, quantum efficiency, responsivity
+     ===================================================================== */
+  (function () {
+    const cv = new Cv('cv2', 720, 400);
+    const LX = 50, LY = 195, BX0 = 215, BX1 = 300, BY0 = 125, BY1 = 265, D0 = 227, D1 = 252;
+    let S = null, ph = 0, acc = 0, nPh = 0, nEl = 0, idx = 0, photons = [], carriers = [], P = 100, lam = 850, slP = 100, slL = 850;
+    const etaSi = l => l < 300 ? 0 : 0.9 * (1 - Math.exp(-(l - 300) / 150)) / (1 + Math.exp((l - 1030) / 22));
+    const Rsi = l => etaSi(l) * l / 1240;
+    const pS = $('s2p'), pO = $('o2p'), lS = $('s2l'), lO = $('o2l');
+    function syncS() { slP = +pS.value; slL = +lS.value; pO.textContent = slP + ' µW'; lO.textContent = slL + ' nm'; if (S) S.dirty = true; }
+    pS.addEventListener('input', syncS); lS.addEventListener('input', syncS); syncS();
+    function spawn(s) {
+      const ty = lerp(BY0 + 18, BY1 - 18, Math.random()), sy = LY + (Math.random() - 0.5) * 14;
+      let fate;
+      if (s < 5) fate = (idx % 5 === 4) ? 'refl' : 'abs';
+      else { const e = etaSi(lam); fate = Math.random() < e ? 'abs' : lam > 1000 ? 'pass' : 'refl'; }
+      idx++;
+      const tx = fate === 'abs' ? lerp(D0 + 3, D1 - 3, Math.random()) : fate === 'refl' ? BX0 : 760;
+      photons.push({ x: LX + 18, y: sy, sx: LX + 18, sy, tx, ty: fate === 'pass' ? sy + (ty - sy) * (760 - LX) / (BX0 - LX) : ty, fate, u: 0, back: 0 });
+    }
+    const o = {
+      cv,
+      steps: [
+        { dur: 9, cap: 'Light of power P arrives as a stream of photons. Each photon of wavelength λ carries E = hc/λ, so the number arriving per second is N = P/E. Here 100 µW of 850 nm light delivers about 4 × 10¹⁴ photons every second.' },
+        { dur: 9, cap: 'Not every photon produces an electron. Some bounce off the surface, some are absorbed where the field cannot collect the pair. The fraction that counts is the <strong>quantum efficiency η</strong>. Here 4 of every 5 make it, so η = 0.8.' },
+        { dur: 9, cap: 'Each counted photon gives one electron of charge q, so <strong>I<sub>λ</sub> = ηqN = ηqPλ/hc</strong>. Everything except P is fixed, so the photocurrent rises in a <strong>straight line</strong> with light power.' },
+        { dur: 9, cap: 'Dividing by P gives the <strong>responsivity R = I<sub>λ</sub>/P = ηλ/1240 A/W</strong> (λ in nm). For η = 0.8 at 850 nm, R ≈ 0.55 A/W, so 100 µW of light gives about 55 µA.' },
+        { dur: 10, cap: 'Real silicon: R climbs with λ, because longer-wavelength photons carry less energy, so each watt holds more of them. It peaks near 900 nm, then <strong>collapses at the cut-off</strong>. Very short wavelengths are absorbed at the surface, before reaching the junction.' },
+        { dur: 0, cap: '<strong>Try it:</strong> set the light power and wavelength. The photon rate, the electron rate and I<sub>λ</sub> = R·P all follow the responsivity curve.' }
+      ],
+      enter(k) { if (k <= 1) { nPh = 0; nEl = 0; idx = 0; } acc = 0.9; },
+      step(dt, s, ts) {
+        ph += dt;
+        if (s === 2) P = 200 * clamp(ts / 6, 0, 1); else if (s === 5) P = slP; else P = 100;
+        lam = s === 5 ? slL : 850;
+        const rate = P > 0 ? 0.6 + 5.4 * (P / 100) * (lam / 850) : 0;
+        acc += rate * dt; while (acc >= 1) { acc -= 1; spawn(s); }
+        photons.forEach(p => {
+          if (p.back > 0) { p.back += dt; p.x -= 220 * dt; p.y -= 160 * dt; return; }
+          p.u += dt * 300 / Math.max(40, Math.abs(p.tx - p.sx));
+          p.x = lerp(p.sx, p.tx, Math.min(1, p.u)); p.y = lerp(p.sy, p.ty, Math.min(1, p.u));
+          if (p.u >= 1) {
+            if (p.fate === 'abs') { p.done = true; nPh++; nEl++; carriers.push({ k: 'e', x: p.x, y: p.y, a: 1, st: 0 }, { k: 'h', x: p.x, y: p.y, a: 1 }); }
+            else if (p.fate === 'refl') { p.back = 0.001; nPh++; }
+            else p.done = true;
+          }
+          if (p.fate === 'pass' && !p.counted && p.x > BX0) { p.counted = true; nPh++; }
+        });
+        photons = photons.filter(p => !p.done && p.back < 0.7);
+        carriers.forEach(q => {
+          if (q.k === 'h') { q.x -= 70 * dt; if (q.x < BX0 + 4) q.a -= dt * 4; return; }
+          if (q.st === 0) { q.x += 110 * dt; q.y += (LY - q.y) * Math.min(1, dt * 3); if (q.x >= BX1 + 6) { q.st = 1; q.y = LY; } }
+          else { q.x += 150 * dt; q.y = LY; if (q.x > 330) q.a -= dt * 5; }
+        });
+        carriers = carriers.filter(q => q.a > 0);
+      },
+      draw(c, s, tr, st) {
+        const ts = st.ts;
+        /* left: lamp, diode, wire */
+        const lcol = wlCol(lam);
+        lamp(c, LX, LY, P > 0 ? 0.3 + 0.7 * Math.min(1, P / 150) : 0, lcol, ph);
+        txt(c, 'λ = ' + lam + ' nm', LX + 20, LY + 46, lcol, 11, 700, 'center', MONO);
+        txt(c, 'P = ' + Math.round(P) + ' µW', LX + 20, LY + 64, C.text, 11, 700, 'center', MONO);
+        rect(c, BX0, BY0, D0 - BX0, BY1 - BY0, C.P); hatch(c, D0, BY0, D1, BY1); rect(c, D1, BY0, BX1 - D1, BY1 - BY0, C.N);
+        rect(c, BX1, BY0, 6, BY1 - BY0, C.metal);
+        txt(c, 'p⁺', (BX0 + D0) / 2, BY0 - 10, C.acc, 11, 700, 'center'); txt(c, 'n', (D1 + BX1) / 2, BY0 - 10, C.don, 11, 700, 'center');
+        txt(c, 'photodiode', (BX0 + BX1) / 2, BY1 + 16, C.muted, 11, 600, 'center');
+        line(c, BX1 + 6, LY, 360, LY, C.wire, 2);
+        subs(c, [['I', 'λ'], [' →', '']], 320, LY - 16, C.cur, 12, 'center');
+        photons.forEach(p => {
+          let dx = p.tx - p.sx, dy = p.ty - p.sy; if (p.back > 0) { dx = -220; dy = -160; }
+          const L = Math.hypot(dx, dy) || 1;
+          c.globalAlpha = p.back > 0 ? Math.max(0, 1 - p.back / 0.7) : 1;
+          photon(c, p.x, p.y, dx / L, dy / L, lcol, ph + p.sy, 30);
+          c.globalAlpha = 1;
+        });
+        carriers.forEach(q => carrier(c, q.x, q.y, q.k, q.a, 4));
+        /* counters */
+        txt(c, 'photons in', 40, 318, C.muted, 11, 600, 'left'); txt(c, String(nPh), 190, 318, lcol, 13, 700, 'right', MONO);
+        txt(c, 'electrons out', 40, 340, C.muted, 11, 600, 'left'); txt(c, String(nEl), 190, 340, C.elec, 13, 700, 'right', MONO);
+        if (s >= 1 && s <= 3 && nPh > 0) txt(c, 'η ≈ ' + (nEl / nPh).toFixed(2), 40, 364, C.text, 13, 700, 'left', MONO);
+        if (s === 5) txt(c, 'η = ' + etaSi(lam).toFixed(2), 40, 364, C.text, 13, 700, 'left', MONO);
+
+        /* right panel */
+        line(c, 375, 24, 375, 380, C.axis, 1);
+        c.globalAlpha = tr;
+        const card = (lines) => {
+          lines.forEach((ln, k) => {
+            const a = clamp((ts - 0.3 - k * 0.45) / 0.4, 0, 1); if (a <= 0) return;
+            c.globalAlpha = tr * a;
+            const y = 50 + k * 30, sty = ln[1];
+            if (sty === 'h') txt(c, ln[0], 395, y, C.text, 14, 700, 'left');
+            else if (sty === 'f') txt(c, ln[0], 395, y, C.field, 13, 700, 'left', MONO);
+            else if (sty === 'v') txt(c, ln[0], 395, y, C.text, 13, 600, 'left', MONO);
+            else txt(c, ln[0], 395, y, C.muted, 12, 600, 'left');
+          });
+          c.globalAlpha = tr;
+        };
+        if (s === 0) card([
+          ['Energy of one photon', 'h'], ['E = hc/λ = 1240/λ  eV', 'f'], ['λ = 850 nm  →  E = 1.46 eV', 'v'], ['', 'm'],
+          ['Photons per second', 'h'], ['N = P / E', 'f'], ['100 µW / 1.46 eV ≈ 4.3 × 10¹⁴ /s', 'v']
+        ]);
+        if (s === 1) card([
+          ['Quantum efficiency', 'h'], ['η = electrons out / photons in', 'f'], ['counted so far: ' + nEl + ' / ' + nPh, 'v'], ['', 'm'],
+          ['Lost photons: reflected at the surface,', 'm'], ['or absorbed too deep or too shallow', 'm'], ['for the field to collect the pair.', 'm']
+        ]);
+        if (s === 3) card([
+          ['Responsivity', 'h'], ['R = Iλ / P = ηλ / 1240  A/W', 'f'], ['(λ in nm)', 'm'], ['', 'm'],
+          ['η = 0.8,  λ = 850 nm', 'v'], ['R = 0.8 × 850 / 1240 = 0.55 A/W', 'v'], ['P = 100 µW  →  Iλ = 55 µA', 'v']
+        ]);
+        if (s === 2) {
+          txt(c, 'Iλ = ηqN = ηqPλ / hc', 395, 50, C.field, 13, 700, 'left', MONO);
+          const gx0 = 420, gx1 = 690, gy0 = 330, gy1 = 100, R = 0.8 * 850 / 1240;
+          const gx = p => lerp(gx0, gx1, p / 200), gy = i => lerp(gy0, gy1, i / 120);
+          line(c, gx0, gy0, gx1, gy0, C.axis, 1.5); line(c, gx0, gy0, gx0, gy1, C.axis, 1.5);
+          [0, 100, 200].forEach(p => txt(c, String(p), gx(p), gy0 + 14, C.muted, 10, 600, 'center'));
+          [0, 50, 100].forEach(i => txt(c, String(i), gx0 - 6, gy(i), C.muted, 10, 600, 'right'));
+          txt(c, 'P (µW)', gx1, gy0 + 30, C.muted, 11, 600, 'right'); txt(c, 'Iλ (µA)', gx0, gy1 - 14, C.muted, 11, 600, 'left');
+          pline(c, [[gx(0), gy(0)], [gx(P), gy(R * P)]], C.cur, 2.5);
+          line(c, gx(P), gy(R * P), gx(200), gy(R * 200), C.cur, 1, [4, 4]);
+          circ(c, gx(P), gy(R * P), 5, C.cur);
+          txt(c, Math.round(R * P) + ' µA', gx(P) + 10, gy(R * P) - 12, C.cur, 12, 700, 'left', MONO);
+        }
+        if (s >= 4) {
+          const gx0 = 420, gx1 = 690, gy0 = 322, gy1 = 70;
+          const gx = l => lerp(gx0, gx1, (l - 300) / 900), gy = r => lerp(gy0, gy1, r / 1.0);
+          txt(c, 'Responsivity of silicon', 395, 30, C.text, 13, 700, 'left');
+          line(c, gx0, gy0, gx1, gy0, C.axis, 1.5); line(c, gx0, gy0, gx0, gy1, C.axis, 1.5);
+          [400, 600, 800, 1000, 1200].forEach(l => txt(c, String(l), gx(l), gy0 + 13, C.muted, 10, 600, 'center'));
+          [0, 0.5, 1].forEach(r => txt(c, r.toFixed(1), gx0 - 6, gy(r), C.muted, 10, 600, 'right'));
+          txt(c, 'λ (nm)', gx1, gy0 + 28, C.muted, 11, 600, 'right'); txt(c, 'A/W', gx0 - 6, gy1 - 14, C.muted, 11, 600, 'left');
+          const lc = 1240 / 1.12;
+          pline(c, [[gx(300), gy(300 / 1240)], [gx(lc), gy(lc / 1240)], [gx(lc), gy(0)]], C.muted, 1.5, [5, 4]);
+          txt(c, 'ideal, η = 1', gx(700), gy(700 / 1240) - 16, C.muted, 10, 600, 'right');
+          const rev = s === 4 ? clamp(ts / 3, 0, 1) : 1, lEnd = lerp(300, 1200, rev), pts = [];
+          for (let l = 300; l <= lEnd; l += 5) pts.push([gx(l), gy(Rsi(l))]);
+          pline(c, pts, C.elec, 2.5);
+          line(c, gx(lc), gy0, gx(lc), gy1 + 30, C.bad, 1, [3, 3]); txt(c, 'λc', gx(lc) + 4, gy1 + 36, C.bad, 11, 700, 'left');
+          if (s === 4 && rev >= 1) {
+            let pk = 300; for (let l = 300; l < 1200; l += 2) if (Rsi(l) > Rsi(pk)) pk = l;
+            circ(c, gx(pk), gy(Rsi(pk)), 4.5, C.elec);
+            txt(c, 'peak ≈ ' + Rsi(pk).toFixed(2) + ' A/W', gx(pk) - 8, gy(Rsi(pk)) - 16, C.elec, 11, 700, 'right');
+          }
+          if (s === 5) {
+            const R = Rsi(lam);
+            line(c, gx(lam), gy0, gx(lam), gy(R), wlCol(lam), 1.2, [3, 3]);
+            circ(c, gx(lam), gy(R), 5.5, wlCol(lam), '#fff', 1.5);
+            txt(c, 'R = ' + R.toFixed(2) + ' A/W', 395, 356, C.text, 12, 700, 'left', MONO);
+            txt(c, 'Iλ = R·P = ' + fI(R * P * 1e-6), 395, 378, C.cur, 12, 700, 'left', MONO);
+          }
+        }
+        c.globalAlpha = 1;
+      }
+    };
+    S = new Story('st2', o);
+  })();
+
+  /* =====================================================================
+     SCENE 3: V-I characteristic, photoconductive and photovoltaic modes
+     ===================================================================== */
+  (function () {
+    const cv = new Cv('cv3', 720, 420);
+    const PL = 70, PR = 690, PT = 30, PB = 390, XZ = PL + 0.62 * (PR - PL);
+    const VMIN = -6, VMAX = 0.6, IMIN = -70e-6, ITOP = 30e-6;
+    const xOf = v => v <= 0 ? XZ - (v / VMIN) * (XZ - PL) : XZ + (v / VMAX) * (PR - XZ);
+    const yOf = i => PB - (i - IMIN) / (ITOP - IMIN) * (PB - PT);
+    const YZ = yOf(0);
+    const IS = 2e-11, VT = 0.0259, GSH = 0.15e-6;
+    const iOf = (v, il) => IS * (Math.exp(v / VT) - 1) + GSH * v - il;
+    function voc(il) { let lo = 0, hi = 0.7; for (let k = 0; k < 50; k++) { const m = (lo + hi) / 2; if (iOf(m, il) < 0) lo = m; else hi = m; } return lo; }
+    const LV = [0, 20e-6, 40e-6, 60e-6], LC = ['#9aa4b8', '#fff59d', '#ffd54f', '#ffa726'], LN = ['dark', 'L₁', 'L₂', 'L₃'];
+    let S = null, slL = 0.67, slV = -3;
+    const lS = $('s3l'), lO = $('o3l'), vS = $('s3v'), vO = $('o3v');
+    function syncS() { slL = +lS.value / 100; slV = +vS.value; lO.textContent = lS.value + ' %'; vO.textContent = fV(slV); if (S) S.dirty = true; }
+    lS.addEventListener('input', syncS); vS.addEventListener('input', syncS); syncS();
+    function curve(c, il, col, lw, xEnd, alpha) {
+      const pts = [];
+      for (let v = VMIN; v < 0; v += 0.05) pts.push([xOf(v), yOf(iOf(v, il))]);
+      for (let v = 0; v <= VMAX + 1e-9; v += 0.003) { const i = iOf(v, il); pts.push([xOf(v), yOf(i)]); if (i > ITOP * 1.3) break; }
+      const vis = xEnd == null ? pts : pts.filter(p => p[0] <= xEnd);
+      c.save(); c.beginPath(); c.rect(PL, PT, PR - PL, PB - PT); c.clip();
+      c.globalAlpha = alpha == null ? 1 : alpha; pline(c, vis, col, lw || 2.5); c.restore();
+    }
+    function axes(c) {
+      [-60e-6, -40e-6, -20e-6, 20e-6].forEach(i => { line(c, PL, yOf(i), PR, yOf(i), C.grid, 1); txt(c, String(Math.round(i * 1e6)).replace('-', '−'), PL - 6, yOf(i), C.muted, 10, 600, 'right'); });
+      [-4, -2].forEach(v => { line(c, xOf(v), PT, xOf(v), PB, C.grid, 1); txt(c, String(v).replace('-', '−'), xOf(v), YZ - 11, C.muted, 10, 600, 'center'); });
+      [0.2, 0.4].forEach(v => { line(c, xOf(v), PT, xOf(v), PB, C.grid, 1); txt(c, String(v), xOf(v), YZ - 11, C.muted, 10, 600, 'center'); });
+      line(c, PL, YZ, PR, YZ, C.axis, 1.5); line(c, XZ, PT, XZ, PB, C.axis, 1.5);
+      txt(c, 'µA', PL - 6, PT + 4, C.muted, 10, 600, 'right');
+      txt(c, 'V (volts)', PR - 2, YZ - 11, C.muted, 11, 600, 'right');
+      txt(c, 'forward axis stretched', (XZ + PR) / 2, PT + 10, C.muted, 10, 600, 'center');
+    }
+    const eqDark = 'I = Is(e^(V/VT) − 1)', eqLit = 'I = Is(e^(V/VT) − 1) − Iλ';
+    const o = {
+      cv,
+      steps: [
+        { dur: 9, cap: 'In the dark a photodiode is just a diode: <strong>I = I<sub>S</sub>(e<sup>V/V<sub>T</sub></sup> − 1)</strong>. Forward current rises steeply. In reverse only the tiny dark current flows, so the curve lies almost on the axis.' },
+        { dur: 8, cap: 'Light adds the photocurrent I<sub>λ</sub>, which flows in the <strong>reverse</strong> direction. The whole curve slides <strong>down</strong> by I<sub>λ</sub>: <strong>I = I<sub>S</sub>(e<sup>V/V<sub>T</sub></sup> − 1) − I<sub>λ</sub></strong>.' },
+        { dur: 8, cap: 'More light, bigger shift. Each curve belongs to one light level. Because I<sub>λ</sub> ∝ intensity, equal steps in light give <strong>equally spaced</strong> curves.' },
+        { dur: 9, cap: 'In the <strong>third quadrant</strong> (reverse bias) the curves are flat: the current depends on light, not on voltage. This is the <strong>photoconductive mode</strong>, the normal way to use a photodiode as a light sensor.' },
+        { dur: 10, cap: 'In the <strong>fourth quadrant</strong> (V positive, I negative) the diode delivers power, like a battery charged by light. This is the <strong>photovoltaic mode</strong>, with short-circuit current I<sub>sc</sub> and open-circuit voltage V<sub>oc</sub>. A solar cell (3.5) works here.' },
+        { dur: 0, cap: '<strong>Try it:</strong> set the light level and the bias voltage, and see which quadrant the operating point lands in.' }
+      ],
+      step() {},
+      draw(c, s, tr, st) {
+        const ts = st.ts;
+        if (s === 3) { c.globalAlpha = tr; rect(c, PL, YZ, XZ - PL, PB - YZ, 'rgba(79,195,247,.09)'); c.globalAlpha = 1; }
+        if (s === 4) { c.globalAlpha = tr; rect(c, XZ, YZ, PR - XZ, PB - YZ, 'rgba(129,199,132,.10)'); c.globalAlpha = 1; }
+        axes(c);
+        const lab = (k, il, a) => { c.globalAlpha = a; txt(c, LN[k], PL + 6, yOf(iOf(VMIN, il)) - 11, LC[k], 12, 700, 'left'); c.globalAlpha = 1; };
+        if (s === 0) {
+          const r = clamp(ts / 2.5, 0, 1);
+          curve(c, 0, LC[0], 2.5, lerp(PL, PR, r));
+          if (r > 0.3) lab(0, 0, 1);
+          if (r > 0.9) txt(c, 'dark current ≈ 0', xOf(-3), YZ + 16, C.muted, 11, 600, 'center');
+          txt(c, eqDark, PL + 12, PT + 14, C.text, 13, 700, 'left', MONO);
+        } else if (s === 1) {
+          const u = ease(clamp((ts - 0.6) / 1.6, 0, 1)), il = LV[1] * u;
+          curve(c, 0, LC[0], 2, null, 0.6); lab(0, 0, 0.8);
+          curve(c, il, LC[1], 2.8);
+          if (il > 3e-6) {
+            const x = xOf(-3);
+            vdim(c, x, yOf(iOf(-3, 0)), yOf(iOf(-3, il)), C.cur);
+            subs(c, [['I', 'λ']], x + 10, (yOf(iOf(-3, 0)) + yOf(iOf(-3, il))) / 2, C.cur, 13, 'left');
+          }
+          if (u >= 1) lab(1, il, 1);
+          txt(c, eqLit, PL + 12, PT + 14, C.text, 13, 700, 'left', MONO);
+        } else if (s === 2) {
+          curve(c, 0, LC[0], 2, null, 0.7); lab(0, 0, 0.8);
+          curve(c, LV[1], LC[1], 2.5); lab(1, LV[1], 1);
+          const u2 = ease(clamp((ts - 0.6) / 1.2, 0, 1)), u3 = ease(clamp((ts - 2.0) / 1.2, 0, 1));
+          if (u2 > 0) { curve(c, lerp(LV[1], LV[2], u2), LC[2], 2.5); if (u2 >= 1) lab(2, LV[2], 1); }
+          if (u3 > 0) { curve(c, lerp(LV[2], LV[3], u3), LC[3], 2.5); if (u3 >= 1) lab(3, LV[3], 1); }
+          if (u3 >= 1) {
+            const x = xOf(-1.2);
+            for (let k = 0; k < 3; k++) vdim(c, x, yOf(iOf(-1.2, LV[k])), yOf(iOf(-1.2, LV[k + 1])), C.cur);
+            txt(c, 'equal steps', x + 10, yOf(-30e-6), C.cur, 11, 700, 'left');
+          }
+          txt(c, eqLit, PL + 12, PT + 14, C.text, 13, 700, 'left', MONO);
+        } else if (s === 3 || s === 4) {
+          for (let k = 0; k < 4; k++) { curve(c, LV[k], LC[k], 2.4); lab(k, LV[k], 1); }
+          c.globalAlpha = tr;
+          if (s === 3) {
+            txt(c, 'photoconductive mode', (PL + XZ) / 2, PB - 30, C.elec, 13, 700, 'center');
+            txt(c, 'reverse bias · I set by light', (PL + XZ) / 2, PB - 12, C.muted, 11, 600, 'center');
+            const v = -5.5 + 5 * (0.5 - 0.5 * Math.cos(TAU * ts / 5)), i = iOf(v, LV[2]);
+            circ(c, xOf(v), yOf(i), 6, '#fff', LC[2], 2);
+            txt(c, 'V = ' + fV(v) + ',  I = ' + fI(i), xOf(v), yOf(i) - 16, C.text, 11, 700, 'center', MONO);
+          } else {
+            txt(c, 'photovoltaic mode', (XZ + PR) / 2, PB - 30, C.ok, 13, 700, 'center');
+            txt(c, 'V > 0, I < 0 · solar cell', (XZ + PR) / 2, PB - 12, C.muted, 11, 600, 'center');
+            const il = LV[3], vo = voc(il);
+            let vm = 0, pm = 0; for (let v = 0; v < vo; v += 0.002) { const p = -v * iOf(v, il); if (p > pm) { pm = p; vm = v; } }
+            const u = clamp((ts - 0.8) / 0.8, 0, 1);
+            c.globalAlpha = tr * u; rect(c, XZ, YZ, xOf(vm) - XZ, yOf(iOf(vm, il)) - YZ, 'rgba(129,199,132,.28)');
+            txt(c, 'power out', (XZ + xOf(vm)) / 2, (YZ + yOf(iOf(vm, il))) / 2, C.ok, 11, 700, 'center');
+            c.globalAlpha = tr;
+            circ(c, XZ, yOf(iOf(0, il)), 5.5, LC[3]); subs(c, [['I', 'sc']], XZ - 10, yOf(iOf(0, il)) + 14, LC[3], 12, 'right');
+            circ(c, xOf(vo), YZ, 5.5, LC[3]); subs(c, [['V', 'oc'], [' ≈ ' + vo.toFixed(2) + ' V', '']], xOf(vo) + 10, YZ + 16, LC[3], 12, 'left');
+          }
+          c.globalAlpha = 1;
+        } else {
+          for (let k = 0; k < 4; k++) curve(c, LV[k], LC[k], 1.5, null, 0.25);
+          const il = slL * 60e-6, i = iOf(slV, il);
+          curve(c, il, C.field, 2.8);
+          const y = clamp(yOf(i), PT, PB);
+          line(c, xOf(slV), YZ, xOf(slV), y, C.field, 1, [3, 3]);
+          circ(c, xOf(slV), y, 6.5, '#fff', C.field, 2.5);
+          let mode, mc;
+          if (slV < 0) { mode = 'photoconductive (reverse bias)'; mc = C.elec; }
+          else if (i < 0) { mode = 'photovoltaic (delivers power)'; mc = C.ok; }
+          else { mode = 'forward conduction (not sensing)'; mc = C.bad; }
+          txt(c, 'Iλ = ' + fI(il), PL + 12, PT + 14, C.text, 12, 700, 'left', MONO);
+          txt(c, 'V = ' + fV(slV) + '   I = ' + (i > ITOP ? '> +30 µA' : fI(i)), PL + 12, PT + 36, C.text, 12, 700, 'left', MONO);
+          txt(c, mode, PL + 12, PT + 58, mc, 12, 700, 'left');
+        }
+      }
+    };
+    S = new Story('st3', o);
+  })();
+
+  /* =====================================================================
+     SCENE 4: load-resistor circuit, response time, optocoupler
+     ===================================================================== */
+  (function () {
+    const cv = new Cv('cv4', 720, 420);
+    const N = 600, DTS = 0.1e-6, VS = 5, CJ = 10e-12, PER = 20e-6, SPEED = 15e-6, IPK = 20e-6;
+    const Lb = new Float32Array(N), Vb = new Float32Array(N);
+    let S = null, head = 0, simT = 0, v = 0, simAcc = 0, RL = 100e3, lvl = 1, ph = 0, slR = 50, slLv = 1;
+    const rlOf = u => 10e3 * Math.pow(10, 2 * u / 100);
+    const rS = $('s4r'), rO = $('o4r'), lS = $('s4l'), lO = $('o4l');
+    function syncS() { slR = +rS.value; slLv = +lS.value / 100; rO.textContent = fR(rlOf(slR)); lO.textContent = lS.value + ' %'; if (S) S.dirty = true; }
+    rS.addEventListener('input', syncS); lS.addEventListener('input', syncS); syncS();
+    function params(s, ts) {
+      if (s <= 1 || s === 4) return [100e3, 1];
+      if (s === 2) return [470e3, 0.25];
+      if (s === 3) return [rlOf(100 * (0.5 - 0.5 * Math.cos(TAU * ts / 8))), 0.25];
+      return [rlOf(slR), slLv];
+    }
+    function simStep() {
+      simT += DTS;
+      const on = (simT % PER) < PER / 2 ? 1 : 0;
+      const target = Math.min(on * IPK * lvl * RL, VS), tau = RL * CJ;
+      v += (target - v) * (1 - Math.exp(-DTS / tau));
+      Lb[head] = on; Vb[head] = v; head = (head + 1) % N;
+    }
+    const lightOn = () => Lb[(head + N - 1) % N] > 0.5;
+    function trace(c, buf, x0, x1, yOf, col, lw, from) {
+      const pts = [], n0 = from || 0;
+      for (let k = n0; k < N; k++) pts.push([lerp(x0, x1, (k - n0) / (N - 1 - n0)), yOf(buf[(head + k) % N])]);
+      pline(c, pts, col, lw || 2);
+    }
+    const o = {
+      cv,
+      steps: [
+        { dur: 8, cap: 'A practical circuit: the supply <strong>reverse-biases</strong> the photodiode (cathode to +5 V) through a <strong>load resistor R<sub>L</sub></strong>. When light falls on the diode, the photocurrent I<sub>λ</sub> flows down through R<sub>L</sub>.', snap: 4.5 },
+        { dur: 9, cap: 'So the voltage across R<sub>L</sub> follows the light: <strong>V<sub>out</sub> = I<sub>λ</sub> · R<sub>L</sub></strong>. Here 20 µA through 100 kΩ gives 2 V. The oscilloscope shows the light flashing (top) and V<sub>out</sub> pulsing with it (bottom).', snap: 4.5 },
+        { dur: 11, cap: 'The edges are not instant. The junction capacitance C<sub>j</sub> (topic 2.8) must charge through R<sub>L</sub>, with time constant <strong>τ = R<sub>L</sub>·C<sub>j</sub></strong>. Reverse bias widens the depletion region and keeps C<sub>j</sub> small, so the diode stays fast. A <strong>PIN photodiode</strong> adds a wide intrinsic layer to shrink C<sub>j</sub> further.', snap: 4.5 },
+        { dur: 9, cap: 'So R<sub>L</sub> is a trade-off. A large R<sub>L</sub> gives a big output but slow, rounded edges. A small R<sub>L</sub> is fast but gives a tiny output. Watch R<sub>L</sub> sweep from 10 kΩ to 1 MΩ.', snap: 4.5 },
+        { dur: 9, cap: 'A common use is the <strong>optocoupler</strong>: an IR LED and a photodiode sealed in one package. The signal crosses the gap as light, so the two circuits share no electrical connection and can sit thousands of volts apart.', snap: 4.5 },
+        { dur: 0, cap: '<strong>Try it:</strong> change R<sub>L</sub> and the light level. Note that V<sub>out</sub> can never rise above the 5 V supply.', snap: 4.5 }
+      ],
+      step(dt, s, ts) {
+        ph += dt;
+        const p = params(s, ts); RL = p[0]; lvl = p[1];
+        simAcc += dt * SPEED;
+        while (simAcc >= DTS) { simAcc -= DTS; simStep(); }
+      },
+      draw(c, s, tr) {
+        const on = lightOn();
+        if (s === 4) { c.globalAlpha = tr; drawOpto(c, on); c.globalAlpha = 1; return; }
+        /* circuit */
+        const CX = 230, DY = 140;
+        txt(c, '+5 V', CX, 30, C.text, 13, 700, 'center');
+        circ(c, CX, 46, 4, null, C.text, 1.8);
+        line(c, CX, 50, CX, DY - 40, C.wire, 2);
+        dsym(c, CX, DY, -Math.PI / 2, C.text, 40);
+        txt(c, 'K', CX + 18, DY - 30, C.muted, 11, 700, 'left'); txt(c, 'A', CX + 18, DY + 30, C.muted, 11, 700, 'left');
+        line(c, CX, DY + 40, CX, 240, C.wire, 2);
+        circ(c, CX, 225, 3.5, C.text);
+        line(c, CX, 225, 330, 225, C.wire, 2); circ(c, 334, 225, 4, null, C.text, 1.8);
+        subs(c, [['V', 'out']], 334, 205, C.field, 13, 'center');
+        resV(c, CX, 240, 305, C.text);
+        line(c, CX, 305, CX, 330, C.wire, 2); ground(c, CX, 330, C.text);
+        subs(c, [['R', 'L'], [' = ' + fR(RL), '']], CX + 18, 272, C.text, 12, 'left');
+        const lc = '#e57373';
+        lamp(c, 80, DY, on ? Math.min(1, 0.4 + 0.6 * lvl) : 0, lc, ph);
+        txt(c, 'IR source', 80, DY + 34, C.muted, 11, 600, 'center');
+        if (on && lvl > 0) {
+          rays(c, 112, DY - 26, CX - 22, DY - 8, lc, 6);
+          const I = IPK * lvl, sp = 40 + 120 * lvl;
+          c.globalAlpha = 0.4 + 0.6 * lvl;
+          for (let k = 0; k < 9; k++) { const y = 50 + ((ph * sp + k * 31) % 280); if (y < 330 && Math.abs(y - DY) > 14) circ(c, CX, y, 2.6, C.cur); }
+          c.globalAlpha = 1;
+          arrow(c, CX - 22, 172, CX - 22, 212, C.cur, 2, 8);
+          subs(c, [['I', 'λ'], [' = ' + fI(I), '']], CX - 30, 192, C.cur, 12, 'right');
+        }
+        /* oscilloscope */
+        const OX0 = 395, OX1 = 700, OY0 = 44, OY1 = 362;
+        rect(c, OX0, OY0, OX1 - OX0, OY1 - OY0, '#0d1220'); c.strokeStyle = '#2a3448'; c.lineWidth = 1; c.strokeRect(OX0 + 0.5, OY0 + 0.5, OX1 - OX0, OY1 - OY0);
+        txt(c, 'oscilloscope · 60 µs window', (OX0 + OX1) / 2, 28, C.muted, 11, 600, 'center');
+        const ly = b => lerp(112, 76, b);
+        txt(c, 'light', OX0 + 6, 62, lc, 10, 700, 'left');
+        trace(c, Lb, OX0 + 6, OX1 - 6, ly, lc, 2);
+        const vy = vv => lerp(346, 150, vv / VS);
+        for (let k = 0; k <= 5; k++) { line(c, OX0 + 1, vy(k), OX1 - 1, vy(k), C.grid, 1); txt(c, k + ' V', OX0 + 6, vy(k) - 7, C.muted, 9, 600, 'left'); }
+        subs(c, [['V', 'out']], OX1 - 8, 136, C.field, 11, 'right');
+        trace(c, Vb, OX0 + 6, OX1 - 6, vy, C.field, 2.4);
+        const tau = RL * CJ, vpk = Math.min(IPK * lvl * RL, VS);
+        txt(c, 'τ = RL·Cj = ' + fT(tau), OX0, 386, C.text, 12, 700, 'left', MONO);
+        txt(c, 'peak = ' + fV(vpk) + (IPK * lvl * RL > VS ? ' (clipped)' : ''), OX1, 386, C.field, 12, 700, 'right', MONO);
+        txt(c, 'Cj = 10 pF', 40, 386, C.muted, 11, 600, 'left', MONO);
+      }
+    };
+    function drawOpto(c, on) {
+      const a0 = c.globalAlpha;
+      c.strokeStyle = C.metal; c.lineWidth = 1.5; c.setLineDash([6, 4]); c.strokeRect(230.5, 100.5, 260, 200); c.setLineDash([]);
+      txt(c, 'optocoupler (one package)', 360, 84, C.text, 13, 700, 'center');
+      line(c, 360, 112, 360, 288, C.field, 1.5, [4, 4]);
+      txt(c, 'isolation gap', 360, 318, C.field, 12, 700, 'center');
+      txt(c, 'no wire crosses it', 360, 336, C.muted, 11, 600, 'center');
+      // IR LED (anode left) and photodiode (cathode up)
+      dsym(c, 295, 200, 0, C.text, 34);
+      if (on) { c.save(); c.shadowColor = '#e57373'; c.shadowBlur = 20; circ(c, 300, 200, 8, 'rgba(229,115,115,.5)'); c.restore(); }
+      txt(c, 'IR LED', 295, 236, C.muted, 11, 600, 'center');
+      dsym(c, 425, 200, -Math.PI / 2, C.text, 34);
+      txt(c, 'photodiode', 425, 252, C.muted, 11, 600, 'center');
+      if (on) for (let k = 0; k < 3; k++) { const x = 318 + ((ph * 120 + k * 30) % 88); photon(c, x, 196 + (k - 1) * 9, 1, 0, '#e57373', ph + k, 22); }
+      // input and output
+      line(c, 200, 200, 261, 200, C.wire, 2); line(c, 425, 166, 425, 130, C.wire, 2); line(c, 425, 130, 540, 130, C.wire, 2);
+      line(c, 425, 234, 425, 270, C.wire, 2); line(c, 425, 270, 540, 270, C.wire, 2);
+      line(c, 329, 200, 340, 200, C.wire, 2); line(c, 340, 200, 340, 270, C.wire, 2); line(c, 340, 270, 200, 270, C.wire, 2);
+      txt(c, 'input', 115, 146, C.text, 12, 700, 'center');
+      rect(c, 40, 160, 150, 80, '#0d1220');
+      trace(c, Lb, 46, 184, b => lerp(228, 172, b), '#e57373', 2, 300);
+      txt(c, 'circuit 1', 115, 290, C.muted, 11, 600, 'center');
+      txt(c, 'output', 620, 146, C.text, 12, 700, 'center');
+      rect(c, 545, 160, 150, 80, '#0d1220');
+      trace(c, Vb, 551, 689, vv => lerp(228, 172, vv / 2), C.field, 2, 300);
+      txt(c, 'circuit 2', 620, 290, C.muted, 11, 600, 'center');
+      c.globalAlpha = a0;
+    }
+    S = new Story('st4', o);
+  })();
+
+  /* ---------- sticky mini-nav highlight ---------- */
+  (function () {
+    const links = Array.from(document.querySelectorAll('.toc a'));
+    const secs = links.map(l => document.querySelector(l.getAttribute('href')));
+    function upd() {
+      let cur = 0;
+      secs.forEach((s, i) => { if (s.getBoundingClientRect().top < 120) cur = i; });
+      links.forEach((l, i) => l.classList.toggle('active', i === cur));
+    }
+    window.addEventListener('scroll', upd, { passive: true }); upd();
+  })();
+
+  let last = performance.now();
+  function frameLoop(ts) {
+    const dt = Math.min(0.05, Math.max(0, (ts - last) / 1000)); last = ts;
+    stories.forEach(st => {
+      if (!st.visible) return;
+      if (st.playing) { st.tick(dt); st.draw(); }
+      else if (st.dirty) st.draw();
+      st.dirty = false;
+    });
+    requestAnimationFrame(frameLoop);
+  }
+  function onResize() { stories.forEach(st => { st.dirty = true; }); }
+  window.addEventListener('resize', onResize);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(onResize);
+  requestAnimationFrame(frameLoop);
+})();
+</script>
+</body>
+</html>
