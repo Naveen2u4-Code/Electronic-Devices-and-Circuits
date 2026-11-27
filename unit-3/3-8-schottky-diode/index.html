@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>3.8 Schottky Diode</title>
+  <meta name="description" content="The Schottky diode told as step-by-step animations: how a metal on n-type silicon forms a Schottky barrier, majority-carrier conduction with no stored charge and no reverse recovery, and the trade-offs of low forward drop against higher leakage and lower breakdown.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1420;
+      --panel: #1a2132;
+      --panel-hover: #212a3f;
+      --border: #2a3448;
+      --text: #e6e9ef;
+      --muted: #9aa4b8;
+      --electron: #4fc3f7;
+      --hole: #ff8a65;
+      --energy: #ffd54f;
+      --success: #81c784;
+      --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+      --max: 960px;
+      --radius: 12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: var(--font); font-size: 16px; line-height: 1.65;
+      overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column;
+    }
+    a { color: var(--electron); }
+    .wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 16px; }
+
+    /* Sticky mini-nav */
+    .toc {
+      position: sticky; top: 0; z-index: 10; background: rgba(15, 20, 32, .95);
+      border-bottom: 1px solid var(--border); backdrop-filter: blur(6px);
+    }
+    .toc ul { display: flex; gap: 4px; list-style: none; margin: 0 auto; padding: 8px 16px; max-width: var(--max); overflow-x: auto; scrollbar-width: none; }
+    .toc ul::-webkit-scrollbar { display: none; }
+    .toc a {
+      display: block; white-space: nowrap; text-decoration: none; color: var(--muted);
+      font-size: 0.85rem; font-weight: 500; padding: 6px 10px; border-radius: 999px;
+    }
+    .toc a:hover { color: var(--text); background: var(--panel); }
+    .toc a.active { color: var(--bg); background: var(--electron); }
+
+    main { flex: 1; padding: 24px 0 48px; }
+    .crumbs { font-size: 0.875rem; color: var(--muted); margin: 0 0 16px; }
+    .crumbs a { color: var(--muted); }
+    .crumbs a:hover { color: var(--electron); }
+    .eyebrow { font-family: var(--mono); font-size: 0.8rem; color: var(--electron); letter-spacing: .04em; margin: 0; }
+    h1 { font-size: clamp(1.5rem, 6vw, 2.2rem); line-height: 1.2; margin: 4px 0 6px; }
+    .subtitle { color: var(--muted); margin: 0 0 8px; }
+    .howto {
+      margin: 14px 0 0; padding: 10px 14px; border-radius: 8px; font-size: 0.9rem; color: var(--muted);
+      background: rgba(79,195,247,.06); border: 1px solid rgba(79,195,247,.3);
+    }
+    .howto b { color: var(--text); }
+    section { scroll-margin-top: 64px; padding-top: 28px; }
+    h2 { font-size: clamp(1.3rem, 5vw, 1.6rem); line-height: 1.25; margin: 0 0 4px; }
+    h3 { font-size: 1.05rem; margin: 0 0 8px; }
+    hr.sep { border: 0; border-top: 1px solid var(--border); margin: 40px 0 0; }
+    .rm-note { font-size: 0.78rem; color: var(--muted); margin: 0 0 8px; }
+
+    /* Buttons & controls */
+    .btn {
+      font: inherit; font-size: 0.88rem; font-weight: 600; color: var(--text);
+      background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+      padding: 7px 12px; cursor: pointer; min-height: 38px;
+    }
+    .btn:hover:not(:disabled) { background: var(--panel-hover); border-color: var(--electron); }
+    .btn:disabled { opacity: .45; cursor: default; }
+    .btn:focus-visible, input:focus-visible, figure.story:focus-visible, .dot:focus-visible { outline: 2px solid var(--electron); outline-offset: 2px; }
+    .btn[aria-pressed="true"] { background: rgba(255,213,79,.14); border-color: var(--energy); color: var(--energy); }
+    .btn.primary { border-color: var(--electron); min-width: 84px; }
+    .seg { display: inline-flex; gap: 0; flex-wrap: wrap; }
+    .seg .btn { border-radius: 0; padding: 7px 10px; }
+    .seg .btn:first-child { border-radius: 8px 0 0 8px; }
+    .seg .btn:last-child { border-radius: 0 8px 8px 0; }
+    .seg .btn + .btn { margin-left: -1px; }
+
+    /* Story player: canvas + stepped caption + controls */
+    figure.story {
+      margin: 14px 0 0; background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 12px; min-width: 0;
+    }
+    canvas { display: block; width: 100%; border-radius: 8px; background: #141b2b; }
+    .narrow { max-width: 820px; margin-left: auto; margin-right: auto; }
+    .cap {
+      margin-top: 12px; background: #141b2b; border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 14px 12px;
+    }
+    .cap-head { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+    .cap-num { font-family: var(--mono); font-size: .78rem; color: var(--electron); white-space: nowrap; }
+    .bar { flex: 1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+    .bar i { display: block; height: 100%; width: 0; background: var(--electron); }
+    .cap-text { margin: 0; font-size: 1.02rem; line-height: 1.6; min-height: 5em; }
+    .cap-text strong { color: #fff; }
+    .cap-text.fade { animation: capin .45s ease; }
+    @keyframes capin { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+    .ctrls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-top: 12px; }
+    .dots { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; flex: 1; justify-content: center; min-width: 0; }
+    .dot {
+      width: 30px; height: 30px; border-radius: 50%; padding: 0; cursor: pointer;
+      border: 1px solid var(--border); background: var(--panel); color: var(--muted);
+      font: 600 .75rem var(--mono);
+    }
+    .dot:hover { border-color: var(--electron); }
+    .dot.seen { color: var(--text); border-color: #3d4a63; }
+    .dot[aria-current="step"] { background: var(--electron); border-color: var(--electron); color: var(--bg); }
+    .tryit { margin-top: 12px; padding: 10px 12px; border-radius: 8px; border: 1px dashed rgba(255,213,79,.45); background: rgba(255,213,79,.05); }
+    .tryit-row { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: flex-end; }
+    .slider { flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; }
+    .slider label { display: flex; justify-content: space-between; gap: 8px; font-size: 0.8rem; color: var(--muted); }
+    .slider output { font-family: var(--mono); color: var(--energy); white-space: nowrap; }
+    input[type="range"] { width: 100%; accent-color: var(--energy); margin: 4px 0 0; }
+
+    .keypoints {
+      margin-top: 16px; padding: 14px 16px; border-radius: var(--radius);
+      background: rgba(129,199,132,.07); border: 1px solid rgba(129,199,132,.35);
+    }
+    .keypoints h3 { color: var(--success); font-size: 0.95rem; text-transform: uppercase; letter-spacing: .05em; }
+    .keypoints ul { margin: 0; padding-left: 20px; }
+    .keypoints li { margin: 4px 0; }
+
+    .further { margin-top: 48px; color: var(--muted); font-size: 0.85rem; }
+    .further h3 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 0 0 6px; }
+    .further ul { margin: 0; padding-left: 18px; }
+    .further li { margin: 3px 0; }
+
+    .pager { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 32px; }
+    .pager a {
+      display: block; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 12px 14px; text-decoration: none; color: var(--text); min-width: 0;
+    }
+    .pager a:hover { border-color: var(--electron); }
+    .pager small { display: block; color: var(--muted); font-size: 0.75rem; }
+    .pager .next { text-align: right; }
+    .site-foot { border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; text-align: center; padding: 18px 16px; }
+
+    @media (prefers-reduced-motion: reduce) { .cap-text.fade { animation: none; } }
+    @media (min-width: 768px) { .keypoints li { text-align: justify; hyphens: auto; -webkit-hyphens: auto; } }
+  </style>
+</head>
+<body>
+
+  <nav class="toc" aria-label="Sections">
+    <ul>
+      <li><a href="#s0">Barrier</a></li>
+      <li><a href="#s1">Speed</a></li>
+      <li><a href="#s2">Trade-offs</a></li>
+      <li><a href="#s3">Recap</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="wrap">
+      <header>
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="../../index.html">Home</a> / <a href="../index.html">Unit 3</a> / 3.8
+        </nav>
+        <p class="eyebrow">TOPIC 3.8</p>
+        <h1>Schottky Diode</h1>
+        <p class="subtitle">A metal–semiconductor junction: low forward drop and almost no switching delay</p>
+        <p class="howto"><b>How to watch:</b> each animation explains itself in steps and plays on its own.
+          Use <b>Back</b> and <b>Next</b> or the numbered dots to go at your own pace (←/→ keys work too).
+          The last step of every animation lets you <b>try it</b> yourself.</p>
+        <p class="rm-note" id="rmNote" hidden>Your device asks for reduced motion, so every animation starts paused. Step through with Next, or press Play.</p>
+      </header>
+
+      <!-- ================= SCENE 0 ================= -->
+      <section id="s0" aria-labelledby="h0s">
+        <h2 id="h0s">1. Metal meets semiconductor: the Schottky barrier</h2>
+        <figure class="story" id="st0" tabindex="0" aria-label="Animation: Metal meets semiconductor: the Schottky barrier. Use the left and right arrow keys to step.">
+          <div class="narrow"><canvas id="cv0" style="aspect-ratio:720/420" role="img" aria-label="Energy diagram of a metal and n-type silicon. Before contact the silicon Fermi level is higher; on contact electrons flow into the metal, a depletion region of donor ions forms and the bands bend up, creating the Schottky barrier from the metal side and the built-in potential from the silicon side. Forward bias lowers the silicon-side barrier and electrons flood over; reverse bias raises it."></canvas></div>
+          <div class="cap narrow"><div class="cap-head"><span class="cap-num"></span><div class="bar"><i></i></div></div><p class="cap-text" aria-live="polite"></p></div>
+          <div class="tryit narrow" data-show="6">
+            <div class="tryit-row">
+              <div class="slider"><label for="s0v"><span>Bias (metal relative to Si)</span><output id="o0v"></output></label><input type="range" id="s0v" min="-1" max="0.35" step="0.01" value="0.2"></div>
+            </div>
+          </div>
+          <div class="ctrls narrow">
+            <button class="btn" type="button" data-act="prev">◀ Back</button>
+            <button class="btn primary" type="button" data-act="play">Pause</button>
+            <div class="dots" role="group" aria-label="Steps"></div>
+            <button class="btn" type="button" data-act="next">Next ▶</button>
+            <button class="btn" type="button" data-act="replay">↺ Replay</button>
+          </div>
+        </figure>
+      </section>
+      <hr class="sep">
+      <!-- ================= SCENE 1 ================= -->
+      <section id="s1" aria-labelledby="h1s">
+        <h2 id="h1s">2. No stored charge: why it switches so fast</h2>
+        <figure class="story" id="st1" tabindex="0" aria-label="Animation: No stored charge: why it switches so fast. Use the left and right arrow keys to step.">
+          <div class="narrow"><canvas id="cv1" style="aspect-ratio:720/420" role="img" aria-label="A pn diode bar fills with stored minority carriers when forward biased, and a Schottky bar stores none. Below, a square input voltage and the two diode currents: the pn current dips strongly negative for the reverse recovery time each time the input reverses, the Schottky current switches cleanly."></canvas></div>
+          <div class="cap narrow"><div class="cap-head"><span class="cap-num"></span><div class="bar"><i></i></div></div><p class="cap-text" aria-live="polite"></p></div>
+          <div class="tryit narrow" data-show="4">
+            <div class="tryit-row">
+              <div class="slider"><label for="s1f"><span>Switching frequency</span><output id="o1f"></output></label><input type="range" id="s1f" min="0" max="100" step="1" value="67"></div>
+            </div>
+          </div>
+          <div class="ctrls narrow">
+            <button class="btn" type="button" data-act="prev">◀ Back</button>
+            <button class="btn primary" type="button" data-act="play">Pause</button>
+            <div class="dots" role="group" aria-label="Steps"></div>
+            <button class="btn" type="button" data-act="next">Next ▶</button>
+            <button class="btn" type="button" data-act="replay">↺ Replay</button>
+          </div>
+        </figure>
+      </section>
+      <hr class="sep">
+      <!-- ================= SCENE 2 ================= -->
+      <section id="s2" aria-labelledby="h2s">
+        <h2 id="h2s">3. Forward drop, power loss, leakage and breakdown</h2>
+        <figure class="story" id="st2" tabindex="0" aria-label="Animation: Forward drop, power loss, leakage and breakdown. Use the left and right arrow keys to step.">
+          <div class="narrow"><canvas id="cv2" style="aspect-ratio:720/400" role="img" aria-label="Forward I-V curves of a silicon pn diode and a Schottky diode, the Schottky turning on at a much lower voltage; bars comparing the power lost at the same current; log-scale bars comparing reverse leakage and breakdown voltage; and a comparison table."></canvas></div>
+          <div class="cap narrow"><div class="cap-head"><span class="cap-num"></span><div class="bar"><i></i></div></div><p class="cap-text" aria-live="polite"></p></div>
+          <div class="tryit narrow" data-show="5">
+            <div class="tryit-row">
+              <div class="slider"><label for="s2i"><span>Forward current</span><output id="o2i"></output></label><input type="range" id="s2i" min="0.1" max="3" step="0.1" value="2"></div>
+            </div>
+          </div>
+          <div class="ctrls narrow">
+            <button class="btn" type="button" data-act="prev">◀ Back</button>
+            <button class="btn primary" type="button" data-act="play">Pause</button>
+            <div class="dots" role="group" aria-label="Steps"></div>
+            <button class="btn" type="button" data-act="next">Next ▶</button>
+            <button class="btn" type="button" data-act="replay">↺ Replay</button>
+          </div>
+        </figure>
+      </section>
+      <hr class="sep">
+
+      <!-- ================= RECAP ================= -->
+      <section id="s3" aria-labelledby="hrs">
+        <h2 id="hrs">Recap</h2>
+        <aside class="keypoints" aria-label="Key points">
+          <h3>Key points</h3>
+          <ul>
+            <li>A <strong>Schottky diode</strong> is a <strong>metal–semiconductor junction</strong> (metal on lightly doped n-type Si). The metal is the anode. Symbol: a diode with S-shaped hooks on the cathode bar.</li>
+            <li>On contact, electrons flow from the semiconductor into the metal (φ<sub>m</sub> &gt; φ<sub>s</sub>), leaving a depletion region and a barrier: <strong>φ<sub>B</sub> = φ<sub>m</sub> − χ</strong> from the metal side and V<sub>0</sub> from the semiconductor side.</li>
+            <li>Forward bias lowers the semiconductor-side barrier and electrons flow into the metal. Conduction is by <strong>majority carriers only</strong>, so there is <strong>no stored minority charge</strong> and practically <strong>no reverse recovery time</strong>: it switches in picoseconds.</li>
+            <li>Forward drop is only about <strong>0.2–0.4 V</strong> (vs 0.6–0.7 V for Si pn), so less power is lost (P = V<sub>F</sub>I).</li>
+            <li>Drawbacks: <strong>higher reverse leakage</strong> (rises with temperature) and <strong>lower breakdown voltage</strong> (typically 20–100 V).</li>
+            <li>Uses: rectifiers in switch-mode power supplies, freewheeling and reverse-polarity protection, solar-panel bypass diodes (3.5), RF mixers and detectors, and clamping transistors in Schottky TTL logic. A heavily doped metal–semiconductor contact is <strong>ohmic</strong> instead of rectifying.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <aside class="further" aria-label="Further reading">
+        <h3>Further reading</h3>
+        <ul>
+          <li><em>Semiconductor Physics and Devices</em>, Donald A. Neamen. Chapter: “Metal–Semiconductor and Semiconductor Heterojunctions”.</li>
+          <li><em>Device Electronics for Integrated Circuits</em>, Richard S. Muller, Theodore I. Kamins and Mansun Chan. Chapter on metal–semiconductor contacts.</li>
+          <li><em>Electronic Devices and Circuits</em>, David A. Bell. Section on Schottky diodes.</li>
+          <li><em>Electronic Devices and Circuits</em>, S. Salivahanan and N. Suresh Kumar. Section on Schottky barrier diodes.</li>
+        </ul>
+      </aside>
+
+      <nav class="pager" aria-label="Topic navigation">
+        <a href="../3-7-tunnel-diode/index.html"><small>← Previous</small>3.7 Tunnel Diode</a>
+        <a class="next" href="../index.html"><small>Next →</small>Unit 3 overview</a>
+      </nav>
+    </div>
+  </main>
+
+  <footer class="site-foot">© 2026 Naveen Bokka</footer>
+
+
+<script>
+(function () {
+  'use strict';
+  /* ---------- colours ---------- */
+  const C = {
+    text: '#e6e9ef', muted: '#9aa4b8', grid: 'rgba(255,255,255,.07)',
+    P: '#7d3a3a', N: '#2e4a7d', DEP: '#3a3f4f',
+    hole: '#ff8a65', elec: '#4fc3f7', acc: '#ef9a9a', don: '#90caf9',
+    field: '#ffd54f', ok: '#81c784', bad: '#ef5350', axis: '#5a6478',
+    band: '#e6e9ef', cur: '#81c784', metal: '#b0bec5', wire: '#8a94a8', photon: '#ffffff', bg: '#141b2b'
+  };
+  const FONT = 'Inter, system-ui, sans-serif';
+  const MONO = '"JetBrains Mono", Consolas, monospace';
+  const RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const TAU = Math.PI * 2;
+  const $ = id => document.getElementById(id);
+  if (RM) $('rmNote').hidden = false;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const lerp = (a, b, u) => a + (b - a) * u;
+  const ease = u => u * u * (3 - 2 * u);
+  const hash = k => { const s = Math.sin(k * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+
+  /* ---------- number formatting ---------- */
+  const SUP = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '-': '⁻' };
+  const sup = n => String(n).split('').map(ch => SUP[ch] || ch).join('');
+  function sci(v, d) {
+    if (v === 0) return '0';
+    let e = Math.floor(Math.log10(v)), m = v / Math.pow(10, e);
+    if (+m.toFixed(d) >= 10) { m /= 10; e += 1; }
+    return m.toFixed(d) + ' × 10' + sup(e);
+  }
+  const fI = i => {
+    const a = Math.abs(i), s = i < 0 ? '−' : '';
+    if (a < 1e-12) return '0';
+    if (a >= 1e-3) return s + (a * 1e3).toFixed(2) + ' mA';
+    if (a >= 1e-6) return s + (a * 1e6).toFixed(a >= 1e-5 ? 1 : 2) + ' µA';
+    if (a >= 1e-9) return s + (a * 1e9).toFixed(1) + ' nA';
+    return s + (a * 1e12).toFixed(0) + ' pA';
+  };
+  const fV = v => (v < 0 ? '−' : '') + Math.abs(v).toFixed(2) + ' V';
+  const fR = r => r >= 1e6 ? (r / 1e6).toFixed(2) + ' MΩ' : (r / 1e3).toFixed(r < 1e5 ? 1 : 0) + ' kΩ';
+  const fT = t => t >= 1e-6 ? (t * 1e6).toFixed(t >= 1e-5 ? 0 : 1) + ' µs' : (t * 1e9).toFixed(0) + ' ns';
+
+  /* ---------- wavelength → display colour ---------- */
+  function wlCol(l) {
+    if (l < 380) return 'rgb(190,150,255)';          // ultraviolet: drawn violet
+    if (l > 760) return 'rgb(200,100,100)';          // infrared: drawn dull red
+    let r = 0, g = 0, b = 0;
+    if (l < 440) { r = (440 - l) / 60; b = 1; }
+    else if (l < 490) { g = (l - 440) / 50; b = 1; }
+    else if (l < 510) { g = 1; b = (510 - l) / 20; }
+    else if (l < 580) { r = (l - 510) / 70; g = 1; }
+    else if (l < 645) { r = 1; g = (645 - l) / 65; }
+    else r = 1;
+    const f = l < 420 ? 0.55 + 0.45 * (l - 380) / 40 : l > 700 ? 0.55 + 0.45 * (760 - l) / 60 : 1;
+    const m = v => Math.round(255 * (0.18 + 0.82 * v * f));
+    return 'rgb(' + m(r) + ',' + m(g) + ',' + m(b) + ')';
+  }
+  const bandName = l => l < 380 ? 'ultraviolet' : l > 750 ? 'infrared' : l < 450 ? 'violet' : l < 495 ? 'blue' : l < 570 ? 'green' : l < 590 ? 'yellow' : l < 620 ? 'orange' : 'red';
+
+  /* ---------- Canvas helpers ---------- */
+  let FS = 1;
+  function Cv(id, W, H, cap) { this.el = $(id); this.W = W; this.H = H; this.cap = cap || 2; this.ctx = this.el.getContext('2d'); }
+  Cv.prototype.begin = function () {
+    const w = this.el.clientWidth; if (!w) return null;
+    const dpr = window.devicePixelRatio || 1;
+    const pw = Math.round(w * dpr), ph = Math.round(w * dpr * this.H / this.W);
+    if (this.el.width !== pw || this.el.height !== ph) { this.el.width = pw; this.el.height = ph; }
+    const c = this.ctx, s = pw / this.W;
+    FS = Math.min(this.cap, Math.max(1, 1.15 * this.W / w));
+    c.setTransform(s, 0, 0, s, 0, 0); c.clearRect(0, 0, this.W, this.H);
+    c.textBaseline = 'middle'; c.textAlign = 'left'; c.globalAlpha = 1; c.setLineDash([]); c.lineCap = 'butt'; c.shadowBlur = 0;
+    return c;
+  };
+  Cv.prototype.wm = function (c) {
+    const k = this.W / this.el.clientWidth, s = 13 * k;
+    c.save(); c.setTransform(this.el.width / this.W, 0, 0, this.el.width / this.W, 0, 0);
+    c.globalAlpha = 1; c.shadowBlur = 0; c.font = '500 ' + s.toFixed(1) + 'px ' + FONT; c.fillStyle = 'rgba(255,255,255,.35)';
+    c.textAlign = 'right'; c.textBaseline = 'bottom'; c.fillText('© Naveen Bokka', this.W - 6 * k, this.H - 4 * k); c.restore();
+  };
+  function circ(c, x, y, r, fill, stroke, lw) {
+    c.beginPath(); c.arc(x, y, Math.max(0, r), 0, TAU);
+    if (fill) { c.fillStyle = fill; c.fill(); }
+    if (stroke) { c.strokeStyle = stroke; c.lineWidth = lw || 1.5; c.stroke(); }
+  }
+  function txt(c, s, x, y, col, size, weight, align, font) {
+    c.font = (weight || 600) + ' ' + ((size || 12) * FS).toFixed(1) + 'px ' + (font || FONT);
+    c.fillStyle = col || C.text; c.textAlign = align || 'left'; c.fillText(s, x, y);
+  }
+  // Label made of [main, subscript] parts, e.g. [['I','λ'],[' = 5 µA','']]
+  function subs(c, parts, x, y, col, size, align, font) {
+    const z = (size || 13) * FS, zs = z * 0.72, f = font || FONT;
+    let w = 0;
+    const ws = parts.map(p => {
+      c.font = '700 ' + z.toFixed(1) + 'px ' + f; const a = c.measureText(p[0]).width;
+      c.font = '700 ' + zs.toFixed(1) + 'px ' + f; const b = p[1] ? c.measureText(p[1]).width : 0;
+      w += a + b; return [a, b];
+    });
+    let x0 = align === 'right' ? x - w : align === 'center' ? x - w / 2 : x;
+    c.fillStyle = col; c.textAlign = 'left';
+    parts.forEach((p, k) => {
+      c.font = '700 ' + z.toFixed(1) + 'px ' + f; c.fillText(p[0], x0, y); x0 += ws[k][0];
+      if (p[1]) { c.font = '700 ' + zs.toFixed(1) + 'px ' + f; c.fillText(p[1], x0, y + z * 0.3); x0 += ws[k][1]; }
+    });
+    return w;
+  }
+  function line(c, x0, y0, x1, y1, col, lw, dash) {
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []);
+    c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke(); c.setLineDash([]);
+  }
+  function pline(c, pts, col, lw, dash) {
+    if (pts.length < 2) return;
+    c.strokeStyle = col; c.lineWidth = lw || 1.5; c.setLineDash(dash || []); c.lineJoin = 'round';
+    c.beginPath(); pts.forEach((p, k) => k ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); c.stroke(); c.setLineDash([]);
+  }
+  function arrow(c, x0, y0, x1, y1, col, lw, head) {
+    const dx = x1 - x0, dy = y1 - y0, L = Math.hypot(dx, dy); if (L < 2) return;
+    lw = lw || 3;
+    const ux = dx / L, uy = dy / L, hs = Math.min(head || 10, L * 0.8), hw = Math.max(hs * 0.55, lw * 0.9);
+    line(c, x0, y0, x1 - ux * hs * 0.9, y1 - uy * hs * 0.9, col, lw);
+    c.fillStyle = col; c.beginPath(); c.moveTo(x1, y1);
+    c.lineTo(x1 - ux * hs - uy * hw, y1 - uy * hs + ux * hw);
+    c.lineTo(x1 - ux * hs + uy * hw, y1 - uy * hs - ux * hw); c.closePath(); c.fill();
+  }
+  function vdim(c, x, y0, y1, col) {   // vertical dimension arrow with end ticks
+    line(c, x - 5, y0, x + 5, y0, col, 1.3); line(c, x - 5, y1, x + 5, y1, col, 1.3);
+    if (Math.abs(y1 - y0) > 14) { const m = (y0 + y1) / 2; arrow(c, x, m, x, y0, col, 1.4, 6); arrow(c, x, m, x, y1, col, 1.4, 6); }
+    else line(c, x, y0, x, y1, col, 1.4);
+  }
+  function rect(c, x, y, w, h, fill) { c.fillStyle = fill; c.fillRect(x, y, w, h); }
+  function hatch(c, x0, y0, x1, y1) {
+    if (x1 - x0 < 0.5) return;
+    rect(c, x0, y0, x1 - x0, y1 - y0, C.DEP);
+    c.save(); c.beginPath(); c.rect(x0, y0, x1 - x0, y1 - y0); c.clip();
+    c.strokeStyle = 'rgba(255,255,255,.10)'; c.lineWidth = 1; c.beginPath();
+    for (let x = x0 - (y1 - y0); x < x1; x += 9) { c.moveTo(x, y1); c.lineTo(x + (y1 - y0), y0); }
+    c.stroke(); c.restore();
+  }
+  function ion(c, x, y, r, kind, a) {
+    const col = kind === 'a' ? C.acc : C.don, a0 = c.globalAlpha;
+    c.globalAlpha = a0 * a; circ(c, x, y, r, null, col, Math.max(1, r * 0.22));
+    c.strokeStyle = col; c.lineWidth = Math.max(1, r * 0.24); c.beginPath();
+    c.moveTo(x - r * 0.5, y); c.lineTo(x + r * 0.5, y);
+    if (kind === 'd') { c.moveTo(x, y - r * 0.5); c.lineTo(x, y + r * 0.5); }
+    c.stroke(); c.globalAlpha = a0;
+  }
+  function carrier(c, x, y, kind, a, r) {
+    const a0 = c.globalAlpha;
+    c.globalAlpha = a0 * a; circ(c, x, y, r || (kind === 'h' ? 3.6 : 3.2), kind === 'h' ? C.hole : C.elec); c.globalAlpha = a0;
+  }
+  const jig = (k, ph, amp) => [amp * Math.sin(ph * 1.7 + k * 1.31), amp * Math.cos(ph * 1.3 + k * 2.07)];
+  function tag(c, s, x, y, align) {
+    c.font = '700 ' + (13 * FS).toFixed(1) + 'px ' + FONT;
+    const w = c.measureText(s).width + 10, h = 13 * FS + 8, x0 = align === 'right' ? x - w : align === 'center' ? x - w / 2 : x;
+    c.fillStyle = 'rgba(15,20,32,.78)'; c.fillRect(x0, y, w, h);
+    txt(c, s, x0 + w / 2, y + h / 2, '#fff', 13, 700, 'center');
+  }
+  // A photon: wavy line whose head is at (x, y), travelling along unit vector (dx, dy)
+  function photon(c, x, y, dx, dy, col, ph, len) {
+    len = len || 42;
+    const nx = -dy, ny = dx, n = 26;
+    c.save(); c.shadowColor = col; c.shadowBlur = 8;
+    c.strokeStyle = col; c.lineWidth = 2; c.beginPath();
+    for (let k = 0; k <= n; k++) {
+      const s = k / n * len, w = 4.5 * Math.sin(s * 0.42 - ph * 14) * (1 - k / n * 0.5);
+      const px = x - dx * s + nx * w, py = y - dy * s + ny * w;
+      k ? c.lineTo(px, py) : c.moveTo(px, py);
+    }
+    c.stroke();
+    c.fillStyle = col; c.beginPath(); c.moveTo(x + dx * 5, y + dy * 5);
+    c.lineTo(x - dx * 3 + nx * 4, y - dy * 3 + ny * 4); c.lineTo(x - dx * 3 - nx * 4, y - dy * 3 - ny * 4); c.closePath(); c.fill();
+    c.restore();
+  }
+  // Diode symbol: anode at -len, cathode at +len along angle ang (0 = anode left)
+  function dsym(c, x, y, ang, col, len) {
+    len = len || 40; const h = 12;
+    c.save(); c.translate(x, y); c.rotate(ang);
+    line(c, -len, 0, -11, 0, col, 2.2); line(c, 11, 0, len, 0, col, 2.2);
+    c.fillStyle = col; c.beginPath(); c.moveTo(-11, -h); c.lineTo(-11, h); c.lineTo(11, 0); c.closePath(); c.fill();
+    line(c, 11, -h, 11, h, col, 2.8);
+    c.restore();
+  }
+  // Two parallel light arrows from (x0,y0) to (x1,y1)
+  function rays(c, x0, y0, x1, y1, col, gap) {
+    const dx = x1 - x0, dy = y1 - y0, L = Math.hypot(dx, dy), g = gap || 7, nx = -dy / L * g, ny = dx / L * g;
+    arrow(c, x0 + nx, y0 + ny, x1 + nx, y1 + ny, col, 1.8, 7); arrow(c, x0 - nx, y0 - ny, x1 - nx, y1 - ny, col, 1.8, 7);
+  }
+  function resV(c, x, y0, y1, col) {
+    const n = 6, w = 8, h = y1 - y0, pts = [[x, y0]];
+    for (let k = 0; k < n; k++) pts.push([x + (k % 2 ? -w : w), y0 + h * (k + 0.5) / n]);
+    pts.push([x, y1]); pline(c, pts, col, 2);
+  }
+  function ground(c, x, y, col) { line(c, x - 12, y, x + 12, y, col, 2); line(c, x - 8, y + 5, x + 8, y + 5, col, 2); line(c, x - 4, y + 10, x + 4, y + 10, col, 2); }
+  function lamp(c, x, y, lv, col, ph) {
+    col = col || '#fff8e1';
+    if (lv > 0.01) {
+      c.save(); c.shadowColor = col; c.shadowBlur = 10 + 22 * lv; circ(c, x, y, 12, col); c.restore();
+      for (let k = 0; k < 8; k++) {
+        const a = k * TAU / 8 + (ph || 0) * 0.3, r0 = 17, r1 = 17 + 4 + 8 * lv;
+        line(c, x + Math.cos(a) * r0, y + Math.sin(a) * r0, x + Math.cos(a) * r1, y + Math.sin(a) * r1, col, 2);
+      }
+    } else circ(c, x, y, 12, '#2a3448', '#5a6478', 1.5);
+  }
+
+  /* ---------- Story player ----------
+     Each scene is a list of steps. Every step has a caption (shown under the canvas)
+     and a duration. While playing, the scene advances by itself; Back / Next / dots jump.
+     When paused, a jump fast-forwards the step's simulation so the still frame shows it. */
+  const stories = [];
+  function Story(id, o) {
+    const R = this.root = $(id); this.o = o; this.steps = o.steps; this.n = o.steps.length;
+    this.s = 0; this.ts = 0; this.t = 0; this.tr = 1; this.playing = !RM; this.visible = true; this.dirty = true;
+    this.capEl = R.querySelector('.cap-text'); this.numEl = R.querySelector('.cap-num'); this.barEl = R.querySelector('.bar i');
+    this.pb = R.querySelector('[data-act="play"]');
+    this.prevB = R.querySelector('[data-act="prev"]'); this.nextB = R.querySelector('[data-act="next"]');
+    this.pb.addEventListener('click', () => this.setPlaying(!this.playing));
+    this.prevB.addEventListener('click', () => this.go(this.s - 1));
+    this.nextB.addEventListener('click', () => this.go(this.s + 1));
+    R.querySelector('[data-act="replay"]').addEventListener('click', () => { this.playing = true; this.sync(); this.go(0); });
+    const dots = R.querySelector('.dots');
+    this.dots = this.steps.map((st, k) => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'dot'; b.textContent = String(k + 1);
+      b.setAttribute('aria-label', 'Step ' + (k + 1) + (k === this.n - 1 ? ': try it' : ''));
+      b.addEventListener('click', () => this.go(k));
+      dots.appendChild(b); return b;
+    });
+    this.shows = Array.from(R.querySelectorAll('[data-show]'));
+    R.addEventListener('keydown', e => {
+      if (e.target.tagName === 'INPUT') return;
+      if (e.key === 'ArrowRight') { this.go(this.s + 1); e.preventDefault(); }
+      else if (e.key === 'ArrowLeft') { this.go(this.s - 1); e.preventDefault(); }
+    });
+    if ('IntersectionObserver' in window) {
+      this.visible = false;
+      new IntersectionObserver(es => es.forEach(e => { this.visible = e.isIntersecting; if (this.visible) this.dirty = true; }), { threshold: 0.25 })
+        .observe(R);
+    }
+    stories.push(this); this.sync(); this.go(0);
+  }
+  Story.prototype.setPlaying = function (p) { this.playing = p; this.sync(); this.dirty = true; };
+  Story.prototype.sync = function () { this.pb.textContent = this.playing ? 'Pause' : 'Play'; };
+  Story.prototype.adv = function (dt) {
+    this.t += dt; this.ts += dt; this.tr = Math.min(1, this.tr + dt / 0.9);
+    this.o.step(dt, this.s, this.ts, this);
+  };
+  Story.prototype.go = function (k) {
+    k = clamp(k, 0, this.n - 1);
+    this.s = k; this.ts = 0; this.tr = 0;
+    if (this.o.enter) this.o.enter(k, this);
+    if (!this.playing) {
+      const st = this.steps[k], snap = st.snap != null ? st.snap : Math.min(3, (st.dur || 6) * 0.5);
+      for (let x = 0; x < snap; x += 1 / 30) this.adv(1 / 30);
+      this.tr = 1;
+    }
+    this.capEl.innerHTML = this.steps[k].cap;
+    this.capEl.classList.remove('fade'); void this.capEl.offsetWidth; this.capEl.classList.add('fade');
+    this.numEl.textContent = (k === this.n - 1 ? 'Try it · ' : '') + 'Step ' + (k + 1) + ' of ' + this.n;
+    this.dots.forEach((d, j) => { if (j === k) { d.setAttribute('aria-current', 'step'); d.classList.add('seen'); } else d.removeAttribute('aria-current'); });
+    this.shows.forEach(el => { el.hidden = el.dataset.show.split(',').indexOf(String(k)) < 0; });
+    this.prevB.disabled = k === 0; this.nextB.disabled = k === this.n - 1;
+    this.updBar(); this.dirty = true;
+  };
+  Story.prototype.updBar = function () {
+    const st = this.steps[this.s];
+    this.barEl.style.width = (this.s === this.n - 1 ? 100 : clamp(this.ts / st.dur, 0, 1) * 100) + '%';
+  };
+  Story.prototype.tick = function (dt) {
+    this.adv(dt);
+    if (this.s < this.n - 1 && this.ts >= this.steps[this.s].dur) this.go(this.s + 1);
+    this.updBar();
+  };
+  Story.prototype.draw = function () {
+    const c = this.o.cv.begin(); if (!c) return;
+    this.o.draw(c, this.s, ease(this.tr), this);
+    c.globalAlpha = 1; this.o.cv.wm(c);
+  };
+  const segBtns = (root, key, cb) => {
+    const bs = Array.from(document.querySelectorAll(root + ' [data-' + key + ']'));
+    const set = v => { bs.forEach(b => b.setAttribute('aria-pressed', String(b.dataset[key] === v))); cb(v); };
+    bs.forEach(b => b.addEventListener('click', () => set(b.dataset[key])));
+    return set;
+  };
+  /* ---------- models ----------
+     pn silicon:  I = 1e-12·(e^(V/VT) − 1)          → about 0.72 V at 1 A
+     Schottky:    I = 1e-6·(e^(V/1.05VT) − 1)       → about 0.38 V at 1 A          */
+  const VTH = 0.0259;
+  const PN = { is: 1e-12, n: 1, col: '#ff8a65', name: 'Silicon pn' }, SK = { is: 1e-6, n: 1.05, col: '#4fc3f7', name: 'Schottky' };
+  const iOfV = (d, v) => d.is * (Math.exp(v / (d.n * VTH)) - 1);
+  const vOfI = (d, i) => d.n * VTH * Math.log(i / d.is + 1);
+  function ssym(c, x, y, ang, col, len) {   // Schottky symbol: cathode bar with S-hooks
+    len = len || 40; const h = 12;
+    c.save(); c.translate(x, y); c.rotate(ang);
+    line(c, -len, 0, -11, 0, col, 2.2); line(c, 11, 0, len, 0, col, 2.2);
+    c.fillStyle = col; c.beginPath(); c.moveTo(-11, -h); c.lineTo(-11, h); c.lineTo(11, 0); c.closePath(); c.fill();
+    pline(c, [[5, -h + 5], [5, -h], [11, -h], [11, h], [17, h], [17, h - 5]], col, 2.6);
+    c.restore();
+  }
+
+  /* =====================================================================
+     SCENE 0: metal meets n-type silicon — the Schottky barrier
+     ===================================================================== */
+  (function () {
+    const cv = new Cv('cv0', 720, 420);
+    const MX0 = 40, MX1 = 250, SX1 = 650, VAC = 50, EFM = 210, CHI = 100, EG = 110, K = 100;   // 100 px per eV
+    let S = null, ph = 0, vb = 0, slV = 0.2, u = 0, acc1 = 0, acc2 = 0, parts = [], flow = [];
+    const vS = $('s0v'), vO = $('o0v');
+    function syncS() { slV = +vS.value; vO.textContent = fV(slV); if (S) S.dirty = true; }
+    vS.addEventListener('input', syncS); syncS();
+    const DEP = 90;   // depletion width in px at zero bias
+    // Semiconductor levels after contact, with bias vb (metal + is forward)
+    function lev(vv, uu) {
+      const efs0 = EFM - 50;                        // before contact the Si Fermi level is 0.5 eV higher
+      const efs = lerp(efs0, EFM, uu) - K * vv * uu;  // bias moves the Si side
+      const ecb = efs - 10, ecI = VAC + CHI;          // bulk and interface conduction band edges
+      const w = DEP * Math.sqrt(Math.max(0.05, (ecb - ecI) / 50));
+      return { efs, ecb, ecI, w };
+    }
+    function ecAt(x, L, uu) {   // conduction band edge at position x
+      const x0 = MX1 + lerp(90, 0, uu);
+      if (uu < 1) {   // still bending in
+        const flat = L.ecb, d = x - x0, bend = (L.ecI - flat) * uu;
+        return d < L.w ? flat + bend * Math.pow(1 - d / L.w, 2) : flat;
+      }
+      const d = x - x0;
+      return d < L.w ? L.ecb + (L.ecI - L.ecb) * Math.pow(1 - d / L.w, 2) : L.ecb;
+    }
+    const tgt = s => [0, 0, 0, 0.25, -0.6, 0, slV][s];
+    const o = {
+      cv,
+      steps: [
+        { dur: 10, cap: 'A <strong>Schottky diode</strong> joins a <strong>metal</strong> (such as platinum, molybdenum or aluminium) directly to <strong>n-type silicon</strong>, with no p region at all. Before contact the metal’s Fermi level is lower: its work function φ<sub>m</sub> is larger than the silicon’s φ<sub>s</sub>. So electrons in the silicon sit at higher energy.' },
+        { dur: 10, cap: 'Bring them into contact. Electrons pour from the silicon into the metal until the two Fermi levels line up. The silicon near the surface is left without electrons: a <strong>depletion region of positive donor ions</strong>, and the bands bend upward.' },
+        { dur: 10, cap: 'Two barriers result. From the metal side, electrons face the <strong>Schottky barrier φ<sub>B</sub> = φ<sub>m</sub> − χ</strong>, about 0.5–0.8 eV. From the silicon side they face the built-in potential <strong>V<sub>0</sub></strong>. In equilibrium the few electrons that hop each way balance out.' },
+        { dur: 10, cap: '<strong>Forward bias</strong> (metal +) raises the silicon side and lowers its barrier, so a flood of silicon electrons crosses into the metal. The current is carried <strong>only by majority carriers (electrons)</strong>; no holes are injected, so no minority charge is stored.' },
+        { dur: 10, cap: '<strong>Reverse bias</strong> (metal −) makes the silicon-side barrier bigger, so that flow stops. Only electrons hopping from the metal over φ<sub>B</sub>, which does not change, make a small reverse saturation current. It is larger than a pn diode’s.' },
+        { dur: 8, cap: 'Its symbol is a diode whose cathode bar has S-shaped hooks. The <strong>metal is the anode</strong> and the n-type silicon the cathode. A Schottky contact needs light doping. Heavily doped silicon makes a plain ohmic contact instead, which is how ordinary leads are attached.' },
+        { dur: 0, cap: '<strong>Try it:</strong> set the bias and watch the silicon-side barrier and the flow of electrons over it.' }
+      ],
+      enter(k) { parts = []; if (k === 1) { flow = []; } },
+      step(dt, s, ts) {
+        ph += dt;
+        u = s === 0 ? 0 : s === 1 ? ease(clamp((ts - 0.5) / 4, 0, 1)) : 1;
+        vb += (tgt(s) - vb) * Math.min(1, dt * 4);
+        if (s === 1 && u < 1) { acc1 += dt * 10 * (1 - u); while (acc1 >= 1) { acc1 -= 1; flow.push({ x: MX1 + 100 + Math.random() * 120, y: 0, a: 1 }); } }
+        flow.forEach(f => { f.x -= 140 * dt; if (f.x < MX1 - 30) f.a -= dt * 3; });
+        flow = flow.filter(f => f.a > 0);
+        if (s >= 2) {
+          const rSM = Math.min(18, 1.2 * Math.exp(vb / 0.06)), rMS = 1.2;
+          acc1 += dt * rSM; acc2 += dt * rMS;
+          while (acc1 >= 1) { acc1 -= 1; parts.push({ d: -1, x: SX1 - 30 - Math.random() * 60, a: 1, e: Math.random() * 6 }); }
+          while (acc2 >= 1) { acc2 -= 1; parts.push({ d: 1, x: MX1 - 40, a: 1, e: Math.random() * 4 }); }
+        }
+        parts.forEach(p => { p.x += p.d * 110 * dt; if ((p.d < 0 && p.x < MX0 + 30) || (p.d > 0 && p.x > SX1 - 20)) p.a -= dt * 3; });
+        parts = parts.filter(p => p.a > 0);
+      },
+      draw(c, s, tr) {
+        const L = lev(s === 0 ? 0 : vb, u), x0 = MX1 + lerp(90, 0, u);
+        /* vacuum level */
+        line(c, MX0, VAC, MX1, VAC, C.muted, 1, [4, 4]); line(c, x0, VAC, SX1, VAC, C.muted, 1, [4, 4]);
+        txt(c, 'vacuum level', MX0, VAC - 12, C.muted, 10, 600, 'left');
+        /* metal */
+        rect(c, MX0, EFM, MX1 - MX0, 360 - EFM, 'rgba(176,190,197,.35)');
+        for (let k = 0; k < 40; k++) circ(c, MX0 + 10 + (k % 10) * 20, EFM + 14 + Math.floor(k / 10) * 32 + 3 * Math.sin(ph * 2 + k), 2.6, C.elec);
+        line(c, MX0, EFM, MX1, EFM, C.text, 2);
+        txt(c, 'metal', (MX0 + MX1) / 2, 384, C.metal, 13, 700, 'center');
+        subs(c, [['E', 'F']], MX0 + 4, EFM - 12, C.text, 11, 'left');
+        /* semiconductor bands */
+        const xs = []; for (let x = x0; x <= SX1; x += 3) xs.push(x);
+        const ec = x => ecAt(x, L, u), ev = x => ec(x) + EG;
+        if (u > 0.05) {
+          const wEnd = Math.min(SX1, x0 + L.w);
+          rect(c, x0, 70, wEnd - x0, 300, 'rgba(144,202,249,.07)');
+          const ni = Math.max(1, Math.floor(L.w / 18)); for (let k = 0; k < ni; k++) { const x = x0 + 9 + k * 18; if (x < wEnd - 4) ion(c, x, 330, 5, 'd', u); }
+          txt(c, 'depletion', (x0 + wEnd) / 2, 352, C.don, 10, 700, 'center');
+        }
+        c.fillStyle = 'rgba(79,195,247,.10)'; c.beginPath(); c.moveTo(x0, 70); xs.forEach(x => c.lineTo(x, ec(x))); c.lineTo(SX1, 70); c.closePath(); c.fill();
+        pline(c, xs.map(x => [x, ec(x)]), C.elec, 2.4); pline(c, xs.map(x => [x, Math.min(370, ev(x))]), C.hole, 2.4);
+        line(c, x0, L.efs, SX1, L.efs, C.text, 1.4, [5, 4]);
+        subs(c, [['E', 'C']], SX1 + 4, ec(SX1), C.elec, 11, 'left'); subs(c, [['E', 'V']], SX1 + 4, Math.min(370, ev(SX1)), C.hole, 11, 'left');
+        subs(c, [['E', 'F']], SX1 + 4, L.efs + 2, C.text, 11, 'left');
+        for (let k = 0; k < 9; k++) { const x = x0 + L.w + 14 + k * 26; if (x < SX1 - 6) circ(c, x + 3 * Math.sin(ph * 2 + k), ec(x) - 7, 3, C.elec); }
+        txt(c, 'n-type silicon', (x0 + SX1) / 2 + 30, 384, C.don, 13, 700, 'center');
+        if (s === 0) {
+          c.globalAlpha = tr;
+          vdim(c, 140, VAC, EFM, C.field); subs(c, [['φ', 'm']], 148, 130, C.field, 13, 'left');
+          vdim(c, 560, VAC, L.efs, C.field); subs(c, [['φ', 's']], 568, 110, C.field, 13, 'left');
+          vdim(c, 440, VAC, ec(440), C.muted); txt(c, 'χ', 448, 92, C.muted, 13, 700, 'left');
+          c.globalAlpha = 1;
+        }
+        flow.forEach(f => { const y = f.x > MX1 ? ec(f.x) - 6 : EFM - 6; carrier(c, f.x, y, 'e', f.a, 3.6); });
+        if (s >= 2 && s <= 4 || s === 6) {
+          // barriers
+          vdim(c, MX1 - 14, L.ecI, EFM, C.field); subs(c, [['φ', 'B']], MX1 - 22, (L.ecI + EFM) / 2, C.field, 13, 'right');
+          vdim(c, SX1 - 50, L.ecI, L.ecb, C.ok); subs(c, [[s === 2 ? 'V' : 'V', s === 2 ? '0' : '0'], [s === 2 ? '' : (vb >= 0 ? ' − V' : ' + |V|'), '']], SX1 - 58, (L.ecI + L.ecb) / 2, C.ok, 12, 'right');
+          line(c, MX1, L.ecI, SX1 - 40, L.ecI, C.muted, 1, [2, 4]);
+          parts.forEach(p => {
+            let y;
+            if (p.d < 0) y = p.x > MX1 ? Math.min(ec(p.x), L.ecI) - 6 - p.e : EFM - 8 - p.e;
+            else y = p.x < MX1 ? lerp(EFM - 6, L.ecI - 8, clamp((p.x - (MX1 - 40)) / 40, 0, 1)) : ec(p.x) - 8;
+            carrier(c, p.x, y, 'e', p.a, 3.6);
+          });
+          const I = 1e-6 * (Math.exp(vb / (1.05 * VTH)) - 1);
+          txt(c, 'V = ' + fV(vb) + (vb > 0.02 ? ' (forward)' : vb < -0.02 ? ' (reverse)' : ''), 690, 22, C.text, 12, 700, 'right', MONO);
+          txt(c, 'I = ' + (Math.abs(I) >= 0.95e-6 && Math.abs(I) < 1e-5 ? (I < 0 ? '−' : '') + (Math.abs(I) * 1e6).toFixed(2) + ' µA' : fI(I)), 690, 44, Math.abs(I) > 1e-4 ? C.ok : C.text, 12, 700, 'right', MONO);
+        }
+        if (s === 5) {
+          c.globalAlpha = tr;
+          c.fillStyle = 'rgba(15,20,32,.94)'; c.fillRect(130, 80, 460, 240);
+          c.strokeStyle = C.axis; c.lineWidth = 1; c.strokeRect(130.5, 80.5, 460, 240);
+          txt(c, 'Schottky diode symbol', 360, 110, C.energy, 15, 700, 'center');
+          ssym(c, 360, 190, 0, C.text, 80);
+          txt(c, 'anode = metal', 280, 224, C.metal, 11, 700, 'center'); txt(c, 'cathode = n-Si', 440, 224, C.don, 11, 700, 'center');
+          txt(c, 'lightly doped n-Si → rectifying (Schottky) contact', 360, 264, C.text, 12, 600, 'center');
+          txt(c, 'heavily doped n⁺-Si → ohmic contact (no barrier)', 360, 290, C.muted, 12, 600, 'center');
+          c.globalAlpha = 1;
+        }
+      }
+    };
+    S = new Story('st0', o);
+  })();
+
+  /* =====================================================================
+     SCENE 1: no stored charge, so no reverse recovery
+     ===================================================================== */
+  (function () {
+    const cv = new Cv('cv1', 720, 420);
+    const TRR = 50e-9, TSK = 0.1e-9;
+    let S = null, ph = 0, slF = 1e6;
+    const fS = $('s1f'), fO = $('o1f');
+    const fOf = u => Math.pow(10, 4 + 3 * u / 100);
+    const fHz = f => f >= 1e6 ? (f / 1e6).toFixed(f < 1e7 ? 2 : 1) + ' MHz' : (f / 1e3).toFixed(f < 1e5 ? 1 : 0) + ' kHz';
+    function syncS() { slF = fOf(+fS.value); fO.textContent = fHz(slF); if (S) S.dirty = true; }
+    fS.addEventListener('input', syncS); syncS();
+    function pnI(p, fr) {
+      if (p < 0.5) return 1;
+      const t = p - 0.5, ts = 0.6 * fr;
+      return t < ts ? -0.8 : -0.8 * Math.exp(-(t - ts) / Math.max(1e-4, 0.4 * fr / 2.3));
+    }
+    function pnQ(p, fr) {
+      if (p < 0.5) return 1 - Math.exp(-p / 0.04);
+      const t = p - 0.5, ts = 0.6 * fr;
+      return t < ts ? 1 - 0.85 * t / ts : 0.15 * Math.exp(-(t - ts) / Math.max(1e-4, 0.4 * fr / 2.3));
+    }
+    const skI = (p, fr) => p < 0.5 ? 1 : -0.12 * Math.exp(-(p - 0.5) / Math.max(0.004, fr));
+    function bar(c, x0, x1, y, q, sch, a) {
+      const mid = (x0 + x1) / 2;
+      c.globalAlpha = a;
+      if (sch) { rect(c, x0, y, mid - x0, 60, 'rgba(176,190,197,.55)'); rect(c, mid, y, x1 - mid, 60, C.N); txt(c, 'metal', (x0 + mid) / 2, y + 74, C.metal, 11, 700, 'center'); txt(c, 'n-Si', (mid + x1) / 2, y + 74, C.don, 11, 700, 'center'); }
+      else { rect(c, x0, y, mid - x0, 60, C.P); rect(c, mid, y, x1 - mid, 60, C.N); txt(c, 'p', (x0 + mid) / 2, y + 74, C.acc, 11, 700, 'center'); txt(c, 'n', (mid + x1) / 2, y + 74, C.don, 11, 700, 'center'); }
+      line(c, mid, y, mid, y + 60, C.text, 1.5);
+      if (!sch) {
+        // stored minority carriers: holes in n, electrons in p, decaying away from the junction
+        for (let k = 0; k < 26; k++) {
+          const d = hash(k * 7 + 1), dd = 70 * Math.pow(d, 1.6), yy = y + 6 + 48 * hash(k * 7 + 3);
+          const vis = q > d * 0.9 ? 1 : 0;
+          if (vis) { carrier(c, mid + 4 + dd, yy, 'h', a); carrier(c, mid - 4 - dd, yy, 'e', a); }
+        }
+        txt(c, 'stored charge', mid, y - 10, C.field, 11, 700, 'center');
+      } else txt(c, 'nothing stored', mid, y - 10, C.ok, 11, 700, 'center');
+      c.globalAlpha = 1;
+    }
+    const o = {
+      cv,
+      steps: [
+        { dur: 10, cap: 'In an ordinary pn diode, forward current is carried by <strong>minority carriers</strong> injected across the junction: holes into the n side, electrons into the p side. Before they recombine, a cloud of them is <strong>stored</strong> near the junction.' },
+        { dur: 11, cap: 'Flip the voltage to reverse and that stored charge must be cleared before the diode can block. It flows back out as a <strong>large reverse current</strong> lasting the <strong>reverse recovery time t<sub>rr</sub></strong> (tens of ns to µs). Watch the red dip each time the input goes negative.' },
+        { dur: 10, cap: 'A Schottky diode conducts with <strong>majority electrons only</strong>. They pass straight into the metal’s sea of electrons, so there is <strong>no stored minority charge</strong>. It switches off almost instantly, in tens of picoseconds.' },
+        { dur: 10, cap: 'That is why Schottky diodes are used wherever switching is fast: <strong>switch-mode power supplies</strong>, RF mixers and detectors, and clamping transistors in fast logic (Schottky TTL). At high frequency a pn diode’s recovery spikes waste energy every cycle.' },
+        { dur: 0, cap: '<strong>Try it:</strong> raise the switching frequency. For the pn diode (t<sub>rr</sub> = 50 ns), recovery eats a bigger and bigger share of each cycle. The Schottky diode stays clean.' }
+      ],
+      step(dt) { ph += dt; },
+      draw(c, s, tr) {
+        const fr = s === 4 ? Math.min(0.45, TRR * slF) : 0.12, frS = s === 4 ? TSK * slF : 0.004;
+        const P = 3, p = (ph % P) / P;   // phase across one period on screen
+        const showS = s >= 2;
+        bar(c, 60, 320, 52, pnQ(p, fr), false, s === 2 ? 0.5 : 1);
+        bar(c, 400, 660, 52, 0, true, showS ? 1 : 0.15);
+        txt(c, 'pn diode', 190, 24, PN.col, 13, 700, 'center'); txt(c, 'Schottky diode', 530, 24, SK.col, 13, 700, 'center');
+        /* waveforms: two periods, cursor sweeps */
+        const X0 = 90, X1 = 690, xOf = q => lerp(X0, X1, q / 2);
+        const tr0 = (y0, h, f, col, lab) => {
+          line(c, X0, y0, X1, y0, C.axis, 1);
+          const pts = []; for (let k = 0; k <= 600; k++) { const q = 2 * k / 600; pts.push([xOf(q), y0 - h * f(q % 1)]); }
+          pline(c, pts, col, 2);
+          txt(c, lab, X0 - 8, y0 - h * 0.5, col, 10, 700, 'right');
+        };
+        tr0(190, 22, q => q < 0.5 ? 1 : -1, C.text, 'input V');
+        tr0(272, 32, q => pnI(q, fr), PN.col, 'pn I');
+        if (showS) tr0(352, 32, q => skI(q, frS), SK.col, 'Schottky I');
+        const cx = xOf(p + (ph % (2 * P) >= P ? 1 : 0));
+        line(c, cx, 162, cx, 392, 'rgba(255,255,255,.35)', 1);
+        if (s >= 1) {
+          const x = xOf(0.5), w = xOf(0.5 + fr) - x;
+          rect(c, x, 238, w, 70, 'rgba(239,83,80,.15)');
+          subs(c, [['t', 'rr']], x + w / 2, 318, C.bad, 11, 'center');
+          if (s === 1) txt(c, 'reverse recovery current', x + w + 8, 300, C.bad, 11, 700, 'left');
+        }
+        if (s === 4) {
+          txt(c, 'f = ' + fHz(slF), X1, 228, C.text, 11, 700, 'right', MONO);
+          txt(c, 'pn recovery ≈ ' + Math.min(100, 200 * TRR * slF).toFixed(1) + ' % of each cycle', X1, 392, PN.col, 11, 700, 'right', MONO);
+          txt(c, 'Schottky ≈ ' + (200 * TSK * slF).toFixed(3) + ' %', X0, 392, SK.col, 11, 700, 'left', MONO);
+        }
+      }
+    };
+    S = new Story('st1', o);
+  })();
+
+  /* =====================================================================
+     SCENE 2: I-V comparison, power loss, leakage and breakdown
+     ===================================================================== */
+  (function () {
+    const cv = new Cv('cv2', 720, 400);
+    const PL = 70, PR = 400, PT = 40, PB = 340, VMX = 1, IMX = 3;
+    const gx = v => PL + v / VMX * (PR - PL), gy = i => PB - i / IMX * (PB - PT);
+    let S = null, slI = 2;
+    const iS = $('s2i'), iO = $('o2i');
+    function syncS() { slI = +iS.value; iO.textContent = slI.toFixed(1) + ' A'; if (S) S.dirty = true; }
+    iS.addEventListener('input', syncS); syncS();
+    function axes(c) {
+      for (let i = 1; i <= 3; i++) { line(c, PL, gy(i), PR, gy(i), C.grid, 1); txt(c, i + ' A', PL - 8, gy(i), C.muted, 10, 600, 'right'); }
+      for (let v = 0.2; v <= 1.01; v += 0.2) { line(c, gx(v), PT, gx(v), PB, C.grid, 1); txt(c, v.toFixed(1), gx(v), PB + 13, C.muted, 10, 600, 'center'); }
+      line(c, PL, PB, PR, PB, C.axis, 1.5); line(c, PL, PT, PL, PB, C.axis, 1.5);
+      txt(c, 'forward V (volts)', PR, PB + 30, C.muted, 11, 600, 'right');
+    }
+    function curve(c, d, r) {
+      const pts = [], vEnd = VMX * (r == null ? 1 : r);
+      for (let v = 0; v <= vEnd; v += 0.001) { const i = iOfV(d, v); if (i > IMX * 1.05) break; pts.push([gx(v), gy(i)]); }
+      pline(c, pts, d.col, 2.8);
+    }
+    function lossBars(c, I) {
+      const X = 450, W = 240, pv = vOfI(PN, I), sv = vOfI(SK, I), pp = pv * I, sp = sv * I, sc = W / 2.4;
+      txt(c, 'Power lost in the diode at ' + I.toFixed(1) + ' A', X, 60, C.text, 13, 700, 'left');
+      txt(c, 'P = VF × I', X, 84, C.field, 12, 700, 'left', MONO);
+      [[PN, pv, pp, 110], [SK, sv, sp, 170]].forEach(r => {
+        txt(c, r[0].name + ': VF = ' + r[1].toFixed(2) + ' V', X, r[3], r[0].col, 12, 700, 'left');
+        rect(c, X, r[3] + 14, r[2] * sc, 18, r[0].col);
+        txt(c, r[2].toFixed(2) + ' W', X + r[2] * sc + 6, r[3] + 23, r[0].col, 12, 700, 'left', MONO);
+      });
+      txt(c, 'Schottky saves ' + Math.round(100 * (1 - sp / pp)) + ' % of the loss', X, 236, C.ok, 13, 700, 'left');
+      return [pv, sv];
+    }
+    const o = {
+      cv,
+      steps: [
+        { dur: 8, cap: 'A silicon pn diode barely conducts until about <strong>0.6–0.7 V</strong>, then the current shoots up.' },
+        { dur: 9, cap: 'The Schottky curve is the same shape shifted left. Its barrier is lower and its saturation current far larger, so it conducts at only about <strong>0.2–0.4 V</strong>.' },
+        { dur: 10, cap: 'A lower forward voltage means less heat. The power lost in a diode is <strong>P = V<sub>F</sub> × I</strong>, so at the same current a Schottky wastes about half as much. That matters in power supplies carrying amps.' },
+        { dur: 10, cap: 'The price comes in reverse. The <strong>leakage current is much larger</strong> (µA to mA instead of nA), and it rises steeply with temperature. The <strong>breakdown voltage is lower</strong>, typically 20–100 V, against hundreds or thousands of volts for pn rectifiers.' },
+        { dur: 10, cap: 'In short: a Schottky diode is <strong>faster</strong> and has a <strong>lower forward drop</strong>, but it <strong>leaks more</strong> and <strong>cannot block high voltages</strong>. It suits low-voltage, high-current, high-frequency work.' },
+        { dur: 0, cap: '<strong>Try it:</strong> set the current and compare each diode’s forward voltage and the power it wastes as heat.' }
+      ],
+      step() {},
+      draw(c, s, tr, st) {
+        const ts = st.ts;
+        if (s === 4) {
+          c.globalAlpha = tr;
+          const rows = [['', 'Silicon pn', 'Schottky'], ['carriers', 'minority + majority', 'majority only'], ['forward drop', '0.6 – 0.7 V', '0.2 – 0.4 V'],
+                        ['switching', 'slow (trr: ns – µs)', 'very fast (ps)'], ['reverse leakage', 'small (nA)', 'larger (µA – mA)'], ['breakdown', 'high (up to kV)', 'low (20 – 100 V)'],
+                        ['junction', 'p–n', 'metal–n semiconductor']];
+          rows.forEach((r, k) => {
+            const y = 50 + k * 44, h = k === 0;
+            if (k > 0) line(c, 60, y - 22, 660, y - 22, C.grid, 1);
+            txt(c, r[0], 70, y, C.muted, 12, 700, 'left');
+            txt(c, r[1], 340, y, h ? PN.col : C.text, h ? 14 : 12, 700, 'center');
+            txt(c, r[2], 560, y, h ? SK.col : C.text, h ? 14 : 12, 700, 'center');
+          });
+          c.globalAlpha = 1; return;
+        }
+        axes(c);
+        if (s === 0) { curve(c, PN, clamp(ts / 2.5, 0, 1)); txt(c, 'Silicon pn', gx(0.74) + 6, gy(1.2), PN.col, 12, 700, 'left'); return; }
+        if (s === 1) {
+          curve(c, PN); txt(c, 'Silicon pn', gx(0.74) + 6, gy(1.2), PN.col, 12, 700, 'left');
+          curve(c, SK, clamp(ts / 2.5, 0, 1));
+          if (ts > 2.5) {
+            txt(c, 'Schottky', gx(0.4) - 6, gy(1.6), SK.col, 12, 700, 'right');
+            const pv = vOfI(PN, 1), sv = vOfI(SK, 1);
+            line(c, gx(sv), gy(1), gx(pv), gy(1), C.field, 1.4, [4, 3]);
+            circ(c, gx(sv), gy(1), 5, SK.col); circ(c, gx(pv), gy(1), 5, PN.col);
+            txt(c, 'at 1 A: ' + sv.toFixed(2) + ' V vs ' + pv.toFixed(2) + ' V', 450, 80, C.text, 13, 700, 'left');
+          }
+          return;
+        }
+        curve(c, PN); curve(c, SK);
+        if (s === 2 || s === 5) {
+          const I = s === 2 ? 0.2 + 2.8 * ease(clamp((ts - 0.5) / 5, 0, 1)) : slI;
+          const v = lossBars(c, I);
+          circ(c, gx(v[0]), gy(I), 6, '#fff', PN.col, 2.5); circ(c, gx(v[1]), gy(I), 6, '#fff', SK.col, 2.5);
+          line(c, PL, gy(I), gx(v[0]), gy(I), C.muted, 1, [3, 3]);
+          return;
+        }
+        /* reverse characteristics on log bars */
+        const X = 450;
+        txt(c, 'Reverse behaviour (typical)', X, 50, C.text, 13, 700, 'left');
+        txt(c, 'leakage current at 20 V', X, 84, C.muted, 11, 600, 'left');
+        const lg = (val, lo, hi, w) => w * (Math.log10(val) - lo) / (hi - lo);
+        const a = clamp((ts - 0.3) / 1.5, 0, 1);
+        [[PN, 1e-9, '≈ 1 nA', 104], [SK, 50e-6, '≈ 50 µA', 136]].forEach(r => {
+          rect(c, X, r[3], lg(r[1], -10, -3, 230) * a, 20, r[0].col); txt(c, r[2], X + lg(r[1], -10, -3, 230) * a + 6, r[3] + 10, r[0].col, 11, 700, 'left', MONO);
+        });
+        txt(c, '(log scale: each step = 10×)', X, 172, C.muted, 10, 600, 'left');
+        const b = clamp((ts - 2.5) / 1.5, 0, 1);
+        txt(c, 'breakdown voltage', X, 210, C.muted, 11, 600, 'left');
+        [[PN, 1000, '≈ 1000 V', 230], [SK, 60, '≈ 60 V', 262]].forEach(r => {
+          rect(c, X, r[3], lg(r[1], 0, 3.2, 230) * b, 20, r[0].col); txt(c, r[2], X + lg(r[1], 0, 3.2, 230) * b + 6, r[3] + 10, r[0].col, 11, 700, 'left', MONO);
+        });
+        txt(c, 'Schottky: leaks more, breaks down sooner', X, 310, C.bad, 12, 700, 'left');
+      }
+    };
+    S = new Story('st2', o);
+  })();
+
+  /* ---------- sticky mini-nav highlight ---------- */
+  (function () {
+    const links = Array.from(document.querySelectorAll('.toc a'));
+    const secs = links.map(l => document.querySelector(l.getAttribute('href')));
+    function upd() {
+      let cur = 0;
+      secs.forEach((s, i) => { if (s.getBoundingClientRect().top < 120) cur = i; });
+      links.forEach((l, i) => l.classList.toggle('active', i === cur));
+    }
+    window.addEventListener('scroll', upd, { passive: true }); upd();
+  })();
+
+  let last = performance.now();
+  function frameLoop(ts) {
+    const dt = Math.min(0.05, Math.max(0, (ts - last) / 1000)); last = ts;
+    stories.forEach(st => {
+      if (!st.visible) return;
+      if (st.playing) { st.tick(dt); st.draw(); }
+      else if (st.dirty) st.draw();
+      st.dirty = false;
+    });
+    requestAnimationFrame(frameLoop);
+  }
+  function onResize() { stories.forEach(st => { st.dirty = true; }); }
+  window.addEventListener('resize', onResize);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(onResize);
+  requestAnimationFrame(frameLoop);
+})();
+</script>
+</body>
+</html>
